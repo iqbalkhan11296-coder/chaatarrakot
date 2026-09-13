@@ -1,18 +1,28 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>Cafe Billing</title>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase.js?v=2"></script>
 
+
     <style>
+
         * {
             box-sizing: border-box;
         }
+
 
         body {
             margin: 0;
@@ -21,6 +31,7 @@
             color: #222;
         }
 
+
         header {
             background: #222;
             color: white;
@@ -28,9 +39,11 @@
             text-align: center;
         }
 
+
         header h1 {
             margin: 0;
         }
+
 
         .container {
             max-width: 900px;
@@ -38,12 +51,14 @@
             padding: 20px;
         }
 
+
         .order-info {
             background: white;
             padding: 20px;
             border-radius: 12px;
             margin-bottom: 20px;
         }
+
 
         .order-info input {
             width: 100%;
@@ -54,12 +69,14 @@
             font-size: 16px;
         }
 
+
         .section {
             background: white;
             margin-bottom: 18px;
             border-radius: 12px;
             overflow: hidden;
         }
+
 
         .section h2 {
             margin: 0;
@@ -68,6 +85,7 @@
             color: white;
             font-size: 20px;
         }
+
 
         .item {
             display: flex;
@@ -78,29 +96,35 @@
             gap: 10px;
         }
 
+
         .item:last-child {
             border-bottom: none;
         }
 
+
         .item-name {
             flex: 1;
         }
+
 
         .item-name strong {
             display: block;
             font-size: 17px;
         }
 
+
         .price {
             color: #666;
             margin-top: 4px;
         }
+
 
         .quantity {
             display: flex;
             align-items: center;
             gap: 8px;
         }
+
 
         .quantity button {
             width: 36px;
@@ -113,11 +137,13 @@
             cursor: pointer;
         }
 
+
         .quantity span {
             min-width: 25px;
             text-align: center;
             font-size: 17px;
         }
+
 
         .bottom {
             position: sticky;
@@ -128,6 +154,7 @@
             box-shadow: 0 -3px 15px rgba(0,0,0,0.15);
         }
 
+
         .total {
             display: flex;
             justify-content: space-between;
@@ -135,6 +162,7 @@
             font-weight: bold;
             margin-bottom: 15px;
         }
+
 
         #placeOrder {
             width: 100%;
@@ -148,15 +176,33 @@
             cursor: pointer;
         }
 
+
         #placeOrder:disabled {
             background: #999;
         }
+
+
+        #printBill {
+            width: 100%;
+            padding: 16px;
+            margin-top: 10px;
+            background: #222;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 19px;
+            font-weight: bold;
+            cursor: pointer;
+            display: none;
+        }
+
 
         #message {
             text-align: center;
             margin-top: 15px;
             font-weight: bold;
         }
+
 
         @media (max-width: 600px) {
 
@@ -169,17 +215,31 @@
             }
 
         }
+
     </style>
+
 </head>
+
 
 <body>
 
+
 <header>
+
     <h1>CAFE BILLING</h1>
+
     <p>Main Billing Counter</p>
+
 </header>
 
+
+
 <div class="container">
+
+
+    <!-- =========================
+         TABLE
+    ========================== -->
 
     <div class="order-info">
 
@@ -196,6 +256,7 @@
     </div>
 
 
+
     <!-- =========================
          CHAATS
     ========================== -->
@@ -203,6 +264,7 @@
     <div class="section">
 
         <h2>🥗 CHAATS</h2>
+
 
         <div class="item">
 
@@ -270,6 +332,7 @@
     </div>
 
 
+
     <!-- =========================
          DRINKS
     ========================== -->
@@ -277,6 +340,7 @@
     <div class="section">
 
         <h2>🥤 DRINKS</h2>
+
 
         <div class="item">
 
@@ -344,6 +408,7 @@
     </div>
 
 
+
     <!-- =========================
          BURGERS
     ========================== -->
@@ -351,6 +416,7 @@
     <div class="section">
 
         <h2>🍔 BURGERS</h2>
+
 
         <div class="item">
 
@@ -418,6 +484,7 @@
     </div>
 
 
+
     <!-- =========================
          TOTAL
     ========================== -->
@@ -425,351 +492,853 @@
     <div class="bottom">
 
         <div class="total">
+
             <span>Total</span>
-            <span id="total">₹0</span>
+
+            <span id="total">
+                ₹0
+            </span>
+
         </div>
 
-        <button id="placeOrder" onclick="placeOrder()">
+
+        <button
+            id="placeOrder"
+            onclick="placeOrder()"
+        >
             PLACE ORDER
         </button>
+
+
+        <button
+            id="printBill"
+            onclick="printBill()"
+        >
+            🖨️ PRINT BILL
+        </button>
+
 
         <div id="message"></div>
 
     </div>
 
+
 </div>
+
 
 
 <script>
 
-    const menu = {
 
-        "Pani Puri": {
-            price: 50,
-            counter: "chaats"
-        },
+/* =========================================
+   MENU
+========================================= */
 
-        "Masala Puri": {
-            price: 60,
-            counter: "chaats"
-        },
+const menu = {
 
-        "Samosa Chaat": {
-            price: 80,
-            counter: "chaats"
-        },
+    "Pani Puri": {
+        price: 50,
+        counter: "chaats"
+    },
 
-        "Dahi Puri": {
-            price: 80,
-            counter: "chaats"
-        },
+    "Masala Puri": {
+        price: 60,
+        counter: "chaats"
+    },
 
-        "Mango Shake": {
-            price: 90,
-            counter: "drinks"
-        },
+    "Samosa Chaat": {
+        price: 80,
+        counter: "chaats"
+    },
 
-        "Oreo Shake": {
-            price: 80,
-            counter: "drinks"
-        },
+    "Dahi Puri": {
+        price: 80,
+        counter: "chaats"
+    },
 
-        "Strawberry Shake": {
-            price: 90,
-            counter: "drinks"
-        },
 
-        "Mint Lime": {
-            price: 35,
-            counter: "drinks"
-        },
+    "Mango Shake": {
+        price: 90,
+        counter: "drinks"
+    },
 
-        "Classic Burger": {
-            price: 120,
-            counter: "burgers"
-        },
+    "Oreo Shake": {
+        price: 80,
+        counter: "drinks"
+    },
 
-        "Chicken Burger": {
-            price: 150,
-            counter: "burgers"
-        },
+    "Strawberry Shake": {
+        price: 90,
+        counter: "drinks"
+    },
 
-        "Cheese Burger": {
-            price: 140,
-            counter: "burgers"
-        },
+    "Mint Lime": {
+        price: 35,
+        counter: "drinks"
+    },
 
-        "Double Burger": {
-            price: 180,
-            counter: "burgers"
+
+    "Classic Burger": {
+        price: 120,
+        counter: "burgers"
+    },
+
+    "Chicken Burger": {
+        price: 150,
+        counter: "burgers"
+    },
+
+    "Cheese Burger": {
+        price: 140,
+        counter: "burgers"
+    },
+
+    "Double Burger": {
+        price: 180,
+        counter: "burgers"
+    }
+
+};
+
+
+/* =========================================
+   QUANTITIES
+========================================= */
+
+const quantities = {};
+
+
+/* =========================================
+   LAST PRINTABLE ORDER
+========================================= */
+
+let lastOrder = null;
+
+
+/* =========================================
+   GET ELEMENT ID
+========================================= */
+
+function getId(name) {
+
+    return "qty-" + name.replaceAll(" ", "-");
+
+}
+
+
+/* =========================================
+   CHANGE QUANTITY
+========================================= */
+
+function changeQty(name, change) {
+
+    if (!quantities[name]) {
+        quantities[name] = 0;
+    }
+
+
+    quantities[name] += change;
+
+
+    if (quantities[name] < 0) {
+        quantities[name] = 0;
+    }
+
+
+    document.getElementById(
+        getId(name)
+    ).innerText = quantities[name];
+
+
+    calculateTotal();
+
+}
+
+
+/* =========================================
+   CALCULATE TOTAL
+========================================= */
+
+function calculateTotal() {
+
+    let total = 0;
+
+
+    for (const item in quantities) {
+
+        if (quantities[item] > 0) {
+
+            total +=
+                quantities[item] *
+                menu[item].price;
+
         }
-
-    };
-
-
-    const quantities = {};
-
-
-    function getId(name) {
-
-        return "qty-" + name.replaceAll(" ", "-");
 
     }
 
 
-    function changeQty(name, change) {
+    document.getElementById(
+        "total"
+    ).innerText = "₹" + total;
 
-        if (!quantities[name]) {
-            quantities[name] = 0;
-        }
 
-        quantities[name] += change;
+    return total;
 
-        if (quantities[name] < 0) {
-            quantities[name] = 0;
-        }
+}
 
-        document.getElementById(getId(name)).innerText =
-            quantities[name];
 
-        calculateTotal();
+/* =========================================
+   PLACE ORDER
+========================================= */
+
+async function placeOrder() {
+
+    const tableNumber =
+        document.getElementById(
+            "tableNumber"
+        ).value.trim();
+
+
+    const message =
+        document.getElementById(
+            "message"
+        );
+
+
+    const button =
+        document.getElementById(
+            "placeOrder"
+        );
+
+
+    const printButton =
+        document.getElementById(
+            "printBill"
+        );
+
+
+    if (!tableNumber) {
+
+        message.innerText =
+            "Please enter table number.";
+
+        return;
 
     }
 
 
-    function calculateTotal() {
+    /* =====================================
+       COLLECT ITEMS
+    ===================================== */
 
-        let total = 0;
+    const selectedItems = [];
 
-        for (const item in quantities) {
 
-            if (quantities[item] > 0) {
+    for (const item in quantities) {
 
-                total +=
-                    quantities[item] *
-                    menu[item].price;
+        if (quantities[item] > 0) {
 
-            }
+            selectedItems.push({
 
-        }
+                name: item,
 
-        document.getElementById("total").innerText =
-            "₹" + total;
+                price: menu[item].price,
 
-        return total;
+                quantity: quantities[item],
 
-    }
-
-
-    async function placeOrder() {
-
-        const tableNumber =
-            document.getElementById("tableNumber").value.trim();
-
-        const message =
-            document.getElementById("message");
-
-        const button =
-            document.getElementById("placeOrder");
-
-
-        if (!tableNumber) {
-
-            message.innerText =
-                "Please enter table number.";
-
-            return;
-
-        }
-
-
-        const selectedItems = [];
-
-        for (const item in quantities) {
-
-            if (quantities[item] > 0) {
-
-                selectedItems.push({
-
-                    name: item,
-
-                    price: menu[item].price,
-
-                    quantity: quantities[item],
-
-                    counter: menu[item].counter
-
-                });
-
-            }
-
-        }
-
-
-        if (selectedItems.length === 0) {
-
-            message.innerText =
-                "Please select at least one item.";
-
-            return;
-
-        }
-
-
-        const total = calculateTotal();
-
-
-        button.disabled = true;
-
-        button.innerText = "PLACING ORDER...";
-
-        message.innerText = "";
-
-
-        try {
-
-            /* =========================
-               CREATE MAIN ORDER
-            ========================== */
-
-            const { data: order, error: orderError } =
-                await supabaseClient
-                    .from("orders")
-                    .insert({
-
-                        table_number: tableNumber,
-
-                        items: selectedItems,
-
-                        total: total,
-
-                        status: "Pending"
-
-                    })
-                    .select()
-                    .single();
-
-
-            if (orderError) {
-
-                throw orderError;
-
-            }
-
-
-            /* =========================
-               SPLIT ITEMS BY COUNTER
-            ========================== */
-
-            const counters = {
-
-                chaats: [],
-
-                drinks: [],
-
-                burgers: []
-
-            };
-
-
-            selectedItems.forEach(item => {
-
-                counters[item.counter].push(item);
+                counter: menu[item].counter
 
             });
 
+        }
 
-            /* =========================
-               CREATE COUNTER KOTS
-            ========================== */
-
-            const kots = [];
+    }
 
 
-            for (const counter in counters) {
+    if (selectedItems.length === 0) {
 
-                if (counters[counter].length === 0) {
-                    continue;
-                }
+        message.innerText =
+            "Please select at least one item.";
 
+        return;
 
-                kots.push({
-
-                    order_id: order.id,
-
-                    counter: counter,
-
-                    items: counters[counter],
-
-                    status: "Pending"
-
-                });
-
-            }
+    }
 
 
-            if (kots.length > 0) {
-
-                const { error: kotError } =
-                    await supabaseClient
-                        .from("counter_kot")
-                        .insert(kots);
+    const total =
+        calculateTotal();
 
 
-                if (kotError) {
+    button.disabled = true;
 
-                    throw kotError;
+    button.innerText =
+        "PLACING ORDER...";
 
-                }
+    message.innerText = "";
 
-            }
-
-
-            /* =========================
-               SUCCESS
-            ========================== */
-
-            message.innerText =
-                "✅ Order #" +
-                order.order_number +
-                " sent to counters!";
+    printButton.style.display =
+        "none";
 
 
-            /* Reset */
-
-            for (const item in quantities) {
-
-                quantities[item] = 0;
-
-                document.getElementById(
-                    getId(item)
-                ).innerText = "0";
-
-            }
+    try {
 
 
-            document.getElementById("tableNumber").value = "";
+        /* =========================
+           CREATE MAIN ORDER
+        ========================== */
 
-            calculateTotal();
+        const {
+            data: order,
+            error: orderError
+        } = await supabaseClient
+
+            .from("orders")
+
+            .insert({
+
+                table_number:
+                    tableNumber,
+
+                items:
+                    selectedItems,
+
+                total:
+                    total,
+
+                status:
+                    "Pending"
+
+            })
+
+            .select()
+
+            .single();
 
 
-        } catch (error) {
+        if (orderError) {
 
-            console.error(error);
-
-            message.innerText =
-                "❌ Error: " + error.message;
+            throw orderError;
 
         }
 
 
-        button.disabled = false;
+        /* =========================
+           SPLIT ITEMS BY COUNTER
+        ========================== */
 
-        button.innerText = "PLACE ORDER";
+        const counters = {
+
+            chaats: [],
+
+            drinks: [],
+
+            burgers: []
+
+        };
+
+
+        selectedItems.forEach(item => {
+
+            counters[
+                item.counter
+            ].push(item);
+
+        });
+
+
+        /* =========================
+           CREATE COUNTER KOTS
+        ========================== */
+
+        const kots = [];
+
+
+        for (
+            const counter in counters
+        ) {
+
+            if (
+                counters[counter].length === 0
+            ) {
+
+                continue;
+
+            }
+
+
+            kots.push({
+
+                order_id:
+                    order.id,
+
+                counter:
+                    counter,
+
+                items:
+                    counters[counter],
+
+                status:
+                    "Pending"
+
+            });
+
+        }
+
+
+        if (kots.length > 0) {
+
+            const {
+                error: kotError
+            } = await supabaseClient
+
+                .from("counter_kot")
+
+                .insert(kots);
+
+
+            if (kotError) {
+
+                throw kotError;
+
+            }
+
+        }
+
+
+        /* =========================
+           SAVE LAST ORDER
+        ========================== */
+
+        lastOrder = {
+
+            orderNumber:
+                order.order_number,
+
+            tableNumber:
+                tableNumber,
+
+            items:
+                selectedItems,
+
+            total:
+                total,
+
+            createdAt:
+                new Date()
+
+        };
+
+
+        /* =========================
+           SUCCESS
+        ========================== */
+
+        message.innerText =
+            "✅ Order #" +
+            order.order_number +
+            " sent to counters!";
+
+
+        /* =========================
+           SHOW PRINT BUTTON
+        ========================== */
+
+        printButton.style.display =
+            "block";
+
+
+        /* =========================
+           RESET QUANTITIES
+        ========================== */
+
+        for (
+            const item in quantities
+        ) {
+
+            quantities[item] = 0;
+
+
+            document.getElementById(
+                getId(item)
+            ).innerText = "0";
+
+        }
+
+
+        document.getElementById(
+            "tableNumber"
+        ).value = "";
+
+
+        calculateTotal();
+
 
     }
 
-</script>
+    catch (error) {
+
+        console.error(error);
+
+
+        message.innerText =
+            "❌ Error: " +
+            error.message;
+
+    }
+
+
+    button.disabled = false;
+
+    button.innerText =
+        "PLACE ORDER";
+
+}
+
+
+/* =========================================
+   PRINT BILL
+========================================= */
+
+function printBill() {
+
+    if (!lastOrder) {
+
+        alert(
+            "No order available to print."
+        );
+
+        return;
+
+    }
+
+
+    const order =
+        lastOrder;
+
+
+    const date =
+        order.createdAt
+        .toLocaleDateString("en-IN");
+
+
+    const time =
+        order.createdAt
+        .toLocaleTimeString("en-IN", {
+            hour: "2-digit",
+            minute: "2-digit"
+        });
+
+
+    let itemsHTML = "";
+
+
+    order.items.forEach(item => {
+
+        const itemTotal =
+            item.price *
+            item.quantity;
+
+
+        itemsHTML += `
+
+            <tr>
+
+                <td>
+                    ${item.name}
+                </td>
+
+                <td class="qty">
+                    ${item.quantity}
+                </td>
+
+                <td class="price">
+                    ₹${item.price}
+                </td>
+
+                <td class="price">
+                    ₹${itemTotal}
+                </td>
+
+            </tr>
+
+        `;
+
+    });
+
+
+    const receipt = `
+
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>
+    Order #${order.orderNumber}
+</title>
+
+
+<style>
+
+    body {
+        font-family: Arial, sans-serif;
+        width: 80mm;
+        margin: 0 auto;
+        padding: 10px;
+        color: #000;
+    }
+
+
+    .center {
+        text-align: center;
+    }
+
+
+    h1 {
+        font-size: 22px;
+        margin: 0 0 4px 0;
+    }
+
+
+    .subtitle {
+        font-size: 12px;
+        margin-bottom: 10px;
+    }
+
+
+    .line {
+        border-top: 1px dashed #000;
+        margin: 8px 0;
+    }
+
+
+    .info {
+        font-size: 13px;
+        line-height: 1.6;
+    }
+
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 12px;
+    }
+
+
+    th {
+        border-bottom: 1px solid #000;
+        padding: 5px 2px;
+        text-align: left;
+    }
+
+
+    td {
+        padding: 5px 2px;
+        vertical-align: top;
+    }
+
+
+    .qty {
+        text-align: center;
+        width: 25px;
+    }
+
+
+    .price {
+        text-align: right;
+        white-space: nowrap;
+    }
+
+
+    .total {
+        font-size: 17px;
+        font-weight: bold;
+    }
+
+
+    .thanks {
+        margin-top: 15px;
+        font-size: 12px;
+    }
+
+
+    @media print {
+
+        body {
+            width: 80mm;
+        }
+
+    }
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="center">
+
+    <h1>CAFE</h1>
+
+    <div class="subtitle">
+        Main Billing Counter
+    </div>
+
+</div>
+
+
+<div class="line"></div>
+
+
+<div class="info">
+
+    <strong>
+        Order #${order.orderNumber}
+    </strong>
+
+    <br>
+
+    Table:
+    ${order.tableNumber}
+
+    <br>
+
+    Date:
+    ${date}
+
+    <br>
+
+    Time:
+    ${time}
+
+</div>
+
+
+<div class="line"></div>
+
+
+<table>
+
+    <thead>
+
+        <tr>
+
+            <th>
+                Item
+            </th>
+
+            <th class="qty">
+                Qty
+            </th>
+
+            <th class="price">
+                Rate
+            </th>
+
+            <th class="price">
+                Total
+            </th>
+
+        </tr>
+
+    </thead>
+
+
+    <tbody>
+
+        ${itemsHTML}
+
+    </tbody>
+
+</table>
+
+
+<div class="line"></div>
+
+
+<table>
+
+    <tr>
+
+        <td class="total">
+            GRAND TOTAL
+        </td>
+
+        <td class="price total">
+            ₹${order.total}
+        </td>
+
+    </tr>
+
+</table>
+
+
+<div class="line"></div>
+
+
+<div class="center thanks">
+
+    Thank you!<br>
+
+    Please visit again.
+
+</div>
+
 
 </body>
+
 </html>
+
+`;
+
+
+    const printWindow =
+        window.open(
+            "",
+            "_blank",
+            "width=450,height=700"
+        );
+
+
+    if (!printWindow) {
+
+        alert(
+            "Please allow pop-ups to print the bill."
+        );
+
+        return;
+
+    }
+
+
+    printWindow.document.open();
+
+    printWindow.document.write(
+        receipt
+    );
+
+    printWindow.document.close();
+
+
+    printWindow.onload = function() {
+
+        printWindow.focus();
+
+        printWindow.print();
+
+    };
+
+}
+
+</script>
+
+
+</body>
+
+</html>
+```
