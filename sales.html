@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Sales Report</title>
+
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      color: #222;
+    }
+
+    header {
+      background: #4b001f;
+      color: white;
+      padding: 18px;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 26px;
+    }
+
+    header p {
+      margin: 5px 0 0;
+      opacity: 0.8;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: auto;
+      padding: 15px;
+    }
+
+    .controls {
+      background: white;
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: end;
+    }
+
+    .control {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .control label {
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    input {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 15px;
+    }
+
+    button {
+      padding: 10px 16px;
+      border: none;
+      border-radius: 6px;
+      background: #4b001f;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 15px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    }
+
+    .card h3 {
+      margin: 0;
+      font-size: 14px;
+      color: #777;
+    }
+
+    .card .value {
+      margin-top: 8px;
+      font-size: 25px;
+      font-weight: bold;
+      color: #4b001f;
+    }
+
+    .section {
+      background: white;
+      border-radius: 10px;
+      padding: 15px;
+      margin-bottom: 15px;
+      overflow-x: auto;
+    }
+
+    .section h2 {
+      margin-top: 0;
+      color: #4b001f;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 500px;
+    }
+
+    th {
+      background: #4b001f;
+      color: white;
+      padding: 11px;
+      text-align: left;
+    }
+
+    td {
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+    }
+
+    tr:hover {
+      background: #fafafa;
+    }
+
+    .right {
+      text-align: right;
+    }
+
+    .total-row {
+      font-weight: bold;
+      background: #f8f0f3;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 30px;
+      color: #666;
+    }
+
+    .error {
+      background: #ffe5e5;
+      color: #a00000;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      display: none;
+    }
+
+    .status {
+      font-weight: bold;
+    }
+
+    .status.completed {
+      color: green;
+    }
+
+    .status.pending {
+      color: orange;
+    }
+
+    .status.cancelled {
+      color: red;
+    }
+
+    @media (max-width: 700px) {
+      .summary {
+        grid-template-columns: 1fr;
+      }
+
+      .controls {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .control {
+        width: 100%;
+      }
+
+      input,
+      button {
+        width: 100%;
+      }
+    }
+
+    @media print {
+      body {
+        background: white;
+      }
+
+      header {
+        background: white;
+        color: black;
+      }
+
+      .controls,
+      button {
+        display: none;
+      }
+
+      .section {
+        box-shadow: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>SALES REPORT</h1>
+  <p>Complete Item Sales</p>
+</header>
+
+<div class="container">
+
+  <div id="errorBox" class="error"></div>
+
+  <!-- FILTER -->
+  <div class="controls">
+
+    <div class="control">
+      <label>From</label>
+      <input type="date" id="fromDate">
+    </div>
+
+    <div class="control">
+      <label>To</label>
+      <input type="date" id="toDate">
+    </div>
+
+    <button onclick="loadSales()">Refresh Sales</button>
+
+    <button onclick="window.print()">Print Report</button>
+
+  </div>
+
+  <!-- SUMMARY -->
+  <div class="summary">
+
+    <div class="card">
+      <h3>TOTAL SALES</h3>
+      <div class="value" id="totalSales">₹0</div>
+    </div>
+
+    <div class="card">
+      <h3>TOTAL ITEMS SOLD</h3>
+      <div class="value" id="totalItems">0</div>
+    </div>
+
+    <div class="card">
+      <h3>TOTAL ORDERS</h3>
+      <div class="value" id="totalOrders">0</div>
+    </div>
+
+  </div>
+
+  <!-- ITEM SUMMARY -->
+  <div class="section">
+
+    <h2>Items Sold</h2>
+
+    <div id="itemLoading" class="loading">
+      Loading sales...
+    </div>
+
+    <table id="itemTable" style="display:none;">
+
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th class="right">Qty</th>
+          <th class="right">Price</th>
+          <th class="right">Total</th>
+        </tr>
+      </thead>
+
+      <tbody id="itemBody"></tbody>
+
+    </table>
+
+  </div>
+
+  <!-- INDIVIDUAL ORDERS -->
+  <div class="section">
+
+    <h2>Order Details</h2>
+
+    <div id="orderLoading" class="loading">
+      Loading orders...
+    </div>
+
+    <table id="orderTable" style="display:none;">
+
+      <thead>
+        <tr>
+          <th>Order</th>
+          <th>Customer</th>
+          <th>Table</th>
+          <th>Items</th>
+          <th class="right">Total</th>
+          <th>Status</th>
+          <th>Date / Time</th>
+        </tr>
+      </thead>
+
+      <tbody id="orderBody"></tbody>
+
+    </table>
+
+  </div>
+
+</div>
+
+<script>
+
+  /*
+   =====================================================
+   SUPABASE CONNECTION
+   =====================================================
+
+   IMPORTANT:
+   Replace these two values with the SAME Supabase
+   URL and ANON/PUBLISHABLE KEY used in your other pages.
+  */
+
+  const SUPABASE_URL = "YOUR_SUPABASE_URL";
+
+  const SUPABASE_KEY = "YOUR_SUPABASE_ANON_OR_PUBLISHABLE_KEY";
+
+  const supabaseClient =
+    window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_KEY
+    );
+
+
+  /*
+   =====================================================
+   DATE HELPERS
+   =====================================================
+  */
+
+  function getToday() {
+
+    const now = new Date();
+
+    const year = now.getFullYear();
+
+    const month =
+      String(now.getMonth() + 1).padStart(2, "0");
+
+    const day =
+      String(now.getDate()).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
+  }
+
+
+  /*
+   =====================================================
+   SET DEFAULT DATES
+   =====================================================
+  */
+
+  document.getElementById("fromDate").value = getToday();
+
+  document.getElementById("toDate").value = getToday();
+
+
+  /*
+   =====================================================
+   LOAD SALES
+   =====================================================
+  */
+
+  async function loadSales() {
+
+    const errorBox =
+      document.getElementById("errorBox");
+
+    errorBox.style.display = "none";
+
+    document.getElementById("itemLoading").style.display =
+      "block";
+
+    document.getElementById("orderLoading").style.display =
+      "block";
+
+    document.getElementById("itemTable").style.display =
+      "none";
+
+    document.getElementById("orderTable").style.display =
+      "none";
+
+
+    const from =
+      document.getElementById("fromDate").value;
+
+    const to =
+      document.getElementById("toDate").value;
+
+
+    try {
+
+      /*
+       * Get all orders from Supabase.
+       */
+
+      const { data, error } =
+        await supabaseClient
+          .from("orders")
+          .select("*")
+          .order("created_at", {
+            ascending: false
+          });
+
+
+      if (error) {
+        throw error;
+      }
+
+
+      /*
+       * Filter orders by selected dates.
+       */
+
+      let orders = data || [];
+
+
+      if (from) {
+
+        orders = orders.filter(order => {
+
+          const orderDate =
+            new Date(order.created_at)
+              .toLocaleDateString(
+                "en-CA",
+                {
+                  timeZone: "Asia/Kolkata"
+                }
+              );
+
+          return orderDate >= from;
+
+        });
+
+      }
+
+
+      if (to) {
+
+        orders = orders.filter(order => {
+
+          const orderDate =
+            new Date(order.created_at)
+              .toLocaleDateString(
+                "en-CA",
+                {
+                  timeZone: "Asia/Kolkata"
+                }
+              );
+
+          return orderDate <= to;
+
+        });
+
+      }
+
+
+      /*
+       * ITEM SUMMARY
+       */
+
+      const itemSummary = {};
+
+      let totalSales = 0;
+
+      let totalItems = 0;
+
+
+      orders.forEach(order => {
+
+        let items = order.items;
+
+
+        /*
+         * Supabase JSONB sometimes arrives as an object,
+         * sometimes as a string.
+         */
+
+        if (typeof items === "string") {
+
+          try {
+            items = JSON.parse(items);
+          } catch (e) {
+            items = [];
+          }
+
+        }
+
+
+        if (!items) {
+          return;
+        }
+
+
+        /*
+         * Handle normal array:
+         *
+         * [
+         *   {
+         *      name: "Pani Puri",
+         *      price: 50,
+         *      quantity: 2
+         *   }
+         * ]
+         */
+
+        if (Array.isArray(items)) {
+
+          items.forEach(item => {
+
+            addItem(item);
+
+          });
+
+        }
+
+        /*
+         * Handle object/cart format.
+         */
+
+        else if (
+          typeof items === "object"
+        ) {
+
+          Object.values(items).forEach(item => {
+
+            if (
+              typeof item === "object"
+            ) {
+
+              addItem(item);
+
+            }
+
+          });
+
+        }
+
+
+        function addItem(item) {
+
+          const name =
+            item.name ||
+            item.title ||
+            item.item ||
+            "Unknown Item";
+
+
+          const price =
+            Number(
+              item.price ||
+              item.unit_price ||
+              0
+            );
+
+
+          const quantity =
+            Number(
+              item.quantity ||
+              item.qty ||
+              item.count ||
+              1
+            );
+
+
+          const itemTotal =
+            price * quantity;
+
+
+          if (!itemSummary[name]) {
+
+            itemSummary[name] = {
+
+              name: name,
+
+              quantity: 0,
+
+              price: price,
+
+              total: 0
+
+            };
+
+          }
+
+
+          itemSummary[name].quantity +=
+            quantity;
+
+
+          itemSummary[name].total +=
+            itemTotal;
+
+
+          totalItems += quantity;
+
+          totalSales += itemTotal;
+
+        }
+
+      });
+
+
+      /*
+       * DISPLAY SUMMARY
+       */
+
+      document.getElementById("totalSales")
+        .textContent =
+        "₹" + totalSales.toFixed(2);
+
+
+      document.getElementById("totalItems")
+        .textContent =
+        totalItems;
+
+
+      document.getElementById("totalOrders")
+        .textContent =
+        orders.length;
+
+
+      /*
+       * DISPLAY ITEM TABLE
+       */
+
+      const itemBody =
+        document.getElementById("itemBody");
+
+
+      itemBody.innerHTML = "";
+
+
+      const sortedItems =
+        Object.values(itemSummary)
+          .sort((a, b) =>
+            b.total - a.total
+          );
+
+
+      sortedItems.forEach(item => {
+
+        const row =
+          document.createElement("tr");
+
+
+        row.innerHTML = `
+
+          <td>
+            ${escapeHtml(item.name)}
+          </td>
+
+          <td class="right">
+            ${item.quantity}
+          </td>
+
+          <td class="right">
+            ₹${item.price.toFixed(2)}
+          </td>
+
+          <td class="right">
+            ₹${item.total.toFixed(2)}
+          </td>
+
+        `;
+
+
+        itemBody.appendChild(row);
+
+      });
+
+
+      /*
+       * TOTAL ROW
+       */
+
+      const totalRow =
+        document.createElement("tr");
+
+
+      totalRow.className =
+        "total-row";
+
+
+      totalRow.innerHTML = `
+
+        <td>TOTAL</td>
+
+        <td class="right">
+          ${totalItems}
+        </td>
+
+        <td></td>
+
+        <td class="right">
+          ₹${totalSales.toFixed(2)}
+        </td>
+
+      `;
+
+
+      itemBody.appendChild(totalRow);
+
+
+      document.getElementById("itemLoading")
+        .style.display = "none";
+
+
+      document.getElementById("itemTable")
+        .style.display = "table";
+
+
+      /*
+       * DISPLAY ORDER DETAILS
+       */
+
+      const orderBody =
+        document.getElementById("orderBody");
+
+
+      orderBody.innerHTML = "";
+
+
+      orders.forEach(order => {
+
+        let items = order.items;
+
+
+        if (typeof items === "string") {
+
+          try {
+            items = JSON.parse(items);
+          } catch (e) {
+            items = [];
+          }
+
+        }
+
+
+        let itemText = "";
+
+
+        if (Array.isArray(items)) {
+
+          itemText =
+            items.map(item => {
+
+              const name =
+                item.name ||
+                item.title ||
+                item.item ||
+                "Unknown";
+
+
+              const qty =
+                item.quantity ||
+                item.qty ||
+                1;
+
+
+              return `${name} × ${qty}`;
+
+            }).join("<br>");
+
+        }
+
+
+        const row =
+          document.createElement("tr");
+
+
+        const dateTime =
+          new Date(order.created_at)
+            .toLocaleString(
+              "en-IN",
+              {
+                timeZone: "Asia/Kolkata"
+              }
+            );
+
+
+        let status =
+          order.status || "Pending";
+
+
+        row.innerHTML = `
+
+          <td>
+            ${escapeHtml(
+              String(
+                order.id || "-"
+              )
+            )}
+          </td>
+
+          <td>
+            ${escapeHtml(
+              order.customer_name || "-"
+            )}
+          </td>
+
+          <td>
+            ${escapeHtml(
+              order.table_number || "-"
+            )}
+          </td>
+
+          <td>
+            ${itemText || "-"}
+          </td>
+
+          <td class="right">
+            ₹${Number(
+              order.total || 0
+            ).toFixed(2)}
+          </td>
+
+          <td class="status ${String(status).toLowerCase()}">
+            ${escapeHtml(status)}
+          </td>
+
+          <td>
+            ${dateTime}
+          </td>
+
+        `;
+
+
+        orderBody.appendChild(row);
+
+      });
+
+
+      document.getElementById("orderLoading")
+        .style.display = "none";
+
+
+      document.getElementById("orderTable")
+        .style.display = "table";
+
+
+    } catch (error) {
+
+      console.error(error);
+
+
+      errorBox.textContent =
+        "Error loading sales: " +
+        error.message;
+
+
+      errorBox.style.display = "block";
+
+
+      document.getElementById("itemLoading")
+        .style.display = "none";
+
+
+      document.getElementById("orderLoading")
+        .style.display = "none";
+
+    }
+
+  }
+
+
+  /*
+   =====================================================
+   HTML SECURITY
+   =====================================================
+  */
+
+  function escapeHtml(value) {
+
+    return String(value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+
+  }
+
+
+  /*
+   =====================================================
+   INITIAL LOAD
+   =====================================================
+  */
+
+  loadSales();
+
+</script>
+
+</body>
+</html>
