@@ -52,7 +52,7 @@ header p {
 
 
 /* ================================
-   MAIN
+   ORDERS
 ================================ */
 
 #orders {
@@ -123,13 +123,63 @@ header p {
 .counter {
     background: #181818;
     border-radius: 10px;
-    padding: 15px;
-    text-align: center;
+    padding: 16px;
+}
+
+
+/* ================================
+   COUNTER HEADER
+================================ */
+
+.counter-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+
+    padding-bottom: 12px;
+    margin-bottom: 10px;
+
+    border-bottom: 1px solid #333;
 }
 
 .counter-name {
     font-weight: bold;
-    margin-bottom: 10px;
+    font-size: 17px;
+}
+
+
+/* ================================
+   ITEMS
+================================ */
+
+.items {
+    min-height: 55px;
+}
+
+.item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 8px 0;
+
+    border-bottom: 1px solid #2d2d2d;
+}
+
+.item:last-child {
+    border-bottom: none;
+}
+
+.item-name {
+    font-size: 15px;
+}
+
+.quantity {
+    color: #ffd700;
+    font-weight: bold;
+    white-space: nowrap;
+    margin-left: 10px;
 }
 
 
@@ -139,10 +189,13 @@ header p {
 
 .status {
     display: inline-block;
-    padding: 8px 12px;
-    border-radius: 7px;
+    padding: 7px 10px;
+    border-radius: 6px;
+
+    font-size: 12px;
     font-weight: bold;
-    font-size: 14px;
+
+    white-space: nowrap;
 }
 
 .status-ready {
@@ -159,7 +212,7 @@ header p {
 
 .status-none {
     background: #333;
-    color: #888;
+    color: #777;
 }
 
 
@@ -169,6 +222,7 @@ header p {
 
 .overall {
     border-top: 1px solid #333;
+
     padding-top: 15px;
 
     display: flex;
@@ -187,6 +241,7 @@ header p {
 .overall-status {
     padding: 10px 16px;
     border-radius: 8px;
+
     font-weight: bold;
 }
 
@@ -203,10 +258,23 @@ header p {
    EMPTY
 ================================ */
 
+.no-items {
+    color: #777;
+    font-size: 14px;
+    padding: 8px 0;
+}
+
+
+/* ================================
+   PAGE EMPTY
+================================ */
+
 .empty {
     text-align: center;
     padding: 70px 20px;
+
     color: #888;
+
     font-size: 20px;
 }
 
@@ -216,12 +284,14 @@ header p {
 ================================ */
 
 #notification {
+
     position: fixed;
 
     top: 20px;
     right: 20px;
 
     background: #16803c;
+
     color: white;
 
     padding: 18px 24px;
@@ -229,9 +299,11 @@ header p {
     border-radius: 12px;
 
     font-size: 18px;
+
     font-weight: bold;
 
-    box-shadow: 0 5px 25px rgba(0,0,0,0.5);
+    box-shadow:
+        0 5px 25px rgba(0,0,0,0.5);
 
     display: none;
 
@@ -243,14 +315,14 @@ header p {
    MOBILE
 ================================ */
 
-@media (max-width: 700px) {
+@media (max-width: 750px) {
 
     .counter-grid {
         grid-template-columns: 1fr;
     }
 
-    .order-header {
-        align-items: flex-start;
+    .order {
+        padding: 15px;
     }
 
 }
@@ -273,7 +345,7 @@ header p {
 
 
 <div id="notification">
-    ORDER READY
+    🔔 ORDER READY
 </div>
 
 
@@ -290,10 +362,115 @@ header p {
 
 
 /* =========================================
-   PREVIOUS READY ORDERS
+   REMEMBER READY ORDERS
 ========================================= */
 
 let previouslyReady = new Set();
+
+
+/* =========================================
+   FORMAT COUNTER STATUS
+========================================= */
+
+function getStatusHTML(kot) {
+
+    if (!kot) {
+
+        return `
+            <span class="status status-none">
+                —
+            </span>
+        `;
+
+    }
+
+
+    if (kot.status === "Ready") {
+
+        return `
+            <span class="status status-ready">
+                READY
+            </span>
+        `;
+
+    }
+
+
+    if (kot.status === "Preparing") {
+
+        return `
+            <span class="status status-preparing">
+                PREPARING
+            </span>
+        `;
+
+    }
+
+
+    return `
+        <span class="status status-pending">
+            PENDING
+        </span>
+    `;
+
+}
+
+
+/* =========================================
+   DISPLAY ITEMS
+========================================= */
+
+function getItemsHTML(kot) {
+
+    if (!kot) {
+
+        return `
+            <div class="no-items">
+                No items
+            </div>
+        `;
+
+    }
+
+
+    if (!Array.isArray(kot.items) || kot.items.length === 0) {
+
+        return `
+            <div class="no-items">
+                No items
+            </div>
+        `;
+
+    }
+
+
+    let html = "";
+
+
+    kot.items.forEach(item => {
+
+        html += `
+
+            <div class="item">
+
+                <span class="item-name">
+                    ${item.name}
+                </span>
+
+                <span class="quantity">
+                    × ${item.quantity}
+                </span>
+
+            </div>
+
+        `;
+
+    });
+
+
+    return html;
+
+}
 
 
 /* =========================================
@@ -302,10 +479,16 @@ let previouslyReady = new Set();
 
 async function loadOrders() {
 
-    const container = document.getElementById("orders");
+    const container =
+        document.getElementById("orders");
 
 
-    const { data: orders, error } = await supabaseClient
+    /* =====================================
+       GET ORDERS
+    ===================================== */
+
+    const { data: orders, error } =
+        await supabaseClient
 
         .from("orders")
 
@@ -349,10 +532,11 @@ async function loadOrders() {
 
 
     /* =====================================
-       GET ALL COUNTER KOTS
+       GET COUNTER KOTS
     ===================================== */
 
-    const { data: kots, error: kotError } = await supabaseClient
+    const { data: kots, error: kotError } =
+        await supabaseClient
 
         .from("counter_kot")
 
@@ -360,6 +544,7 @@ async function loadOrders() {
             id,
             order_id,
             counter,
+            items,
             status,
             created_at,
             ready_at
@@ -372,7 +557,7 @@ async function loadOrders() {
 
         container.innerHTML = `
             <div class="empty">
-                Failed to load counter status
+                Failed to load counter orders
             </div>
         `;
 
@@ -384,93 +569,54 @@ async function loadOrders() {
 
 
     /* =====================================
-       CREATE ORDER CARDS
+       CREATE EACH ORDER
     ===================================== */
 
     orders.forEach(order => {
 
 
-        const orderKots = (kots || []).filter(
-            kot => kot.order_id === order.id
-        );
+        const orderKots =
+            (kots || []).filter(
+                kot => kot.order_id === order.id
+            );
 
 
-        const chaatKot = orderKots.find(
-            kot => kot.counter === "chaats"
-        );
-
-
-        const drinksKot = orderKots.find(
-            kot => kot.counter === "drinks"
-        );
-
-
-        const burgerKot = orderKots.find(
-            kot => kot.counter === "burgers"
-        );
-
-
-        /* =================================
-           OVERALL READINESS
+        /* ================================
+           FIND EACH COUNTER
         ================================= */
 
-        const requiredKots = orderKots;
+        const chaatKot =
+            orderKots.find(
+                kot => kot.counter === "chaats"
+            );
 
+
+        const drinksKot =
+            orderKots.find(
+                kot => kot.counter === "drinks"
+            );
+
+
+        const burgerKot =
+            orderKots.find(
+                kot => kot.counter === "burgers"
+            );
+
+
+        /* ================================
+           CHECK OVERALL READY
+        ================================= */
 
         const allReady =
-            requiredKots.length > 0 &&
-            requiredKots.every(
+            orderKots.length > 0 &&
+            orderKots.every(
                 kot => kot.status === "Ready"
             );
 
 
-        /* =================================
-           STATUS HTML
+        /* ================================
+           TIME
         ================================= */
-
-        function getStatusHTML(kot) {
-
-            if (!kot) {
-
-                return `
-                    <span class="status status-none">
-                        —
-                    </span>
-                `;
-
-            }
-
-
-            if (kot.status === "Ready") {
-
-                return `
-                    <span class="status status-ready">
-                        READY
-                    </span>
-                `;
-
-            }
-
-
-            if (kot.status === "Preparing") {
-
-                return `
-                    <span class="status status-preparing">
-                        PREPARING
-                    </span>
-                `;
-
-            }
-
-
-            return `
-                <span class="status status-pending">
-                    PENDING
-                </span>
-            `;
-
-        }
-
 
         const createdTime =
             new Date(order.created_at)
@@ -480,11 +626,13 @@ async function loadOrders() {
             });
 
 
-        /* =================================
-           ORDER CARD
+        /* ================================
+           CARD
         ================================= */
 
-        const card = document.createElement("div");
+        const card =
+            document.createElement("div");
+
 
         card.className =
             "order " +
@@ -492,6 +640,9 @@ async function loadOrders() {
 
 
         card.innerHTML = `
+
+
+            <!-- ORDER HEADER -->
 
             <div class="order-header">
 
@@ -515,38 +666,82 @@ async function loadOrders() {
             </div>
 
 
+
+            <!-- THREE COUNTERS -->
+
             <div class="counter-grid">
 
 
+                <!-- CHAATS -->
+
                 <div class="counter">
 
-                    <div class="counter-name">
-                        🥗 CHAATS
+                    <div class="counter-header">
+
+                        <div class="counter-name">
+                            🥗 CHAATS
+                        </div>
+
+                        ${getStatusHTML(chaatKot)}
+
                     </div>
 
-                    ${getStatusHTML(chaatKot)}
+
+                    <div class="items">
+
+                        ${getItemsHTML(chaatKot)}
+
+                    </div>
 
                 </div>
 
 
+
+                <!-- DRINKS -->
+
                 <div class="counter">
 
-                    <div class="counter-name">
-                        🥤 DRINKS
+                    <div class="counter-header">
+
+                        <div class="counter-name">
+                            🥤 DRINKS
+                        </div>
+
+                        ${getStatusHTML(drinksKot)}
+
                     </div>
 
-                    ${getStatusHTML(drinksKot)}
+
+                    <div class="items">
+
+                        ${getItemsHTML(drinksKot)}
+
+                    </div>
 
                 </div>
 
 
+
+                <!-- BURGERS -->
+
                 <div class="counter">
 
-                    <div class="counter-name">
-                        🍔 BURGERS
+                    <div class="counter-header">
+
+                        <div class="counter-name">
+                            🍔 BURGERS
+                        </div>
+
+                        ${getStatusHTML(burgerKot)}
+
                     </div>
 
-                    ${getStatusHTML(burgerKot)}
+
+                    <div class="items">
+
+                        ${getItemsHTML(burgerKot)}
+
+                    </div>
 
                 </div>
 
@@ -554,8 +749,10 @@ async function loadOrders() {
             </div>
 
 
-            <div class="overall">
 
+            <!-- OVERALL -->
+
+            <div class="overall">
 
                 <div class="overall-label">
                     Overall Status
@@ -582,7 +779,6 @@ async function loadOrders() {
                     `
                 }
 
-
             </div>
 
         `;
@@ -592,7 +788,7 @@ async function loadOrders() {
 
 
         /* =================================
-           READY NOTIFICATION
+           NOTIFY WHEN NEW ORDER IS READY
         ================================= */
 
         if (
@@ -606,54 +802,62 @@ async function loadOrders() {
 
         }
 
-
     });
 
 
     /* =====================================
-       UPDATE READY MEMORY
+       SAVE CURRENT READY ORDERS
     ===================================== */
 
-    previouslyReady = new Set(
+    previouslyReady =
+        new Set(
 
-        orders
-            .filter(order => {
+            orders
 
-                const orderKots =
-                    (kots || []).filter(
-                        kot => kot.order_id === order.id
+                .filter(order => {
+
+                    const orderKots =
+                        (kots || []).filter(
+                            kot =>
+                                kot.order_id === order.id
+                        );
+
+
+                    return (
+                        orderKots.length > 0 &&
+                        orderKots.every(
+                            kot =>
+                                kot.status === "Ready"
+                        )
                     );
 
-                return (
-                    orderKots.length > 0 &&
-                    orderKots.every(
-                        kot => kot.status === "Ready"
-                    )
-                );
+                })
 
-            })
-            .map(order => order.id)
+                .map(order => order.id)
 
-    );
+        );
 
 }
 
 
 /* =========================================
-   NOTIFICATION
+   READY NOTIFICATION
 ========================================= */
 
 function showReadyNotification(orderNumber) {
 
     const notification =
-        document.getElementById("notification");
+        document.getElementById(
+            "notification"
+        );
 
 
     notification.innerHTML =
         `🔔 ORDER #${orderNumber} READY`;
 
 
-    notification.style.display = "block";
+    notification.style.display =
+        "block";
 
 
     /* ================================
@@ -663,13 +867,20 @@ function showReadyNotification(orderNumber) {
     try {
 
         const audio =
-            new Audio("sounds/new-order.mp3");
+            new Audio(
+                "sounds/new-order.mp3"
+            );
+
 
         audio.play().catch(() => {});
 
-    } catch (error) {
+    }
 
-        console.log("Sound unavailable");
+    catch (error) {
+
+        console.log(
+            "Sound unavailable"
+        );
 
     }
 
@@ -686,7 +897,8 @@ function showReadyNotification(orderNumber) {
         new Notification(
             `Order #${orderNumber} Ready`,
             {
-                body: "All required counters have completed the order."
+                body:
+                    "All required counters have completed the order."
             }
         );
 
@@ -694,12 +906,13 @@ function showReadyNotification(orderNumber) {
 
 
     /* ================================
-       HIDE AFTER 5 SECONDS
+       HIDE
     ================================= */
 
     setTimeout(() => {
 
-        notification.style.display = "none";
+        notification.style.display =
+            "none";
 
     }, 5000);
 
@@ -707,7 +920,7 @@ function showReadyNotification(orderNumber) {
 
 
 /* =========================================
-   REQUEST BROWSER NOTIFICATION
+   REQUEST NOTIFICATION PERMISSION
 ========================================= */
 
 if (
@@ -764,7 +977,6 @@ supabaseClient
 ========================================= */
 
 loadOrders();
-
 
 </script>
 
