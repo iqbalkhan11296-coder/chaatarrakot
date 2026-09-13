@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Drinks Counter</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="supabase.js?v=2"></script>
+
+<style>
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f2f2f2;
+    color: #222;
+}
+
+header {
+    background: #222;
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 28px;
+}
+
+header p {
+    margin: 6px 0 0;
+}
+
+.container {
+    max-width: 900px;
+    margin: auto;
+    padding: 20px;
+}
+
+.order {
+    background: white;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    padding: 20px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
+
+.order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 12px;
+    margin-bottom: 15px;
+}
+
+.order-number {
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.table {
+    font-size: 16px;
+    color: #555;
+    margin-top: 5px;
+}
+
+.item {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+    font-size: 18px;
+}
+
+.item:last-child {
+    border-bottom: none;
+}
+
+.quantity {
+    font-weight: bold;
+}
+
+.status {
+    display: inline-block;
+    padding: 8px 14px;
+    border-radius: 20px;
+    font-weight: bold;
+}
+
+.pending {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.preparing {
+    background: #cfe2ff;
+    color: #084298;
+}
+
+.ready {
+    background: #d1e7dd;
+    color: #0f5132;
+}
+
+.buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.buttons button {
+    flex: 1;
+    padding: 14px;
+    border: none;
+    border-radius: 8px;
+    font-size: 17px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.prepare-btn {
+    background: #1976d2;
+    color: white;
+}
+
+.ready-btn {
+    background: #198754;
+    color: white;
+}
+
+.buttons button:disabled {
+    background: #aaa;
+    cursor: not-allowed;
+}
+
+.empty {
+    text-align: center;
+    padding: 50px 20px;
+    color: #777;
+    font-size: 20px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header>
+
+<h1>🥤 DRINKS COUNTER</h1>
+
+<p>KOT Preparation</p>
+
+</header>
+
+
+<div class="container" id="orders">
+
+<div class="empty">
+Waiting for orders...
+</div>
+
+</div>
+
+
+<script>
+
+let kots = {};
+
+
+/* =========================================
+   LOAD DRINK ORDERS
+========================================= */
+
+async function loadOrders() {
+
+    const { data, error } =
+
+        await supabaseClient
+
+        .from("counter_kot")
+
+        .select(`
+            id,
+            order_id,
+            counter,
+            items,
+            status,
+            created_at,
+
+            orders (
+                order_number,
+                table_number
+            )
+        `)
+
+        .eq("counter", "drinks")
+
+        .neq("status", "Ready")
+
+        .order("created_at", {
+            ascending: true
+        });
+
+
+    if (error) {
+
+        console.error(error);
+
+        document.getElementById("orders").innerHTML =
+
+            `<div class="empty">
+                ❌ Error loading orders
+            </div>`;
+
+        return;
+    }
+
+
+    kots = {};
+
+    data.forEach(kot => {
+
+        kots[kot.id] = kot;
+
+    });
+
+
+    renderOrders();
+
+}
+
+
+/* =========================================
+   DISPLAY ORDERS
+========================================= */
+
+function renderOrders() {
+
+    const container =
+        document.getElementById("orders");
+
+    const orders =
+        Object.values(kots);
+
+
+    if (orders.length === 0) {
+
+        container.innerHTML =
+
+            `<div class="empty">
+                No pending drink orders.
+            </div>`;
+
+        return;
+
+    }
+
+
+    container.innerHTML = "";
+
+
+    orders.forEach(kot => {
+
+        const orderNumber =
+            kot.orders?.order_number || kot.order_id;
+
+        const tableNumber =
+            kot.orders?.table_number || "-";
+
+
+        let itemsHTML = "";
+
+
+        kot.items.forEach(item => {
+
+            itemsHTML += `
+
+                <div class="item">
+
+                    <span>
+                        ${item.name}
+                    </span>
+
+                    <span class="quantity">
+                        × ${item.quantity}
+                    </span>
+
+                </div>
+
+            `;
+
+        });
+
+
+        let statusClass =
+            kot.status.toLowerCase();
+
+
+        container.innerHTML += `
+
+            <div class="order">
+
+                <div class="order-header">
+
+                    <div>
+
+                        <div class="order-number">
+                            Order #${orderNumber}
+                        </div>
+
+                        <div class="table">
+                            Table: ${tableNumber}
+                        </div>
+
+                    </div>
+
+
+                    <div class="status ${statusClass}">
+                        ${kot.status}
+                    </div>
+
+                </div>
+
+
+                ${itemsHTML}
+
+
+                <div class="buttons">
+
+                    <button
+                        class="prepare-btn"
+                        onclick="updateStatus(${kot.id}, 'Preparing')"
+                        ${kot.status === "Preparing" ? "disabled" : ""}
+                    >
+                        PREPARING
+                    </button>
+
+
+                    <button
+                        class="ready-btn"
+                        onclick="updateStatus(${kot.id}, 'Ready')"
+                    >
+                        READY
+                    </button>
+
+                </div>
+
+            </div>
+
+        `;
+
+    });
+
+}
+
+
+/* =========================================
+   UPDATE STATUS
+========================================= */
+
+async function updateStatus(id, status) {
+
+    const { error } =
+
+        await supabaseClient
+
+        .from("counter_kot")
+
+        .update({
+
+            status: status,
+
+            ready_at:
+                status === "Ready"
+                    ? new Date().toISOString()
+                    : null
+
+        })
+
+        .eq("id", id);
+
+
+    if (error) {
+
+        alert("Error: " + error.message);
+
+        return;
+
+    }
+
+
+    await loadOrders();
+
+}
+
+
+/* =========================================
+   REALTIME
+========================================= */
+
+supabaseClient
+
+.channel("drinks-counter")
+
+.on(
+
+    "postgres_changes",
+
+    {
+        event: "*",
+        schema: "public",
+        table: "counter_kot"
+    },
+
+    payload => {
+
+        loadOrders();
+
+    }
+
+)
+
+.subscribe();
+
+
+/* =========================================
+   START
+========================================= */
+
+loadOrders();
+
+</script>
+
+</body>
+
+</html>
