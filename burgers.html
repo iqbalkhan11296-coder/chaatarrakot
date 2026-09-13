@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Burgers Counter</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase.js?v=2"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #111;
+            color: white;
+        }
+
+        header {
+            background: #650028;
+            padding: 20px;
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 30px;
+        }
+
+        header p {
+            margin: 5px 0 0;
+            color: #ffd700;
+        }
+
+        #orders {
+            padding: 20px;
+            max-width: 900px;
+            margin: auto;
+        }
+
+        .order {
+            background: #222;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 5px solid #ffd700;
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .order-number {
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .table {
+            color: #ffd700;
+            font-weight: bold;
+        }
+
+        .time {
+            color: #aaa;
+            font-size: 14px;
+        }
+
+        .items {
+            background: #181818;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 15px;
+        }
+
+        .item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #333;
+        }
+
+        .item:last-child {
+            border-bottom: none;
+        }
+
+        .quantity {
+            color: #ffd700;
+            font-weight: bold;
+        }
+
+        .status {
+            padding: 8px 12px;
+            border-radius: 6px;
+            display: inline-block;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+
+        .pending {
+            background: #444;
+        }
+
+        .preparing {
+            background: #d88a00;
+            color: white;
+        }
+
+        .ready {
+            background: #16803c;
+            color: white;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .preparing-btn {
+            background: #d88a00;
+            color: white;
+        }
+
+        .ready-btn {
+            background: #16803c;
+            color: white;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .empty {
+            text-align: center;
+            padding: 60px 20px;
+            color: #888;
+            font-size: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>🍔 BURGERS COUNTER</h1>
+    <p>Kitchen Orders</p>
+</header>
+
+<div id="orders">
+    <div class="empty">
+        Loading orders...
+    </div>
+</div>
+
+<script>
+
+async function loadOrders() {
+
+    const container = document.getElementById("orders");
+
+    const { data, error } = await supabaseClient
+        .from("counter_kot")
+        .select(`
+            id,
+            order_id,
+            counter,
+            items,
+            status,
+            created_at,
+            orders (
+                order_number,
+                table_number
+            )
+        `)
+        .eq("counter", "burgers")
+        .neq("status", "Ready")
+        .order("created_at", {
+            ascending: true
+        });
+
+    if (error) {
+        console.error(error);
+
+        container.innerHTML = `
+            <div class="empty">
+                Failed to load orders
+            </div>
+        `;
+
+        return;
+    }
+
+    if (!data || data.length === 0) {
+
+        container.innerHTML = `
+            <div class="empty">
+                No pending burger orders 🍔
+            </div>
+        `;
+
+        return;
+    }
+
+    container.innerHTML = "";
+
+    data.forEach(order => {
+
+        const orderInfo = order.orders;
+
+        let itemsHTML = "";
+
+        if (Array.isArray(order.items)) {
+
+            order.items.forEach(item => {
+
+                itemsHTML += `
+                    <div class="item">
+                        <span>${item.name}</span>
+
+                        <span class="quantity">
+                            × ${item.quantity}
+                        </span>
+                    </div>
+                `;
+
+            });
+
+        }
+
+        let statusClass = "pending";
+
+        if (order.status === "Preparing") {
+            statusClass = "preparing";
+        }
+
+        if (order.status === "Ready") {
+            statusClass = "ready";
+        }
+
+        const createdTime =
+            new Date(order.created_at).toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit"
+            });
+
+        const card = document.createElement("div");
+
+        card.className = "order";
+
+        card.innerHTML = `
+
+            <div class="order-header">
+
+                <div>
+                    <div class="order-number">
+                        Order #${orderInfo?.order_number ?? order.order_id}
+                    </div>
+
+                    <div class="table">
+                        Table: ${orderInfo?.table_number || "-"}
+                    </div>
+                </div>
+
+                <div class="time">
+                    ${createdTime}
+                </div>
+
+            </div>
+
+            <div class="items">
+                ${itemsHTML}
+            </div>
+
+            <div class="status ${statusClass}">
+                ${order.status}
+            </div>
+
+            <div class="buttons">
+
+                <button
+                    class="preparing-btn"
+                    onclick="updateStatus(${order.id}, 'Preparing')">
+                    PREPARING
+                </button>
+
+                <button
+                    class="ready-btn"
+                    onclick="updateStatus(${order.id}, 'Ready')">
+                    READY
+                </button>
+
+            </div>
+        `;
+
+        container.appendChild(card);
+    });
+}
+
+
+async function updateStatus(id, status) {
+
+    const { error } = await supabaseClient
+        .from("counter_kot")
+        .update({
+            status: status,
+            ready_at: status === "Ready"
+                ? new Date().toISOString()
+                : null
+        })
+        .eq("id", id);
+
+    if (error) {
+
+        console.error(error);
+
+        alert("Failed to update order.");
+
+        return;
+    }
+
+    loadOrders();
+}
+
+
+/* =========================================
+   REALTIME
+========================================= */
+
+supabaseClient
+    .channel("burgers-counter")
+    .on(
+        "postgres_changes",
+        {
+            event: "*",
+            schema: "public",
+            table: "counter_kot"
+        },
+        () => {
+            loadOrders();
+        }
+    )
+    .subscribe();
+
+
+/* Initial load */
+
+loadOrders();
+
+</script>
+
+</body>
+</html>
