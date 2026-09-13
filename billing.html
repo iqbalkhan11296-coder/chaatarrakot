@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Cafe Billing</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase.js?v=2"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            color: #222;
+        }
+
+        header {
+            background: #222;
+            color: white;
+            padding: 18px;
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+            padding: 20px;
+        }
+
+        .order-info {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .order-info input {
+            width: 100%;
+            padding: 13px;
+            margin-top: 8px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .section {
+            background: white;
+            margin-bottom: 18px;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .section h2 {
+            margin: 0;
+            padding: 15px;
+            background: #333;
+            color: white;
+            font-size: 20px;
+        }
+
+        .item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            gap: 10px;
+        }
+
+        .item:last-child {
+            border-bottom: none;
+        }
+
+        .item-name {
+            flex: 1;
+        }
+
+        .item-name strong {
+            display: block;
+            font-size: 17px;
+        }
+
+        .price {
+            color: #666;
+            margin-top: 4px;
+        }
+
+        .quantity {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .quantity button {
+            width: 36px;
+            height: 36px;
+            border: none;
+            border-radius: 6px;
+            background: #333;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .quantity span {
+            min-width: 25px;
+            text-align: center;
+            font-size: 17px;
+        }
+
+        .bottom {
+            position: sticky;
+            bottom: 0;
+            background: white;
+            padding: 18px;
+            border-radius: 12px;
+            box-shadow: 0 -3px 15px rgba(0,0,0,0.15);
+        }
+
+        .total {
+            display: flex;
+            justify-content: space-between;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        #placeOrder {
+            width: 100%;
+            padding: 16px;
+            background: #008000;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 19px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        #placeOrder:disabled {
+            background: #999;
+        }
+
+        #message {
+            text-align: center;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        @media (max-width: 600px) {
+
+            .item {
+                flex-wrap: wrap;
+            }
+
+            .quantity {
+                margin-left: auto;
+            }
+
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>CAFE BILLING</h1>
+    <p>Main Billing Counter</p>
+</header>
+
+<div class="container">
+
+    <div class="order-info">
+
+        <label>
+            <strong>Table Number</strong>
+        </label>
+
+        <input
+            type="text"
+            id="tableNumber"
+            placeholder="Enter table number"
+        >
+
+    </div>
+
+
+    <!-- =========================
+         CHAATS
+    ========================== -->
+
+    <div class="section">
+
+        <h2>🥗 CHAATS</h2>
+
+        <div class="item">
+
+            <div class="item-name">
+                <strong>Pani Puri</strong>
+                <div class="price">₹50</div>
+            </div>
+
+            <div class="quantity">
+                <button onclick="changeQty('Pani Puri', -1)">−</button>
+                <span id="qty-Pani-Puri">0</span>
+                <button onclick="changeQty('Pani Puri', 1)">+</button>
+            </div>
+
+        </div>
+
+
+        <div class="item">
+
+            <div class="item-name">
+                <strong>Masala Puri</strong>
+                <div class="price">₹60</div>
+            </div>
+
+            <div class="quantity">
+                <button onclick="changeQty('Masala Puri', -1)">−</button>
+                <span id="qty-Masala-Puri">0</span>
+                <button onclick="changeQty('Masala Puri', 1)">+</button>
+            </div>
+
+        </div>
+
+
+        <div class="item">
+
+            <div class="item-name">
+                <strong>Samosa Chaat</strong>
+                <div class="price">₹80</div>
+            </div>
+
+            <div class="quantity">
+                <button onclick="changeQty('Samosa Chaat', -1)">−</button>
+                <span id="qty-Samosa-Chaat">0</span>
+                <button onclick="changeQty('Samosa Chaat', 1)">+</button>
+            </div>
+
+        </div>
+
+
+        <div class="item">
+
+            <div class="item-name">
+                <strong>Dahi Puri</strong>
+                <div class="price">₹80</div>
+            </div>
+
+            <div class="quantity">
+                <button onclick="changeQty('Dahi Puri', -1)">−</button>
+                <span id="qty-Dahi-Puri">0</span>
+                <button onclick="changeQty('Dahi Puri', 1)">+</button>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================
+         DRINKS
+    ========================== -->
+
+    <div class="section">
+
+        <h2>🥤 DRINKS</h2>
+
+        <div class="item">
+
+            <div class="item-name">
+                <strong>Mango Shake</strong>
+                <div class="price">₹90</div>
+            </div>
+
+            <div class="quantity">
+                <button onclick="changeQty('Mango Shake', -1)">−</button>
+                <span id="qty-Mango-Shake">0</span>
+                <button onclick="changeQty('Mango Shake', 1)">+</button>
+            </div>
+
+        </div>
+
+
+        <div class="item">
+
+            <div class="item-name">
+                <strong>Oreo Shake</strong>
+                <div class="price">₹80</div>
+            </div>
+
+            <div class="quantity">
+                <button onclick="changeQty('Oreo Shake', -1)">−</button>
+                <span id="qty-Oreo-Shake">0</span>
+                <button onclick="changeQty('Oreo Shake', 1)">+</button>
+            </div>
+
+        </div>
+
+
+        <div class="item">
+
+            <div class="item-name">
+                <strong>Strawberry Shake</strong>
+                <div class="price">₹90</div>
+            </div>
+
+            <div class="quantity">
+                <button onclick="changeQty('Strawberry Shake', -1)">−</button>
+                <span id="qty-Strawberry-Shake">0</span>
+                <button onclick="changeQty('Strawberry Shake', 1)">+</button>
+            </div>
+
+        </div>
+
+
+        <div class="item">
+
+            <div class="item-name">
+                <strong>Mint Lime</strong>
+                <div class="price">₹35</div>
+            </div>
+
+            <div class="quantity">
+                <button onclick="changeQty('Mint Lime', -1)">−</button>
+                <span id="qty-Mint-Lime">0</span>
+                <button onclick="changeQty('Mint Lime', 1)">+</button>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================
+         BURGERS
+    ========================== -->
+
+    <div class="section">
+
+        <h2>🍔 BURGERS</h2>
+
+        <div class="item">
+
+            <div class="item-name">
+                <strong>Classic Burger</strong>
+                <div class="price">₹120</div>
+            </div>
+
+            <div class="quantity">
+                <button onclick="changeQty('Classic Burger', -1)">−</button>
+                <span id="qty-Classic-Burger">0</span>
+                <button onclick="changeQty('Classic Burger', 1)">+</button>
+            </div>
+
+        </div>
+
+
+        <div class="item">
+
+            <div class="item-name">
+                <strong>Chicken Burger</strong>
+                <div class="price">₹150</div>
+            </div>
+
+            <div class="quantity">
+                <button onclick="changeQty('Chicken Burger', -1)">−</button>
+                <span id="qty-Chicken-Burger">0</span>
+                <button onclick="changeQty('Chicken Burger', 1)">+</button>
+            </div>
+
+        </div>
+
+
+        <div class="item">
+
+            <div class="item-name">
+                <strong>Cheese Burger</strong>
+                <div class="price">₹140</div>
+            </div>
+
+            <div class="quantity">
+                <button onclick="changeQty('Cheese Burger', -1)">−</button>
+                <span id="qty-Cheese-Burger">0</span>
+                <button onclick="changeQty('Cheese Burger', 1)">+</button>
+            </div>
+
+        </div>
+
+
+        <div class="item">
+
+            <div class="item-name">
+                <strong>Double Burger</strong>
+                <div class="price">₹180</div>
+            </div>
+
+            <div class="quantity">
+                <button onclick="changeQty('Double Burger', -1)">−</button>
+                <span id="qty-Double-Burger">0</span>
+                <button onclick="changeQty('Double Burger', 1)">+</button>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================
+         TOTAL
+    ========================== -->
+
+    <div class="bottom">
+
+        <div class="total">
+            <span>Total</span>
+            <span id="total">₹0</span>
+        </div>
+
+        <button id="placeOrder" onclick="placeOrder()">
+            PLACE ORDER
+        </button>
+
+        <div id="message"></div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    const menu = {
+
+        "Pani Puri": {
+            price: 50,
+            counter: "chaats"
+        },
+
+        "Masala Puri": {
+            price: 60,
+            counter: "chaats"
+        },
+
+        "Samosa Chaat": {
+            price: 80,
+            counter: "chaats"
+        },
+
+        "Dahi Puri": {
+            price: 80,
+            counter: "chaats"
+        },
+
+        "Mango Shake": {
+            price: 90,
+            counter: "drinks"
+        },
+
+        "Oreo Shake": {
+            price: 80,
+            counter: "drinks"
+        },
+
+        "Strawberry Shake": {
+            price: 90,
+            counter: "drinks"
+        },
+
+        "Mint Lime": {
+            price: 35,
+            counter: "drinks"
+        },
+
+        "Classic Burger": {
+            price: 120,
+            counter: "burgers"
+        },
+
+        "Chicken Burger": {
+            price: 150,
+            counter: "burgers"
+        },
+
+        "Cheese Burger": {
+            price: 140,
+            counter: "burgers"
+        },
+
+        "Double Burger": {
+            price: 180,
+            counter: "burgers"
+        }
+
+    };
+
+
+    const quantities = {};
+
+
+    function getId(name) {
+
+        return "qty-" + name.replaceAll(" ", "-");
+
+    }
+
+
+    function changeQty(name, change) {
+
+        if (!quantities[name]) {
+            quantities[name] = 0;
+        }
+
+        quantities[name] += change;
+
+        if (quantities[name] < 0) {
+            quantities[name] = 0;
+        }
+
+        document.getElementById(getId(name)).innerText =
+            quantities[name];
+
+        calculateTotal();
+
+    }
+
+
+    function calculateTotal() {
+
+        let total = 0;
+
+        for (const item in quantities) {
+
+            if (quantities[item] > 0) {
+
+                total +=
+                    quantities[item] *
+                    menu[item].price;
+
+            }
+
+        }
+
+        document.getElementById("total").innerText =
+            "₹" + total;
+
+        return total;
+
+    }
+
+
+    async function placeOrder() {
+
+        const tableNumber =
+            document.getElementById("tableNumber").value.trim();
+
+        const message =
+            document.getElementById("message");
+
+        const button =
+            document.getElementById("placeOrder");
+
+
+        if (!tableNumber) {
+
+            message.innerText =
+                "Please enter table number.";
+
+            return;
+
+        }
+
+
+        const selectedItems = [];
+
+        for (const item in quantities) {
+
+            if (quantities[item] > 0) {
+
+                selectedItems.push({
+
+                    name: item,
+
+                    price: menu[item].price,
+
+                    quantity: quantities[item],
+
+                    counter: menu[item].counter
+
+                });
+
+            }
+
+        }
+
+
+        if (selectedItems.length === 0) {
+
+            message.innerText =
+                "Please select at least one item.";
+
+            return;
+
+        }
+
+
+        const total = calculateTotal();
+
+
+        button.disabled = true;
+
+        button.innerText = "PLACING ORDER...";
+
+        message.innerText = "";
+
+
+        try {
+
+            /* =========================
+               CREATE MAIN ORDER
+            ========================== */
+
+            const { data: order, error: orderError } =
+                await supabaseClient
+                    .from("orders")
+                    .insert({
+
+                        table_number: tableNumber,
+
+                        items: selectedItems,
+
+                        total: total,
+
+                        status: "Pending"
+
+                    })
+                    .select()
+                    .single();
+
+
+            if (orderError) {
+
+                throw orderError;
+
+            }
+
+
+            /* =========================
+               SPLIT ITEMS BY COUNTER
+            ========================== */
+
+            const counters = {
+
+                chaats: [],
+
+                drinks: [],
+
+                burgers: []
+
+            };
+
+
+            selectedItems.forEach(item => {
+
+                counters[item.counter].push(item);
+
+            });
+
+
+            /* =========================
+               CREATE COUNTER KOTS
+            ========================== */
+
+            const kots = [];
+
+
+            for (const counter in counters) {
+
+                if (counters[counter].length === 0) {
+                    continue;
+                }
+
+
+                kots.push({
+
+                    order_id: order.id,
+
+                    counter: counter,
+
+                    items: counters[counter],
+
+                    status: "Pending"
+
+                });
+
+            }
+
+
+            if (kots.length > 0) {
+
+                const { error: kotError } =
+                    await supabaseClient
+                        .from("counter_kot")
+                        .insert(kots);
+
+
+                if (kotError) {
+
+                    throw kotError;
+
+                }
+
+            }
+
+
+            /* =========================
+               SUCCESS
+            ========================== */
+
+            message.innerText =
+                "✅ Order #" +
+                order.order_number +
+                " sent to counters!";
+
+
+            /* Reset */
+
+            for (const item in quantities) {
+
+                quantities[item] = 0;
+
+                document.getElementById(
+                    getId(item)
+                ).innerText = "0";
+
+            }
+
+
+            document.getElementById("tableNumber").value = "";
+
+            calculateTotal();
+
+
+        } catch (error) {
+
+            console.error(error);
+
+            message.innerText =
+                "❌ Error: " + error.message;
+
+        }
+
+
+        button.disabled = false;
+
+        button.innerText = "PLACE ORDER";
+
+    }
+
+</script>
+
+</body>
+</html>
