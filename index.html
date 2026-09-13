@@ -14,7 +14,41 @@
 
     <h1>Cafe KOT System</h1>
 
-    <p>System connection setup.</p>
+    <button onclick="testConnection()">
+        Test Supabase Connection
+    </button>
+
+    <p id="result"></p>
+
+    <script>
+
+        async function testConnection() {
+
+            const result = document.getElementById("result");
+
+            result.innerText = "Testing...";
+
+            const { data, error } = await supabaseClient
+                .from("orders")
+                .select("id")
+                .limit(1);
+
+            if (error) {
+
+                console.error(error);
+
+                result.innerText =
+                    "❌ Connection failed: " + error.message;
+
+            } else {
+
+                result.innerText =
+                    "✅ Supabase connected successfully!";
+
+            }
+        }
+
+    </script>
 
 </body>
 </html>
