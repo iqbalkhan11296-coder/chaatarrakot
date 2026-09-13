@@ -4,23 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Chaatarra Sales</title>
+<title>CHAATARRA - Sales</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-<script>
-const SUPABASE_URL = "https://ucqeyhcycwksiubmlilg.supabase.co";
-
-const SUPABASE_KEY = "sb_publishable_YdIvl7IqdpT0UZOHBumEiw_ZThYEsgV";
-
-const supabaseClient = supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_KEY
-);
-</script>
-
 <style>
-
 * {
     box-sizing: border-box;
 }
@@ -28,136 +16,97 @@ const supabaseClient = supabase.createClient(
 body {
     margin: 0;
     font-family: Arial, sans-serif;
-    background: #f4f4f4;
+    background: #f5f5f5;
     color: #222;
 }
 
 header {
     background: #4b001f;
     color: #FFD700;
-    text-align: center;
     padding: 20px;
+    text-align: center;
 }
 
 header h1 {
     margin: 0;
-    font-size: 30px;
-    letter-spacing: 2px;
+    font-size: 28px;
 }
 
 header p {
-    margin: 6px 0 0;
+    margin: 5px 0 0;
     color: white;
 }
 
 .container {
-    max-width: 1100px;
+    max-width: 1200px;
     margin: auto;
-    padding: 15px;
+    padding: 20px;
 }
 
 .controls {
     background: white;
     padding: 15px;
-    border-radius: 12px;
-    margin-bottom: 15px;
-
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    align-items: end;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 
-.controls div {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-}
-
-label {
-    font-size: 13px;
+.controls label {
     font-weight: bold;
+    margin-right: 5px;
 }
 
-input,
-select {
+.controls input,
+.controls select,
+.controls button {
     padding: 10px;
+    margin: 5px;
+    border-radius: 6px;
     border: 1px solid #ccc;
-    border-radius: 7px;
-    font-size: 15px;
 }
 
-button {
-    padding: 11px 18px;
-    border: none;
-    border-radius: 7px;
+.controls button {
     background: #4b001f;
-    color: white;
-    font-weight: bold;
+    color: #FFD700;
+    border: none;
     cursor: pointer;
-}
-
-button:hover {
-    opacity: .9;
+    font-weight: bold;
 }
 
 .summary {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-    margin-bottom: 15px;
+    gap: 15px;
+    margin-bottom: 20px;
 }
 
 .card {
     background: white;
     padding: 20px;
-    border-radius: 12px;
+    border-radius: 10px;
     text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 
 .card h3 {
     margin: 0;
-    color: #777;
-    font-size: 14px;
+    color: #666;
+    font-size: 15px;
 }
 
-.value {
+.card strong {
+    display: block;
+    font-size: 26px;
+    color: #4b001f;
     margin-top: 8px;
-    color: #4b001f;
-    font-size: 27px;
-    font-weight: bold;
-}
-
-.counter-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-    margin-bottom: 15px;
-}
-
-.counter-card {
-    background: white;
-    padding: 18px;
-    border-radius: 12px;
-    text-align: center;
-}
-
-.counter-card h3 {
-    margin: 0 0 8px;
-    color: #4b001f;
-}
-
-.counter-card div {
-    font-size: 22px;
-    font-weight: bold;
 }
 
 .section {
     background: white;
-    padding: 15px;
-    border-radius: 12px;
-    margin-bottom: 15px;
-    overflow-x: auto;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 
 .section h2 {
@@ -168,1118 +117,1240 @@ button:hover {
 table {
     width: 100%;
     border-collapse: collapse;
-    min-width: 600px;
 }
 
 th {
     background: #4b001f;
-    color: white;
-    padding: 11px;
+    color: #FFD700;
+    padding: 12px;
     text-align: left;
 }
 
 td {
-    padding: 10px;
+    padding: 11px;
     border-bottom: 1px solid #ddd;
 }
 
-.right {
-    text-align: right;
+tr:hover {
+    background: #fafafa;
 }
 
-.total-row {
+.status {
+    padding: 5px 9px;
+    border-radius: 20px;
+    font-size: 12px;
     font-weight: bold;
-    background: #fff4f7;
+}
+
+.status.pending {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.status.served,
+.status.completed {
+    background: #d4edda;
+    color: #155724;
+}
+
+.status.cancelled {
+    background: #f8d7da;
+    color: #721c24;
 }
 
 .loading {
     text-align: center;
-    padding: 25px;
-    color: #777;
+    padding: 30px;
+    font-size: 18px;
 }
 
 .error {
-    display: none;
-    background: #ffe5e5;
-    color: #a00000;
+    background: #f8d7da;
+    color: #721c24;
     padding: 15px;
     border-radius: 8px;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
+    display: none;
+}
+
+.empty {
+    text-align: center;
+    padding: 30px;
+    color: #777;
+}
+
+.debug {
+    background: #222;
+    color: #0f0;
+    padding: 15px;
+    border-radius: 8px;
+    font-family: monospace;
+    font-size: 12px;
     white-space: pre-wrap;
+    overflow-x: auto;
 }
 
 @media(max-width:700px) {
 
-    .summary,
-    .counter-grid {
+    .summary {
         grid-template-columns: 1fr;
     }
 
-    .controls {
-        flex-direction: column;
-        align-items: stretch;
+    .section {
+        overflow-x: auto;
     }
 
-    .controls div,
+    table {
+        min-width: 800px;
+    }
+
     .controls input,
     .controls select,
     .controls button {
         width: 100%;
+        margin: 5px 0;
     }
-
 }
-
-@media print {
-
-    .controls {
-        display: none;
-    }
-
-    body {
-        background: white;
-    }
-
-}
-
 </style>
 </head>
 
 <body>
 
 <header>
-
     <h1>CHAATARRA</h1>
-
-    <p>SALES REPORT</p>
-
+    <p>Sales Report</p>
 </header>
-
 
 <div class="container">
 
+    <div class="controls">
 
-<div id="errorBox" class="error"></div>
+        <label>From:</label>
+        <input type="date" id="fromDate">
 
+        <label>To:</label>
+        <input type="date" id="toDate">
 
-<!-- FILTER -->
-
-<div class="controls">
-
-    <div>
-
-        <label>FROM</label>
-
-        <input
-            type="date"
-            id="fromDate">
-
-    </div>
-
-
-    <div>
-
-        <label>TO</label>
-
-        <input
-            type="date"
-            id="toDate">
-
-    </div>
-
-
-    <div>
-
-        <label>COUNTER</label>
-
+        <label>Counter:</label>
         <select id="counterFilter">
-
-            <option value="all">
-                All Counters
-            </option>
-
-            <option value="chaats">
-                Chaats
-            </option>
-
-            <option value="drinks">
-                Drinks
-            </option>
-
-            <option value="burgers">
-                Burgers
-            </option>
-
+            <option value="all">All Counters</option>
         </select>
 
+        <label>Status:</label>
+        <select id="statusFilter">
+            <option value="all">All Status</option>
+        </select>
+
+        <button onclick="applyFilters()">Apply</button>
+        <button onclick="resetFilters()">Reset</button>
+        <button onclick="loadSales()">Refresh</button>
+
     </div>
 
+    <div id="errorBox" class="error"></div>
 
-    <button onclick="loadSales()">
-        REFRESH
-    </button>
+    <div class="summary">
 
+        <div class="card">
+            <h3>Total Orders</h3>
+            <strong id="totalOrders">0</strong>
+        </div>
 
-    <button onclick="window.print()">
-        PRINT
-    </button>
+        <div class="card">
+            <h3>Total Items Sold</h3>
+            <strong id="totalItems">0</strong>
+        </div>
 
-</div>
-
-
-<!-- TOTALS -->
-
-<div class="summary">
-
-    <div class="card">
-
-        <h3>TOTAL SALES</h3>
-
-        <div
-            class="value"
-            id="totalSales">
-
-            ₹0
-
+        <div class="card">
+            <h3>Total Sales</h3>
+            <strong id="totalSales">₹0</strong>
         </div>
 
     </div>
 
+    <div class="section">
 
-    <div class="card">
+        <h2>Items Sold</h2>
 
-        <h3>ITEMS SOLD</h3>
-
-        <div
-            class="value"
-            id="totalItems">
-
-            0
-
+        <div id="itemsLoading" class="loading">
+            Loading sales...
         </div>
 
-    </div>
-
-
-    <div class="card">
-
-        <h3>KOTs</h3>
-
-        <div
-            class="value"
-            id="totalKots">
-
-            0
-
-        </div>
+        <div id="itemsTableContainer"></div>
 
     </div>
 
-</div>
+    <div class="section">
 
+        <h2>Order Details</h2>
 
-<!-- COUNTER TOTALS -->
-
-<div class="counter-grid">
-
-    <div class="counter-card">
-
-        <h3>CHAATS</h3>
-
-        <div id="chaatTotal">
-            ₹0
-        </div>
+        <div id="ordersTableContainer"></div>
 
     </div>
 
+    <div class="section">
 
-    <div class="counter-card">
+        <h2>Item Summary</h2>
 
-        <h3>DRINKS</h3>
-
-        <div id="drinkTotal">
-            ₹0
-        </div>
+        <div id="summaryTableContainer"></div>
 
     </div>
 
+    <div class="section">
 
-    <div class="counter-card">
-
-        <h3>BURGERS</h3>
-
-        <div id="burgerTotal">
-            ₹0
-        </div>
-
-    </div>
-
-</div>
-
-
-<!-- ITEM SALES -->
-
-<div class="section">
-
-    <h2>ITEMS SOLD</h2>
-
-
-    <div
-        id="itemLoading"
-        class="loading">
-
-        Loading sales...
+        <details>
+            <summary><b>Technical Information</b></summary>
+            <br>
+            <div id="debugBox" class="debug">
+                Waiting for data...
+            </div>
+        </details>
 
     </div>
-
-
-    <table
-        id="itemTable"
-        style="display:none;">
-
-        <thead>
-
-        <tr>
-
-            <th>ITEM</th>
-
-            <th>COUNTER</th>
-
-            <th class="right">
-                QTY
-            </th>
-
-            <th class="right">
-                PRICE
-            </th>
-
-            <th class="right">
-                TOTAL
-            </th>
-
-        </tr>
-
-        </thead>
-
-
-        <tbody id="itemBody"></tbody>
-
-    </table>
-
-</div>
-
-
-<!-- KOT LIST -->
-
-<div class="section">
-
-    <h2>ALL KOTs</h2>
-
-
-    <div
-        id="kotLoading"
-        class="loading">
-
-        Loading KOTs...
-
-    </div>
-
-
-    <table
-        id="kotTable"
-        style="display:none;">
-
-        <thead>
-
-        <tr>
-
-            <th>ID</th>
-
-            <th>ORDER ID</th>
-
-            <th>COUNTER</th>
-
-            <th>ITEMS</th>
-
-            <th>STATUS</th>
-
-            <th>TIME</th>
-
-        </tr>
-
-        </thead>
-
-
-        <tbody id="kotBody"></tbody>
-
-    </table>
-
-</div>
-
 
 </div>
 
 
 <script>
 
-/*
-====================================================
-IMPORTANT
-====================================================
+/* =====================================================
+   SUPABASE CONNECTION
+   ===================================================== */
 
-Your supabase.js creates:
+const SUPABASE_URL =
+"https://ucqeyhcycwksiubmlilg.supabase.co";
 
-const supabase = ...
+const SUPABASE_KEY =
+"sb_publishable_YdIvl7IqdpT0UZOHBumEiw_ZThYEsgV";
 
-Therefore we use:
-
-supabase.from(...)
-
-NOT:
-
-supabaseClient.from(...)
-====================================================
-*/
+const supabaseClient =
+supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+);
 
 
-function todayIndia() {
+/* =====================================================
+   GLOBAL DATA
+   ===================================================== */
 
-    return new Date()
-        .toLocaleDateString(
-            "en-CA",
-            {
-                timeZone: "Asia/Kolkata"
-            }
-        );
-
-}
+let ordersData = [];
+let kotData = [];
+let combinedData = [];
 
 
-document.getElementById("fromDate").value =
-    todayIndia();
-
-document.getElementById("toDate").value =
-    todayIndia();
-
-
-/*
-====================================================
-LOAD SALES
-====================================================
-*/
+/* =====================================================
+   LOAD SALES
+   ===================================================== */
 
 async function loadSales() {
 
-    const errorBox =
-        document.getElementById("errorBox");
+    showError("");
 
-
-    errorBox.style.display =
-        "none";
-
-
-    document.getElementById(
-        "itemLoading"
-    ).style.display = "block";
-
-
-    document.getElementById(
-        "kotLoading"
-    ).style.display = "block";
-
+    document.getElementById("itemsLoading").style.display = "block";
 
     try {
 
         /*
-        GET COUNTER KOTs
-        */
+         * Load main orders table
+         */
 
-        const result =
-            await supabase
-                .from("counter_kot")
-                .select("*")
-                .order(
-                    "created_at",
-                    {
-                        ascending: false
-                    }
-                );
-
-
-        const kots = result.data;
-
-        const error = result.error;
+        const {
+            data: orders,
+            error: ordersError
+        } = await supabaseClient
+            .from("orders")
+            .select("*")
+            .order("created_at", {
+                ascending: false
+            });
 
 
-        if (error) {
-
-            throw error;
-
-        }
-
-
-        console.log(
-            "COUNTER KOT DATA:",
-            kots
-        );
-
-
-        /*
-        FILTER
-        */
-
-        const from =
-            document.getElementById(
-                "fromDate"
-            ).value;
-
-
-        const to =
-            document.getElementById(
-                "toDate"
-            ).value;
-
-
-        const selectedCounter =
-            document.getElementById(
-                "counterFilter"
-            ).value;
-
-
-        let filtered =
-            kots || [];
-
-
-        if (from) {
-
-            filtered =
-                filtered.filter(kot => {
-
-                    const date =
-                        new Date(
-                            kot.created_at
-                        )
-                        .toLocaleDateString(
-                            "en-CA",
-                            {
-                                timeZone:
-                                    "Asia/Kolkata"
-                            }
-                        );
-
-
-                    return date >= from;
-
-                });
-
-        }
-
-
-        if (to) {
-
-            filtered =
-                filtered.filter(kot => {
-
-                    const date =
-                        new Date(
-                            kot.created_at
-                        )
-                        .toLocaleDateString(
-                            "en-CA",
-                            {
-                                timeZone:
-                                    "Asia/Kolkata"
-                            }
-                        );
-
-
-                    return date <= to;
-
-                });
-
-        }
-
-
-        if (
-            selectedCounter !== "all"
-        ) {
-
-            filtered =
-                filtered.filter(kot => {
-
-                    return String(
-                        kot.counter
-                    ).toLowerCase() ===
-                    selectedCounter;
-
-                });
-
+        if (ordersError) {
+            throw new Error(
+                "ORDERS TABLE ERROR:\n" +
+                ordersError.message
+            );
         }
 
 
         /*
-        ITEM SUMMARY
-        */
+         * Load counter KOT table
+         */
 
-        const items = {};
-
-
-        let totalSales = 0;
-
-        let totalItems = 0;
-
-
-        let chaats = 0;
-
-        let drinks = 0;
-
-        let burgers = 0;
+        const {
+            data: kots,
+            error: kotError
+        } = await supabaseClient
+            .from("counter_kot")
+            .select("*")
+            .order("created_at", {
+                ascending: false
+            });
 
 
-        filtered.forEach(kot => {
-
-            let kotItems =
-                kot.items;
-
-
-            /*
-            Convert JSON string
-            if necessary.
-            */
-
-            if (
-                typeof kotItems ===
-                "string"
-            ) {
-
-                try {
-
-                    kotItems =
-                        JSON.parse(
-                            kotItems
-                        );
-
-                }
-
-                catch(e) {
-
-                    console.error(
-                        "Bad items JSON:",
-                        kotItems
-                    );
-
-                    kotItems = [];
-
-                }
-
-            }
+        if (kotError) {
+            throw new Error(
+                "COUNTER_KOT TABLE ERROR:\n" +
+                kotError.message
+            );
+        }
 
 
-            if (
-                !Array.isArray(kotItems)
-            ) {
+        ordersData = orders || [];
+        kotData = kots || [];
 
-                console.warn(
-                    "Items is not array:",
-                    kotItems
-                );
 
+        /*
+         * Combine orders + counter KOT
+         */
+
+        combinedData = [];
+
+
+        kotData.forEach(kot => {
+
+            let order = ordersData.find(
+                o => String(o.id) === String(kot.order_id)
+            );
+
+
+            let items = parseItems(kot.items);
+
+
+            if (!Array.isArray(items)) {
                 return;
-
             }
 
 
-            kotItems.forEach(item => {
-
-                const name =
-                    item.name ||
-                    item.item ||
-                    item.title ||
-                    "Unknown";
-
-
-                const price =
-                    Number(
-                        item.price || 0
-                    );
-
+            items.forEach(item => {
 
                 const quantity =
                     Number(
-                        item.quantity ||
-                        item.qty ||
+                        item.quantity ??
+                        item.qty ??
                         1
                     );
 
 
-                const counter =
-                    item.counter ||
-                    kot.counter ||
-                    "unknown";
+                const price =
+                    Number(
+                        item.price ??
+                        item.unit_price ??
+                        0
+                    );
 
 
-                const amount =
-                    price * quantity;
+                combinedData.push({
 
+                    orderId: kot.order_id,
 
-                const key =
-                    name + "|" + counter;
+                    kotId: kot.id,
 
+                    order: order,
 
-                if (!items[key]) {
+                    table:
+                        order?.table_number ??
+                        kot.table_number ??
+                        "-",
 
-                    items[key] = {
+                    created_at:
+                        order?.created_at ??
+                        kot.created_at ??
+                        null,
 
-                        name:
-                            name,
+                    item:
+                        item.name ??
+                        item.item_name ??
+                        "Unknown Item",
 
-                        counter:
-                            counter,
+                    quantity: quantity,
 
-                        price:
-                            price,
+                    price: price,
 
-                        quantity:
-                            0,
+                    amount: quantity * price,
 
-                        total:
-                            0
+                    counter:
+                        item.counter ??
+                        kot.counter ??
+                        "-",
 
-                    };
+                    status:
+                        kot.status ??
+                        order?.status ??
+                        "Unknown"
 
-                }
-
-
-                items[key].quantity +=
-                    quantity;
-
-
-                items[key].total +=
-                    amount;
-
-
-                totalItems +=
-                    quantity;
-
-
-                totalSales +=
-                    amount;
-
-
-                if (
-                    counter ===
-                    "chaats"
-                ) {
-
-                    chaats += amount;
-
-                }
-
-
-                if (
-                    counter ===
-                    "drinks"
-                ) {
-
-                    drinks += amount;
-
-                }
-
-
-                if (
-                    counter ===
-                    "burgers"
-                ) {
-
-                    burgers += amount;
-
-                }
+                });
 
             });
 
         });
 
 
-        /*
-        SUMMARY
-        */
+        populateFilters();
 
-        document.getElementById(
-            "totalSales"
-        ).innerText =
-            "₹" +
-            totalSales.toFixed(2);
+        renderSales();
 
+        updateDebug();
 
-        document.getElementById(
-            "totalItems"
-        ).innerText =
-            totalItems;
 
+    } catch (error) {
 
-        document.getElementById(
-            "totalKots"
-        ).innerText =
-            filtered.length;
+        console.error(error);
 
+        showError(error.message);
 
-        document.getElementById(
-            "chaatTotal"
-        ).innerText =
-            "₹" +
-            chaats.toFixed(2);
-
-
-        document.getElementById(
-            "drinkTotal"
-        ).innerText =
-            "₹" +
-            drinks.toFixed(2);
-
-
-        document.getElementById(
-            "burgerTotal"
-        ).innerText =
-            "₹" +
-            burgers.toFixed(2);
-
-
-        /*
-        ITEM TABLE
-        */
-
-        const body =
-            document.getElementById(
-                "itemBody"
-            );
-
-
-        body.innerHTML = "";
-
-
-        const sorted =
-            Object.values(items)
-                .sort(
-                    (a,b) =>
-                        b.total -
-                        a.total
-                );
-
-
-        sorted.forEach(item => {
-
-            const row =
-                document.createElement(
-                    "tr"
-                );
-
-
-            row.innerHTML = `
-
-                <td>
-                    ${escapeHtml(
-                        item.name
-                    )}
-                </td>
-
-                <td>
-                    ${escapeHtml(
-                        item.counter
-                    )}
-                </td>
-
-                <td class="right">
-                    ${item.quantity}
-                </td>
-
-                <td class="right">
-                    ₹${item.price.toFixed(2)}
-                </td>
-
-                <td class="right">
-                    ₹${item.total.toFixed(2)}
-                </td>
-
-            `;
-
-
-            body.appendChild(row);
-
-        });
-
-
-        /*
-        TOTAL ROW
-        */
-
-        const totalRow =
-            document.createElement(
-                "tr"
-            );
-
-
-        totalRow.className =
-            "total-row";
-
-
-        totalRow.innerHTML = `
-
-            <td>
-                TOTAL
-            </td>
-
-            <td></td>
-
-            <td class="right">
-                ${totalItems}
-            </td>
-
-            <td></td>
-
-            <td class="right">
-                ₹${totalSales.toFixed(2)}
-            </td>
-
-        `;
-
-
-        body.appendChild(
-            totalRow
-        );
-
-
-        document.getElementById(
-            "itemLoading"
-        ).style.display =
-            "none";
-
-
-        document.getElementById(
-            "itemTable"
-        ).style.display =
-            "table";
-
-
-        /*
-        KOT TABLE
-        */
-
-        const kotBody =
-            document.getElementById(
-                "kotBody"
-            );
-
-
-        kotBody.innerHTML = "";
-
-
-        filtered.forEach(kot => {
-
-            let kotItems =
-                kot.items;
-
-
-            if (
-                typeof kotItems ===
-                "string"
-            ) {
-
-                try {
-
-                    kotItems =
-                        JSON.parse(
-                            kotItems
-                        );
-
-                }
-
-                catch(e) {
-
-                    kotItems = [];
-
-                }
-
-            }
-
-
-            let text = "";
-
-
-            if (
-                Array.isArray(kotItems)
-            ) {
-
-                text =
-                    kotItems
-                        .map(item => {
-
-                            const name =
-                                item.name ||
-                                item.item ||
-                                item.title ||
-                                "Unknown";
-
-
-                            const qty =
-                                item.quantity ||
-                                item.qty ||
-                                1;
-
-
-                            return (
-                                escapeHtml(
-                                    name
-                                ) +
-                                " × " +
-                                qty
-                            );
-
-                        })
-                        .join("<br>");
-
-            }
-
-
-            const time =
-                new Date(
-                    kot.created_at
-                )
-                .toLocaleString(
-                    "en-IN",
-                    {
-                        timeZone:
-                            "Asia/Kolkata"
-                    }
-                );
-
-
-            const row =
-                document.createElement(
-                    "tr"
-                );
-
-
-            row.innerHTML = `
-
-                <td>
-                    ${escapeHtml(
-                        String(
-                            kot.id ||
-                            "-"
-                        )
-                    )}
-                </td>
-
-                <td>
-                    ${escapeHtml(
-                        String(
-                            kot.order_id ||
-                            "-"
-                        )
-                    )}
-                </td>
-
-                <td>
-                    ${escapeHtml(
-                        kot.counter ||
-                        "-"
-                    )}
-                </td>
-
-                <td>
-                    ${text || "-"}
-                </td>
-
-                <td>
-                    ${escapeHtml(
-                        kot.status ||
-                        "-"
-                    )}
-                </td>
-
-                <td>
-                    ${time}
-                </td>
-
-            `;
-
-
-            kotBody.appendChild(
-                row
-            );
-
-        });
-
-
-        document.getElementById(
-            "kotLoading"
-        ).style.display =
-            "none";
-
-
-        document.getElementById(
-            "kotTable"
-        ).style.display =
-            "table";
-
-    }
-
-
-    catch(error) {
-
-        console.error(
-            "SALES PAGE ERROR:",
-            error
-        );
-
-
-        errorBox.innerText =
-            "SALES ERROR:\n\n" +
-            error.message;
-
-
-        errorBox.style.display =
-            "block";
-
-
-        document.getElementById(
-            "itemLoading"
-        ).style.display =
-            "none";
-
-
-        document.getElementById(
-            "kotLoading"
-        ).style.display =
-            "none";
+        document.getElementById("itemsLoading").style.display = "none";
 
     }
 
 }
 
 
-/*
-====================================================
-ESCAPE HTML
-====================================================
-*/
+/* =====================================================
+   PARSE ITEMS
+   ===================================================== */
+
+function parseItems(items) {
+
+    if (!items) {
+        return [];
+    }
+
+
+    /*
+     * Already an array
+     */
+
+    if (Array.isArray(items)) {
+        return items;
+    }
+
+
+    /*
+     * JSON string
+     */
+
+    if (typeof items === "string") {
+
+        try {
+
+            const parsed =
+                JSON.parse(items);
+
+            if (Array.isArray(parsed)) {
+                return parsed;
+            }
+
+            if (
+                parsed &&
+                Array.isArray(parsed.items)
+            ) {
+                return parsed.items;
+            }
+
+        } catch (e) {
+
+            console.error(
+                "Could not parse items:",
+                items
+            );
+
+        }
+
+    }
+
+
+    /*
+     * Object containing items
+     */
+
+    if (
+        typeof items === "object" &&
+        Array.isArray(items.items)
+    ) {
+        return items.items;
+    }
+
+
+    return [];
+
+}
+
+
+/* =====================================================
+   FILTER OPTIONS
+   ===================================================== */
+
+function populateFilters() {
+
+    const counterSelect =
+        document.getElementById("counterFilter");
+
+    const statusSelect =
+        document.getElementById("statusFilter");
+
+
+    const counters =
+        [...new Set(
+            combinedData
+                .map(x => x.counter)
+                .filter(Boolean)
+        )];
+
+
+    const statuses =
+        [...new Set(
+            combinedData
+                .map(x => x.status)
+                .filter(Boolean)
+        )];
+
+
+    counterSelect.innerHTML =
+        '<option value="all">All Counters</option>';
+
+
+    counters.forEach(counter => {
+
+        counterSelect.innerHTML +=
+            `<option value="${escapeHtml(counter)}">
+                ${escapeHtml(counter)}
+            </option>`;
+
+    });
+
+
+    statusSelect.innerHTML =
+        '<option value="all">All Status</option>';
+
+
+    statuses.forEach(status => {
+
+        statusSelect.innerHTML +=
+            `<option value="${escapeHtml(status)}">
+                ${escapeHtml(status)}
+            </option>`;
+
+    });
+
+}
+
+
+/* =====================================================
+   APPLY FILTERS
+   ===================================================== */
+
+function applyFilters() {
+
+    renderSales();
+
+}
+
+
+/* =====================================================
+   RENDER SALES
+   ===================================================== */
+
+function renderSales() {
+
+    const fromDate =
+        document.getElementById("fromDate").value;
+
+    const toDate =
+        document.getElementById("toDate").value;
+
+    const counter =
+        document.getElementById("counterFilter").value;
+
+    const status =
+        document.getElementById("statusFilter").value;
+
+
+    let filtered =
+        combinedData.filter(row => {
+
+
+            /*
+             * Counter filter
+             */
+
+            if (
+                counter !== "all" &&
+                row.counter !== counter
+            ) {
+                return false;
+            }
+
+
+            /*
+             * Status filter
+             */
+
+            if (
+                status !== "all" &&
+                row.status !== status
+            ) {
+                return false;
+            }
+
+
+            /*
+             * Date filter
+             */
+
+            if (
+                fromDate ||
+                toDate
+            ) {
+
+                if (!row.created_at) {
+                    return false;
+                }
+
+
+                const date =
+                    new Date(row.created_at);
+
+
+                const dateString =
+                    date.toISOString()
+                        .split("T")[0];
+
+
+                if (
+                    fromDate &&
+                    dateString < fromDate
+                ) {
+                    return false;
+                }
+
+
+                if (
+                    toDate &&
+                    dateString > toDate
+                ) {
+                    return false;
+                }
+
+            }
+
+
+            return true;
+
+        });
+
+
+    renderSummary(filtered);
+
+    renderItemsTable(filtered);
+
+    renderOrdersTable(filtered);
+
+    renderItemSummary(filtered);
+
+}
+
+
+/* =====================================================
+   SUMMARY CARDS
+   ===================================================== */
+
+function renderSummary(data) {
+
+    const orderIds =
+        new Set(
+            data.map(x => x.orderId)
+        );
+
+
+    const totalOrders =
+        orderIds.size;
+
+
+    const totalItems =
+        data.reduce(
+            (sum, x) =>
+                sum + Number(x.quantity || 0),
+            0
+        );
+
+
+    const totalSales =
+        data.reduce(
+            (sum, x) =>
+                sum + Number(x.amount || 0),
+            0
+        );
+
+
+    document.getElementById("totalOrders")
+        .textContent = totalOrders;
+
+
+    document.getElementById("totalItems")
+        .textContent = totalItems;
+
+
+    document.getElementById("totalSales")
+        .textContent =
+        "₹" + totalSales.toFixed(2);
+
+}
+
+
+/* =====================================================
+   ITEMS TABLE
+   ===================================================== */
+
+function renderItemsTable(data) {
+
+    document.getElementById("itemsLoading")
+        .style.display = "none";
+
+
+    const container =
+        document.getElementById(
+            "itemsTableContainer"
+        );
+
+
+    if (!data.length) {
+
+        container.innerHTML =
+            '<div class="empty">No sales found.</div>';
+
+        return;
+
+    }
+
+
+    let html = `
+
+        <table>
+
+            <thead>
+
+                <tr>
+                    <th>Date / Time</th>
+                    <th>Order</th>
+                    <th>Table</th>
+                    <th>Item</th>
+                    <th>Qty</th>
+                    <th>Price</th>
+                    <th>Amount</th>
+                    <th>Counter</th>
+                    <th>Status</th>
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+    `;
+
+
+    data.forEach(row => {
+
+        html += `
+
+            <tr>
+
+                <td>
+                    ${formatDate(row.created_at)}
+                </td>
+
+                <td>
+                    #${escapeHtml(row.orderId)}
+                </td>
+
+                <td>
+                    ${escapeHtml(row.table)}
+                </td>
+
+                <td>
+                    <b>${escapeHtml(row.item)}</b>
+                </td>
+
+                <td>
+                    ${row.quantity}
+                </td>
+
+                <td>
+                    ₹${row.price.toFixed(2)}
+                </td>
+
+                <td>
+                    <b>₹${row.amount.toFixed(2)}</b>
+                </td>
+
+                <td>
+                    ${escapeHtml(row.counter)}
+                </td>
+
+                <td>
+                    <span class="status ${statusClass(row.status)}">
+                        ${escapeHtml(row.status)}
+                    </span>
+                </td>
+
+            </tr>
+
+        `;
+
+    });
+
+
+    html += `
+            </tbody>
+        </table>
+    `;
+
+
+    container.innerHTML = html;
+
+}
+
+
+/* =====================================================
+   ORDER TABLE
+   ===================================================== */
+
+function renderOrdersTable(data) {
+
+    const container =
+        document.getElementById(
+            "ordersTableContainer"
+        );
+
+
+    const orderMap = new Map();
+
+
+    data.forEach(row => {
+
+        if (!orderMap.has(row.orderId)) {
+
+            orderMap.set(
+                row.orderId,
+                {
+                    orderId: row.orderId,
+                    table: row.table,
+                    created_at: row.created_at,
+                    amount: 0,
+                    items: 0,
+                    status: row.status
+                }
+            );
+
+        }
+
+
+        const order =
+            orderMap.get(row.orderId);
+
+
+        order.amount +=
+            Number(row.amount || 0);
+
+
+        order.items +=
+            Number(row.quantity || 0);
+
+    });
+
+
+    const orders =
+        [...orderMap.values()];
+
+
+    if (!orders.length) {
+
+        container.innerHTML =
+            '<div class="empty">No orders found.</div>';
+
+        return;
+
+    }
+
+
+    let html = `
+
+        <table>
+
+            <thead>
+
+                <tr>
+                    <th>Date / Time</th>
+                    <th>Order</th>
+                    <th>Table</th>
+                    <th>Items</th>
+                    <th>Calculated Total</th>
+                    <th>Status</th>
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+    `;
+
+
+    orders.forEach(order => {
+
+        html += `
+
+            <tr>
+
+                <td>
+                    ${formatDate(order.created_at)}
+                </td>
+
+                <td>
+                    <b>#${escapeHtml(order.orderId)}</b>
+                </td>
+
+                <td>
+                    ${escapeHtml(order.table)}
+                </td>
+
+                <td>
+                    ${order.items}
+                </td>
+
+                <td>
+                    ₹${order.amount.toFixed(2)}
+                </td>
+
+                <td>
+                    <span class="status ${statusClass(order.status)}">
+                        ${escapeHtml(order.status)}
+                    </span>
+                </td>
+
+            </tr>
+
+        `;
+
+    });
+
+
+    html += `
+            </tbody>
+        </table>
+    `;
+
+
+    container.innerHTML = html;
+
+}
+
+
+/* =====================================================
+   ITEM SUMMARY
+   ===================================================== */
+
+function renderItemSummary(data) {
+
+    const container =
+        document.getElementById(
+            "summaryTableContainer"
+        );
+
+
+    const map = new Map();
+
+
+    data.forEach(row => {
+
+        const key =
+            row.item + "|" + row.counter;
+
+
+        if (!map.has(key)) {
+
+            map.set(
+                key,
+                {
+                    item: row.item,
+                    counter: row.counter,
+                    quantity: 0,
+                    amount: 0
+                }
+            );
+
+        }
+
+
+        const entry =
+            map.get(key);
+
+
+        entry.quantity +=
+            Number(row.quantity || 0);
+
+
+        entry.amount +=
+            Number(row.amount || 0);
+
+    });
+
+
+    const summary =
+        [...map.values()]
+        .sort(
+            (a,b) =>
+                b.quantity - a.quantity
+        );
+
+
+    if (!summary.length) {
+
+        container.innerHTML =
+            '<div class="empty">No item data.</div>';
+
+        return;
+
+    }
+
+
+    let html = `
+
+        <table>
+
+            <thead>
+
+                <tr>
+                    <th>Item</th>
+                    <th>Counter</th>
+                    <th>Total Quantity</th>
+                    <th>Total Amount</th>
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+    `;
+
+
+    summary.forEach(row => {
+
+        html += `
+
+            <tr>
+
+                <td>
+                    <b>${escapeHtml(row.item)}</b>
+                </td>
+
+                <td>
+                    ${escapeHtml(row.counter)}
+                </td>
+
+                <td>
+                    ${row.quantity}
+                </td>
+
+                <td>
+                    <b>₹${row.amount.toFixed(2)}</b>
+                </td>
+
+            </tr>
+
+        `;
+
+    });
+
+
+    html += `
+            </tbody>
+        </table>
+    `;
+
+
+    container.innerHTML = html;
+
+}
+
+
+/* =====================================================
+   RESET
+   ===================================================== */
+
+function resetFilters() {
+
+    document.getElementById("fromDate").value = "";
+
+    document.getElementById("toDate").value = "";
+
+    document.getElementById("counterFilter").value = "all";
+
+    document.getElementById("statusFilter").value = "all";
+
+    renderSales();
+
+}
+
+
+/* =====================================================
+   DATE FORMAT
+   ===================================================== */
+
+function formatDate(value) {
+
+    if (!value) {
+        return "-";
+    }
+
+
+    const date =
+        new Date(value);
+
+
+    if (isNaN(date.getTime())) {
+        return "-";
+    }
+
+
+    return date.toLocaleString(
+        "en-IN",
+        {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit"
+        }
+    );
+
+}
+
+
+/* =====================================================
+   STATUS CLASS
+   ===================================================== */
+
+function statusClass(status) {
+
+    if (!status) {
+        return "";
+    }
+
+
+    return String(status)
+        .toLowerCase()
+        .replace(/\s+/g, "-");
+
+}
+
+
+/* =====================================================
+   ESCAPE HTML
+   ===================================================== */
 
 function escapeHtml(value) {
 
+    if (value === null ||
+        value === undefined) {
+        return "";
+    }
+
+
     return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 
-        .replace(
-            /&/g,
-            "&amp;"
-        )
+}
 
-        .replace(
-            /</g,
-            "&lt;"
-        )
 
-        .replace(
-            />/g,
-            "&gt;"
-        )
+/* =====================================================
+   ERROR
+   ===================================================== */
 
-   
+function showError(message) {
+
+    const box =
+        document.getElementById("errorBox");
+
+
+    if (!message) {
+
+        box.style.display = "none";
+        box.textContent = "";
+
+        return;
+
+    }
+
+
+    box.style.display = "block";
+
+    box.textContent = message;
+
+}
+
+
+/* =====================================================
+   DEBUG INFORMATION
+   ===================================================== */
+
+function updateDebug() {
+
+    const statuses =
+        [...new Set(
+            kotData.map(k => k.status)
+        )];
+
+
+    const counters =
+        [...new Set(
+            kotData.map(k => k.counter)
+        )];
+
+
+    document.getElementById("debugBox")
+        .textContent =
+
+`ORDERS ROWS: ${ordersData.length}
+
+COUNTER_KOT ROWS: ${kotData.length}
+
+ITEM ROWS CREATED: ${combinedData.length}
+
+COUNTERS:
+${JSON.stringify(counters, null, 2)}
+
+STATUSES:
+${JSON.stringify(statuses, null, 2)}
+
+First order:
+${JSON.stringify(
+    ordersData[0] || null,
+    null,
+    2
+)}
+
+First counter_kot:
+${JSON.stringify(
+    kotData[0] || null,
+    null,
+    2
+)}`;
+
+}
+
+
+/* =====================================================
+   START
+   ===================================================== */
+
+loadSales();
+
+</script>
+
+</body>
+</html>
