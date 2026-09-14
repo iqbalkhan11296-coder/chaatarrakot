@@ -1,14 +1,22 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
 
 <title>CHAATARRA - Sales</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
+
 * {
     box-sizing: border-box;
 }
@@ -75,7 +83,7 @@ header p {
 
 .summary {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 15px;
     margin-bottom: 20px;
 }
@@ -135,6 +143,23 @@ tr:hover {
     background: #fafafa;
 }
 
+.type {
+    padding: 5px 9px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.type.single {
+    background: #e8f0ff;
+    color: #174ea6;
+}
+
+.type.combo {
+    background: #fff0c2;
+    color: #7a4d00;
+}
+
 .status {
     padding: 5px 9px;
     border-radius: 20px;
@@ -190,6 +215,12 @@ tr:hover {
     overflow-x: auto;
 }
 
+.combo-components {
+    margin-top: 5px;
+    font-size: 12px;
+    color: #777;
+}
+
 @media(max-width:700px) {
 
     .summary {
@@ -201,7 +232,7 @@ tr:hover {
     }
 
     table {
-        min-width: 800px;
+        min-width: 850px;
     }
 
     .controls input,
@@ -210,108 +241,207 @@ tr:hover {
         width: 100%;
         margin: 5px 0;
     }
+
 }
+
 </style>
+
 </head>
 
 <body>
 
 <header>
-    <h1>CHAATARRA</h1>
-    <p>Sales Report</p>
+
+<h1>CHAATARRA</h1>
+<p>Sales Report</p>
+
 </header>
+
 
 <div class="container">
 
-    <div class="controls">
 
-        <label>From:</label>
-        <input type="date" id="fromDate">
+<!-- FILTERS -->
 
-        <label>To:</label>
-        <input type="date" id="toDate">
+<div class="controls">
 
-        <label>Counter:</label>
-        <select id="counterFilter">
-            <option value="all">All Counters</option>
-        </select>
+<label>From:</label>
+<input type="date" id="fromDate">
 
-        <label>Status:</label>
-        <select id="statusFilter">
-            <option value="all">All Status</option>
-        </select>
+<label>To:</label>
+<input type="date" id="toDate">
 
-        <button onclick="applyFilters()">Apply</button>
-        <button onclick="resetFilters()">Reset</button>
-        <button onclick="loadSales()">Refresh</button>
+<label>Counter:</label>
 
-    </div>
+<select id="counterFilter">
 
-    <div id="errorBox" class="error"></div>
+<option value="all">
+All Counters
+</option>
 
-    <div class="summary">
+<option value="chaats">
+Chaats
+</option>
 
-        <div class="card">
-            <h3>Total Orders</h3>
-            <strong id="totalOrders">0</strong>
-        </div>
+<option value="drinks">
+Drinks
+</option>
 
-        <div class="card">
-            <h3>Total Items Sold</h3>
-            <strong id="totalItems">0</strong>
-        </div>
+<option value="burgers">
+Burgers
+</option>
 
-        <div class="card">
-            <h3>Total Sales</h3>
-            <strong id="totalSales">₹0</strong>
-        </div>
+</select>
 
-    </div>
 
-    <div class="section">
+<label>Status:</label>
 
-        <h2>Items Sold</h2>
+<select id="statusFilter">
 
-        <div id="itemsLoading" class="loading">
-            Loading sales...
-        </div>
+<option value="all">
+All Status
+</option>
 
-        <div id="itemsTableContainer"></div>
+</select>
 
-    </div>
 
-    <div class="section">
+<button onclick="applyFilters()">
+Apply
+</button>
 
-        <h2>Order Details</h2>
+<button onclick="resetFilters()">
+Reset
+</button>
 
-        <div id="ordersTableContainer"></div>
+<button onclick="loadSales()">
+Refresh
+</button>
 
-    </div>
+</div>
 
-    <div class="section">
 
-        <h2>Item Summary</h2>
+<div id="errorBox" class="error"></div>
 
-        <div id="summaryTableContainer"></div>
 
-    </div>
+<!-- SUMMARY -->
 
-    <div class="section">
+<div class="summary">
 
-        <details>
-            <summary><b>Technical Information</b></summary>
-            <br>
-            <div id="debugBox" class="debug">
-                Waiting for data...
-            </div>
-        </details>
+<div class="card">
 
-    </div>
+<h3>Total Orders</h3>
+
+<strong id="totalOrders">
+0
+</strong>
+
+</div>
+
+
+<div class="card">
+
+<h3>Total Items Sold</h3>
+
+<strong id="totalItems">
+0
+</strong>
+
+</div>
+
+
+<div class="card">
+
+<h3>Total Combos Sold</h3>
+
+<strong id="totalCombos">
+0
+</strong>
+
+</div>
+
+
+<div class="card">
+
+<h3>Total Sales</h3>
+
+<strong id="totalSales">
+₹0
+</strong>
+
+</div>
+
+</div>
+
+
+<!-- SALES ITEMS -->
+
+<div class="section">
+
+<h2>
+Sales Items
+</h2>
+
+<div id="itemsLoading" class="loading">
+Loading sales...
+</div>
+
+<div id="itemsTableContainer"></div>
+
+</div>
+
+
+<!-- ORDER DETAILS -->
+
+<div class="section">
+
+<h2>
+Order Details
+</h2>
+
+<div id="ordersTableContainer"></div>
+
+</div>
+
+
+<!-- ITEM SUMMARY -->
+
+<div class="section">
+
+<h2>
+Item Summary
+</h2>
+
+<div id="summaryTableContainer"></div>
+
+</div>
+
+
+<!-- DEBUG -->
+
+<div class="section">
+
+<details>
+
+<summary>
+<b>Technical Information</b>
+</summary>
+
+<br>
+
+<div id="debugBox" class="debug">
+Waiting for data...
+</div>
+
+</details>
+
+</div>
+
 
 </div>
 
 
 <script>
+
 
 /* =====================================================
    SUPABASE CONNECTION
@@ -336,7 +466,7 @@ supabase.createClient(
 
 let ordersData = [];
 let kotData = [];
-let combinedData = [];
+let salesData = [];
 
 
 /* =====================================================
@@ -347,75 +477,94 @@ async function loadSales() {
 
     showError("");
 
-    document.getElementById("itemsLoading").style.display = "block";
+    document.getElementById(
+        "itemsLoading"
+    ).style.display = "block";
+
 
     try {
 
         /*
-         * Load main orders table
+         * IMPORTANT:
+         * Sales are calculated from ORDERS.
+         *
+         * This is necessary because combo orders are stored
+         * as one item in orders.items.
+         *
+         * counter_kot splits the combo into preparation
+         * components and therefore must NOT be used to
+         * calculate sales revenue.
          */
+
 
         const {
             data: orders,
             error: ordersError
         } = await supabaseClient
+
             .from("orders")
+
             .select("*")
+
             .order("created_at", {
                 ascending: false
             });
 
 
         if (ordersError) {
+
             throw new Error(
                 "ORDERS TABLE ERROR:\n" +
                 ordersError.message
             );
+
         }
 
 
         /*
-         * Load counter KOT table
+         * Load KOT only for counter/status information.
          */
 
         const {
             data: kots,
             error: kotError
         } = await supabaseClient
+
             .from("counter_kot")
+
             .select("*")
+
             .order("created_at", {
                 ascending: false
             });
 
 
         if (kotError) {
+
             throw new Error(
                 "COUNTER_KOT TABLE ERROR:\n" +
                 kotError.message
             );
+
         }
 
 
         ordersData = orders || [];
+
         kotData = kots || [];
 
 
         /*
-         * Combine orders + counter KOT
+         * Build SALES DATA directly from orders.
          */
 
-        combinedData = [];
+        salesData = [];
 
 
-        kotData.forEach(kot => {
+        ordersData.forEach(order => {
 
-            let order = ordersData.find(
-                o => String(o.id) === String(kot.order_id)
-            );
-
-
-            let items = parseItems(kot.items);
+            const items =
+                parseItems(order.items);
 
 
             if (!Array.isArray(items)) {
@@ -441,44 +590,101 @@ async function loadSales() {
                     );
 
 
-                combinedData.push({
+                const isCombo =
+                    item.type === "combo";
 
-                    orderId: kot.order_id,
 
-                    kotId: kot.id,
+                /*
+                 * Determine counter.
+                 *
+                 * Normal item:
+                 * item.counter
+                 *
+                 * Combo:
+                 * component counters are used only for
+                 * filtering/display. Combo remains one sale.
+                 */
 
-                    order: order,
+                let counter =
+                    item.counter || "";
 
-                    table:
-                        order?.table_number ??
-                        kot.table_number ??
-                        "-",
+
+                if (
+                    isCombo &&
+                    Array.isArray(item.components)
+                ) {
+
+                    const counters =
+                        [
+                            ...new Set(
+                                item.components
+                                    .map(c =>
+                                        c.counter
+                                    )
+                                    .filter(Boolean)
+                            )
+                        ];
+
+                    counter =
+                        counters.join(" + ");
+
+                }
+
+
+                salesData.push({
+
+                    orderId:
+                        order.id,
+
+                    orderNumber:
+                        order.order_number,
+
+                    order:
+                        order,
 
                     created_at:
-                        order?.created_at ??
-                        kot.created_at ??
-                        null,
+                        order.created_at,
+
+                    table:
+                        order.table_number ??
+                        "-",
+
+                    customer:
+                        order.customer_name ??
+                        "-",
 
                     item:
                         item.name ??
                         item.item_name ??
                         "Unknown Item",
 
-                    quantity: quantity,
+                    quantity:
+                        quantity,
 
-                    price: price,
+                    price:
+                        price,
 
-                    amount: quantity * price,
+                    amount:
+                        quantity * price,
 
                     counter:
-                        item.counter ??
-                        kot.counter ??
-                        "-",
+                        counter || "-",
 
                     status:
-                        kot.status ??
-                        order?.status ??
-                        "Unknown"
+                        order.status ??
+                        "Pending",
+
+                    type:
+                        isCombo
+                            ? "combo"
+                            : "single",
+
+                    components:
+                        Array.isArray(
+                            item.components
+                        )
+                            ? item.components
+                            : []
 
                 });
 
@@ -498,9 +704,13 @@ async function loadSales() {
 
         console.error(error);
 
-        showError(error.message);
+        showError(
+            error.message
+        );
 
-        document.getElementById("itemsLoading").style.display = "none";
+        document.getElementById(
+            "itemsLoading"
+        ).style.display = "none";
 
     }
 
@@ -518,18 +728,10 @@ function parseItems(items) {
     }
 
 
-    /*
-     * Already an array
-     */
-
     if (Array.isArray(items)) {
         return items;
     }
 
-
-    /*
-     * JSON string
-     */
 
     if (typeof items === "string") {
 
@@ -538,15 +740,19 @@ function parseItems(items) {
             const parsed =
                 JSON.parse(items);
 
+
             if (Array.isArray(parsed)) {
                 return parsed;
             }
+
 
             if (
                 parsed &&
                 Array.isArray(parsed.items)
             ) {
+
                 return parsed.items;
+
             }
 
         } catch (e) {
@@ -561,15 +767,13 @@ function parseItems(items) {
     }
 
 
-    /*
-     * Object containing items
-     */
-
     if (
         typeof items === "object" &&
         Array.isArray(items.items)
     ) {
+
         return items.items;
+
     }
 
 
@@ -584,41 +788,20 @@ function parseItems(items) {
 
 function populateFilters() {
 
-    const counterSelect =
-        document.getElementById("counterFilter");
-
     const statusSelect =
-        document.getElementById("statusFilter");
-
-
-    const counters =
-        [...new Set(
-            combinedData
-                .map(x => x.counter)
-                .filter(Boolean)
-        )];
+        document.getElementById(
+            "statusFilter"
+        );
 
 
     const statuses =
-        [...new Set(
-            combinedData
-                .map(x => x.status)
-                .filter(Boolean)
-        )];
-
-
-    counterSelect.innerHTML =
-        '<option value="all">All Counters</option>';
-
-
-    counters.forEach(counter => {
-
-        counterSelect.innerHTML +=
-            `<option value="${escapeHtml(counter)}">
-                ${escapeHtml(counter)}
-            </option>`;
-
-    });
+        [
+            ...new Set(
+                salesData
+                    .map(x => x.status)
+                    .filter(Boolean)
+            )
+        ];
 
 
     statusSelect.innerHTML =
@@ -628,6 +811,7 @@ function populateFilters() {
     statuses.forEach(status => {
 
         statusSelect.innerHTML +=
+
             `<option value="${escapeHtml(status)}">
                 ${escapeHtml(status)}
             </option>`;
@@ -649,118 +833,197 @@ function applyFilters() {
 
 
 /* =====================================================
-   RENDER SALES
+   GET FILTERED DATA
    ===================================================== */
 
-function renderSales() {
+function getFilteredData() {
 
     const fromDate =
-        document.getElementById("fromDate").value;
+        document.getElementById(
+            "fromDate"
+        ).value;
+
 
     const toDate =
-        document.getElementById("toDate").value;
+        document.getElementById(
+            "toDate"
+        ).value;
+
 
     const counter =
-        document.getElementById("counterFilter").value;
+        document.getElementById(
+            "counterFilter"
+        ).value;
+
 
     const status =
-        document.getElementById("statusFilter").value;
+        document.getElementById(
+            "statusFilter"
+        ).value;
 
 
-    let filtered =
-        combinedData.filter(row => {
+    return salesData.filter(row => {
 
+
+        /*
+         * Counter filter
+         */
+
+        if (counter !== "all") {
 
             /*
-             * Counter filter
+             * Normal item
              */
 
             if (
-                counter !== "all" &&
+                row.type === "single" &&
                 row.counter !== counter
             ) {
+
                 return false;
+
             }
 
 
             /*
-             * Status filter
+             * Combo:
+             * check component counters.
              */
 
-            if (
-                status !== "all" &&
-                row.status !== status
-            ) {
+            if (row.type === "combo") {
+
+                const hasCounter =
+                    row.components.some(
+                        component =>
+                            component.counter === counter
+                    );
+
+
+                if (!hasCounter) {
+                    return false;
+                }
+
+            }
+
+        }
+
+
+        /*
+         * Status filter
+         */
+
+        if (
+            status !== "all" &&
+            row.status !== status
+        ) {
+
+            return false;
+
+        }
+
+
+        /*
+         * Date filter
+         */
+
+        if (
+            fromDate ||
+            toDate
+        ) {
+
+            if (!row.created_at) {
                 return false;
             }
 
 
-            /*
-             * Date filter
-             */
+            const date =
+                new Date(
+                    row.created_at
+                );
+
+
+            const dateString =
+                date.toISOString()
+                    .split("T")[0];
+
 
             if (
-                fromDate ||
-                toDate
+                fromDate &&
+                dateString < fromDate
             ) {
 
-                if (!row.created_at) {
-                    return false;
-                }
-
-
-                const date =
-                    new Date(row.created_at);
-
-
-                const dateString =
-                    date.toISOString()
-                        .split("T")[0];
-
-
-                if (
-                    fromDate &&
-                    dateString < fromDate
-                ) {
-                    return false;
-                }
-
-
-                if (
-                    toDate &&
-                    dateString > toDate
-                ) {
-                    return false;
-                }
+                return false;
 
             }
 
 
-            return true;
+            if (
+                toDate &&
+                dateString > toDate
+            ) {
 
-        });
+                return false;
+
+            }
+
+        }
 
 
-    renderSummary(filtered);
+        return true;
 
-    renderItemsTable(filtered);
-
-    renderOrdersTable(filtered);
-
-    renderItemSummary(filtered);
+    });
 
 }
 
 
 /* =====================================================
-   SUMMARY CARDS
+   RENDER SALES
+   ===================================================== */
+
+function renderSales() {
+
+    const filtered =
+        getFilteredData();
+
+
+    renderSummary(
+        filtered
+    );
+
+
+    renderItemsTable(
+        filtered
+    );
+
+
+    renderOrdersTable(
+        filtered
+    );
+
+
+    renderItemSummary(
+        filtered
+    );
+
+}
+
+
+/* =====================================================
+   SUMMARY
    ===================================================== */
 
 function renderSummary(data) {
 
+
+    /*
+     * Unique orders
+     */
+
     const orderIds =
         new Set(
-            data.map(x => x.orderId)
+            data.map(
+                x => x.orderId
+            )
         );
 
 
@@ -768,45 +1031,98 @@ function renderSummary(data) {
         orderIds.size;
 
 
+    /*
+     * Total quantities.
+     *
+     * Both normal items and combos count
+     * as one sold item per quantity.
+     */
+
     const totalItems =
         data.reduce(
             (sum, x) =>
-                sum + Number(x.quantity || 0),
+                sum +
+                Number(
+                    x.quantity || 0
+                ),
             0
         );
 
+
+    /*
+     * Number of combos sold
+     */
+
+    const totalCombos =
+        data
+            .filter(
+                x =>
+                    x.type === "combo"
+            )
+            .reduce(
+                (sum, x) =>
+                    sum +
+                    Number(
+                        x.quantity || 0
+                    ),
+                0
+            );
+
+
+    /*
+     * Sales amount.
+     *
+     * Because each row comes from orders.items,
+     * combo price is counted ONCE.
+     */
 
     const totalSales =
         data.reduce(
             (sum, x) =>
-                sum + Number(x.amount || 0),
+                sum +
+                Number(
+                    x.amount || 0
+                ),
             0
         );
 
 
-    document.getElementById("totalOrders")
-        .textContent = totalOrders;
+    document.getElementById(
+        "totalOrders"
+    ).textContent =
+        totalOrders;
 
 
-    document.getElementById("totalItems")
-        .textContent = totalItems;
+    document.getElementById(
+        "totalItems"
+    ).textContent =
+        totalItems;
 
 
-    document.getElementById("totalSales")
-        .textContent =
-        "₹" + totalSales.toFixed(2);
+    document.getElementById(
+        "totalCombos"
+    ).textContent =
+        totalCombos;
+
+
+    document.getElementById(
+        "totalSales"
+    ).textContent =
+        "₹" +
+        totalSales.toFixed(2);
 
 }
 
 
 /* =====================================================
-   ITEMS TABLE
+   SALES ITEMS TABLE
    ===================================================== */
 
 function renderItemsTable(data) {
 
-    document.getElementById("itemsLoading")
-        .style.display = "none";
+    document.getElementById(
+        "itemsLoading"
+    ).style.display = "none";
 
 
     const container =
@@ -827,74 +1143,171 @@ function renderItemsTable(data) {
 
     let html = `
 
-        <table>
+    <table>
 
-            <thead>
+    <thead>
 
-                <tr>
-                    <th>Date / Time</th>
-                    <th>Order</th>
-                    <th>Table</th>
-                    <th>Item</th>
-                    <th>Qty</th>
-                    <th>Price</th>
-                    <th>Amount</th>
-                    <th>Counter</th>
-                    <th>Status</th>
-                </tr>
+    <tr>
 
-            </thead>
+        <th>Date / Time</th>
 
-            <tbody>
+        <th>Order</th>
+
+        <th>Customer</th>
+
+        <th>Item</th>
+
+        <th>Type</th>
+
+        <th>Qty</th>
+
+        <th>Price</th>
+
+        <th>Amount</th>
+
+        <th>Counter</th>
+
+        <th>Status</th>
+
+    </tr>
+
+    </thead>
+
+    <tbody>
 
     `;
 
 
     data.forEach(row => {
 
+
+        let componentText = "";
+
+
+        if (
+            row.type === "combo" &&
+            row.components.length
+        ) {
+
+            componentText =
+                row.components
+                    .map(
+                        component =>
+                            escapeHtml(
+                                component.name
+                            )
+                    )
+                    .join(" + ");
+
+        }
+
+
         html += `
 
-            <tr>
+        <tr>
 
-                <td>
-                    ${formatDate(row.created_at)}
-                </td>
+            <td>
+                ${formatDate(
+                    row.created_at
+                )}
+            </td>
 
-                <td>
-                    #${escapeHtml(row.orderId)}
-                </td>
 
-                <td>
-                    ${escapeHtml(row.table)}
-                </td>
+            <td>
+                <b>
+                    #${escapeHtml(
+                        row.orderNumber ??
+                        row.orderId
+                    )}
+                </b>
+            </td>
 
-                <td>
-                    <b>${escapeHtml(row.item)}</b>
-                </td>
 
-                <td>
-                    ${row.quantity}
-                </td>
+            <td>
+                ${escapeHtml(
+                    row.customer
+                )}
+            </td>
 
-                <td>
-                    ₹${row.price.toFixed(2)}
-                </td>
 
-                <td>
-                    <b>₹${row.amount.toFixed(2)}</b>
-                </td>
+            <td>
 
-                <td>
-                    ${escapeHtml(row.counter)}
-                </td>
+                <b>
+                    ${escapeHtml(
+                        row.item
+                    )}
+                </b>
 
-                <td>
-                    <span class="status ${statusClass(row.status)}">
-                        ${escapeHtml(row.status)}
-                    </span>
-                </td>
+                ${
+                    componentText
+                    ? `
+                    <div class="combo-components">
+                        Includes:
+                        ${componentText}
+                    </div>
+                    `
+                    : ""
+                }
 
-            </tr>
+            </td>
+
+
+            <td>
+
+                <span class="type ${row.type}">
+
+                    ${
+                        row.type === "combo"
+                        ? "COMBO"
+                        : "SINGLE"
+                    }
+
+                </span>
+
+            </td>
+
+
+            <td>
+                ${row.quantity}
+            </td>
+
+
+            <td>
+                ₹${row.price.toFixed(2)}
+            </td>
+
+
+            <td>
+                <b>
+                    ₹${row.amount.toFixed(2)}
+                </b>
+            </td>
+
+
+            <td>
+                ${escapeHtml(
+                    row.counter
+                )}
+            </td>
+
+
+            <td>
+
+                <span
+                    class="status ${statusClass(
+                        row.status
+                    )}"
+                >
+
+                    ${escapeHtml(
+                        row.status
+                    )}
+
+                </span>
+
+            </td>
+
+        </tr>
 
         `;
 
@@ -902,18 +1315,22 @@ function renderItemsTable(data) {
 
 
     html += `
-            </tbody>
-        </table>
+
+    </tbody>
+
+    </table>
+
     `;
 
 
-    container.innerHTML = html;
+    container.innerHTML =
+        html;
 
 }
 
 
 /* =====================================================
-   ORDER TABLE
+   ORDER DETAILS
    ===================================================== */
 
 function renderOrdersTable(data) {
@@ -924,22 +1341,49 @@ function renderOrdersTable(data) {
         );
 
 
-    const orderMap = new Map();
+    const orderMap =
+        new Map();
 
 
     data.forEach(row => {
 
-        if (!orderMap.has(row.orderId)) {
+        if (
+            !orderMap.has(
+                row.orderId
+            )
+        ) {
 
             orderMap.set(
                 row.orderId,
                 {
-                    orderId: row.orderId,
-                    table: row.table,
-                    created_at: row.created_at,
-                    amount: 0,
-                    items: 0,
-                    status: row.status
+
+                    orderId:
+                        row.orderId,
+
+                    orderNumber:
+                        row.orderNumber,
+
+                    customer:
+                        row.customer,
+
+                    table:
+                        row.table,
+
+                    created_at:
+                        row.created_at,
+
+                    amount:
+                        0,
+
+                    items:
+                        0,
+
+                    combos:
+                        0,
+
+                    status:
+                        row.status
+
                 }
             );
 
@@ -947,21 +1391,41 @@ function renderOrdersTable(data) {
 
 
         const order =
-            orderMap.get(row.orderId);
+            orderMap.get(
+                row.orderId
+            );
 
 
         order.amount +=
-            Number(row.amount || 0);
+            Number(
+                row.amount || 0
+            );
 
 
         order.items +=
-            Number(row.quantity || 0);
+            Number(
+                row.quantity || 0
+            );
+
+
+        if (
+            row.type === "combo"
+        ) {
+
+            order.combos +=
+                Number(
+                    row.quantity || 0
+                );
+
+        }
 
     });
 
 
     const orders =
-        [...orderMap.values()];
+        [
+            ...orderMap.values()
+        ];
 
 
     if (!orders.length) {
@@ -976,22 +1440,31 @@ function renderOrdersTable(data) {
 
     let html = `
 
-        <table>
+    <table>
 
-            <thead>
+    <thead>
 
-                <tr>
-                    <th>Date / Time</th>
-                    <th>Order</th>
-                    <th>Table</th>
-                    <th>Items</th>
-                    <th>Calculated Total</th>
-                    <th>Status</th>
-                </tr>
+    <tr>
 
-            </thead>
+        <th>Date / Time</th>
 
-            <tbody>
+        <th>Order</th>
+
+        <th>Customer</th>
+
+        <th>Items</th>
+
+        <th>Combos</th>
+
+        <th>Calculated Total</th>
+
+        <th>Status</th>
+
+    </tr>
+
+    </thead>
+
+    <tbody>
 
     `;
 
@@ -1000,35 +1473,66 @@ function renderOrdersTable(data) {
 
         html += `
 
-            <tr>
+        <tr>
 
-                <td>
-                    ${formatDate(order.created_at)}
-                </td>
+            <td>
+                ${formatDate(
+                    order.created_at
+                )}
+            </td>
 
-                <td>
-                    <b>#${escapeHtml(order.orderId)}</b>
-                </td>
 
-                <td>
-                    ${escapeHtml(order.table)}
-                </td>
+            <td>
+                <b>
+                    #${escapeHtml(
+                        order.orderNumber ??
+                        order.orderId
+                    )}
+                </b>
+            </td>
 
-                <td>
-                    ${order.items}
-                </td>
 
-                <td>
+            <td>
+                ${escapeHtml(
+                    order.customer
+                )}
+            </td>
+
+
+            <td>
+                ${order.items}
+            </td>
+
+
+            <td>
+                ${order.combos}
+            </td>
+
+
+            <td>
+                <b>
                     ₹${order.amount.toFixed(2)}
-                </td>
+                </b>
+            </td>
 
-                <td>
-                    <span class="status ${statusClass(order.status)}">
-                        ${escapeHtml(order.status)}
-                    </span>
-                </td>
 
-            </tr>
+            <td>
+
+                <span
+                    class="status ${statusClass(
+                        order.status
+                    )}"
+                >
+
+                    ${escapeHtml(
+                        order.status
+                    )}
+
+                </span>
+
+            </td>
+
+        </tr>
 
         `;
 
@@ -1036,12 +1540,16 @@ function renderOrdersTable(data) {
 
 
     html += `
-            </tbody>
-        </table>
+
+    </tbody>
+
+    </table>
+
     `;
 
 
-    container.innerHTML = html;
+    container.innerHTML =
+        html;
 
 }
 
@@ -1058,24 +1566,42 @@ function renderItemSummary(data) {
         );
 
 
-    const map = new Map();
+    const map =
+        new Map();
 
 
     data.forEach(row => {
 
+        /*
+         * Keep SINGLE and COMBO separate.
+         */
+
         const key =
-            row.item + "|" + row.counter;
+            row.type +
+            "|" +
+            row.item;
 
 
-        if (!map.has(key)) {
+        if (
+            !map.has(key)
+        ) {
 
             map.set(
                 key,
                 {
-                    item: row.item,
-                    counter: row.counter,
-                    quantity: 0,
-                    amount: 0
+
+                    item:
+                        row.item,
+
+                    type:
+                        row.type,
+
+                    quantity:
+                        0,
+
+                    amount:
+                        0
+
                 }
             );
 
@@ -1087,20 +1613,27 @@ function renderItemSummary(data) {
 
 
         entry.quantity +=
-            Number(row.quantity || 0);
+            Number(
+                row.quantity || 0
+            );
 
 
         entry.amount +=
-            Number(row.amount || 0);
+            Number(
+                row.amount || 0
+            );
 
     });
 
 
     const summary =
-        [...map.values()]
+        [
+            ...map.values()
+        ]
         .sort(
             (a,b) =>
-                b.quantity - a.quantity
+                b.quantity -
+                a.quantity
         );
 
 
@@ -1116,20 +1649,25 @@ function renderItemSummary(data) {
 
     let html = `
 
-        <table>
+    <table>
 
-            <thead>
+    <thead>
 
-                <tr>
-                    <th>Item</th>
-                    <th>Counter</th>
-                    <th>Total Quantity</th>
-                    <th>Total Amount</th>
-                </tr>
+    <tr>
 
-            </thead>
+        <th>Item</th>
 
-            <tbody>
+        <th>Type</th>
+
+        <th>Total Quantity</th>
+
+        <th>Total Amount</th>
+
+    </tr>
+
+    </thead>
+
+    <tbody>
 
     `;
 
@@ -1138,25 +1676,46 @@ function renderItemSummary(data) {
 
         html += `
 
-            <tr>
+        <tr>
 
-                <td>
-                    <b>${escapeHtml(row.item)}</b>
-                </td>
+            <td>
+                <b>
+                    ${escapeHtml(
+                        row.item
+                    )}
+                </b>
+            </td>
 
-                <td>
-                    ${escapeHtml(row.counter)}
-                </td>
 
-                <td>
-                    ${row.quantity}
-                </td>
+            <td>
 
-                <td>
-                    <b>₹${row.amount.toFixed(2)}</b>
-                </td>
+                <span
+                    class="type ${row.type}"
+                >
 
-            </tr>
+                    ${
+                        row.type === "combo"
+                        ? "COMBO"
+                        : "SINGLE"
+                    }
+
+                </span>
+
+            </td>
+
+
+            <td>
+                ${row.quantity}
+            </td>
+
+
+            <td>
+                <b>
+                    ₹${row.amount.toFixed(2)}
+                </b>
+            </td>
+
+        </tr>
 
         `;
 
@@ -1164,29 +1723,45 @@ function renderItemSummary(data) {
 
 
     html += `
-            </tbody>
-        </table>
+
+    </tbody>
+
+    </table>
+
     `;
 
 
-    container.innerHTML = html;
+    container.innerHTML =
+        html;
 
 }
 
 
 /* =====================================================
-   RESET
+   RESET FILTERS
    ===================================================== */
 
 function resetFilters() {
 
-    document.getElementById("fromDate").value = "";
+    document.getElementById(
+        "fromDate"
+    ).value = "";
 
-    document.getElementById("toDate").value = "";
 
-    document.getElementById("counterFilter").value = "all";
+    document.getElementById(
+        "toDate"
+    ).value = "";
 
-    document.getElementById("statusFilter").value = "all";
+
+    document.getElementById(
+        "counterFilter"
+    ).value = "all";
+
+
+    document.getElementById(
+        "statusFilter"
+    ).value = "all";
+
 
     renderSales();
 
@@ -1208,19 +1783,31 @@ function formatDate(value) {
         new Date(value);
 
 
-    if (isNaN(date.getTime())) {
+    if (
+        isNaN(
+            date.getTime()
+        )
+    ) {
+
         return "-";
+
     }
 
 
     return date.toLocaleString(
         "en-IN",
         {
+
             day: "2-digit",
+
             month: "2-digit",
+
             year: "numeric",
+
             hour: "2-digit",
+
             minute: "2-digit"
+
         }
     );
 
@@ -1240,7 +1827,10 @@ function statusClass(status) {
 
     return String(status)
         .toLowerCase()
-        .replace(/\s+/g, "-");
+        .replace(
+            /\s+/g,
+            "-"
+        );
 
 }
 
@@ -1251,18 +1841,42 @@ function statusClass(status) {
 
 function escapeHtml(value) {
 
-    if (value === null ||
-        value === undefined) {
+    if (
+        value === null ||
+        value === undefined
+    ) {
+
         return "";
+
     }
 
 
     return String(value)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+
+        .replace(
+            /</g,
+            "&lt;"
+        )
+
+        .replace(
+            />/g,
+            "&gt;"
+        )
+
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+
+        .replace(
+            /'/g,
+            "&#039;"
+        );
 
 }
 
@@ -1274,12 +1888,16 @@ function escapeHtml(value) {
 function showError(message) {
 
     const box =
-        document.getElementById("errorBox");
+        document.getElementById(
+            "errorBox"
+        );
 
 
     if (!message) {
 
-        box.style.display = "none";
+        box.style.display =
+            "none";
+
         box.textContent = "";
 
         return;
@@ -1287,45 +1905,49 @@ function showError(message) {
     }
 
 
-    box.style.display = "block";
+    box.style.display =
+        "block";
 
-    box.textContent = message;
+
+    box.textContent =
+        message;
 
 }
 
 
 /* =====================================================
-   DEBUG INFORMATION
+   DEBUG
    ===================================================== */
 
 function updateDebug() {
 
-    const statuses =
-        [...new Set(
-            kotData.map(k => k.status)
-        )];
+    const comboCount =
+        salesData.filter(
+            x =>
+                x.type === "combo"
+        ).length;
 
 
-    const counters =
-        [...new Set(
-            kotData.map(k => k.counter)
-        )];
+    const singleCount =
+        salesData.filter(
+            x =>
+                x.type === "single"
+        ).length;
 
 
-    document.getElementById("debugBox")
-        .textContent =
+    document.getElementById(
+        "debugBox"
+    ).textContent =
 
 `ORDERS ROWS: ${ordersData.length}
 
 COUNTER_KOT ROWS: ${kotData.length}
 
-ITEM ROWS CREATED: ${combinedData.length}
+SALES ROWS: ${salesData.length}
 
-COUNTERS:
-${JSON.stringify(counters, null, 2)}
+SINGLE SALES ROWS: ${singleCount}
 
-STATUSES:
-${JSON.stringify(statuses, null, 2)}
+COMBO SALES ROWS: ${comboCount}
 
 First order:
 ${JSON.stringify(
@@ -1334,9 +1956,9 @@ ${JSON.stringify(
     2
 )}
 
-First counter_kot:
+First sales row:
 ${JSON.stringify(
-    kotData[0] || null,
+    salesData[0] || null,
     null,
     2
 )}`;
@@ -1353,4 +1975,6 @@ loadSales();
 </script>
 
 </body>
+
 </html>
+```
