@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 
@@ -84,6 +85,17 @@
             margin-top: 5px;
         }
 
+        .combo-label {
+            display: inline-block;
+            margin-top: 5px;
+            padding: 3px 7px;
+            border-radius: 4px;
+            background: #4b001f;
+            color: white;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
         .quantity-row {
             display: flex;
             align-items: center;
@@ -126,6 +138,16 @@
             justify-content: space-between;
             padding: 8px 0;
             border-bottom: 1px solid #eee;
+            gap: 10px;
+        }
+
+        .cart-left {
+            flex: 1;
+        }
+
+        .cart-right {
+            white-space: nowrap;
+            font-weight: bold;
         }
 
         .total {
@@ -183,8 +205,6 @@
             color: red;
         }
 
-        /* PRINT AREA */
-
         #receipt {
             display: none;
         }
@@ -234,7 +254,7 @@
             }
 
             .receipt-subtitle {
-                font-size: 11px;
+                font-size: 10px;
             }
 
             .receipt-line {
@@ -247,7 +267,7 @@
             }
 
             .receipt-item {
-                margin: 4px 0;
+                margin: 5px 0;
             }
 
             .receipt-item-line {
@@ -264,6 +284,11 @@
             .receipt-item-price {
                 width: 13mm;
                 text-align: right;
+                white-space: nowrap;
+            }
+
+            .receipt-qty {
+                font-size: 10px;
             }
 
             .receipt-total {
@@ -291,53 +316,91 @@
 
 <div class="container">
 
+    <!-- CUSTOMER -->
+
     <div class="section">
 
         <h2>Customer</h2>
 
         <div class="customer-box">
+
             <input
                 type="text"
                 id="customerName"
                 placeholder="Customer Name"
             >
+
         </div>
 
     </div>
 
 
+    <!-- CHAATS -->
+
     <div class="section">
 
         <h2>Chaats</h2>
 
-        <div class="menu-grid" id="chaatsMenu"></div>
+        <div
+            class="menu-grid"
+            id="chaatsMenu"
+        ></div>
 
     </div>
 
+
+    <!-- DRINKS -->
 
     <div class="section">
 
         <h2>Drinks</h2>
 
-        <div class="menu-grid" id="drinksMenu"></div>
+        <div
+            class="menu-grid"
+            id="drinksMenu"
+        ></div>
 
     </div>
 
+
+    <!-- BURGERS -->
 
     <div class="section">
 
         <h2>Burgers</h2>
 
-        <div class="menu-grid" id="burgersMenu"></div>
+        <div
+            class="menu-grid"
+            id="burgersMenu"
+        ></div>
 
     </div>
 
+
+    <!-- COMBOS -->
+
+    <div class="section">
+
+        <h2>Combos</h2>
+
+        <div
+            class="menu-grid"
+            id="combosMenu"
+        ></div>
+
+    </div>
+
+
+    <!-- ORDER -->
 
     <div class="section">
 
         <h2>Order</h2>
 
-        <div id="cart" class="cart">
+        <div
+            id="cart"
+            class="cart"
+        >
             No items selected.
         </div>
 
@@ -370,7 +433,9 @@
 </div>
 
 
-<!-- 58MM RECEIPT -->
+<!-- ========================= -->
+<!-- 58MM THERMAL RECEIPT -->
+<!-- ========================= -->
 
 <div id="receipt">
 
@@ -391,15 +456,20 @@
     <div class="receipt-info">
 
         <div>
-            Order No: <span id="receiptOrderNumber"></span>
+            Order No:
+            <span id="receiptOrderNumber"></span>
         </div>
 
         <div>
-            Date: <span id="receiptDate"></span>
+            Date:
+            <span id="receiptDate"></span>
         </div>
 
         <div id="receiptCustomerRow">
-            Customer: <span id="receiptCustomer"></span>
+
+            Customer:
+            <span id="receiptCustomer"></span>
+
         </div>
 
     </div>
@@ -436,6 +506,12 @@
 
 
 <script>
+
+    /*
+    ==========================================
+    NORMAL MENU ITEMS
+    ==========================================
+    */
 
     const menu = {
 
@@ -510,12 +586,118 @@
     };
 
 
+    /*
+    ==========================================
+    DUMMY COMBOS
+    ==========================================
+    */
+
+    const combos = {
+
+        "Pani Puri + Mint Lime": {
+
+            price: 80,
+
+            items: [
+
+                {
+                    name: "Pani Puri",
+                    counter: "chaats"
+                },
+
+                {
+                    name: "Mint Lime",
+                    counter: "drinks"
+                }
+
+            ]
+
+        },
+
+
+        "Masala Puri + Mango Shake": {
+
+            price: 140,
+
+            items: [
+
+                {
+                    name: "Masala Puri",
+                    counter: "chaats"
+                },
+
+                {
+                    name: "Mango Shake",
+                    counter: "drinks"
+                }
+
+            ]
+
+        },
+
+
+        "Classic Burger + Mango Shake": {
+
+            price: 190,
+
+            items: [
+
+                {
+                    name: "Classic Burger",
+                    counter: "burgers"
+                },
+
+                {
+                    name: "Mango Shake",
+                    counter: "drinks"
+                }
+
+            ]
+
+        },
+
+
+        "Chicken Burger + Oreo Shake": {
+
+            price: 210,
+
+            items: [
+
+                {
+                    name: "Chicken Burger",
+                    counter: "burgers"
+                },
+
+                {
+                    name: "Oreo Shake",
+                    counter: "drinks"
+                }
+
+            ]
+
+        }
+
+    };
+
+
+    /*
+    ==========================================
+    QUANTITIES
+    ==========================================
+    */
+
     const quantities = {};
+
+    const comboQuantities = {};
 
     let lastOrder = null;
 
 
-    // CREATE MENU
+    /*
+    ==========================================
+    CREATE NORMAL MENU
+    ==========================================
+    */
 
     function createMenu(containerId, counter) {
 
@@ -530,6 +712,7 @@
             if (menu[item].counter !== counter) {
                 return;
             }
+
 
             quantities[item] = 0;
 
@@ -583,14 +766,101 @@
     }
 
 
-    createMenu("chaatsMenu", "chaats");
+    /*
+    ==========================================
+    CREATE COMBO MENU
+    ==========================================
+    */
 
-    createMenu("drinksMenu", "drinks");
+    function createComboMenu() {
 
-    createMenu("burgersMenu", "burgers");
+        const container =
+            document.getElementById("combosMenu");
+
+        container.innerHTML = "";
 
 
-    // CHANGE QUANTITY
+        Object.keys(combos).forEach(combo => {
+
+            comboQuantities[combo] = 0;
+
+
+            const div =
+                document.createElement("div");
+
+            div.className = "item";
+
+
+            div.innerHTML = `
+
+                <div class="item-name">
+                    ${combo}
+                </div>
+
+                <span class="combo-label">
+                    COMBO
+                </span>
+
+                <div class="item-price">
+                    ₹${combos[combo].price}
+                </div>
+
+                <div class="quantity-row">
+
+                    <button
+                        onclick="changeComboQuantity('${combo}', -1)"
+                    >
+                        −
+                    </button>
+
+                    <span
+                        class="quantity"
+                        id="comboQty-${combo.replace(/[^a-zA-Z0-9]/g, '')}"
+                    >
+                        0
+                    </span>
+
+                    <button
+                        onclick="changeComboQuantity('${combo}', 1)"
+                    >
+                        +
+                    </button>
+
+                </div>
+
+            `;
+
+
+            container.appendChild(div);
+
+        });
+
+    }
+
+
+    createMenu(
+        "chaatsMenu",
+        "chaats"
+    );
+
+    createMenu(
+        "drinksMenu",
+        "drinks"
+    );
+
+    createMenu(
+        "burgersMenu",
+        "burgers"
+    );
+
+    createComboMenu();
+
+
+    /*
+    ==========================================
+    NORMAL ITEM QUANTITY
+    ==========================================
+    */
 
     function changeQuantity(item, change) {
 
@@ -616,7 +886,41 @@
     }
 
 
-    // UPDATE CART
+    /*
+    ==========================================
+    COMBO QUANTITY
+    ==========================================
+    */
+
+    function changeComboQuantity(combo, change) {
+
+        comboQuantities[combo] += change;
+
+
+        if (comboQuantities[combo] < 0) {
+            comboQuantities[combo] = 0;
+        }
+
+
+        const id =
+            "comboQty-" +
+            combo.replace(/[^a-zA-Z0-9]/g, "");
+
+
+        document.getElementById(id).textContent =
+            comboQuantities[combo];
+
+
+        updateCart();
+
+    }
+
+
+    /*
+    ==========================================
+    UPDATE CART
+    ==========================================
+    */
 
     function updateCart() {
 
@@ -630,9 +934,14 @@
         let hasItems = false;
 
 
+        /*
+        NORMAL ITEMS
+        */
+
         Object.keys(menu).forEach(item => {
 
-            const qty = quantities[item];
+            const qty =
+                quantities[item];
 
 
             if (qty > 0) {
@@ -651,13 +960,66 @@
 
                     <div class="cart-row">
 
-                        <span>
-                            ${item} × ${qty}
-                        </span>
+                        <div class="cart-left">
 
-                        <span>
+                            ${item}
+                            × ${qty}
+
+                        </div>
+
+                        <div class="cart-right">
+
                             ₹${amount}
-                        </span>
+
+                        </div>
+
+                    </div>
+
+                `;
+
+            }
+
+        });
+
+
+        /*
+        COMBOS
+        */
+
+        Object.keys(combos).forEach(combo => {
+
+            const qty =
+                comboQuantities[combo];
+
+
+            if (qty > 0) {
+
+                hasItems = true;
+
+
+                const amount =
+                    combos[combo].price * qty;
+
+
+                total += amount;
+
+
+                html += `
+
+                    <div class="cart-row">
+
+                        <div class="cart-left">
+
+                            ${combo}
+                            × ${qty}
+
+                        </div>
+
+                        <div class="cart-right">
+
+                            ₹${amount}
+
+                        </div>
 
                     </div>
 
@@ -687,7 +1049,11 @@
     }
 
 
-    // PLACE ORDER
+    /*
+    ==========================================
+    PLACE ORDER
+    ==========================================
+    */
 
     async function placeOrder() {
 
@@ -711,14 +1077,21 @@
         let total = 0;
 
 
+        /*
+        ======================================
+        NORMAL ITEMS
+        ======================================
+        */
+
         Object.keys(menu).forEach(item => {
 
-            const qty = quantities[item];
+            const qty =
+                quantities[item];
 
 
             if (qty > 0) {
 
-                const itemTotal =
+                const amount =
                     menu[item].price * qty;
 
 
@@ -730,21 +1103,71 @@
 
                     quantity: qty,
 
-                    counter: menu[item].counter
+                    counter: menu[item].counter,
+
+                    type: "single"
 
                 });
 
 
-                total += itemTotal;
+                total += amount;
 
             }
 
         });
 
 
+        /*
+        ======================================
+        COMBOS
+        ======================================
+        */
+
+        Object.keys(combos).forEach(combo => {
+
+            const qty =
+                comboQuantities[combo];
+
+
+            if (qty > 0) {
+
+                const amount =
+                    combos[combo].price * qty;
+
+
+                selectedItems.push({
+
+                    name: combo,
+
+                    price: combos[combo].price,
+
+                    quantity: qty,
+
+                    type: "combo",
+
+                    components:
+                        combos[combo].items
+
+                });
+
+
+                total += amount;
+
+            }
+
+        });
+
+
+        /*
+        ======================================
+        CHECK ORDER
+        ======================================
+        */
+
         if (selectedItems.length === 0) {
 
-            message.className = "error";
+            message.className =
+                "error";
 
             message.textContent =
                 "Please select at least one item.";
@@ -759,14 +1182,20 @@
         button.textContent =
             "PLACING ORDER...";
 
-        printButton.style.display = "none";
+        printButton.style.display =
+            "none";
 
-        message.textContent = "";
+        message.textContent =
+            "";
 
 
         try {
 
-            // CREATE MAIN ORDER
+            /*
+            ==================================
+            CREATE MAIN ORDER
+            ==================================
+            */
 
             const { data: order, error: orderError } =
                 await supabaseClient
@@ -799,7 +1228,11 @@
             }
 
 
-            // GROUP ITEMS BY COUNTER
+            /*
+            ==================================
+            CREATE COUNTER ITEM GROUPS
+            ==================================
+            */
 
             const counterItems = {
 
@@ -812,25 +1245,91 @@
             };
 
 
+            /*
+            ==================================
+            SPLIT NORMAL ITEMS
+            ==================================
+            */
+
             selectedItems.forEach(item => {
 
-                if (counterItems[item.counter]) {
+                if (item.type === "single") {
 
-                    counterItems[item.counter].push(item);
+                    if (counterItems[item.counter]) {
+
+                        counterItems[item.counter].push({
+
+                            name:
+                                item.name,
+
+                            quantity:
+                                item.quantity
+
+                        });
+
+                    }
 
                 }
 
             });
 
 
-            // CREATE KOT ROWS
+            /*
+            ==================================
+            SPLIT COMBOS
+            ==================================
+            */
+
+            selectedItems.forEach(item => {
+
+                if (
+                    item.type === "combo" &&
+                    item.components
+                ) {
+
+                    item.components.forEach(component => {
+
+                        if (
+                            counterItems[
+                                component.counter
+                            ]
+                        ) {
+
+                            counterItems[
+                                component.counter
+                            ].push({
+
+                                name:
+                                    component.name,
+
+                                quantity:
+                                    item.quantity
+
+                            });
+
+                        }
+
+                    });
+
+                }
+
+            });
+
+
+            /*
+            ==================================
+            CREATE KOT ROWS
+            ==================================
+            */
 
             const kotRows = [];
 
 
             Object.keys(counterItems).forEach(counter => {
 
-                if (counterItems[counter].length > 0) {
+                if (
+                    counterItems[counter].length > 0
+                ) {
 
                     kotRows.push({
 
@@ -853,7 +1352,11 @@
             });
 
 
-            // INSERT KOTS
+            /*
+            ==================================
+            INSERT KOTS
+            ==================================
+            */
 
             if (kotRows.length > 0) {
 
@@ -872,7 +1375,11 @@
             }
 
 
-            // SAVE ORDER FOR PRINTING
+            /*
+            ==================================
+            SAVE FOR PRINTING
+            ==================================
+            */
 
             lastOrder = {
 
@@ -891,12 +1398,11 @@
             };
 
 
-            // PREPARE RECEIPT
-
             prepareReceipt(lastOrder);
 
 
-            message.className = "success";
+            message.className =
+                "success";
 
             message.textContent =
                 "Order #" +
@@ -904,17 +1410,18 @@
                 " sent to counters.";
 
 
-            button.style.display = "none";
+            button.style.display =
+                "none";
 
             printButton.style.display =
                 "block";
-
 
         } catch (error) {
 
             console.error(error);
 
-            message.className = "error";
+            message.className =
+                "error";
 
             message.textContent =
                 "Order failed. Please try again.";
@@ -929,7 +1436,11 @@
     }
 
 
-    // PREPARE RECEIPT
+    /*
+    ==========================================
+    PREPARE RECEIPT
+    ==========================================
+    */
 
     function prepareReceipt(order) {
 
@@ -939,7 +1450,8 @@
             order.orderNumber;
 
 
-        const now = new Date();
+        const now =
+            new Date();
 
 
         document.getElementById(
@@ -978,17 +1490,20 @@
             );
 
 
-        receiptItems.innerHTML = "";
+        receiptItems.innerHTML =
+            "";
 
 
         order.items.forEach(item => {
 
             const amount =
-                item.price * item.quantity;
+                item.price *
+                item.quantity;
 
 
             const row =
                 document.createElement("div");
+
 
             row.className =
                 "receipt-item";
@@ -999,17 +1514,24 @@
                 <div class="receipt-item-line">
 
                     <span class="receipt-item-name">
+
                         ${item.name}
+
                     </span>
 
                     <span class="receipt-item-price">
+
                         ₹${amount}
+
                     </span>
 
                 </div>
 
-                <div>
-                    ${item.quantity} × ₹${item.price}
+                <div class="receipt-qty">
+
+                    ${item.quantity}
+                    × ₹${item.price}
+
                 </div>
 
             `;
@@ -1028,7 +1550,11 @@
     }
 
 
-    // PRINT BILL
+    /*
+    ==========================================
+    PRINT
+    ==========================================
+    */
 
     function printBill() {
 
@@ -1049,7 +1575,11 @@
     }
 
 
-    // AFTER PRINTING
+    /*
+    ==========================================
+    AFTER PRINT
+    ==========================================
+    */
 
     window.onafterprint = function() {
 
@@ -1065,3 +1595,4 @@
 
 </body>
 </html>
+```
