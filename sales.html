@@ -468,6 +468,27 @@ let ordersData = [];
 let kotData = [];
 let salesData = [];
 
+/*
+ * Normal menu prices.
+ * Used only to calculate each component's share of a combo price.
+ */
+const basePrices = {
+    "Pani Puri": 50,
+    "Masala Puri": 60,
+    "Samosa Chaat": 80,
+    "Dahi Puri": 80,
+
+    "Mango Shake": 90,
+    "Oreo Shake": 80,
+    "Strawberry Shake": 90,
+    "Mint Lime": 35,
+
+    "Classic Burger": 120,
+    "Chicken Burger": 150,
+    "Cheese Burger": 140,
+    "Double Burger": 180
+};
+
 
 /* =====================================================
    LOAD SALES
@@ -628,10 +649,16 @@ async function loadSales() {
                     const componentPrices =
                         item.components.map(component => {
 
+                            const componentName =
+                                component.name ??
+                                component.item_name ??
+                                "Unknown Item";
+
                             const componentPrice =
                                 Number(
                                     component.price ??
                                     component.unit_price ??
+                                    basePrices[componentName] ??
                                     0
                                 );
 
