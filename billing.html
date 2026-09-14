@@ -5,18 +5,23 @@
 
     <meta charset="UTF-8">
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>Cafe Billing</title>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="supabase.js?v=3"></script>
+    <script src="supabase.js?v=4"></script>
+
 
     <style>
 
         * {
             box-sizing: border-box;
         }
+
 
         body {
             margin: 0;
@@ -25,6 +30,7 @@
             color: #222;
         }
 
+
         header {
             background: #222;
             color: white;
@@ -32,13 +38,16 @@
             text-align: center;
         }
 
+
         header h1 {
             margin: 0;
         }
 
+
         header p {
             margin: 6px 0 0;
         }
+
 
         .container {
             max-width: 900px;
@@ -47,21 +56,6 @@
             padding-bottom: 30px;
         }
 
-        .order-info {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-        }
-
-        .order-info input {
-            width: 100%;
-            padding: 13px;
-            margin-top: 8px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            font-size: 16px;
-        }
 
         .section {
             background: white;
@@ -70,6 +64,7 @@
             overflow: hidden;
         }
 
+
         .section h2 {
             margin: 0;
             padding: 15px;
@@ -77,6 +72,7 @@
             color: white;
             font-size: 20px;
         }
+
 
         .item {
             display: flex;
@@ -87,29 +83,35 @@
             gap: 10px;
         }
 
+
         .item:last-child {
             border-bottom: none;
         }
 
+
         .item-name {
             flex: 1;
         }
+
 
         .item-name strong {
             display: block;
             font-size: 17px;
         }
 
+
         .price {
             color: #666;
             margin-top: 4px;
         }
+
 
         .quantity {
             display: flex;
             align-items: center;
             gap: 8px;
         }
+
 
         .quantity button {
             width: 38px;
@@ -122,15 +124,18 @@
             cursor: pointer;
         }
 
+
         .quantity button:active {
             transform: scale(0.95);
         }
+
 
         .quantity span {
             min-width: 28px;
             text-align: center;
             font-size: 17px;
         }
+
 
         .bottom {
             position: sticky;
@@ -141,6 +146,7 @@
             box-shadow: 0 -3px 15px rgba(0,0,0,0.15);
         }
 
+
         .total {
             display: flex;
             justify-content: space-between;
@@ -149,10 +155,12 @@
             margin-bottom: 15px;
         }
 
-        #placeOrder,
-        #printBill {
+
+        #placeOrder {
             width: 100%;
             padding: 16px;
+            background: #008000;
+            color: white;
             border: none;
             border-radius: 8px;
             font-size: 19px;
@@ -160,28 +168,19 @@
             cursor: pointer;
         }
 
-        #placeOrder {
-            background: #008000;
-            color: white;
-        }
 
         #placeOrder:disabled {
             background: #999;
             cursor: not-allowed;
         }
 
-        #printBill {
-            margin-top: 10px;
-            background: #222;
-            color: white;
-            display: none;
-        }
 
         #message {
             text-align: center;
             margin-top: 15px;
             font-weight: bold;
         }
+
 
         @media (max-width: 600px) {
 
@@ -216,106 +215,168 @@
 </header>
 
 
+
 <div class="container">
 
 
-    <!-- TABLE NUMBER -->
-
-    <div class="order-info">
-
-        <label>
-            <strong>Table Number</strong>
-        </label>
-
-        <input
-            type="text"
-            id="tableNumber"
-            placeholder="Enter table number"
-        >
-
-    </div>
-
-
-    <!-- CHAATS -->
+    <!-- =========================
+         CHAATS
+    ========================== -->
 
     <div class="section">
 
         <h2>🥗 CHAATS</h2>
 
+
         <div class="item">
 
             <div class="item-name">
+
                 <strong>Pani Puri</strong>
-                <div class="price">₹50</div>
+
+                <div class="price">
+                    ₹50
+                </div>
+
             </div>
+
 
             <div class="quantity">
 
-                <button onclick="changeQty('Pani Puri', -1)">−</button>
+                <button
+                    onclick="changeQty('Pani Puri', -1)"
+                >
+                    −
+                </button>
 
-                <span id="qty-Pani-Puri">0</span>
 
-                <button onclick="changeQty('Pani Puri', 1)">+</button>
+                <span id="qty-Pani-Puri">
+                    0
+                </span>
+
+
+                <button
+                    onclick="changeQty('Pani Puri', 1)"
+                >
+                    +
+                </button>
 
             </div>
 
         </div>
 
 
+
         <div class="item">
 
             <div class="item-name">
+
                 <strong>Masala Puri</strong>
-                <div class="price">₹60</div>
+
+                <div class="price">
+                    ₹60
+                </div>
+
             </div>
+
 
             <div class="quantity">
 
-                <button onclick="changeQty('Masala Puri', -1)">−</button>
+                <button
+                    onclick="changeQty('Masala Puri', -1)"
+                >
+                    −
+                </button>
 
-                <span id="qty-Masala-Puri">0</span>
 
-                <button onclick="changeQty('Masala Puri', 1)">+</button>
+                <span id="qty-Masala-Puri">
+                    0
+                </span>
+
+
+                <button
+                    onclick="changeQty('Masala Puri', 1)"
+                >
+                    +
+                </button>
 
             </div>
 
         </div>
 
 
+
         <div class="item">
 
             <div class="item-name">
+
                 <strong>Samosa Chaat</strong>
-                <div class="price">₹80</div>
+
+                <div class="price">
+                    ₹80
+                </div>
+
             </div>
+
 
             <div class="quantity">
 
-                <button onclick="changeQty('Samosa Chaat', -1)">−</button>
+                <button
+                    onclick="changeQty('Samosa Chaat', -1)"
+                >
+                    −
+                </button>
 
-                <span id="qty-Samosa-Chaat">0</span>
 
-                <button onclick="changeQty('Samosa Chaat', 1)">+</button>
+                <span id="qty-Samosa-Chaat">
+                    0
+                </span>
+
+
+                <button
+                    onclick="changeQty('Samosa Chaat', 1)"
+                >
+                    +
+                </button>
 
             </div>
 
         </div>
 
 
+
         <div class="item">
 
             <div class="item-name">
+
                 <strong>Dahi Puri</strong>
-                <div class="price">₹80</div>
+
+                <div class="price">
+                    ₹80
+                </div>
+
             </div>
+
 
             <div class="quantity">
 
-                <button onclick="changeQty('Dahi Puri', -1)">−</button>
+                <button
+                    onclick="changeQty('Dahi Puri', -1)"
+                >
+                    −
+                </button>
 
-                <span id="qty-Dahi-Puri">0</span>
 
-                <button onclick="changeQty('Dahi Puri', 1)">+</button>
+                <span id="qty-Dahi-Puri">
+                    0
+                </span>
+
+
+                <button
+                    onclick="changeQty('Dahi Puri', 1)"
+                >
+                    +
+                </button>
 
             </div>
 
@@ -324,86 +385,165 @@
     </div>
 
 
-    <!-- DRINKS -->
+
+    <!-- =========================
+         DRINKS
+    ========================== -->
 
     <div class="section">
 
         <h2>🥤 DRINKS</h2>
 
+
         <div class="item">
 
             <div class="item-name">
+
                 <strong>Mango Shake</strong>
-                <div class="price">₹90</div>
+
+                <div class="price">
+                    ₹90
+                </div>
+
             </div>
+
 
             <div class="quantity">
 
-                <button onclick="changeQty('Mango Shake', -1)">−</button>
+                <button
+                    onclick="changeQty('Mango Shake', -1)"
+                >
+                    −
+                </button>
 
-                <span id="qty-Mango-Shake">0</span>
 
-                <button onclick="changeQty('Mango Shake', 1)">+</button>
+                <span id="qty-Mango-Shake">
+                    0
+                </span>
+
+
+                <button
+                    onclick="changeQty('Mango Shake', 1)"
+                >
+                    +
+                </button>
 
             </div>
 
         </div>
 
 
+
         <div class="item">
 
             <div class="item-name">
+
                 <strong>Oreo Shake</strong>
-                <div class="price">₹80</div>
+
+                <div class="price">
+                    ₹80
+                </div>
+
             </div>
+
 
             <div class="quantity">
 
-                <button onclick="changeQty('Oreo Shake', -1)">−</button>
+                <button
+                    onclick="changeQty('Oreo Shake', -1)"
+                >
+                    −
+                </button>
 
-                <span id="qty-Oreo-Shake">0</span>
 
-                <button onclick="changeQty('Oreo Shake', 1)">+</button>
+                <span id="qty-Oreo-Shake">
+                    0
+                </span>
+
+
+                <button
+                    onclick="changeQty('Oreo Shake', 1)"
+                >
+                    +
+                </button>
 
             </div>
 
         </div>
 
 
+
         <div class="item">
 
             <div class="item-name">
+
                 <strong>Strawberry Shake</strong>
-                <div class="price">₹90</div>
+
+                <div class="price">
+                    ₹90
+                </div>
+
             </div>
+
 
             <div class="quantity">
 
-                <button onclick="changeQty('Strawberry Shake', -1)">−</button>
+                <button
+                    onclick="changeQty('Strawberry Shake', -1)"
+                >
+                    −
+                </button>
 
-                <span id="qty-Strawberry-Shake">0</span>
 
-                <button onclick="changeQty('Strawberry Shake', 1)">+</button>
+                <span id="qty-Strawberry-Shake">
+                    0
+                </span>
+
+
+                <button
+                    onclick="changeQty('Strawberry Shake', 1)"
+                >
+                    +
+                </button>
 
             </div>
 
         </div>
 
 
+
         <div class="item">
 
             <div class="item-name">
+
                 <strong>Mint Lime</strong>
-                <div class="price">₹35</div>
+
+                <div class="price">
+                    ₹35
+                </div>
+
             </div>
+
 
             <div class="quantity">
 
-                <button onclick="changeQty('Mint Lime', -1)">−</button>
+                <button
+                    onclick="changeQty('Mint Lime', -1)"
+                >
+                    −
+                </button>
 
-                <span id="qty-Mint-Lime">0</span>
 
-                <button onclick="changeQty('Mint Lime', 1)">+</button>
+                <span id="qty-Mint-Lime">
+                    0
+                </span>
+
+
+                <button
+                    onclick="changeQty('Mint Lime', 1)"
+                >
+                    +
+                </button>
 
             </div>
 
@@ -412,86 +552,165 @@
     </div>
 
 
-    <!-- BURGERS -->
+
+    <!-- =========================
+         BURGERS
+    ========================== -->
 
     <div class="section">
 
         <h2>🍔 BURGERS</h2>
 
+
         <div class="item">
 
             <div class="item-name">
+
                 <strong>Classic Burger</strong>
-                <div class="price">₹120</div>
+
+                <div class="price">
+                    ₹120
+                </div>
+
             </div>
+
 
             <div class="quantity">
 
-                <button onclick="changeQty('Classic Burger', -1)">−</button>
+                <button
+                    onclick="changeQty('Classic Burger', -1)"
+                >
+                    −
+                </button>
 
-                <span id="qty-Classic-Burger">0</span>
 
-                <button onclick="changeQty('Classic Burger', 1)">+</button>
+                <span id="qty-Classic-Burger">
+                    0
+                </span>
+
+
+                <button
+                    onclick="changeQty('Classic Burger', 1)"
+                >
+                    +
+                </button>
 
             </div>
 
         </div>
 
 
+
         <div class="item">
 
             <div class="item-name">
+
                 <strong>Chicken Burger</strong>
-                <div class="price">₹150</div>
+
+                <div class="price">
+                    ₹150
+                </div>
+
             </div>
+
 
             <div class="quantity">
 
-                <button onclick="changeQty('Chicken Burger', -1)">−</button>
+                <button
+                    onclick="changeQty('Chicken Burger', -1)"
+                >
+                    −
+                </button>
 
-                <span id="qty-Chicken-Burger">0</span>
 
-                <button onclick="changeQty('Chicken Burger', 1)">+</button>
+                <span id="qty-Chicken-Burger">
+                    0
+                </span>
+
+
+                <button
+                    onclick="changeQty('Chicken Burger', 1)"
+                >
+                    +
+                </button>
 
             </div>
 
         </div>
 
 
+
         <div class="item">
 
             <div class="item-name">
+
                 <strong>Cheese Burger</strong>
-                <div class="price">₹140</div>
+
+                <div class="price">
+                    ₹140
+                </div>
+
             </div>
+
 
             <div class="quantity">
 
-                <button onclick="changeQty('Cheese Burger', -1)">−</button>
+                <button
+                    onclick="changeQty('Cheese Burger', -1)"
+                >
+                    −
+                </button>
 
-                <span id="qty-Cheese-Burger">0</span>
 
-                <button onclick="changeQty('Cheese Burger', 1)">+</button>
+                <span id="qty-Cheese-Burger">
+                    0
+                </span>
+
+
+                <button
+                    onclick="changeQty('Cheese Burger', 1)"
+                >
+                    +
+                </button>
 
             </div>
 
         </div>
 
 
+
         <div class="item">
 
             <div class="item-name">
+
                 <strong>Double Burger</strong>
-                <div class="price">₹180</div>
+
+                <div class="price">
+                    ₹180
+                </div>
+
             </div>
+
 
             <div class="quantity">
 
-                <button onclick="changeQty('Double Burger', -1)">−</button>
+                <button
+                    onclick="changeQty('Double Burger', -1)"
+                >
+                    −
+                </button>
 
-                <span id="qty-Double-Burger">0</span>
 
-                <button onclick="changeQty('Double Burger', 1)">+</button>
+                <span id="qty-Double-Burger">
+                    0
+                </span>
+
+
+                <button
+                    onclick="changeQty('Double Burger', 1)"
+                >
+                    +
+                </button>
 
             </div>
 
@@ -500,15 +719,22 @@
     </div>
 
 
-    <!-- TOTAL -->
+
+    <!-- =========================
+         TOTAL
+    ========================== -->
 
     <div class="bottom">
 
         <div class="total">
 
-            <span>Total</span>
+            <span>
+                Total
+            </span>
 
-            <span id="total">₹0</span>
+            <span id="total">
+                ₹0
+            </span>
 
         </div>
 
@@ -521,19 +747,13 @@
         </button>
 
 
-        <button
-            id="printBill"
-            onclick="printBill()"
-        >
-            🖨️ PRINT BILL
-        </button>
-
-
         <div id="message"></div>
 
     </div>
 
+
 </div>
+
 
 
 <script>
@@ -565,6 +785,7 @@ const menu = {
         counter: "chaats"
     },
 
+
     "Mango Shake": {
         price: 90,
         counter: "drinks"
@@ -584,6 +805,7 @@ const menu = {
         price: 35,
         counter: "drinks"
     },
+
 
     "Classic Burger": {
         price: 120,
@@ -616,19 +838,13 @@ const quantities = {};
 
 
 /* =========================================
-   LAST ORDER
-========================================= */
-
-let lastOrder = null;
-
-
-/* =========================================
-   ELEMENT ID
+   GET QUANTITY ELEMENT ID
 ========================================= */
 
 function getId(name) {
 
-    return "qty-" + name.replaceAll(" ", "-");
+    return "qty-" +
+        name.replaceAll(" ", "-");
 
 }
 
@@ -640,20 +856,35 @@ function getId(name) {
 function changeQty(name, change) {
 
     if (!quantities[name]) {
+
         quantities[name] = 0;
+
     }
+
 
     quantities[name] += change;
 
+
     if (quantities[name] < 0) {
+
         quantities[name] = 0;
+
     }
 
-    const element = document.getElementById(getId(name));
+
+    const element =
+        document.getElementById(
+            getId(name)
+        );
+
 
     if (element) {
-        element.innerText = quantities[name];
+
+        element.innerText =
+            quantities[name];
+
     }
+
 
     calculateTotal();
 
@@ -668,7 +899,10 @@ function calculateTotal() {
 
     let total = 0;
 
-    for (const item in quantities) {
+
+    for (
+        const item in quantities
+    ) {
 
         if (
             quantities[item] > 0 &&
@@ -683,8 +917,12 @@ function calculateTotal() {
 
     }
 
-    document.getElementById("total").innerText =
+
+    document.getElementById(
+        "total"
+    ).innerText =
         "₹" + total;
+
 
     return total;
 
@@ -697,25 +935,25 @@ function calculateTotal() {
 
 async function placeOrder() {
 
-    const tableNumber =
-        document.getElementById("tableNumber")
-            .value
-            .trim();
-
     const message =
-        document.getElementById("message");
+        document.getElementById(
+            "message"
+        );
+
 
     const button =
-        document.getElementById("placeOrder");
+        document.getElementById(
+            "placeOrder"
+        );
 
-    const printButton =
-        document.getElementById("printBill");
 
-
-    /* CHECK SUPABASE */
+    /* =====================================
+       CHECK SUPABASE
+    ===================================== */
 
     if (
-        typeof supabaseClient === "undefined"
+        typeof supabaseClient ===
+        "undefined"
     ) {
 
         message.innerText =
@@ -726,24 +964,16 @@ async function placeOrder() {
     }
 
 
-    /* TABLE CHECK */
-
-    if (!tableNumber) {
-
-        message.innerText =
-            "Please enter table number.";
-
-        return;
-
-    }
-
-
-    /* COLLECT ITEMS */
+    /* =====================================
+       COLLECT ITEMS
+    ===================================== */
 
     const selectedItems = [];
 
 
-    for (const item in quantities) {
+    for (
+        const item in quantities
+    ) {
 
         if (
             quantities[item] > 0 &&
@@ -754,11 +984,14 @@ async function placeOrder() {
 
                 name: item,
 
-                price: menu[item].price,
+                price:
+                    menu[item].price,
 
-                quantity: quantities[item],
+                quantity:
+                    quantities[item],
 
-                counter: menu[item].counter
+                counter:
+                    menu[item].counter
 
             });
 
@@ -767,9 +1000,13 @@ async function placeOrder() {
     }
 
 
-    /* ITEM CHECK */
+    /* =====================================
+       CHECK ITEMS
+    ===================================== */
 
-    if (selectedItems.length === 0) {
+    if (
+        selectedItems.length === 0
+    ) {
 
         message.innerText =
             "Please select at least one item.";
@@ -779,28 +1016,29 @@ async function placeOrder() {
     }
 
 
-    const total = calculateTotal();
+    const total =
+        calculateTotal();
 
 
-    /* DISABLE BUTTON */
+    /* =====================================
+       DISABLE BUTTON
+    ===================================== */
 
     button.disabled = true;
 
     button.innerText =
         "PLACING ORDER...";
 
-    message.innerText = "";
-
-    printButton.style.display =
-        "none";
+    message.innerText =
+        "Sending order...";
 
 
     try {
 
 
-        /* =====================================
-           INSERT MAIN ORDER
-        ===================================== */
+        /* =================================
+           CREATE MAIN ORDER
+        ================================= */
 
         const {
             data: order,
@@ -811,13 +1049,14 @@ async function placeOrder() {
 
             .insert({
 
-                table_number: tableNumber,
+                items:
+                    selectedItems,
 
-                items: selectedItems,
+                total:
+                    total,
 
-                total: total,
-
-                status: "Pending"
+                status:
+                    "Pending"
 
             })
 
@@ -842,9 +1081,9 @@ async function placeOrder() {
         }
 
 
-        /* =====================================
-           SPLIT BY COUNTER
-        ===================================== */
+        /* =================================
+           SPLIT ITEMS BY COUNTER
+        ================================= */
 
         const counters = {
 
@@ -857,22 +1096,26 @@ async function placeOrder() {
         };
 
 
-        selectedItems.forEach(item => {
+        selectedItems.forEach(
+            item => {
 
-            if (
-                counters[item.counter]
-            ) {
+                if (
+                    counters[item.counter]
+                ) {
 
-                counters[item.counter].push(item);
+                    counters[
+                        item.counter
+                    ].push(item);
+
+                }
 
             }
+        );
 
-        });
 
-
-        /* =====================================
+        /* =================================
            CREATE KOTS
-        ===================================== */
+        ================================= */
 
         const kots = [];
 
@@ -892,24 +1135,30 @@ async function placeOrder() {
 
             kots.push({
 
-                order_id: order.id,
+                order_id:
+                    order.id,
 
-                counter: counter,
+                counter:
+                    counter,
 
-                items: counters[counter],
+                items:
+                    counters[counter],
 
-                status: "Pending"
+                status:
+                    "Pending"
 
             });
 
         }
 
 
-        /* =====================================
+        /* =================================
            INSERT KOTS
-        ===================================== */
+        ================================= */
 
-        if (kots.length > 0) {
+        if (
+            kots.length > 0
+        ) {
 
             const {
                 error: kotError
@@ -929,33 +1178,9 @@ async function placeOrder() {
         }
 
 
-        /* =====================================
-           SAVE ORDER FOR PRINTING
-        ===================================== */
-
-        lastOrder = {
-
-            orderNumber:
-                order.order_number,
-
-            tableNumber:
-                tableNumber,
-
-            items:
-                selectedItems,
-
-            total:
-                total,
-
-            createdAt:
-                new Date()
-
-        };
-
-
-        /* =====================================
+        /* =================================
            SUCCESS
-        ===================================== */
+        ================================= */
 
         message.innerText =
             "✅ Order #" +
@@ -963,38 +1188,1237 @@ async function placeOrder() {
             " sent to counters!";
 
 
-        printButton.style.display =
-            "block";
+        /*
+         * Wait briefly so the user can
+         * see the success message.
+         *
+         * Then automatically reload.
+         */
+
+        setTimeout(
+            function() {
+
+                window.location.reload();
+
+            },
+            1200
+        );
 
 
-        /* =====================================
-           RESET
-        ===================================== */
+    }
 
-        for (
-            const item in quantities
+    catch (error) {
+
+        console.error(
+            "ORDER ERROR:",
+            error
+        );
+
+    <!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Cafe Billing</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase.js?v=4"></script>
+
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            color: #222;
+        }
+
+
+        header {
+            background: #222;
+            color: white;
+            padding: 18px;
+            text-align: center;
+        }
+
+
+        header h1 {
+            margin: 0;
+        }
+
+
+        header p {
+            margin: 6px 0 0;
+        }
+
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+            padding: 20px;
+            padding-bottom: 30px;
+        }
+
+
+        .section {
+            background: white;
+            margin-bottom: 18px;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+
+        .section h2 {
+            margin: 0;
+            padding: 15px;
+            background: #333;
+            color: white;
+            font-size: 20px;
+        }
+
+
+        .item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            gap: 10px;
+        }
+
+
+        .item:last-child {
+            border-bottom: none;
+        }
+
+
+        .item-name {
+            flex: 1;
+        }
+
+
+        .item-name strong {
+            display: block;
+            font-size: 17px;
+        }
+
+
+        .price {
+            color: #666;
+            margin-top: 4px;
+        }
+
+
+        .quantity {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+
+        .quantity button {
+            width: 38px;
+            height: 38px;
+            border: none;
+            border-radius: 6px;
+            background: #333;
+            color: white;
+            font-size: 21px;
+            cursor: pointer;
+        }
+
+
+        .quantity button:active {
+            transform: scale(0.95);
+        }
+
+
+        .quantity span {
+            min-width: 28px;
+            text-align: center;
+            font-size: 17px;
+        }
+
+
+        .bottom {
+            position: sticky;
+            bottom: 0;
+            background: white;
+            padding: 18px;
+            border-radius: 12px;
+            box-shadow: 0 -3px 15px rgba(0,0,0,0.15);
+        }
+
+
+        .total {
+            display: flex;
+            justify-content: space-between;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+
+        #placeOrder {
+            width: 100%;
+            padding: 16px;
+            background: #008000;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 19px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+
+        #placeOrder:disabled {
+            background: #999;
+            cursor: not-allowed;
+        }
+
+
+        #message {
+            text-align: center;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+
+        @media (max-width: 600px) {
+
+            .container {
+                padding: 12px;
+            }
+
+            .item {
+                flex-wrap: wrap;
+            }
+
+            .quantity {
+                margin-left: auto;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<header>
+
+    <h1>CAFE BILLING</h1>
+
+    <p>Main Billing Counter</p>
+
+</header>
+
+
+
+<div class="container">
+
+
+    <!-- =========================
+         CHAATS
+    ========================== -->
+
+    <div class="section">
+
+        <h2>🥗 CHAATS</h2>
+
+
+        <div class="item">
+
+            <div class="item-name">
+
+                <strong>Pani Puri</strong>
+
+                <div class="price">
+                    ₹50
+                </div>
+
+            </div>
+
+
+            <div class="quantity">
+
+                <button
+                    onclick="changeQty('Pani Puri', -1)"
+                >
+                    −
+                </button>
+
+
+                <span id="qty-Pani-Puri">
+                    0
+                </span>
+
+
+                <button
+                    onclick="changeQty('Pani Puri', 1)"
+                >
+                    +
+                </button>
+
+            </div>
+
+        </div>
+
+
+
+        <div class="item">
+
+            <div class="item-name">
+
+                <strong>Masala Puri</strong>
+
+                <div class="price">
+                    ₹60
+                </div>
+
+            </div>
+
+
+            <div class="quantity">
+
+                <button
+                    onclick="changeQty('Masala Puri', -1)"
+                >
+                    −
+                </button>
+
+
+                <span id="qty-Masala-Puri">
+                    0
+                </span>
+
+
+                <button
+                    onclick="changeQty('Masala Puri', 1)"
+                >
+                    +
+                </button>
+
+            </div>
+
+        </div>
+
+
+
+        <div class="item">
+
+            <div class="item-name">
+
+                <strong>Samosa Chaat</strong>
+
+                <div class="price">
+                    ₹80
+                </div>
+
+            </div>
+
+
+            <div class="quantity">
+
+                <button
+                    onclick="changeQty('Samosa Chaat', -1)"
+                >
+                    −
+                </button>
+
+
+                <span id="qty-Samosa-Chaat">
+                    0
+                </span>
+
+
+                <button
+                    onclick="changeQty('Samosa Chaat', 1)"
+                >
+                    +
+                </button>
+
+            </div>
+
+        </div>
+
+
+
+        <div class="item">
+
+            <div class="item-name">
+
+                <strong>Dahi Puri</strong>
+
+                <div class="price">
+                    ₹80
+                </div>
+
+            </div>
+
+
+            <div class="quantity">
+
+                <button
+                    onclick="changeQty('Dahi Puri', -1)"
+                >
+                    −
+                </button>
+
+
+                <span id="qty-Dahi-Puri">
+                    0
+                </span>
+
+
+                <button
+                    onclick="changeQty('Dahi Puri', 1)"
+                >
+                    +
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =========================
+         DRINKS
+    ========================== -->
+
+    <div class="section">
+
+        <h2>🥤 DRINKS</h2>
+
+
+        <div class="item">
+
+            <div class="item-name">
+
+                <strong>Mango Shake</strong>
+
+                <div class="price">
+                    ₹90
+                </div>
+
+            </div>
+
+
+            <div class="quantity">
+
+                <button
+                    onclick="changeQty('Mango Shake', -1)"
+                >
+                    −
+                </button>
+
+
+                <span id="qty-Mango-Shake">
+                    0
+                </span>
+
+
+                <button
+                    onclick="changeQty('Mango Shake', 1)"
+                >
+                    +
+                </button>
+
+            </div>
+
+        </div>
+
+
+
+        <div class="item">
+
+            <div class="item-name">
+
+                <strong>Oreo Shake</strong>
+
+                <div class="price">
+                    ₹80
+                </div>
+
+            </div>
+
+
+            <div class="quantity">
+
+                <button
+                    onclick="changeQty('Oreo Shake', -1)"
+                >
+                    −
+                </button>
+
+
+                <span id="qty-Oreo-Shake">
+                    0
+                </span>
+
+
+                <button
+                    onclick="changeQty('Oreo Shake', 1)"
+                >
+                    +
+                </button>
+
+            </div>
+
+        </div>
+
+
+
+        <div class="item">
+
+            <div class="item-name">
+
+                <strong>Strawberry Shake</strong>
+
+                <div class="price">
+                    ₹90
+                </div>
+
+            </div>
+
+
+            <div class="quantity">
+
+                <button
+                    onclick="changeQty('Strawberry Shake', -1)"
+                >
+                    −
+                </button>
+
+
+                <span id="qty-Strawberry-Shake">
+                    0
+                </span>
+
+
+                <button
+                    onclick="changeQty('Strawberry Shake', 1)"
+                >
+                    +
+                </button>
+
+            </div>
+
+        </div>
+
+
+
+        <div class="item">
+
+            <div class="item-name">
+
+                <strong>Mint Lime</strong>
+
+                <div class="price">
+                    ₹35
+                </div>
+
+            </div>
+
+
+            <div class="quantity">
+
+                <button
+                    onclick="changeQty('Mint Lime', -1)"
+                >
+                    −
+                </button>
+
+
+                <span id="qty-Mint-Lime">
+                    0
+                </span>
+
+
+                <button
+                    onclick="changeQty('Mint Lime', 1)"
+                >
+                    +
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =========================
+         BURGERS
+    ========================== -->
+
+    <div class="section">
+
+        <h2>🍔 BURGERS</h2>
+
+
+        <div class="item">
+
+            <div class="item-name">
+
+                <strong>Classic Burger</strong>
+
+                <div class="price">
+                    ₹120
+                </div>
+
+            </div>
+
+
+            <div class="quantity">
+
+                <button
+                    onclick="changeQty('Classic Burger', -1)"
+                >
+                    −
+                </button>
+
+
+                <span id="qty-Classic-Burger">
+                    0
+                </span>
+
+
+                <button
+                    onclick="changeQty('Classic Burger', 1)"
+                >
+                    +
+                </button>
+
+            </div>
+
+        </div>
+
+
+
+        <div class="item">
+
+            <div class="item-name">
+
+                <strong>Chicken Burger</strong>
+
+                <div class="price">
+                    ₹150
+                </div>
+
+            </div>
+
+
+            <div class="quantity">
+
+                <button
+                    onclick="changeQty('Chicken Burger', -1)"
+                >
+                    −
+                </button>
+
+
+                <span id="qty-Chicken-Burger">
+                    0
+                </span>
+
+
+                <button
+                    onclick="changeQty('Chicken Burger', 1)"
+                >
+                    +
+                </button>
+
+            </div>
+
+        </div>
+
+
+
+        <div class="item">
+
+            <div class="item-name">
+
+                <strong>Cheese Burger</strong>
+
+                <div class="price">
+                    ₹140
+                </div>
+
+            </div>
+
+
+            <div class="quantity">
+
+                <button
+                    onclick="changeQty('Cheese Burger', -1)"
+                >
+                    −
+                </button>
+
+
+                <span id="qty-Cheese-Burger">
+                    0
+                </span>
+
+
+                <button
+                    onclick="changeQty('Cheese Burger', 1)"
+                >
+                    +
+                </button>
+
+            </div>
+
+        </div>
+
+
+
+        <div class="item">
+
+            <div class="item-name">
+
+                <strong>Double Burger</strong>
+
+                <div class="price">
+                    ₹180
+                </div>
+
+            </div>
+
+
+            <div class="quantity">
+
+                <button
+                    onclick="changeQty('Double Burger', -1)"
+                >
+                    −
+                </button>
+
+
+                <span id="qty-Double-Burger">
+                    0
+                </span>
+
+
+                <button
+                    onclick="changeQty('Double Burger', 1)"
+                >
+                    +
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =========================
+         TOTAL
+    ========================== -->
+
+    <div class="bottom">
+
+        <div class="total">
+
+            <span>
+                Total
+            </span>
+
+            <span id="total">
+                ₹0
+            </span>
+
+        </div>
+
+
+        <button
+            id="placeOrder"
+            onclick="placeOrder()"
+        >
+            PLACE ORDER
+        </button>
+
+
+        <div id="message"></div>
+
+    </div>
+
+
+</div>
+
+
+
+<script>
+
+
+/* =========================================
+   MENU
+========================================= */
+
+const menu = {
+
+    "Pani Puri": {
+        price: 50,
+        counter: "chaats"
+    },
+
+    "Masala Puri": {
+        price: 60,
+        counter: "chaats"
+    },
+
+    "Samosa Chaat": {
+        price: 80,
+        counter: "chaats"
+    },
+
+    "Dahi Puri": {
+        price: 80,
+        counter: "chaats"
+    },
+
+
+    "Mango Shake": {
+        price: 90,
+        counter: "drinks"
+    },
+
+    "Oreo Shake": {
+        price: 80,
+        counter: "drinks"
+    },
+
+    "Strawberry Shake": {
+        price: 90,
+        counter: "drinks"
+    },
+
+    "Mint Lime": {
+        price: 35,
+        counter: "drinks"
+    },
+
+
+    "Classic Burger": {
+        price: 120,
+        counter: "burgers"
+    },
+
+    "Chicken Burger": {
+        price: 150,
+        counter: "burgers"
+    },
+
+    "Cheese Burger": {
+        price: 140,
+        counter: "burgers"
+    },
+
+    "Double Burger": {
+        price: 180,
+        counter: "burgers"
+    }
+
+};
+
+
+/* =========================================
+   QUANTITIES
+========================================= */
+
+const quantities = {};
+
+
+/* =========================================
+   GET QUANTITY ELEMENT ID
+========================================= */
+
+function getId(name) {
+
+    return "qty-" +
+        name.replaceAll(" ", "-");
+
+}
+
+
+/* =========================================
+   CHANGE QUANTITY
+========================================= */
+
+function changeQty(name, change) {
+
+    if (!quantities[name]) {
+
+        quantities[name] = 0;
+
+    }
+
+
+    quantities[name] += change;
+
+
+    if (quantities[name] < 0) {
+
+        quantities[name] = 0;
+
+    }
+
+
+    const element =
+        document.getElementById(
+            getId(name)
+        );
+
+
+    if (element) {
+
+        element.innerText =
+            quantities[name];
+
+    }
+
+
+    calculateTotal();
+
+}
+
+
+/* =========================================
+   CALCULATE TOTAL
+========================================= */
+
+function calculateTotal() {
+
+    let total = 0;
+
+
+    for (
+        const item in quantities
+    ) {
+
+        if (
+            quantities[item] > 0 &&
+            menu[item]
         ) {
 
-            quantities[item] = 0;
+            total +=
+                quantities[item] *
+                menu[item].price;
 
-            const element =
-                document.getElementById(
-                    getId(item)
-                );
+        }
 
-            if (element) {
-                element.innerText = "0";
+    }
+
+
+    document.getElementById(
+        "total"
+    ).innerText =
+        "₹" + total;
+
+
+    return total;
+
+}
+
+
+/* =========================================
+   PLACE ORDER
+========================================= */
+
+async function placeOrder() {
+
+    const message =
+        document.getElementById(
+            "message"
+        );
+
+
+    const button =
+        document.getElementById(
+            "placeOrder"
+        );
+
+
+    /* =====================================
+       CHECK SUPABASE
+    ===================================== */
+
+    if (
+        typeof supabaseClient ===
+        "undefined"
+    ) {
+
+        message.innerText =
+            "❌ Supabase connection not found.";
+
+        return;
+
+    }
+
+
+    /* =====================================
+       COLLECT ITEMS
+    ===================================== */
+
+    const selectedItems = [];
+
+
+    for (
+        const item in quantities
+    ) {
+
+        if (
+            quantities[item] > 0 &&
+            menu[item]
+        ) {
+
+            selectedItems.push({
+
+                name: item,
+
+                price:
+                    menu[item].price,
+
+                quantity:
+                    quantities[item],
+
+                counter:
+                    menu[item].counter
+
+            });
+
+        }
+
+    }
+
+
+    /* =====================================
+       CHECK ITEMS
+    ===================================== */
+
+    if (
+        selectedItems.length === 0
+    ) {
+
+        message.innerText =
+            "Please select at least one item.";
+
+        return;
+
+    }
+
+
+    const total =
+        calculateTotal();
+
+
+    /* =====================================
+       DISABLE BUTTON
+    ===================================== */
+
+    button.disabled = true;
+
+    button.innerText =
+        "PLACING ORDER...";
+
+    message.innerText =
+        "Sending order...";
+
+
+    try {
+
+
+        /* =================================
+           CREATE MAIN ORDER
+        ================================= */
+
+        const {
+            data: order,
+            error: orderError
+        } = await supabaseClient
+
+            .from("orders")
+
+            .insert({
+
+                items:
+                    selectedItems,
+
+                total:
+                    total,
+
+                status:
+                    "Pending"
+
+            })
+
+            .select()
+
+            .single();
+
+
+        if (orderError) {
+
+            throw orderError;
+
+        }
+
+
+        if (!order) {
+
+            throw new Error(
+                "Order was not created."
+            );
+
+        }
+
+
+        /* =================================
+           SPLIT ITEMS BY COUNTER
+        ================================= */
+
+        const counters = {
+
+            chaats: [],
+
+            drinks: [],
+
+            burgers: []
+
+        };
+
+
+        selectedItems.forEach(
+            item => {
+
+                if (
+                    counters[item.counter]
+                ) {
+
+                    counters[
+                        item.counter
+                    ].push(item);
+
+                }
+
+            }
+        );
+
+
+        /* =================================
+           CREATE KOTS
+        ================================= */
+
+        const kots = [];
+
+
+        for (
+            const counter in counters
+        ) {
+
+            if (
+                counters[counter].length === 0
+            ) {
+
+                continue;
+
+            }
+
+
+            kots.push({
+
+                order_id:
+                    order.id,
+
+                counter:
+                    counter,
+
+                items:
+                    counters[counter],
+
+                status:
+                    "Pending"
+
+            });
+
+        }
+
+
+        /* =================================
+           INSERT KOTS
+        ================================= */
+
+        if (
+            kots.length > 0
+        ) {
+
+            const {
+                error: kotError
+            } = await supabaseClient
+
+                .from("counter_kot")
+
+                .insert(kots);
+
+
+            if (kotError) {
+
+                throw kotError;
+
             }
 
         }
 
 
-        document.getElementById(
-            "tableNumber"
-        ).value = "";
+        /* =================================
+           SUCCESS
+        ================================= */
+
+        message.innerText =
+            "✅ Order #" +
+            order.order_number +
+            " sent to counters!";
 
 
-        calculateTotal();
+        /*
+         * Wait briefly so the user can
+         * see the success message.
+         *
+         * Then automatically reload.
+         */
+
+        setTimeout(
+            function() {
+
+                window.location.reload();
+
+            },
+            1200
+        );
 
 
     }
@@ -1014,378 +2438,13 @@ async function placeOrder() {
                 "Unable to place order."
             );
 
-    }
 
+        button.disabled = false;
 
-    button.disabled = false;
-
-    button.innerText =
-        "PLACE ORDER";
-
-}
-
-
-/* =========================================
-   PRINT BILL
-========================================= */
-
-function printBill() {
-
-    if (!lastOrder) {
-
-        alert(
-            "No order available to print."
-        );
-
-        return;
+        button.innerText =
+            "PLACE ORDER";
 
     }
-
-
-    const order = lastOrder;
-
-
-    const date =
-        order.createdAt.toLocaleDateString(
-            "en-IN"
-        );
-
-
-    const time =
-        order.createdAt.toLocaleTimeString(
-            "en-IN",
-            {
-                hour: "2-digit",
-                minute: "2-digit"
-            }
-        );
-
-
-    let itemsHTML = "";
-
-
-    order.items.forEach(item => {
-
-        const itemTotal =
-            item.price *
-            item.quantity;
-
-
-        itemsHTML += `
-
-            <tr>
-
-                <td class="name">
-                    ${escapeHTML(item.name)}
-                </td>
-
-                <td class="qty">
-                    ${item.quantity}
-                </td>
-
-                <td class="amount">
-                    ₹${item.price}
-                </td>
-
-                <td class="amount">
-                    ₹${itemTotal}
-                </td>
-
-            </tr>
-
-        `;
-
-    });
-
-
-    const receipt = `
-<!DOCTYPE html>
-
-<html>
-
-<head>
-
-<meta charset="UTF-8">
-
-<title>Bill #${order.orderNumber}</title>
-
-<style>
-
-    @page {
-        size: 80mm auto;
-        margin: 0;
-    }
-
-    * {
-        box-sizing: border-box;
-    }
-
-    html,
-    body {
-        margin: 0;
-        padding: 0;
-        width: 80mm;
-        font-family: Arial, sans-serif;
-        color: #000;
-        background: #fff;
-    }
-
-    body {
-        padding: 5mm;
-    }
-
-    .center {
-        text-align: center;
-    }
-
-    .cafe-name {
-        font-size: 24px;
-        font-weight: bold;
-        margin-bottom: 3px;
-    }
-
-    .counter {
-        font-size: 12px;
-        margin-bottom: 8px;
-    }
-
-    .line {
-        border-top: 1px dashed #000;
-        margin: 8px 0;
-    }
-
-    .info {
-        font-size: 13px;
-        line-height: 1.6;
-    }
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        table-layout: fixed;
-        font-size: 11px;
-    }
-
-    th {
-        border-bottom: 1px solid #000;
-        padding: 4px 1px;
-        text-align: left;
-    }
-
-    td {
-        padding: 5px 1px;
-        vertical-align: top;
-    }
-
-    .name {
-        width: 43%;
-        word-wrap: break-word;
-    }
-
-    .qty {
-        width: 12%;
-        text-align: center;
-    }
-
-    .amount {
-        width: 22.5%;
-        text-align: right;
-    }
-
-    .grand-total {
-        display: flex;
-        justify-content: space-between;
-        font-size: 18px;
-        font-weight: bold;
-        margin-top: 8px;
-    }
-
-    .thank-you {
-        text-align: center;
-        margin-top: 15px;
-        font-size: 12px;
-    }
-
-</style>
-
-</head>
-
-<body>
-
-    <div class="center">
-
-        <div class="cafe-name">
-            CAFE
-        </div>
-
-        <div class="counter">
-            Main Billing Counter
-        </div>
-
-    </div>
-
-
-    <div class="line"></div>
-
-
-    <div class="info">
-
-        <div>
-            <strong>Order:</strong>
-            #${order.orderNumber}
-        </div>
-
-        <div>
-            <strong>Table:</strong>
-            ${escapeHTML(order.tableNumber)}
-        </div>
-
-        <div>
-            <strong>Date:</strong>
-            ${date}
-        </div>
-
-        <div>
-            <strong>Time:</strong>
-            ${time}
-        </div>
-
-    </div>
-
-
-    <div class="line"></div>
-
-
-    <table>
-
-        <thead>
-
-            <tr>
-
-                <th class="name">
-                    Item
-                </th>
-
-                <th class="qty">
-                    Qty
-                </th>
-
-                <th class="amount">
-                    Rate
-                </th>
-
-                <th class="amount">
-                    Total
-                </th>
-
-            </tr>
-
-        </thead>
-
-        <tbody>
-
-            ${itemsHTML}
-
-        </tbody>
-
-    </table>
-
-
-    <div class="line"></div>
-
-
-    <div class="grand-total">
-
-        <span>
-            GRAND TOTAL
-        </span>
-
-        <span>
-            ₹${order.total}
-        </span>
-
-    </div>
-
-
-    <div class="line"></div>
-
-
-    <div class="thank-you">
-
-        Thank you!<br>
-        Please visit again.
-
-    </div>
-
-
-<script>
-
-    window.onload = function() {
-
-        window.print();
-
-    };
-
-<\/script>
-
-</body>
-
-</html>
-
-`;
-
-
-    /* =====================================
-       OPEN PRINT WINDOW
-    ===================================== */
-
-    const printWindow =
-        window.open(
-            "",
-            "_blank",
-            "width=400,height=700"
-        );
-
-
-    if (!printWindow) {
-
-        alert(
-            "Printing was blocked by the browser. Please allow pop-ups for this website."
-        );
-
-        return;
-
-    }
-
-
-    printWindow.document.open();
-
-    printWindow.document.write(
-        receipt
-    );
-
-    printWindow.document.close();
-
-}
-
-
-/* =========================================
-   BASIC HTML ESCAPE
-========================================= */
-
-function escapeHTML(value) {
-
-    return String(value)
-
-        .replaceAll("&", "&amp;")
-
-        .replaceAll("<", "&lt;")
-
-        .replaceAll(">", "&gt;")
-
-        .replaceAll('"', "&quot;")
-
-        .replaceAll("'", "&#039;");
 
 }
 
@@ -1403,4 +2462,3 @@ calculateTotal();
 </body>
 
 </html>
-       
