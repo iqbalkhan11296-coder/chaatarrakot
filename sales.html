@@ -602,7 +602,6 @@ async function loadSales() {
                         1
                     );
 
-
                 const price =
                     Number(
                         item.price ??
@@ -610,46 +609,30 @@ async function loadSales() {
                         0
                     );
 
-
                 const isCombo =
                     item.type === "combo";
-
-
-                /*
-                 * Normal item:
-                 * keep its normal counter and amount.
-                 *
-                 * Combo:
-                 * split the combo price between the counters
-                 * according to the normal component prices.
-                 *
-                 * Example:
-                 * Pani Puri ₹50 + Mint Lime ₹35 = ₹85
-                 * Combo sold for ₹80
-                 * Chaats gets ₹47.06
-                 * Drinks gets ₹32.94
-                 */
 
                 const itemName =
                     item.name ??
                     item.item_name ??
                     "Unknown Item";
 
-                const itemType =
-                    isCombo
-                        ? "combo"
-                        : "single";
-
+                /*
+                 * COMBO:
+                 * Split the actual combo selling price between
+                 * the component counters according to the
+                 * normal component prices.
+                 */
                 if (
                     isCombo &&
                     Array.isArray(item.components) &&
                     item.components.length
                 ) {
 
-                    const componentPrices =
+                    const components =
                         item.components.map(component => {
 
-                            const componentName =
+                            const name =
                                 component.name ??
                                 component.item_name ??
                                 "Unknown Item";
@@ -658,20 +641,15 @@ async function loadSales() {
                                 Number(
                                     component.price ??
                                     component.unit_price ??
-                                    basePrices[componentName] ??
+                                    basePrices[name] ??
                                     0
                                 );
 
                             return {
-                                name:
-                                    component.name ??
-                                    component.item_name ??
-                                    "Unknown Item",
-
+                                name: name,
                                 counter:
-                                    component.counter ??
+                                    component.counter ||
                                     "-",
-
                                 price:
                                     componentPrice
                             };
@@ -679,7 +657,7 @@ async function loadSales() {
                         });
 
                     const normalTotal =
-                        componentPrices.reduce(
+                        components.reduce(
                             (sum, component) =>
                                 sum + component.price,
                             0
@@ -687,14 +665,8 @@ async function loadSales() {
 
                     if (normalTotal > 0) {
 
-                        componentPrices.forEach(
-                            (component, componentIndex) => {
-
-                                const allocatedAmount =
-                                    quantity *
-                                    price *
-                                    component.price /
-                                    normalTotal;
+                        components.forEach(
+                            (component, index) => {
 
                                 salesData.push({
 
@@ -718,12 +690,6 @@ async function loadSales() {
                                         order.customer_name ??
                                         "-",
 
-                                    /*
-                                     * IMPORTANT:
-                                     * Show the actual component item,
-                                     * not the combo name.
-                                     */
-
                                     item:
                                         component.name,
 
@@ -731,16 +697,24 @@ async function loadSales() {
                                         quantity,
 
                                     /*
-                                     * Keep the original component price
-                                     * visible, while Amount is the
-                                     * portion of the combo price.
+                                     * Original menu price of
+                                     * this component.
                                      */
 
                                     price:
                                         component.price,
 
+                                    /*
+                                     * THIS is the important value:
+                                     * the component's share of the
+                                     * actual combo selling price.
+                                     */
+
                                     amount:
-                                        allocatedAmount,
+                                        quantity *
+                                        price *
+                                        component.price /
+                                        normalTotal,
 
                                     counter:
                                         component.counter,
@@ -761,9 +735,10 @@ async function loadSales() {
                                     comboGroup:
                                         order.id +
                                         "_" +
-                                        itemName +
-                                        "_" +
-                                        componentIndex,
+                                        itemName,
+
+                                    comboComponentIndex:
+                                        index,
 
                                     isComboComponent:
                                         true
@@ -773,10 +748,12 @@ async function loadSales() {
                             }
                         );
 
-                    } else {                        }
-                        );
-
                     } else {
+
+                        /*
+                         * Safety fallback if component prices
+                         * cannot be determined.
+                         */
 
                         salesData.push({
 
@@ -820,7 +797,7 @@ async function loadSales() {
                                 "Pending",
 
                             type:
-                                itemType,
+                                "combo",
 
                             components:
                                 item.components,
@@ -829,16 +806,23 @@ async function loadSales() {
                                 itemName,
 
                             comboGroup:
-                                order.id + "_" + itemName,
+                                order.id +
+                                "_" +
+                                itemName,
 
                             isComboComponent:
-                                true
+                                false
 
                         });
 
                     }
 
                 } else {
+
+                    /*
+                     * NORMAL SINGLE ITEM:
+                     * unchanged.
+                     */
 
                     salesData.push({
 
@@ -882,7 +866,7 @@ async function loadSales() {
                             "Pending",
 
                         type:
-                            itemType,
+                            "single",
 
                         components:
                             []
@@ -894,7 +878,6 @@ async function loadSales() {
             });
 
         });
-
 
         populateFilters();
 
@@ -1093,18 +1076,12 @@ function getFilteredData() {
              * check component counters.
              */
 
-            if (row.type === "combo") {
+            if (
+                row.type === "combo" &&
+                row.counter !== counter
+            ) {
 
-                const hasCounter =
-                    row.components.some(
-                        component =>
-                            component.counter === counter
-                    );
-
-
-                if (!hasCounter) {
-                    return false;
-                }
+                return false;
 
             }
 
