@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 
@@ -6,23 +5,18 @@
 
     <meta charset="UTF-8">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Cafe Billing</title>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="supabase.js?v=2"></script>
-
+    <script src="supabase.js?v=3"></script>
 
     <style>
 
         * {
             box-sizing: border-box;
         }
-
 
         body {
             margin: 0;
@@ -31,7 +25,6 @@
             color: #222;
         }
 
-
         header {
             background: #222;
             color: white;
@@ -39,18 +32,20 @@
             text-align: center;
         }
 
-
         header h1 {
             margin: 0;
         }
 
+        header p {
+            margin: 6px 0 0;
+        }
 
         .container {
             max-width: 900px;
             margin: auto;
             padding: 20px;
+            padding-bottom: 30px;
         }
-
 
         .order-info {
             background: white;
@@ -58,7 +53,6 @@
             border-radius: 12px;
             margin-bottom: 20px;
         }
-
 
         .order-info input {
             width: 100%;
@@ -69,14 +63,12 @@
             font-size: 16px;
         }
 
-
         .section {
             background: white;
             margin-bottom: 18px;
             border-radius: 12px;
             overflow: hidden;
         }
-
 
         .section h2 {
             margin: 0;
@@ -85,7 +77,6 @@
             color: white;
             font-size: 20px;
         }
-
 
         .item {
             display: flex;
@@ -96,28 +87,23 @@
             gap: 10px;
         }
 
-
         .item:last-child {
             border-bottom: none;
         }
 
-
         .item-name {
             flex: 1;
         }
-
 
         .item-name strong {
             display: block;
             font-size: 17px;
         }
 
-
         .price {
             color: #666;
             margin-top: 4px;
         }
-
 
         .quantity {
             display: flex;
@@ -125,25 +111,26 @@
             gap: 8px;
         }
 
-
         .quantity button {
-            width: 36px;
-            height: 36px;
+            width: 38px;
+            height: 38px;
             border: none;
             border-radius: 6px;
             background: #333;
             color: white;
-            font-size: 20px;
+            font-size: 21px;
             cursor: pointer;
         }
 
+        .quantity button:active {
+            transform: scale(0.95);
+        }
 
         .quantity span {
-            min-width: 25px;
+            min-width: 28px;
             text-align: center;
             font-size: 17px;
         }
-
 
         .bottom {
             position: sticky;
@@ -154,7 +141,6 @@
             box-shadow: 0 -3px 15px rgba(0,0,0,0.15);
         }
 
-
         .total {
             display: flex;
             justify-content: space-between;
@@ -163,39 +149,33 @@
             margin-bottom: 15px;
         }
 
-
-        #placeOrder {
-            width: 100%;
-            padding: 16px;
-            background: #008000;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 19px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-
-        #placeOrder:disabled {
-            background: #999;
-        }
-
-
+        #placeOrder,
         #printBill {
             width: 100%;
             padding: 16px;
-            margin-top: 10px;
-            background: #222;
-            color: white;
             border: none;
             border-radius: 8px;
             font-size: 19px;
             font-weight: bold;
             cursor: pointer;
-            display: none;
         }
 
+        #placeOrder {
+            background: #008000;
+            color: white;
+        }
+
+        #placeOrder:disabled {
+            background: #999;
+            cursor: not-allowed;
+        }
+
+        #printBill {
+            margin-top: 10px;
+            background: #222;
+            color: white;
+            display: none;
+        }
 
         #message {
             text-align: center;
@@ -203,8 +183,11 @@
             font-weight: bold;
         }
 
-
         @media (max-width: 600px) {
+
+            .container {
+                padding: 12px;
+            }
 
             .item {
                 flex-wrap: wrap;
@@ -233,13 +216,10 @@
 </header>
 
 
-
 <div class="container">
 
 
-    <!-- =========================
-         TABLE
-    ========================== -->
+    <!-- TABLE NUMBER -->
 
     <div class="order-info">
 
@@ -256,15 +236,11 @@
     </div>
 
 
-
-    <!-- =========================
-         CHAATS
-    ========================== -->
+    <!-- CHAATS -->
 
     <div class="section">
 
         <h2>🥗 CHAATS</h2>
-
 
         <div class="item">
 
@@ -274,9 +250,13 @@
             </div>
 
             <div class="quantity">
+
                 <button onclick="changeQty('Pani Puri', -1)">−</button>
+
                 <span id="qty-Pani-Puri">0</span>
+
                 <button onclick="changeQty('Pani Puri', 1)">+</button>
+
             </div>
 
         </div>
@@ -290,9 +270,13 @@
             </div>
 
             <div class="quantity">
+
                 <button onclick="changeQty('Masala Puri', -1)">−</button>
+
                 <span id="qty-Masala-Puri">0</span>
+
                 <button onclick="changeQty('Masala Puri', 1)">+</button>
+
             </div>
 
         </div>
@@ -306,9 +290,13 @@
             </div>
 
             <div class="quantity">
+
                 <button onclick="changeQty('Samosa Chaat', -1)">−</button>
+
                 <span id="qty-Samosa-Chaat">0</span>
+
                 <button onclick="changeQty('Samosa Chaat', 1)">+</button>
+
             </div>
 
         </div>
@@ -322,9 +310,13 @@
             </div>
 
             <div class="quantity">
+
                 <button onclick="changeQty('Dahi Puri', -1)">−</button>
+
                 <span id="qty-Dahi-Puri">0</span>
+
                 <button onclick="changeQty('Dahi Puri', 1)">+</button>
+
             </div>
 
         </div>
@@ -332,15 +324,11 @@
     </div>
 
 
-
-    <!-- =========================
-         DRINKS
-    ========================== -->
+    <!-- DRINKS -->
 
     <div class="section">
 
         <h2>🥤 DRINKS</h2>
-
 
         <div class="item">
 
@@ -350,9 +338,13 @@
             </div>
 
             <div class="quantity">
+
                 <button onclick="changeQty('Mango Shake', -1)">−</button>
+
                 <span id="qty-Mango-Shake">0</span>
+
                 <button onclick="changeQty('Mango Shake', 1)">+</button>
+
             </div>
 
         </div>
@@ -366,9 +358,13 @@
             </div>
 
             <div class="quantity">
+
                 <button onclick="changeQty('Oreo Shake', -1)">−</button>
+
                 <span id="qty-Oreo-Shake">0</span>
+
                 <button onclick="changeQty('Oreo Shake', 1)">+</button>
+
             </div>
 
         </div>
@@ -382,9 +378,13 @@
             </div>
 
             <div class="quantity">
+
                 <button onclick="changeQty('Strawberry Shake', -1)">−</button>
+
                 <span id="qty-Strawberry-Shake">0</span>
+
                 <button onclick="changeQty('Strawberry Shake', 1)">+</button>
+
             </div>
 
         </div>
@@ -398,9 +398,13 @@
             </div>
 
             <div class="quantity">
+
                 <button onclick="changeQty('Mint Lime', -1)">−</button>
+
                 <span id="qty-Mint-Lime">0</span>
+
                 <button onclick="changeQty('Mint Lime', 1)">+</button>
+
             </div>
 
         </div>
@@ -408,15 +412,11 @@
     </div>
 
 
-
-    <!-- =========================
-         BURGERS
-    ========================== -->
+    <!-- BURGERS -->
 
     <div class="section">
 
         <h2>🍔 BURGERS</h2>
-
 
         <div class="item">
 
@@ -426,9 +426,13 @@
             </div>
 
             <div class="quantity">
+
                 <button onclick="changeQty('Classic Burger', -1)">−</button>
+
                 <span id="qty-Classic-Burger">0</span>
+
                 <button onclick="changeQty('Classic Burger', 1)">+</button>
+
             </div>
 
         </div>
@@ -442,9 +446,13 @@
             </div>
 
             <div class="quantity">
+
                 <button onclick="changeQty('Chicken Burger', -1)">−</button>
+
                 <span id="qty-Chicken-Burger">0</span>
+
                 <button onclick="changeQty('Chicken Burger', 1)">+</button>
+
             </div>
 
         </div>
@@ -458,9 +466,13 @@
             </div>
 
             <div class="quantity">
+
                 <button onclick="changeQty('Cheese Burger', -1)">−</button>
+
                 <span id="qty-Cheese-Burger">0</span>
+
                 <button onclick="changeQty('Cheese Burger', 1)">+</button>
+
             </div>
 
         </div>
@@ -474,9 +486,13 @@
             </div>
 
             <div class="quantity">
+
                 <button onclick="changeQty('Double Burger', -1)">−</button>
+
                 <span id="qty-Double-Burger">0</span>
+
                 <button onclick="changeQty('Double Burger', 1)">+</button>
+
             </div>
 
         </div>
@@ -484,10 +500,7 @@
     </div>
 
 
-
-    <!-- =========================
-         TOTAL
-    ========================== -->
+    <!-- TOTAL -->
 
     <div class="bottom">
 
@@ -495,9 +508,7 @@
 
             <span>Total</span>
 
-            <span id="total">
-                ₹0
-            </span>
+            <span id="total">₹0</span>
 
         </div>
 
@@ -522,9 +533,7 @@
 
     </div>
 
-
 </div>
-
 
 
 <script>
@@ -556,7 +565,6 @@ const menu = {
         counter: "chaats"
     },
 
-
     "Mango Shake": {
         price: 90,
         counter: "drinks"
@@ -576,7 +584,6 @@ const menu = {
         price: 35,
         counter: "drinks"
     },
-
 
     "Classic Burger": {
         price: 120,
@@ -609,14 +616,14 @@ const quantities = {};
 
 
 /* =========================================
-   LAST PRINTABLE ORDER
+   LAST ORDER
 ========================================= */
 
 let lastOrder = null;
 
 
 /* =========================================
-   GET ELEMENT ID
+   ELEMENT ID
 ========================================= */
 
 function getId(name) {
@@ -636,19 +643,17 @@ function changeQty(name, change) {
         quantities[name] = 0;
     }
 
-
     quantities[name] += change;
-
 
     if (quantities[name] < 0) {
         quantities[name] = 0;
     }
 
+    const element = document.getElementById(getId(name));
 
-    document.getElementById(
-        getId(name)
-    ).innerText = quantities[name];
-
+    if (element) {
+        element.innerText = quantities[name];
+    }
 
     calculateTotal();
 
@@ -663,10 +668,12 @@ function calculateTotal() {
 
     let total = 0;
 
-
     for (const item in quantities) {
 
-        if (quantities[item] > 0) {
+        if (
+            quantities[item] > 0 &&
+            menu[item]
+        ) {
 
             total +=
                 quantities[item] *
@@ -676,11 +683,8 @@ function calculateTotal() {
 
     }
 
-
-    document.getElementById(
-        "total"
-    ).innerText = "₹" + total;
-
+    document.getElementById("total").innerText =
+        "₹" + total;
 
     return total;
 
@@ -694,28 +698,35 @@ function calculateTotal() {
 async function placeOrder() {
 
     const tableNumber =
-        document.getElementById(
-            "tableNumber"
-        ).value.trim();
-
+        document.getElementById("tableNumber")
+            .value
+            .trim();
 
     const message =
-        document.getElementById(
-            "message"
-        );
-
+        document.getElementById("message");
 
     const button =
-        document.getElementById(
-            "placeOrder"
-        );
-
+        document.getElementById("placeOrder");
 
     const printButton =
-        document.getElementById(
-            "printBill"
-        );
+        document.getElementById("printBill");
 
+
+    /* CHECK SUPABASE */
+
+    if (
+        typeof supabaseClient === "undefined"
+    ) {
+
+        message.innerText =
+            "❌ Supabase connection not found.";
+
+        return;
+
+    }
+
+
+    /* TABLE CHECK */
 
     if (!tableNumber) {
 
@@ -727,16 +738,17 @@ async function placeOrder() {
     }
 
 
-    /* =====================================
-       COLLECT ITEMS
-    ===================================== */
+    /* COLLECT ITEMS */
 
     const selectedItems = [];
 
 
     for (const item in quantities) {
 
-        if (quantities[item] > 0) {
+        if (
+            quantities[item] > 0 &&
+            menu[item]
+        ) {
 
             selectedItems.push({
 
@@ -755,6 +767,8 @@ async function placeOrder() {
     }
 
 
+    /* ITEM CHECK */
+
     if (selectedItems.length === 0) {
 
         message.innerText =
@@ -765,9 +779,10 @@ async function placeOrder() {
     }
 
 
-    const total =
-        calculateTotal();
+    const total = calculateTotal();
 
+
+    /* DISABLE BUTTON */
 
     button.disabled = true;
 
@@ -783,9 +798,9 @@ async function placeOrder() {
     try {
 
 
-        /* =========================
-           CREATE MAIN ORDER
-        ========================== */
+        /* =====================================
+           INSERT MAIN ORDER
+        ===================================== */
 
         const {
             data: order,
@@ -796,17 +811,13 @@ async function placeOrder() {
 
             .insert({
 
-                table_number:
-                    tableNumber,
+                table_number: tableNumber,
 
-                items:
-                    selectedItems,
+                items: selectedItems,
 
-                total:
-                    total,
+                total: total,
 
-                status:
-                    "Pending"
+                status: "Pending"
 
             })
 
@@ -822,9 +833,18 @@ async function placeOrder() {
         }
 
 
-        /* =========================
-           SPLIT ITEMS BY COUNTER
-        ========================== */
+        if (!order) {
+
+            throw new Error(
+                "Order was not created."
+            );
+
+        }
+
+
+        /* =====================================
+           SPLIT BY COUNTER
+        ===================================== */
 
         const counters = {
 
@@ -839,16 +859,20 @@ async function placeOrder() {
 
         selectedItems.forEach(item => {
 
-            counters[
-                item.counter
-            ].push(item);
+            if (
+                counters[item.counter]
+            ) {
+
+                counters[item.counter].push(item);
+
+            }
 
         });
 
 
-        /* =========================
-           CREATE COUNTER KOTS
-        ========================== */
+        /* =====================================
+           CREATE KOTS
+        ===================================== */
 
         const kots = [];
 
@@ -868,22 +892,22 @@ async function placeOrder() {
 
             kots.push({
 
-                order_id:
-                    order.id,
+                order_id: order.id,
 
-                counter:
-                    counter,
+                counter: counter,
 
-                items:
-                    counters[counter],
+                items: counters[counter],
 
-                status:
-                    "Pending"
+                status: "Pending"
 
             });
 
         }
 
+
+        /* =====================================
+           INSERT KOTS
+        ===================================== */
 
         if (kots.length > 0) {
 
@@ -905,9 +929,9 @@ async function placeOrder() {
         }
 
 
-        /* =========================
-           SAVE LAST ORDER
-        ========================== */
+        /* =====================================
+           SAVE ORDER FOR PRINTING
+        ===================================== */
 
         lastOrder = {
 
@@ -929,9 +953,9 @@ async function placeOrder() {
         };
 
 
-        /* =========================
+        /* =====================================
            SUCCESS
-        ========================== */
+        ===================================== */
 
         message.innerText =
             "✅ Order #" +
@@ -939,17 +963,13 @@ async function placeOrder() {
             " sent to counters!";
 
 
-        /* =========================
-           SHOW PRINT BUTTON
-        ========================== */
-
         printButton.style.display =
             "block";
 
 
-        /* =========================
-           RESET QUANTITIES
-        ========================== */
+        /* =====================================
+           RESET
+        ===================================== */
 
         for (
             const item in quantities
@@ -957,10 +977,14 @@ async function placeOrder() {
 
             quantities[item] = 0;
 
+            const element =
+                document.getElementById(
+                    getId(item)
+                );
 
-            document.getElementById(
-                getId(item)
-            ).innerText = "0";
+            if (element) {
+                element.innerText = "0";
+            }
 
         }
 
@@ -977,12 +1001,18 @@ async function placeOrder() {
 
     catch (error) {
 
-        console.error(error);
+        console.error(
+            "ORDER ERROR:",
+            error
+        );
 
 
         message.innerText =
             "❌ Error: " +
-            error.message;
+            (
+                error.message ||
+                "Unable to place order."
+            );
 
     }
 
@@ -1012,21 +1042,23 @@ function printBill() {
     }
 
 
-    const order =
-        lastOrder;
+    const order = lastOrder;
 
 
     const date =
-        order.createdAt
-        .toLocaleDateString("en-IN");
+        order.createdAt.toLocaleDateString(
+            "en-IN"
+        );
 
 
     const time =
-        order.createdAt
-        .toLocaleTimeString("en-IN", {
-            hour: "2-digit",
-            minute: "2-digit"
-        });
+        order.createdAt.toLocaleTimeString(
+            "en-IN",
+            {
+                hour: "2-digit",
+                minute: "2-digit"
+            }
+        );
 
 
     let itemsHTML = "";
@@ -1043,19 +1075,19 @@ function printBill() {
 
             <tr>
 
-                <td>
-                    ${item.name}
+                <td class="name">
+                    ${escapeHTML(item.name)}
                 </td>
 
                 <td class="qty">
                     ${item.quantity}
                 </td>
 
-                <td class="price">
+                <td class="amount">
                     ₹${item.price}
                 </td>
 
-                <td class="price">
+                <td class="amount">
                     ₹${itemTotal}
                 </td>
 
@@ -1067,7 +1099,6 @@ function printBill() {
 
 
     const receipt = `
-
 <!DOCTYPE html>
 
 <html>
@@ -1076,219 +1107,226 @@ function printBill() {
 
 <meta charset="UTF-8">
 
-<title>
-    Order #${order.orderNumber}
-</title>
-
+<title>Bill #${order.orderNumber}</title>
 
 <style>
 
-    body {
-        font-family: Arial, sans-serif;
-        width: 80mm;
-        margin: 0 auto;
-        padding: 10px;
-        color: #000;
+    @page {
+        size: 80mm auto;
+        margin: 0;
     }
 
+    * {
+        box-sizing: border-box;
+    }
+
+    html,
+    body {
+        margin: 0;
+        padding: 0;
+        width: 80mm;
+        font-family: Arial, sans-serif;
+        color: #000;
+        background: #fff;
+    }
+
+    body {
+        padding: 5mm;
+    }
 
     .center {
         text-align: center;
     }
 
-
-    h1 {
-        font-size: 22px;
-        margin: 0 0 4px 0;
+    .cafe-name {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 3px;
     }
 
-
-    .subtitle {
+    .counter {
         font-size: 12px;
-        margin-bottom: 10px;
+        margin-bottom: 8px;
     }
-
 
     .line {
         border-top: 1px dashed #000;
         margin: 8px 0;
     }
 
-
     .info {
         font-size: 13px;
         line-height: 1.6;
     }
 
-
     table {
         width: 100%;
         border-collapse: collapse;
-        font-size: 12px;
+        table-layout: fixed;
+        font-size: 11px;
     }
-
 
     th {
         border-bottom: 1px solid #000;
-        padding: 5px 2px;
+        padding: 4px 1px;
         text-align: left;
     }
 
-
     td {
-        padding: 5px 2px;
+        padding: 5px 1px;
         vertical-align: top;
     }
 
+    .name {
+        width: 43%;
+        word-wrap: break-word;
+    }
 
     .qty {
+        width: 12%;
         text-align: center;
-        width: 25px;
     }
 
-
-    .price {
+    .amount {
+        width: 22.5%;
         text-align: right;
-        white-space: nowrap;
     }
 
-
-    .total {
-        font-size: 17px;
+    .grand-total {
+        display: flex;
+        justify-content: space-between;
+        font-size: 18px;
         font-weight: bold;
+        margin-top: 8px;
     }
 
-
-    .thanks {
+    .thank-you {
+        text-align: center;
         margin-top: 15px;
         font-size: 12px;
-    }
-
-
-    @media print {
-
-        body {
-            width: 80mm;
-        }
-
     }
 
 </style>
 
 </head>
 
-
 <body>
 
+    <div class="center">
 
-<div class="center">
+        <div class="cafe-name">
+            CAFE
+        </div>
 
-    <h1>CAFE</h1>
+        <div class="counter">
+            Main Billing Counter
+        </div>
 
-    <div class="subtitle">
-        Main Billing Counter
     </div>
 
-</div>
+
+    <div class="line"></div>
 
 
-<div class="line"></div>
+    <div class="info">
+
+        <div>
+            <strong>Order:</strong>
+            #${order.orderNumber}
+        </div>
+
+        <div>
+            <strong>Table:</strong>
+            ${escapeHTML(order.tableNumber)}
+        </div>
+
+        <div>
+            <strong>Date:</strong>
+            ${date}
+        </div>
+
+        <div>
+            <strong>Time:</strong>
+            ${time}
+        </div>
+
+    </div>
 
 
-<div class="info">
-
-    <strong>
-        Order #${order.orderNumber}
-    </strong>
-
-    <br>
-
-    Table:
-    ${order.tableNumber}
-
-    <br>
-
-    Date:
-    ${date}
-
-    <br>
-
-    Time:
-    ${time}
-
-</div>
+    <div class="line"></div>
 
 
-<div class="line"></div>
+    <table>
+
+        <thead>
+
+            <tr>
+
+                <th class="name">
+                    Item
+                </th>
+
+                <th class="qty">
+                    Qty
+                </th>
+
+                <th class="amount">
+                    Rate
+                </th>
+
+                <th class="amount">
+                    Total
+                </th>
+
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            ${itemsHTML}
+
+        </tbody>
+
+    </table>
 
 
-<table>
-
-    <thead>
-
-        <tr>
-
-            <th>
-                Item
-            </th>
-
-            <th class="qty">
-                Qty
-            </th>
-
-            <th class="price">
-                Rate
-            </th>
-
-            <th class="price">
-                Total
-            </th>
-
-        </tr>
-
-    </thead>
+    <div class="line"></div>
 
 
-    <tbody>
+    <div class="grand-total">
 
-        ${itemsHTML}
-
-    </tbody>
-
-</table>
-
-
-<div class="line"></div>
-
-
-<table>
-
-    <tr>
-
-        <td class="total">
+        <span>
             GRAND TOTAL
-        </td>
+        </span>
 
-        <td class="price total">
+        <span>
             ₹${order.total}
-        </td>
+        </span>
 
-    </tr>
-
-</table>
+    </div>
 
 
-<div class="line"></div>
+    <div class="line"></div>
 
 
-<div class="center thanks">
+    <div class="thank-you">
 
-    Thank you!<br>
+        Thank you!<br>
+        Please visit again.
 
-    Please visit again.
+    </div>
 
-</div>
 
+<script>
+
+    window.onload = function() {
+
+        window.print();
+
+    };
+
+<\/script>
 
 </body>
 
@@ -1297,18 +1335,22 @@ function printBill() {
 `;
 
 
+    /* =====================================
+       OPEN PRINT WINDOW
+    ===================================== */
+
     const printWindow =
         window.open(
             "",
             "_blank",
-            "width=450,height=700"
+            "width=400,height=700"
         );
 
 
     if (!printWindow) {
 
         alert(
-            "Please allow pop-ups to print the bill."
+            "Printing was blocked by the browser. Please allow pop-ups for this website."
         );
 
         return;
@@ -1324,19 +1366,36 @@ function printBill() {
 
     printWindow.document.close();
 
+}
 
-    printWindow.onload = function() {
 
-        printWindow.focus();
+/* =========================================
+   BASIC HTML ESCAPE
+========================================= */
 
-        printWindow.print();
+function escapeHTML(value) {
 
-    };
+    return String(value)
+
+        .replaceAll("&", "&amp;")
+
+        .replaceAll("<", "&lt;")
+
+        .replaceAll(">", "&gt;")
+
+        .replaceAll('"', "&quot;")
+
+        .replaceAll("'", "&#039;");
 
 }
-</body>
 
-</html>   
+
+/* =========================================
+   INITIAL TOTAL
+========================================= */
+
+calculateTotal();
+
 
 </script>
 
@@ -1344,4 +1403,4 @@ function printBill() {
 </body>
 
 </html>
-```
+       
