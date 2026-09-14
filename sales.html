@@ -1843,7 +1843,9 @@ function renderItemSummary(data) {
         const key =
             row.type +
             "|" +
-            row.item;
+            row.item +
+            "|" +
+            (row.comboName || "");
 
 
         if (
@@ -1859,6 +1861,9 @@ function renderItemSummary(data) {
 
                     type:
                         row.type,
+
+                    comboName:
+                        row.comboName || "",
 
                     quantity:
                         0,
@@ -1948,6 +1953,16 @@ function renderItemSummary(data) {
                         row.item
                     )}
                 </b>
+
+                ${
+                    row.type === "combo" && row.comboName
+                    ? `
+                        <div class="combo-components">
+                            From combo: ${escapeHtml(row.comboName)}
+                        </div>
+                    `
+                    : ""
+                }
             </td>
 
 
@@ -2241,3 +2256,5 @@ loadSales();
 </body>
 
 </html>
+
+```
