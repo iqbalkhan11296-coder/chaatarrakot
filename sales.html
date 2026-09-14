@@ -595,98 +595,239 @@ async function loadSales() {
 
 
                 /*
-                 * Determine counter.
-                 *
                  * Normal item:
-                 * item.counter
+                 * keep its normal counter and amount.
                  *
                  * Combo:
-                 * component counters are used only for
-                 * filtering/display. Combo remains one sale.
+                 * split the combo price between the counters
+                 * according to the normal component prices.
+                 *
+                 * Example:
+                 * Pani Puri ₹50 + Mint Lime ₹35 = ₹85
+                 * Combo sold for ₹80
+                 * Chaats gets ₹47.06
+                 * Drinks gets ₹32.94
                  */
 
-                let counter =
-                    item.counter || "";
+                const itemName =
+                    item.name ??
+                    item.item_name ??
+                    "Unknown Item";
 
+                const itemType =
+                    isCombo
+                        ? "combo"
+                        : "single";
 
                 if (
                     isCombo &&
-                    Array.isArray(item.components)
+                    Array.isArray(item.components) &&
+                    item.components.length
                 ) {
 
-                    const counters =
-                        [
-                            ...new Set(
-                                item.components
-                                    .map(c =>
-                                        c.counter
-                                    )
-                                    .filter(Boolean)
-                            )
-                        ];
+                    const componentPrices =
+                        item.components.map(component => {
 
-                    counter =
-                        counters.join(" + ");
+                            const componentPrice =
+                                Number(
+                                    component.price ??
+                                    component.unit_price ??
+                                    0
+                                );
+
+                            return {
+                                name:
+                                    component.name ??
+                                    component.item_name ??
+                                    "Unknown Item",
+
+                                counter:
+                                    component.counter ??
+                                    "-",
+
+                                price:
+                                    componentPrice
+                            };
+
+                        });
+
+                    const normalTotal =
+                        componentPrices.reduce(
+                            (sum, component) =>
+                                sum + component.price,
+                            0
+                        );
+
+                    if (normalTotal > 0) {
+
+                        componentPrices.forEach(
+                            component => {
+
+                                salesData.push({
+
+                                    orderId:
+                                        order.id,
+
+                                    orderNumber:
+                                        order.order_number,
+
+                                    order:
+                                        order,
+
+                                    created_at:
+                                        order.created_at,
+
+                                    table:
+                                        order.table_number ??
+                                        "-",
+
+                                    customer:
+                                        order.customer_name ??
+                                        "-",
+
+                                    item:
+                                        itemName,
+
+                                    quantity:
+                                        quantity,
+
+                                    price:
+                                        price,
+
+                                    amount:
+                                        (
+                                            quantity *
+                                            price *
+                                            component.price /
+                                            normalTotal
+                                        ),
+
+                                    counter:
+                                        component.counter,
+
+                                    status:
+                                        order.status ??
+                                        "Pending",
+
+                                    type:
+                                        itemType,
+
+                                    components:
+                                        item.components,
+
+                                    comboComponent:
+                                        component.name
+
+                                });
+
+                            }
+                        );
+
+                    } else {
+
+                        salesData.push({
+
+                            orderId:
+                                order.id,
+
+                            orderNumber:
+                                order.order_number,
+
+                            order:
+                                order,
+
+                            created_at:
+                                order.created_at,
+
+                            table:
+                                order.table_number ??
+                                "-",
+
+                            customer:
+                                order.customer_name ??
+                                "-",
+
+                            item:
+                                itemName,
+
+                            quantity:
+                                quantity,
+
+                            price:
+                                price,
+
+                            amount:
+                                quantity * price,
+
+                            counter:
+                                "-",
+
+                            status:
+                                order.status ??
+                                "Pending",
+
+                            type:
+                                itemType,
+
+                            components:
+                                item.components
+
+                        });
+
+                    }
+
+                } else {
+
+                    salesData.push({
+
+                        orderId:
+                            order.id,
+
+                        orderNumber:
+                            order.order_number,
+
+                        order:
+                            order,
+
+                        created_at:
+                            order.created_at,
+
+                        table:
+                            order.table_number ??
+                            "-",
+
+                        customer:
+                            order.customer_name ??
+                            "-",
+
+                        item:
+                            itemName,
+
+                        quantity:
+                            quantity,
+
+                        price:
+                            price,
+
+                        amount:
+                            quantity * price,
+
+                        counter:
+                            item.counter || "-",
+
+                        status:
+                            order.status ??
+                            "Pending",
+
+                        type:
+                            itemType,
+
+                        components:
+                            []
+
+                    });
 
                 }
-
-
-                salesData.push({
-
-                    orderId:
-                        order.id,
-
-                    orderNumber:
-                        order.order_number,
-
-                    order:
-                        order,
-
-                    created_at:
-                        order.created_at,
-
-                    table:
-                        order.table_number ??
-                        "-",
-
-                    customer:
-                        order.customer_name ??
-                        "-",
-
-                    item:
-                        item.name ??
-                        item.item_name ??
-                        "Unknown Item",
-
-                    quantity:
-                        quantity,
-
-                    price:
-                        price,
-
-                    amount:
-                        quantity * price,
-
-                    counter:
-                        counter || "-",
-
-                    status:
-                        order.status ??
-                        "Pending",
-
-                    type:
-                        isCombo
-                            ? "combo"
-                            : "single",
-
-                    components:
-                        Array.isArray(
-                            item.components
-                        )
-                            ? item.components
-                            : []
-
-                });
 
             });
 
@@ -1189,15 +1330,64 @@ function renderItemsTable(data) {
             row.components.length
         ) {
 
-            componentText =
-                row.components
-                    .map(
-                        component =>
-                            escapeHtml(
-                                component.name
-                            )
-                    )
-                    .join(" + ");
+            /*
+             * Show the combo components with the amount
+             * allocated to each counter.
+             */
+
+            const normalTotal =
+                row.components.reduce(
+                    (sum, component) =>
+                        sum +
+                        Number(
+                            component.price ??
+                            component.unit_price ??
+                            0
+                        ),
+                    0
+                );
+
+            if (normalTotal > 0) {
+
+                componentText =
+                    row.components
+                        .map(component => {
+
+                            const componentPrice =
+                                Number(
+                                    component.price ??
+                                    component.unit_price ??
+                                    0
+                                );
+
+                            const allocatedAmount =
+                                row.quantity *
+                                row.price *
+                                componentPrice /
+                                normalTotal;
+
+                            return `
+                                ${escapeHtml(component.name)}
+                                (${escapeHtml(component.counter || "-")})
+                                - ₹${allocatedAmount.toFixed(2)}
+                            `;
+
+                        })
+                        .join("<br>");
+
+            } else {
+
+                componentText =
+                    row.components
+                        .map(
+                            component =>
+                                escapeHtml(
+                                    component.name
+                                )
+                        )
+                        .join(" + ");
+
+            }
 
         }
 
@@ -1977,4 +2167,5 @@ loadSales();
 </body>
 
 </html>
+
 ```
