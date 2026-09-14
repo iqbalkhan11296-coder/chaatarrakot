@@ -2,26 +2,19 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Cafe Billing</title>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase.js?v=4"></script>
 
-
     <style>
-
         * {
             box-sizing: border-box;
         }
-
 
         body {
             margin: 0;
@@ -30,136 +23,132 @@
             color: #222;
         }
 
-
         header {
-            background: #222;
+            background: #4b001f;
             color: white;
             padding: 18px;
             text-align: center;
         }
-
 
         header h1 {
             margin: 0;
+            font-size: 28px;
         }
-
 
         header p {
-            margin: 6px 0 0;
+            margin: 5px 0 0;
+            font-size: 14px;
         }
-
 
         .container {
-            max-width: 900px;
+            max-width: 1000px;
             margin: auto;
-            padding: 20px;
-            padding-bottom: 30px;
+            padding: 15px;
         }
-
 
         .section {
             background: white;
-            margin-bottom: 18px;
-            border-radius: 12px;
-            overflow: hidden;
+            margin-bottom: 15px;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
         }
-
 
         .section h2 {
-            margin: 0;
-            padding: 15px;
-            background: #333;
-            color: white;
-            font-size: 20px;
+            margin-top: 0;
+            color: #4b001f;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 8px;
         }
 
-
-        .item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 15px;
-            border-bottom: 1px solid #eee;
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
             gap: 10px;
         }
 
-
-        .item:last-child {
-            border-bottom: none;
+        .item {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 12px;
+            background: #fff;
         }
-
 
         .item-name {
-            flex: 1;
-        }
-
-
-        .item-name strong {
-            display: block;
+            font-weight: bold;
             font-size: 17px;
         }
 
-
-        .price {
-            color: #666;
-            margin-top: 4px;
+        .item-price {
+            color: #4b001f;
+            font-weight: bold;
+            margin-top: 5px;
         }
 
-
-        .quantity {
+        .quantity-row {
             display: flex;
             align-items: center;
-            gap: 8px;
+            justify-content: space-between;
+            margin-top: 10px;
         }
 
-
-        .quantity button {
-            width: 38px;
-            height: 38px;
+        .quantity-row button {
+            width: 35px;
+            height: 35px;
             border: none;
             border-radius: 6px;
-            background: #333;
+            background: #4b001f;
             color: white;
-            font-size: 21px;
+            font-size: 20px;
             cursor: pointer;
         }
 
-
-        .quantity button:active {
-            transform: scale(0.95);
-        }
-
-
-        .quantity span {
-            min-width: 28px;
+        .quantity {
+            font-size: 18px;
+            font-weight: bold;
+            min-width: 30px;
             text-align: center;
-            font-size: 17px;
         }
 
-
-        .bottom {
-            position: sticky;
-            bottom: 0;
-            background: white;
-            padding: 18px;
-            border-radius: 12px;
-            box-shadow: 0 -3px 15px rgba(0,0,0,0.15);
+        .customer-box {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
         }
 
+        .customer-box input {
+            flex: 1;
+            min-width: 200px;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 16px;
+        }
 
-        .total {
+        .cart {
+            margin-top: 10px;
+        }
+
+        .cart-row {
             display: flex;
             justify-content: space-between;
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 15px;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
         }
 
+        .total {
+            text-align: right;
+            font-size: 24px;
+            font-weight: bold;
+            color: #4b001f;
+            margin-top: 15px;
+        }
 
-        #placeOrder {
+        .place-order {
             width: 100%;
             padding: 16px;
-            background: #008000;
+            margin-top: 15px;
+            background: #4b001f;
             color: white;
             border: none;
             border-radius: 8px;
@@ -168,2297 +157,552 @@
             cursor: pointer;
         }
 
-
-        #placeOrder:disabled {
+        .place-order:disabled {
             background: #999;
             cursor: not-allowed;
         }
 
-
         #message {
             text-align: center;
-            margin-top: 15px;
             font-weight: bold;
+            margin-top: 15px;
+            min-height: 24px;
         }
 
-
-        @media (max-width: 600px) {
-
-            .container {
-                padding: 12px;
-            }
-
-            .item {
-                flex-wrap: wrap;
-            }
-
-            .quantity {
-                margin-left: auto;
-            }
-
+        .success {
+            color: green;
         }
 
+        .error {
+            color: red;
+        }
     </style>
-
 </head>
-
 
 <body>
 
-
 <header>
-
-    <h1>CAFE BILLING</h1>
-
+    <h1>Cafe Billing</h1>
     <p>Main Billing Counter</p>
-
 </header>
-
-
 
 <div class="container">
 
-
-    <!-- =========================
-         CHAATS
-    ========================== -->
-
+    <!-- CUSTOMER -->
     <div class="section">
 
-        <h2>🥗 CHAATS</h2>
+        <h2>Customer</h2>
 
+        <div class="customer-box">
 
-        <div class="item">
-
-            <div class="item-name">
-
-                <strong>Pani Puri</strong>
-
-                <div class="price">
-                    ₹50
-                </div>
-
-            </div>
-
-
-            <div class="quantity">
-
-                <button
-                    onclick="changeQty('Pani Puri', -1)"
-                >
-                    −
-                </button>
-
-
-                <span id="qty-Pani-Puri">
-                    0
-                </span>
-
-
-                <button
-                    onclick="changeQty('Pani Puri', 1)"
-                >
-                    +
-                </button>
-
-            </div>
-
-        </div>
-
-
-
-        <div class="item">
-
-            <div class="item-name">
-
-                <strong>Masala Puri</strong>
-
-                <div class="price">
-                    ₹60
-                </div>
-
-            </div>
-
-
-            <div class="quantity">
-
-                <button
-                    onclick="changeQty('Masala Puri', -1)"
-                >
-                    −
-                </button>
-
-
-                <span id="qty-Masala-Puri">
-                    0
-                </span>
-
-
-                <button
-                    onclick="changeQty('Masala Puri', 1)"
-                >
-                    +
-                </button>
-
-            </div>
-
-        </div>
-
-
-
-        <div class="item">
-
-            <div class="item-name">
-
-                <strong>Samosa Chaat</strong>
-
-                <div class="price">
-                    ₹80
-                </div>
-
-            </div>
-
-
-            <div class="quantity">
-
-                <button
-                    onclick="changeQty('Samosa Chaat', -1)"
-                >
-                    −
-                </button>
-
-
-                <span id="qty-Samosa-Chaat">
-                    0
-                </span>
-
-
-                <button
-                    onclick="changeQty('Samosa Chaat', 1)"
-                >
-                    +
-                </button>
-
-            </div>
-
-        </div>
-
-
-
-        <div class="item">
-
-            <div class="item-name">
-
-                <strong>Dahi Puri</strong>
-
-                <div class="price">
-                    ₹80
-                </div>
-
-            </div>
-
-
-            <div class="quantity">
-
-                <button
-                    onclick="changeQty('Dahi Puri', -1)"
-                >
-                    −
-                </button>
-
-
-                <span id="qty-Dahi-Puri">
-                    0
-                </span>
-
-
-                <button
-                    onclick="changeQty('Dahi Puri', 1)"
-                >
-                    +
-                </button>
-
-            </div>
+            <input
+                type="text"
+                id="customerName"
+                placeholder="Customer Name"
+            >
 
         </div>
 
     </div>
 
 
-
-    <!-- =========================
-         DRINKS
-    ========================== -->
-
+    <!-- CHAATS -->
     <div class="section">
 
-        <h2>🥤 DRINKS</h2>
+        <h2>Chaats</h2>
 
-
-        <div class="item">
-
-            <div class="item-name">
-
-                <strong>Mango Shake</strong>
-
-                <div class="price">
-                    ₹90
-                </div>
-
-            </div>
-
-
-            <div class="quantity">
-
-                <button
-                    onclick="changeQty('Mango Shake', -1)"
-                >
-                    −
-                </button>
-
-
-                <span id="qty-Mango-Shake">
-                    0
-                </span>
-
-
-                <button
-                    onclick="changeQty('Mango Shake', 1)"
-                >
-                    +
-                </button>
-
-            </div>
-
-        </div>
-
-
-
-        <div class="item">
-
-            <div class="item-name">
-
-                <strong>Oreo Shake</strong>
-
-                <div class="price">
-                    ₹80
-                </div>
-
-            </div>
-
-
-            <div class="quantity">
-
-                <button
-                    onclick="changeQty('Oreo Shake', -1)"
-                >
-                    −
-                </button>
-
-
-                <span id="qty-Oreo-Shake">
-                    0
-                </span>
-
-
-                <button
-                    onclick="changeQty('Oreo Shake', 1)"
-                >
-                    +
-                </button>
-
-            </div>
-
-        </div>
-
-
-
-        <div class="item">
-
-            <div class="item-name">
-
-                <strong>Strawberry Shake</strong>
-
-                <div class="price">
-                    ₹90
-                </div>
-
-            </div>
-
-
-            <div class="quantity">
-
-                <button
-                    onclick="changeQty('Strawberry Shake', -1)"
-                >
-                    −
-                </button>
-
-
-                <span id="qty-Strawberry-Shake">
-                    0
-                </span>
-
-
-                <button
-                    onclick="changeQty('Strawberry Shake', 1)"
-                >
-                    +
-                </button>
-
-            </div>
-
-        </div>
-
-
-
-        <div class="item">
-
-            <div class="item-name">
-
-                <strong>Mint Lime</strong>
-
-                <div class="price">
-                    ₹35
-                </div>
-
-            </div>
-
-
-            <div class="quantity">
-
-                <button
-                    onclick="changeQty('Mint Lime', -1)"
-                >
-                    −
-                </button>
-
-
-                <span id="qty-Mint-Lime">
-                    0
-                </span>
-
-
-                <button
-                    onclick="changeQty('Mint Lime', 1)"
-                >
-                    +
-                </button>
-
-            </div>
-
-        </div>
+        <div class="menu-grid" id="chaatsMenu"></div>
 
     </div>
 
 
-
-    <!-- =========================
-         BURGERS
-    ========================== -->
-
+    <!-- DRINKS -->
     <div class="section">
 
-        <h2>🍔 BURGERS</h2>
+        <h2>Drinks</h2>
 
-
-        <div class="item">
-
-            <div class="item-name">
-
-                <strong>Classic Burger</strong>
-
-                <div class="price">
-                    ₹120
-                </div>
-
-            </div>
-
-
-            <div class="quantity">
-
-                <button
-                    onclick="changeQty('Classic Burger', -1)"
-                >
-                    −
-                </button>
-
-
-                <span id="qty-Classic-Burger">
-                    0
-                </span>
-
-
-                <button
-                    onclick="changeQty('Classic Burger', 1)"
-                >
-                    +
-                </button>
-
-            </div>
-
-        </div>
-
-
-
-        <div class="item">
-
-            <div class="item-name">
-
-                <strong>Chicken Burger</strong>
-
-                <div class="price">
-                    ₹150
-                </div>
-
-            </div>
-
-
-            <div class="quantity">
-
-                <button
-                    onclick="changeQty('Chicken Burger', -1)"
-                >
-                    −
-                </button>
-
-
-                <span id="qty-Chicken-Burger">
-                    0
-                </span>
-
-
-                <button
-                    onclick="changeQty('Chicken Burger', 1)"
-                >
-                    +
-                </button>
-
-            </div>
-
-        </div>
-
-
-
-        <div class="item">
-
-            <div class="item-name">
-
-                <strong>Cheese Burger</strong>
-
-                <div class="price">
-                    ₹140
-                </div>
-
-            </div>
-
-
-            <div class="quantity">
-
-                <button
-                    onclick="changeQty('Cheese Burger', -1)"
-                >
-                    −
-                </button>
-
-
-                <span id="qty-Cheese-Burger">
-                    0
-                </span>
-
-
-                <button
-                    onclick="changeQty('Cheese Burger', 1)"
-                >
-                    +
-                </button>
-
-            </div>
-
-        </div>
-
-
-
-        <div class="item">
-
-            <div class="item-name">
-
-                <strong>Double Burger</strong>
-
-                <div class="price">
-                    ₹180
-                </div>
-
-            </div>
-
-
-            <div class="quantity">
-
-                <button
-                    onclick="changeQty('Double Burger', -1)"
-                >
-                    −
-                </button>
-
-
-                <span id="qty-Double-Burger">
-                    0
-                </span>
-
-
-                <button
-                    onclick="changeQty('Double Burger', 1)"
-                >
-                    +
-                </button>
-
-            </div>
-
-        </div>
+        <div class="menu-grid" id="drinksMenu"></div>
 
     </div>
 
 
+    <!-- BURGERS -->
+    <div class="section">
 
-    <!-- =========================
-         TOTAL
-    ========================== -->
+        <h2>Burgers</h2>
 
-    <div class="bottom">
+        <div class="menu-grid" id="burgersMenu"></div>
+
+    </div>
+
+
+    <!-- CART -->
+    <div class="section">
+
+        <h2>Order</h2>
+
+        <div id="cart" class="cart">
+            No items selected.
+        </div>
 
         <div class="total">
-
-            <span>
-                Total
-            </span>
-
-            <span id="total">
-                ₹0
-            </span>
-
+            Total: ₹<span id="total">0</span>
         </div>
 
-
         <button
+            class="place-order"
             id="placeOrder"
             onclick="placeOrder()"
         >
             PLACE ORDER
         </button>
 
-
         <div id="message"></div>
 
     </div>
 
-
 </div>
-
 
 
 <script>
 
+    const menu = {
 
-/* =========================================
-   MENU
-========================================= */
+        // CHAATS
+        "Pani Puri": {
+            price: 50,
+            counter: "chaats"
+        },
 
-const menu = {
+        "Masala Puri": {
+            price: 60,
+            counter: "chaats"
+        },
 
-    "Pani Puri": {
-        price: 50,
-        counter: "chaats"
-    },
+        "Samosa Chaat": {
+            price: 80,
+            counter: "chaats"
+        },
 
-    "Masala Puri": {
-        price: 60,
-        counter: "chaats"
-    },
-
-    "Samosa Chaat": {
-        price: 80,
-        counter: "chaats"
-    },
-
-    "Dahi Puri": {
-        price: 80,
-        counter: "chaats"
-    },
+        "Dahi Puri": {
+            price: 80,
+            counter: "chaats"
+        },
 
 
-    "Mango Shake": {
-        price: 90,
-        counter: "drinks"
-    },
+        // DRINKS
+        "Mango Shake": {
+            price: 90,
+            counter: "drinks"
+        },
 
-    "Oreo Shake": {
-        price: 80,
-        counter: "drinks"
-    },
+        "Oreo Shake": {
+            price: 80,
+            counter: "drinks"
+        },
 
-    "Strawberry Shake": {
-        price: 90,
-        counter: "drinks"
-    },
+        "Strawberry Shake": {
+            price: 90,
+            counter: "drinks"
+        },
 
-    "Mint Lime": {
-        price: 35,
-        counter: "drinks"
-    },
+        "Mint Lime": {
+            price: 35,
+            counter: "drinks"
+        },
 
 
-    "Classic Burger": {
-        price: 120,
-        counter: "burgers"
-    },
+        // BURGERS
+        "Classic Burger": {
+            price: 120,
+            counter: "burgers"
+        },
 
-    "Chicken Burger": {
-        price: 150,
-        counter: "burgers"
-    },
+        "Chicken Burger": {
+            price: 150,
+            counter: "burgers"
+        },
 
-    "Cheese Burger": {
-        price: 140,
-        counter: "burgers"
-    },
+        "Cheese Burger": {
+            price: 140,
+            counter: "burgers"
+        },
 
-    "Double Burger": {
-        price: 180,
-        counter: "burgers"
+        "Double Burger": {
+            price: 180,
+            counter: "burgers"
+        }
+
+    };
+
+
+    const quantities = {};
+
+
+    // CREATE MENU
+    function createMenu(containerId, counter) {
+
+        const container = document.getElementById(containerId);
+
+        container.innerHTML = "";
+
+        Object.keys(menu).forEach(item => {
+
+            if (menu[item].counter !== counter) {
+                return;
+            }
+
+            quantities[item] = 0;
+
+            const div = document.createElement("div");
+
+            div.className = "item";
+
+            div.innerHTML = `
+
+                <div class="item-name">
+                    ${item}
+                </div>
+
+                <div class="item-price">
+                    ₹${menu[item].price}
+                </div>
+
+                <div class="quantity-row">
+
+                    <button onclick="changeQuantity('${item}', -1)">
+                        −
+                    </button>
+
+                    <span
+                        class="quantity"
+                        id="qty-${item.replace(/[^a-zA-Z0-9]/g, '')}"
+                    >
+                        0
+                    </span>
+
+                    <button onclick="changeQuantity('${item}', 1)">
+                        +
+                    </button>
+
+                </div>
+
+            `;
+
+            container.appendChild(div);
+
+        });
+
     }
 
-};
+
+    createMenu("chaatsMenu", "chaats");
+
+    createMenu("drinksMenu", "drinks");
+
+    createMenu("burgersMenu", "burgers");
 
 
-/* =========================================
-   QUANTITIES
-========================================= */
+    // CHANGE QUANTITY
+    function changeQuantity(item, change) {
 
-const quantities = {};
+        quantities[item] += change;
 
+        if (quantities[item] < 0) {
+            quantities[item] = 0;
+        }
 
-/* =========================================
-   GET QUANTITY ELEMENT ID
-========================================= */
+        const id =
+            "qty-" +
+            item.replace(/[^a-zA-Z0-9]/g, "");
 
-function getId(name) {
+        document.getElementById(id).textContent =
+            quantities[item];
 
-    return "qty-" +
-        name.replaceAll(" ", "-");
-
-}
-
-
-/* =========================================
-   CHANGE QUANTITY
-========================================= */
-
-function changeQty(name, change) {
-
-    if (!quantities[name]) {
-
-        quantities[name] = 0;
+        updateCart();
 
     }
 
 
-    quantities[name] += change;
+    // UPDATE CART
+    function updateCart() {
+
+        const cart = document.getElementById("cart");
+
+        let total = 0;
+
+        let html = "";
+
+        let hasItems = false;
 
 
-    if (quantities[name] < 0) {
+        Object.keys(menu).forEach(item => {
 
-        quantities[name] = 0;
+            const qty = quantities[item];
 
-    }
+            if (qty > 0) {
+
+                hasItems = true;
+
+                const amount =
+                    menu[item].price * qty;
+
+                total += amount;
+
+                html += `
+
+                    <div class="cart-row">
+
+                        <span>
+                            ${item} × ${qty}
+                        </span>
+
+                        <span>
+                            ₹${amount}
+                        </span>
+
+                    </div>
+
+                `;
+
+            }
+
+        });
 
 
-    const element =
-        document.getElementById(
-            getId(name)
-        );
+        if (!hasItems) {
 
+            cart.innerHTML =
+                "No items selected.";
 
-    if (element) {
+        } else {
 
-        element.innerText =
-            quantities[name];
-
-    }
-
-
-    calculateTotal();
-
-}
-
-
-/* =========================================
-   CALCULATE TOTAL
-========================================= */
-
-function calculateTotal() {
-
-    let total = 0;
-
-
-    for (
-        const item in quantities
-    ) {
-
-        if (
-            quantities[item] > 0 &&
-            menu[item]
-        ) {
-
-            total +=
-                quantities[item] *
-                menu[item].price;
+            cart.innerHTML = html;
 
         }
 
-    }
 
-
-    document.getElementById(
-        "total"
-    ).innerText =
-        "₹" + total;
-
-
-    return total;
-
-}
-
-
-/* =========================================
-   PLACE ORDER
-========================================= */
-
-async function placeOrder() {
-
-    const message =
-        document.getElementById(
-            "message"
-        );
-
-
-    const button =
-        document.getElementById(
-            "placeOrder"
-        );
-
-
-    /* =====================================
-       CHECK SUPABASE
-    ===================================== */
-
-    if (
-        typeof supabaseClient ===
-        "undefined"
-    ) {
-
-        message.innerText =
-            "❌ Supabase connection not found.";
-
-        return;
+        document.getElementById("total").textContent =
+            total;
 
     }
 
 
-    /* =====================================
-       COLLECT ITEMS
-    ===================================== */
+    // PLACE ORDER
+    async function placeOrder() {
 
-    const selectedItems = [];
+        const button =
+            document.getElementById("placeOrder");
+
+        const message =
+            document.getElementById("message");
+
+        const customerName =
+            document.getElementById("customerName").value.trim();
 
 
-    for (
-        const item in quantities
-    ) {
+        const selectedItems = [];
 
-        if (
-            quantities[item] > 0 &&
-            menu[item]
-        ) {
+        let total = 0;
 
-            selectedItems.push({
 
-                name: item,
+        Object.keys(menu).forEach(item => {
 
-                price:
-                    menu[item].price,
+            if (quantities[item] > 0) {
 
-                quantity:
-                    quantities[item],
+                const itemTotal =
+                    menu[item].price *
+                    quantities[item];
 
-                counter:
-                    menu[item].counter
+                selectedItems.push({
+
+                    name: item,
+
+                    price: menu[item].price,
+
+                    quantity: quantities[item],
+
+                    counter: menu[item].counter
+
+                });
+
+                total += itemTotal;
+
+            }
+
+        });
+
+
+        if (selectedItems.length === 0) {
+
+            message.className = "error";
+
+            message.textContent =
+                "Please select at least one item.";
+
+            return;
+
+        }
+
+
+        button.disabled = true;
+
+        button.textContent =
+            "PLACING ORDER...";
+
+        message.textContent = "";
+
+
+        try {
+
+            // INSERT MAIN ORDER
+            const { data: order, error: orderError } =
+                await supabaseClient
+
+                    .from("orders")
+
+                    .insert({
+
+                        customer_name:
+                            customerName || null,
+
+                        items:
+                            selectedItems,
+
+                        total:
+                            total,
+
+                        status:
+                            "Pending"
+
+                    })
+
+                    .select()
+
+                    .single();
+
+
+            if (orderError) {
+
+                throw orderError;
+
+            }
+
+
+            // GROUP ITEMS BY COUNTER
+
+            const counterItems = {
+
+                chaats: [],
+
+                drinks: [],
+
+                burgers: []
+
+            };
+
+
+            selectedItems.forEach(item => {
+
+                if (counterItems[item.counter]) {
+
+                    counterItems[item.counter].push(item);
+
+                }
 
             });
 
-        }
 
-    }
+            // CREATE KOTs
 
-
-    /* =====================================
-       CHECK ITEMS
-    ===================================== */
-
-    if (
-        selectedItems.length === 0
-    ) {
-
-        message.innerText =
-            "Please select at least one item.";
-
-        return;
-
-    }
+            const kotRows = [];
 
 
-    const total =
-        calculateTotal();
+            Object.keys(counterItems).forEach(counter => {
+
+                if (counterItems[counter].length > 0) {
+
+                    kotRows.push({
+
+                        order_id:
+                            order.id,
+
+                        counter:
+                            counter,
+
+                        items:
+                            counterItems[counter],
+
+                        status:
+                            "Pending"
+
+                    });
+
+                }
+
+            });
 
 
-    /* =====================================
-       DISABLE BUTTON
-    ===================================== */
+            if (kotRows.length > 0) {
 
-    button.disabled = true;
+                const { error: kotError } =
+                    await supabaseClient
 
-    button.innerText =
-        "PLACING ORDER...";
+                        .from("counter_kot")
 
-    message.innerText =
-        "Sending order...";
+                        .insert(kotRows);
 
 
-    try {
+                if (kotError) {
 
-
-        /* =================================
-           CREATE MAIN ORDER
-        ================================= */
-
-        const {
-            data: order,
-            error: orderError
-        } = await supabaseClient
-
-            .from("orders")
-
-            .insert({
-
-                items:
-                    selectedItems,
-
-                total:
-                    total,
-
-                status:
-                    "Pending"
-
-            })
-
-            .select()
-
-            .single();
-
-
-        if (orderError) {
-
-            throw orderError;
-
-        }
-
-
-        if (!order) {
-
-            throw new Error(
-                "Order was not created."
-            );
-
-        }
-
-
-        /* =================================
-           SPLIT ITEMS BY COUNTER
-        ================================= */
-
-        const counters = {
-
-            chaats: [],
-
-            drinks: [],
-
-            burgers: []
-
-        };
-
-
-        selectedItems.forEach(
-            item => {
-
-                if (
-                    counters[item.counter]
-                ) {
-
-                    counters[
-                        item.counter
-                    ].push(item);
+                    throw kotError;
 
                 }
 
             }
-        );
 
 
-        /* =================================
-           CREATE KOTS
-        ================================= */
+            // SUCCESS
 
-        const kots = [];
+            message.className = "success";
 
-
-        for (
-            const counter in counters
-        ) {
-
-            if (
-                counters[counter].length === 0
-            ) {
-
-                continue;
-
-            }
+            message.textContent =
+                "Order #" +
+                order.order_number +
+                " sent to counters!";
 
 
-            kots.push({
+            /*
+             * Automatically reload the billing page
+             * after a short delay.
+             */
 
-                order_id:
-                    order.id,
-
-                counter:
-                    counter,
-
-                items:
-                    counters[counter],
-
-                status:
-                    "Pending"
-
-            });
-
-        }
-
-
-        /* =================================
-           INSERT KOTS
-        ================================= */
-
-        if (
-            kots.length > 0
-        ) {
-
-            const {
-                error: kotError
-            } = await supabaseClient
-
-                .from("counter_kot")
-
-                .insert(kots);
-
-
-            if (kotError) {
-
-                throw kotError;
-
-            }
-
-        }
-
-
-        /* =================================
-           SUCCESS
-        ================================= */
-
-        message.innerText =
-            "✅ Order #" +
-            order.order_number +
-            " sent to counters!";
-
-
-        /*
-         * Wait briefly so the user can
-         * see the success message.
-         *
-         * Then automatically reload.
-         */
-
-        setTimeout(
-            function() {
+            setTimeout(() => {
 
                 window.location.reload();
 
-            },
-            1200
-        );
+            }, 1200);
 
 
-    }
+        } catch (error) {
 
-    catch (error) {
+            console.error(error);
 
-        console.error(
-            "ORDER ERROR:",
-            error
-        );
+            message.className = "error";
 
-    <!DOCTYPE html>
-<html lang="en">
+            message.textContent =
+                "Order failed. Please try again.";
 
-<head>
+            button.disabled = false;
 
-    <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <title>Cafe Billing</title>
-
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="supabase.js?v=4"></script>
-
-
-    <style>
-
-        * {
-            box-sizing: border-box;
-        }
-
-
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f4f4f4;
-            color: #222;
-        }
-
-
-        header {
-            background: #222;
-            color: white;
-            padding: 18px;
-            text-align: center;
-        }
-
-
-        header h1 {
-            margin: 0;
-        }
-
-
-        header p {
-            margin: 6px 0 0;
-        }
-
-
-        .container {
-            max-width: 900px;
-            margin: auto;
-            padding: 20px;
-            padding-bottom: 30px;
-        }
-
-
-        .section {
-            background: white;
-            margin-bottom: 18px;
-            border-radius: 12px;
-            overflow: hidden;
-        }
-
-
-        .section h2 {
-            margin: 0;
-            padding: 15px;
-            background: #333;
-            color: white;
-            font-size: 20px;
-        }
-
-
-        .item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 15px;
-            border-bottom: 1px solid #eee;
-            gap: 10px;
-        }
-
-
-        .item:last-child {
-            border-bottom: none;
-        }
-
-
-        .item-name {
-            flex: 1;
-        }
-
-
-        .item-name strong {
-            display: block;
-            font-size: 17px;
-        }
-
-
-        .price {
-            color: #666;
-            margin-top: 4px;
-        }
-
-
-        .quantity {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-
-        .quantity button {
-            width: 38px;
-            height: 38px;
-            border: none;
-            border-radius: 6px;
-            background: #333;
-            color: white;
-            font-size: 21px;
-            cursor: pointer;
-        }
-
-
-        .quantity button:active {
-            transform: scale(0.95);
-        }
-
-
-        .quantity span {
-            min-width: 28px;
-            text-align: center;
-            font-size: 17px;
-        }
-
-
-        .bottom {
-            position: sticky;
-            bottom: 0;
-            background: white;
-            padding: 18px;
-            border-radius: 12px;
-            box-shadow: 0 -3px 15px rgba(0,0,0,0.15);
-        }
-
-
-        .total {
-            display: flex;
-            justify-content: space-between;
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 15px;
-        }
-
-
-        #placeOrder {
-            width: 100%;
-            padding: 16px;
-            background: #008000;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 19px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-
-        #placeOrder:disabled {
-            background: #999;
-            cursor: not-allowed;
-        }
-
-
-        #message {
-            text-align: center;
-            margin-top: 15px;
-            font-weight: bold;
-        }
-
-
-        @media (max-width: 600px) {
-
-            .container {
-                padding: 12px;
-            }
-
-            .item {
-                flex-wrap: wrap;
-            }
-
-            .quantity {
-                margin-left: auto;
-            }
-
-        }
-
-    </style>
-
-</head>
-
-
-<body>
-
-
-<header>
-
-    <h1>CAFE BILLING</h1>
-
-    <p>Main Billing Counter</p>
-
-</header>
-
-
-
-<div class="container">
-
-
-    <!-- =========================
-         CHAATS
-    ========================== -->
-
-    <div class="section">
-
-        <h2>🥗 CHAATS</h2>
-
-
-        <div class="item">
-
-            <div class="item-name">
-
-                <strong>Pani Puri</strong>
-
-                <div class="price">
-                    ₹50
-                </div>
-
-            </div>
-
-
-            <div class="quantity">
-
-                <button
-                    onclick="changeQty('Pani Puri', -1)"
-                >
-                    −
-                </button>
-
-
-                <span id="qty-Pani-Puri">
-                    0
-                </span>
-
-
-                <button
-                    onclick="changeQty('Pani Puri', 1)"
-                >
-                    +
-                </button>
-
-            </div>
-
-        </div>
-
-
-
-        <div class="item">
-
-            <div class="item-name">
-
-                <strong>Masala Puri</strong>
-
-                <div class="price">
-                    ₹60
-                </div>
-
-            </div>
-
-
-            <div class="quantity">
-
-                <button
-                    onclick="changeQty('Masala Puri', -1)"
-                >
-                    −
-                </button>
-
-
-                <span id="qty-Masala-Puri">
-                    0
-                </span>
-
-
-                <button
-                    onclick="changeQty('Masala Puri', 1)"
-                >
-                    +
-                </button>
-
-            </div>
-
-        </div>
-
-
-
-        <div class="item">
-
-            <div class="item-name">
-
-                <strong>Samosa Chaat</strong>
-
-                <div class="price">
-                    ₹80
-                </div>
-
-            </div>
-
-
-            <div class="quantity">
-
-                <button
-                    onclick="changeQty('Samosa Chaat', -1)"
-                >
-                    −
-                </button>
-
-
-                <span id="qty-Samosa-Chaat">
-                    0
-                </span>
-
-
-                <button
-                    onclick="changeQty('Samosa Chaat', 1)"
-                >
-                    +
-                </button>
-
-            </div>
-
-        </div>
-
-
-
-        <div class="item">
-
-            <div class="item-name">
-
-                <strong>Dahi Puri</strong>
-
-                <div class="price">
-                    ₹80
-                </div>
-
-            </div>
-
-
-            <div class="quantity">
-
-                <button
-                    onclick="changeQty('Dahi Puri', -1)"
-                >
-                    −
-                </button>
-
-
-                <span id="qty-Dahi-Puri">
-                    0
-                </span>
-
-
-                <button
-                    onclick="changeQty('Dahi Puri', 1)"
-                >
-                    +
-                </button>
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-
-    <!-- =========================
-         DRINKS
-    ========================== -->
-
-    <div class="section">
-
-        <h2>🥤 DRINKS</h2>
-
-
-        <div class="item">
-
-            <div class="item-name">
-
-                <strong>Mango Shake</strong>
-
-                <div class="price">
-                    ₹90
-                </div>
-
-            </div>
-
-
-            <div class="quantity">
-
-                <button
-                    onclick="changeQty('Mango Shake', -1)"
-                >
-                    −
-                </button>
-
-
-                <span id="qty-Mango-Shake">
-                    0
-                </span>
-
-
-                <button
-                    onclick="changeQty('Mango Shake', 1)"
-                >
-                    +
-                </button>
-
-            </div>
-
-        </div>
-
-
-
-        <div class="item">
-
-            <div class="item-name">
-
-                <strong>Oreo Shake</strong>
-
-                <div class="price">
-                    ₹80
-                </div>
-
-            </div>
-
-
-            <div class="quantity">
-
-                <button
-                    onclick="changeQty('Oreo Shake', -1)"
-                >
-                    −
-                </button>
-
-
-                <span id="qty-Oreo-Shake">
-                    0
-                </span>
-
-
-                <button
-                    onclick="changeQty('Oreo Shake', 1)"
-                >
-                    +
-                </button>
-
-            </div>
-
-        </div>
-
-
-
-        <div class="item">
-
-            <div class="item-name">
-
-                <strong>Strawberry Shake</strong>
-
-                <div class="price">
-                    ₹90
-                </div>
-
-            </div>
-
-
-            <div class="quantity">
-
-                <button
-                    onclick="changeQty('Strawberry Shake', -1)"
-                >
-                    −
-                </button>
-
-
-                <span id="qty-Strawberry-Shake">
-                    0
-                </span>
-
-
-                <button
-                    onclick="changeQty('Strawberry Shake', 1)"
-                >
-                    +
-                </button>
-
-            </div>
-
-        </div>
-
-
-
-        <div class="item">
-
-            <div class="item-name">
-
-                <strong>Mint Lime</strong>
-
-                <div class="price">
-                    ₹35
-                </div>
-
-            </div>
-
-
-            <div class="quantity">
-
-                <button
-                    onclick="changeQty('Mint Lime', -1)"
-                >
-                    −
-                </button>
-
-
-                <span id="qty-Mint-Lime">
-                    0
-                </span>
-
-
-                <button
-                    onclick="changeQty('Mint Lime', 1)"
-                >
-                    +
-                </button>
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-
-    <!-- =========================
-         BURGERS
-    ========================== -->
-
-    <div class="section">
-
-        <h2>🍔 BURGERS</h2>
-
-
-        <div class="item">
-
-            <div class="item-name">
-
-                <strong>Classic Burger</strong>
-
-                <div class="price">
-                    ₹120
-                </div>
-
-            </div>
-
-
-            <div class="quantity">
-
-                <button
-                    onclick="changeQty('Classic Burger', -1)"
-                >
-                    −
-                </button>
-
-
-                <span id="qty-Classic-Burger">
-                    0
-                </span>
-
-
-                <button
-                    onclick="changeQty('Classic Burger', 1)"
-                >
-                    +
-                </button>
-
-            </div>
-
-        </div>
-
-
-
-        <div class="item">
-
-            <div class="item-name">
-
-                <strong>Chicken Burger</strong>
-
-                <div class="price">
-                    ₹150
-                </div>
-
-            </div>
-
-
-            <div class="quantity">
-
-                <button
-                    onclick="changeQty('Chicken Burger', -1)"
-                >
-                    −
-                </button>
-
-
-                <span id="qty-Chicken-Burger">
-                    0
-                </span>
-
-
-                <button
-                    onclick="changeQty('Chicken Burger', 1)"
-                >
-                    +
-                </button>
-
-            </div>
-
-        </div>
-
-
-
-        <div class="item">
-
-            <div class="item-name">
-
-                <strong>Cheese Burger</strong>
-
-                <div class="price">
-                    ₹140
-                </div>
-
-            </div>
-
-
-            <div class="quantity">
-
-                <button
-                    onclick="changeQty('Cheese Burger', -1)"
-                >
-                    −
-                </button>
-
-
-                <span id="qty-Cheese-Burger">
-                    0
-                </span>
-
-
-                <button
-                    onclick="changeQty('Cheese Burger', 1)"
-                >
-                    +
-                </button>
-
-            </div>
-
-        </div>
-
-
-
-        <div class="item">
-
-            <div class="item-name">
-
-                <strong>Double Burger</strong>
-
-                <div class="price">
-                    ₹180
-                </div>
-
-            </div>
-
-
-            <div class="quantity">
-
-                <button
-                    onclick="changeQty('Double Burger', -1)"
-                >
-                    −
-                </button>
-
-
-                <span id="qty-Double-Burger">
-                    0
-                </span>
-
-
-                <button
-                    onclick="changeQty('Double Burger', 1)"
-                >
-                    +
-                </button>
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-
-    <!-- =========================
-         TOTAL
-    ========================== -->
-
-    <div class="bottom">
-
-        <div class="total">
-
-            <span>
-                Total
-            </span>
-
-            <span id="total">
-                ₹0
-            </span>
-
-        </div>
-
-
-        <button
-            id="placeOrder"
-            onclick="placeOrder()"
-        >
-            PLACE ORDER
-        </button>
-
-
-        <div id="message"></div>
-
-    </div>
-
-
-</div>
-
-
-
-<script>
-
-
-/* =========================================
-   MENU
-========================================= */
-
-const menu = {
-
-    "Pani Puri": {
-        price: 50,
-        counter: "chaats"
-    },
-
-    "Masala Puri": {
-        price: 60,
-        counter: "chaats"
-    },
-
-    "Samosa Chaat": {
-        price: 80,
-        counter: "chaats"
-    },
-
-    "Dahi Puri": {
-        price: 80,
-        counter: "chaats"
-    },
-
-
-    "Mango Shake": {
-        price: 90,
-        counter: "drinks"
-    },
-
-    "Oreo Shake": {
-        price: 80,
-        counter: "drinks"
-    },
-
-    "Strawberry Shake": {
-        price: 90,
-        counter: "drinks"
-    },
-
-    "Mint Lime": {
-        price: 35,
-        counter: "drinks"
-    },
-
-
-    "Classic Burger": {
-        price: 120,
-        counter: "burgers"
-    },
-
-    "Chicken Burger": {
-        price: 150,
-        counter: "burgers"
-    },
-
-    "Cheese Burger": {
-        price: 140,
-        counter: "burgers"
-    },
-
-    "Double Burger": {
-        price: 180,
-        counter: "burgers"
-    }
-
-};
-
-
-/* =========================================
-   QUANTITIES
-========================================= */
-
-const quantities = {};
-
-
-/* =========================================
-   GET QUANTITY ELEMENT ID
-========================================= */
-
-function getId(name) {
-
-    return "qty-" +
-        name.replaceAll(" ", "-");
-
-}
-
-
-/* =========================================
-   CHANGE QUANTITY
-========================================= */
-
-function changeQty(name, change) {
-
-    if (!quantities[name]) {
-
-        quantities[name] = 0;
-
-    }
-
-
-    quantities[name] += change;
-
-
-    if (quantities[name] < 0) {
-
-        quantities[name] = 0;
-
-    }
-
-
-    const element =
-        document.getElementById(
-            getId(name)
-        );
-
-
-    if (element) {
-
-        element.innerText =
-            quantities[name];
-
-    }
-
-
-    calculateTotal();
-
-}
-
-
-/* =========================================
-   CALCULATE TOTAL
-========================================= */
-
-function calculateTotal() {
-
-    let total = 0;
-
-
-    for (
-        const item in quantities
-    ) {
-
-        if (
-            quantities[item] > 0 &&
-            menu[item]
-        ) {
-
-            total +=
-                quantities[item] *
-                menu[item].price;
+            button.textContent =
+                "PLACE ORDER";
 
         }
 
     }
-
-
-    document.getElementById(
-        "total"
-    ).innerText =
-        "₹" + total;
-
-
-    return total;
-
-}
-
-
-/* =========================================
-   PLACE ORDER
-========================================= */
-
-async function placeOrder() {
-
-    const message =
-        document.getElementById(
-            "message"
-        );
-
-
-    const button =
-        document.getElementById(
-            "placeOrder"
-        );
-
-
-    /* =====================================
-       CHECK SUPABASE
-    ===================================== */
-
-    if (
-        typeof supabaseClient ===
-        "undefined"
-    ) {
-
-        message.innerText =
-            "❌ Supabase connection not found.";
-
-        return;
-
-    }
-
-
-    /* =====================================
-       COLLECT ITEMS
-    ===================================== */
-
-    const selectedItems = [];
-
-
-    for (
-        const item in quantities
-    ) {
-
-        if (
-            quantities[item] > 0 &&
-            menu[item]
-        ) {
-
-            selectedItems.push({
-
-                name: item,
-
-                price:
-                    menu[item].price,
-
-                quantity:
-                    quantities[item],
-
-                counter:
-                    menu[item].counter
-
-            });
-
-        }
-
-    }
-
-
-    /* =====================================
-       CHECK ITEMS
-    ===================================== */
-
-    if (
-        selectedItems.length === 0
-    ) {
-
-        message.innerText =
-            "Please select at least one item.";
-
-        return;
-
-    }
-
-
-    const total =
-        calculateTotal();
-
-
-    /* =====================================
-       DISABLE BUTTON
-    ===================================== */
-
-    button.disabled = true;
-
-    button.innerText =
-        "PLACING ORDER...";
-
-    message.innerText =
-        "Sending order...";
-
-
-    try {
-
-
-        /* =================================
-           CREATE MAIN ORDER
-        ================================= */
-
-        const {
-            data: order,
-            error: orderError
-        } = await supabaseClient
-
-            .from("orders")
-
-            .insert({
-
-                items:
-                    selectedItems,
-
-                total:
-                    total,
-
-                status:
-                    "Pending"
-
-            })
-
-            .select()
-
-            .single();
-
-
-        if (orderError) {
-
-            throw orderError;
-
-        }
-
-
-        if (!order) {
-
-            throw new Error(
-                "Order was not created."
-            );
-
-        }
-
-
-        /* =================================
-           SPLIT ITEMS BY COUNTER
-        ================================= */
-
-        const counters = {
-
-            chaats: [],
-
-            drinks: [],
-
-            burgers: []
-
-        };
-
-
-        selectedItems.forEach(
-            item => {
-
-                if (
-                    counters[item.counter]
-                ) {
-
-                    counters[
-                        item.counter
-                    ].push(item);
-
-                }
-
-            }
-        );
-
-
-        /* =================================
-           CREATE KOTS
-        ================================= */
-
-        const kots = [];
-
-
-        for (
-            const counter in counters
-        ) {
-
-            if (
-                counters[counter].length === 0
-            ) {
-
-                continue;
-
-            }
-
-
-            kots.push({
-
-                order_id:
-                    order.id,
-
-                counter:
-                    counter,
-
-                items:
-                    counters[counter],
-
-                status:
-                    "Pending"
-
-            });
-
-        }
-
-
-        /* =================================
-           INSERT KOTS
-        ================================= */
-
-        if (
-            kots.length > 0
-        ) {
-
-            const {
-                error: kotError
-            } = await supabaseClient
-
-                .from("counter_kot")
-
-                .insert(kots);
-
-
-            if (kotError) {
-
-                throw kotError;
-
-            }
-
-        }
-
-
-        /* =================================
-           SUCCESS
-        ================================= */
-
-        message.innerText =
-            "✅ Order #" +
-            order.order_number +
-            " sent to counters!";
-
-
-        /*
-         * Wait briefly so the user can
-         * see the success message.
-         *
-         * Then automatically reload.
-         */
-
-        setTimeout(
-            function() {
-
-                window.location.reload();
-
-            },
-            1200
-        );
-
-
-    }
-
-    catch (error) {
-
-        console.error(
-            "ORDER ERROR:",
-            error
-        );
-
-
-        message.innerText =
-            "❌ Error: " +
-            (
-                error.message ||
-                "Unable to place order."
-            );
-
-
-        button.disabled = false;
-
-        button.innerText =
-            "PLACE ORDER";
-
-    }
-
-}
-
-
-/* =========================================
-   INITIAL TOTAL
-========================================= */
-
-calculateTotal();
-
 
 </script>
 
-
 </body>
-
 </html>
