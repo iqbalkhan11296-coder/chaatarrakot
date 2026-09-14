@@ -661,7 +661,13 @@ async function loadSales() {
                     if (normalTotal > 0) {
 
                         componentPrices.forEach(
-                            component => {
+                            (component, componentIndex) => {
+
+                                const allocatedAmount =
+                                    quantity *
+                                    price *
+                                    component.price /
+                                    normalTotal;
 
                                 salesData.push({
 
@@ -685,22 +691,29 @@ async function loadSales() {
                                         order.customer_name ??
                                         "-",
 
+                                    /*
+                                     * IMPORTANT:
+                                     * Show the actual component item,
+                                     * not the combo name.
+                                     */
+
                                     item:
-                                        itemName,
+                                        component.name,
 
                                     quantity:
                                         quantity,
 
+                                    /*
+                                     * Keep the original component price
+                                     * visible, while Amount is the
+                                     * portion of the combo price.
+                                     */
+
                                     price:
-                                        price,
+                                        component.price,
 
                                     amount:
-                                        (
-                                            quantity *
-                                            price *
-                                            component.price /
-                                            normalTotal
-                                        ),
+                                        allocatedAmount,
 
                                     counter:
                                         component.counter,
@@ -710,17 +723,30 @@ async function loadSales() {
                                         "Pending",
 
                                     type:
-                                        itemType,
+                                        "combo",
 
                                     components:
                                         item.components,
 
-                                    comboComponent:
-                                        component.name
+                                    comboName:
+                                        itemName,
+
+                                    comboGroup:
+                                        order.id +
+                                        "_" +
+                                        itemName +
+                                        "_" +
+                                        componentIndex,
+
+                                    isComboComponent:
+                                        true
 
                                 });
 
                             }
+                        );
+
+                    } else {                        }
                         );
 
                     } else {
@@ -770,7 +796,16 @@ async function loadSales() {
                                 itemType,
 
                             components:
-                                item.components
+                                item.components,
+
+                            comboName:
+                                itemName,
+
+                            comboGroup:
+                                order.id + "_" + itemName,
+
+                            isComboComponent:
+                                true
 
                         });
 
@@ -1194,20 +1229,45 @@ function renderSummary(data) {
      * Number of combos sold
      */
 
-    const totalCombos =
-        data
-            .filter(
-                x =>
-                    x.type === "combo"
-            )
-            .reduce(
-                (sum, x) =>
-                    sum +
+    const comboGroups =
+        new Map();
+
+    data
+        .filter(
+            x =>
+                x.type === "combo"
+        )
+        .forEach(x => {
+
+            const key =
+                x.comboGroup ||
+                (
+                    x.orderId +
+                    "|" +
+                    x.item
+                );
+
+            if (!comboGroups.has(key)) {
+
+                comboGroups.set(
+                    key,
                     Number(
                         x.quantity || 0
-                    ),
-                0
-            );
+                    )
+                );
+
+            }
+
+        });
+
+    const totalCombos =
+        Array.from(
+            comboGroups.values()
+        ).reduce(
+            (sum, quantity) =>
+                sum + quantity,
+            0
+        );
 
 
     /*
@@ -1324,70 +1384,19 @@ function renderItemsTable(data) {
 
         let componentText = "";
 
+        /*
+         * Combo components are now separate rows.
+         * Show the original combo name underneath the item.
+         */
 
         if (
             row.type === "combo" &&
-            row.components.length
+            row.comboName
         ) {
 
-            /*
-             * Show the combo components with the amount
-             * allocated to each counter.
-             */
-
-            const normalTotal =
-                row.components.reduce(
-                    (sum, component) =>
-                        sum +
-                        Number(
-                            component.price ??
-                            component.unit_price ??
-                            0
-                        ),
-                    0
-                );
-
-            if (normalTotal > 0) {
-
-                componentText =
-                    row.components
-                        .map(component => {
-
-                            const componentPrice =
-                                Number(
-                                    component.price ??
-                                    component.unit_price ??
-                                    0
-                                );
-
-                            const allocatedAmount =
-                                row.quantity *
-                                row.price *
-                                componentPrice /
-                                normalTotal;
-
-                            return `
-                                ${escapeHtml(component.name)}
-                                (${escapeHtml(component.counter || "-")})
-                                - ₹${allocatedAmount.toFixed(2)}
-                            `;
-
-                        })
-                        .join("<br>");
-
-            } else {
-
-                componentText =
-                    row.components
-                        .map(
-                            component =>
-                                escapeHtml(
-                                    component.name
-                                )
-                        )
-                        .join(" + ");
-
-            }
+            componentText =
+                "From combo: " +
+                escapeHtml(row.comboName);
 
         }
 
