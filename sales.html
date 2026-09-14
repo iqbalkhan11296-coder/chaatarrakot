@@ -656,17 +656,81 @@ async function loadSales() {
 
                         });
 
-                    const normalTotal =
-                        components.reduce(
+                    /*
+                     * COMBO PRICING:
+                     * Chaats and Burgers keep their full normal price.
+                     * The discount is taken from Drinks.
+                     *
+                     * Example:
+                     * Pani Puri ₹50 + Mint Lime ₹35
+                     * Combo ₹80
+                     * Chaats = ₹50
+                     * Drinks = ₹30
+                     */
+                    const fixedComponents =
+                        components.filter(
+                            component =>
+                                component.counter === "chaats" ||
+                                component.counter === "burgers"
+                        );
+
+                    const drinkComponents =
+                        components.filter(
+                            component =>
+                                component.counter === "drinks"
+                        );
+
+                    const fixedTotal =
+                        fixedComponents.reduce(
                             (sum, component) =>
                                 sum + component.price,
                             0
                         );
 
-                    if (normalTotal > 0) {
+                    const comboTotal =
+                        quantity * price;
+
+                    const remainingForDrinks =
+                        comboTotal -
+                        quantity * fixedTotal;
+
+                    if (components.length > 0) {
 
                         components.forEach(
                             (component, index) => {
+
+                                let allocatedAmount = 0;
+
+                                if (
+                                    component.counter === "chaats" ||
+                                    component.counter === "burgers"
+                                ) {
+
+                                    allocatedAmount =
+                                        quantity *
+                                        component.price;
+
+                                } else if (
+                                    component.counter === "drinks"
+                                ) {
+
+                                    const drinkNormalTotal =
+                                        drinkComponents.reduce(
+                                            (sum, drink) =>
+                                                sum + drink.price,
+                                            0
+                                        );
+
+                                    allocatedAmount =
+                                        drinkNormalTotal > 0
+                                            ? remainingForDrinks *
+                                              (
+                                                  component.price /
+                                                  drinkNormalTotal
+                                              )
+                                            : 0;
+
+                                }
 
                                 salesData.push({
 
@@ -711,10 +775,7 @@ async function loadSales() {
                                      */
 
                                     amount:
-                                        quantity *
-                                        price *
-                                        component.price /
-                                        normalTotal,
+                                        allocatedAmount,
 
                                     counter:
                                         component.counter,
@@ -2180,5 +2241,3 @@ loadSales();
 </body>
 
 </html>
-
-```
