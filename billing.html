@@ -12,15 +12,6 @@
     >
 
     <title>Cafe Billing</title>
-    <link rel="manifest" href="manifest.json">
-
-<meta name="theme-color" content="#4b001f">
-
-<meta name="mobile-web-app-capable" content="yes">
-
-<meta name="apple-mobile-web-app-capable" content="yes">
-
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase.js?v=2"></script>
@@ -1343,22 +1334,6 @@ function printBill() {
     };
 
 }
- <script>
-if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => {
-
-        navigator.serviceWorker.register("./service-worker.js")
-            .then(() => {
-                console.log("Chaatarra Billing App Ready");
-            })
-            .catch(error => {
-                console.error("Service Worker Error:", error);
-            });
-
-    });
-}
-</script>
-
 </body>
 
 </html>   
