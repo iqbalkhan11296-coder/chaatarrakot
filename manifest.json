@@ -1,0 +1,22 @@
+{
+  "name": "Chaatarra Cafe",
+  "short_name": "Chaatarra",
+  "description": "Chaatarra Cafe Billing and KOT System",
+  "start_url": "./billing.html",
+  "display": "standalone",
+  "background_color": "#4b001f",
+  "theme_color": "#4b001f",
+  "orientation": "landscape",
+  "icons": [
+    {
+      "src": "./icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "./icon-192.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
