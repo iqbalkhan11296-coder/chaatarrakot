@@ -15,6 +15,8 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
 <style>
 
 * {
@@ -315,6 +317,10 @@ Reset
 
 <button onclick="loadSales()">
 Refresh
+</button>
+
+<button onclick="exportToExcel()">
+📊 Export Excel
 </button>
 
 </div>
@@ -2013,6 +2019,355 @@ function renderItemSummary(data) {
     container.innerHTML =
         html;
 
+}
+
+
+/* =====================================================
+   EXPORT TO EXCEL
+   ===================================================== */
+
+function getOrderPayment(order) {
+
+    if (!order) return "-";
+
+    return (
+        order.payment_method ??
+        order.payment ??
+        order.payment_type ??
+        order.paymentMode ??
+        order.payment_mode ??
+        "-"
+    );
+}
+
+function exportToExcel() {
+
+    if (typeof XLSX === "undefined") {
+        alert("Excel library is still loading. Please try again.");
+        return;
+    }
+
+    const data = getFilteredData();
+
+    if (!data.length) {
+        alert("There is no sales data to export for the selected filters.");
+        return;
+    }
+
+    const workbook = XLSX.utils.book_new();
+
+    /*
+     * -----------------------------------------------------
+     * SHEET 1: SALES ITEMS
+     * -----------------------------------------------------
+     */
+
+    const itemRows = data.map(row => ({
+        "Date / Time": formatDate(row.created_at),
+        "Order": "#" + (row.orderNumber ?? row.orderId),
+        "Customer": row.customer ?? "-",
+        "Payment": getOrderPayment(row.order),
+        "Item": row.item ?? "-",
+        "Type": row.type === "combo" ? "COMBO" : "SINGLE",
+        "Quantity": Number(row.quantity || 0),
+        "Unit Price": Number(row.price || 0),
+        "Revenue": Number(row.amount || 0),
+        "Counter": row.counter ?? "-",
+        "Status": row.status ?? "Pending",
+        "From Combo": row.comboName ?? ""
+    }));
+
+    const salesSheet = XLSX.utils.json_to_sheet(itemRows);
+    XLSX.utils.book_append_sheet(workbook, salesSheet, "Sales Items");
+
+    /*
+     * -----------------------------------------------------
+     * SHEET 2: ORDER DETAILS
+     * -----------------------------------------------------
+     */
+
+    const orderMap = new Map();
+
+    data.forEach(row => {
+
+        if (!orderMap.has(row.orderId)) {
+            orderMap.set(row.orderId, {
+                "Date / Time": formatDate(row.created_at),
+                "Order": "#" + (row.orderNumber ?? row.orderId),
+                "Customer": row.customer ?? "-",
+                "Payment": getOrderPayment(row.order),
+                "Items": 0,
+                "Combos": 0,
+                "Total": 0,
+                "Status": row.status ?? "Pending"
+            });
+        }
+
+        const order = orderMap.get(row.orderId);
+
+        order["Items"] += Number(row.quantity || 0);
+        order["Total"] += Number(row.amount || 0);
+
+        if (row.type === "combo") {
+            order["Combos"] += Number(row.quantity || 0);
+        }
+    });
+
+    const orderRows = [...orderMap.values()];
+    const orderSheet = XLSX.utils.json_to_sheet(orderRows);
+    XLSX.utils.book_append_sheet(workbook, orderSheet, "Orders");
+
+    /*
+     * -----------------------------------------------------
+     * SHEET 3: ITEM SUMMARY
+     * -----------------------------------------------------
+     */
+
+    const itemMap = new Map();
+
+    data.forEach(row => {
+
+        const key =
+            row.type +
+            "|" +
+            row.item +
+            "|" +
+            (row.comboName || "");
+
+        if (!itemMap.has(key)) {
+            itemMap.set(key, {
+                "Item": row.item ?? "-",
+                "Type": row.type === "combo" ? "COMBO" : "SINGLE",
+                "From Combo": row.comboName ?? "",
+                "Quantity": 0,
+                "Revenue": 0
+            });
+        }
+
+        const entry = itemMap.get(key);
+
+        entry["Quantity"] += Number(row.quantity || 0);
+        entry["Revenue"] += Number(row.amount || 0);
+    });
+
+    const itemSummaryRows = [...itemMap.values()]
+        .sort((a, b) => b["Quantity"] - a["Quantity"]);
+
+    const summarySheet =
+        XLSX.utils.json_to_sheet(itemSummaryRows);
+
+    XLSX.utils.book_append_sheet(
+        workbook,
+        summarySheet,
+        "Item Summary"
+    );
+
+    /*
+     * -----------------------------------------------------
+     * SHEET 4: PAYMENT BREAKDOWN
+     * -----------------------------------------------------
+     */
+
+    const paymentMap = new Map();
+
+    orderRows.forEach(order => {
+
+        const payment = order["Payment"] || "-";
+
+        if (!paymentMap.has(payment)) {
+            paymentMap.set(payment, {
+                "Payment Method": payment,
+                "Orders": 0,
+                "Revenue": 0
+            });
+        }
+
+        const entry = paymentMap.get(payment);
+
+        entry["Orders"] += 1;
+        entry["Revenue"] += Number(order["Total"] || 0);
+    });
+
+    const paymentRows = [...paymentMap.values()];
+
+    const paymentSheet =
+        XLSX.utils.json_to_sheet(paymentRows);
+
+    XLSX.utils.book_append_sheet(
+        workbook,
+        paymentSheet,
+        "Payments"
+    );
+
+    /*
+     * -----------------------------------------------------
+     * SHEET 5: REPORT SUMMARY
+     * -----------------------------------------------------
+     */
+
+    const totalOrders =
+        new Set(data.map(x => x.orderId)).size;
+
+    const totalItems =
+        data.reduce(
+            (sum, x) => sum + Number(x.quantity || 0),
+            0
+        );
+
+    const totalSales =
+        data.reduce(
+            (sum, x) => sum + Number(x.amount || 0),
+            0
+        );
+
+    const comboGroups = new Map();
+
+    data
+        .filter(x => x.type === "combo")
+        .forEach(x => {
+
+            const key =
+                x.comboGroup ||
+                x.orderId + "|" + x.item;
+
+            if (!comboGroups.has(key)) {
+                comboGroups.set(
+                    key,
+                    Number(x.quantity || 0)
+                );
+            }
+        });
+
+    const totalCombos =
+        [...comboGroups.values()]
+            .reduce(
+                (sum, quantity) => sum + quantity,
+                0
+            );
+
+    const averageBill =
+        totalOrders > 0
+            ? totalSales / totalOrders
+            : 0;
+
+    const fromDate =
+        document.getElementById("fromDate").value || "All";
+
+    const toDate =
+        document.getElementById("toDate").value || "All";
+
+    const counter =
+        document.getElementById("counterFilter").value;
+
+    const status =
+        document.getElementById("statusFilter").value;
+
+    const reportRows = [
+        {
+            "Report": "CHAATARRA SALES REPORT",
+            "Value": ""
+        },
+        {
+            "Report": "From Date",
+            "Value": fromDate
+        },
+        {
+            "Report": "To Date",
+            "Value": toDate
+        },
+        {
+            "Report": "Counter",
+            "Value": counter
+        },
+        {
+            "Report": "Status",
+            "Value": status
+        },
+        {
+            "Report": "",
+            "Value": ""
+        },
+        {
+            "Report": "Total Orders",
+            "Value": totalOrders
+        },
+        {
+            "Report": "Total Items Sold",
+            "Value": totalItems
+        },
+        {
+            "Report": "Total Combos Sold",
+            "Value": totalCombos
+        },
+        {
+            "Report": "Total Sales",
+            "Value": totalSales
+        },
+        {
+            "Report": "Average Bill",
+            "Value": averageBill
+        }
+    ];
+
+    const reportSheet =
+        XLSX.utils.json_to_sheet(reportRows);
+
+    XLSX.utils.book_append_sheet(
+        workbook,
+        reportSheet,
+        "Report Summary"
+    );
+
+    /*
+     * -----------------------------------------------------
+     * FORMAT COLUMN WIDTHS
+     * -----------------------------------------------------
+     */
+
+    function setWidths(sheet, widths) {
+        sheet["!cols"] = widths.map(width => ({
+            wch: width
+        }));
+    }
+
+    setWidths(salesSheet, [
+        20, 10, 22, 14, 28, 10,
+        10, 12, 12, 14, 14, 28
+    ]);
+
+    setWidths(orderSheet, [
+        20, 10, 22, 14, 10, 10, 14, 14
+    ]);
+
+    setWidths(summarySheet, [
+        30, 12, 30, 12, 14
+    ]);
+
+    setWidths(paymentSheet, [
+        20, 12, 15
+    ]);
+
+    setWidths(reportSheet, [
+        25, 20
+    ]);
+
+    /*
+     * -----------------------------------------------------
+     * FILE NAME
+     * -----------------------------------------------------
+     */
+
+    const today = new Date();
+
+    const datePart =
+        today.toISOString().split("T")[0];
+
+    const fileName =
+        "Chaatarra_Sales_" +
+        datePart +
+        ".xlsx";
+
+    XLSX.writeFile(workbook, fileName);
 }
 
 
