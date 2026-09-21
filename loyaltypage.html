@@ -3,305 +3,878 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Loyalty Admin</title>
 
 <style>
-*{box-sizing:border-box}
+*{
+    box-sizing:border-box;
+}
+
+:root{
+    --burgundy:#4b001f;
+    --burgundy-dark:#300014;
+    --burgundy-light:#650028;
+    --gold:#d4af37;
+    --gold-light:#f3d77a;
+    --cream:#faf7f0;
+    --text:#211b1d;
+    --muted:#81787b;
+    --border:#eadfe2;
+    --white:#ffffff;
+}
 
 body{
     margin:0;
-    font-family:Arial,Helvetica,sans-serif;
-    background:#f3f3f3;
-    color:#171717;
+    font-family:
+        Inter,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Arial,
+        sans-serif;
+
+    background:
+        radial-gradient(circle at top,#eee4e7 0,#f5f2f0 40%,#ebe7e5 100%);
+
+    color:var(--text);
+}
+
+button,
+input{
+    font-family:inherit;
 }
 
 .app{
-    max-width:600px;
+    width:100%;
+    max-width:650px;
     min-height:100vh;
     margin:auto;
     background:#fff;
+    overflow:hidden;
 }
 
+/* =========================
+   HOME HEADER
+========================= */
+
 .header{
-    height:64px;
-    padding:0 20px;
+    min-height:78px;
+    padding:0 22px;
+
     display:flex;
     align-items:center;
     justify-content:space-between;
-    border-bottom:1px solid #e7e7e7;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--burgundy-dark),
+            var(--burgundy),
+            var(--burgundy-light)
+        );
+
+    color:white;
+
     position:sticky;
     top:0;
-    background:#fff;
-    z-index:10;
+    z-index:20;
+
+    box-shadow:0 6px 25px rgba(75,0,31,.25);
+}
+
+.logo-area{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.logo-mark{
+    width:42px;
+    height:42px;
+
+    border:1px solid rgba(212,175,55,.7);
+    border-radius:13px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    color:var(--gold-light);
+    font-size:21px;
+    font-weight:800;
+
+    background:rgba(255,255,255,.05);
 }
 
 .logo{
-    font-size:21px;
+    font-family:Georgia,"Times New Roman",serif;
+    font-size:22px;
     font-weight:700;
+    letter-spacing:.3px;
 }
 
 .header small{
-    color:#777;
+    color:var(--gold-light);
+    font-size:11px;
+    letter-spacing:1.4px;
+    text-transform:uppercase;
+    font-weight:700;
 }
 
+/* =========================
+   HOME
+========================= */
+
 .home{
-    padding:24px 18px;
+    padding:25px 18px 40px;
 }
 
 .hero{
-    padding:26px 20px;
-    border-radius:18px;
-    background:#fafafa;
-    border:1px solid #e8e8e8;
-    margin-bottom:20px;
+    position:relative;
+    overflow:hidden;
+
+    padding:30px 24px;
+    border-radius:24px;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--burgundy-dark),
+            var(--burgundy-light)
+        );
+
+    color:white;
+
+    box-shadow:
+        0 15px 35px rgba(75,0,31,.20);
+
+    margin-bottom:18px;
+}
+
+.hero:after{
+    content:"";
+    position:absolute;
+
+    width:180px;
+    height:180px;
+
+    border:1px solid rgba(212,175,55,.18);
+    border-radius:50%;
+
+    right:-80px;
+    top:-70px;
+}
+
+.hero:before{
+    content:"";
+    position:absolute;
+
+    width:100px;
+    height:100px;
+
+    border:1px solid rgba(212,175,55,.15);
+    border-radius:50%;
+
+    right:20px;
+    bottom:-65px;
+}
+
+.hero-content{
+    position:relative;
+    z-index:2;
+}
+
+.hero-label{
+    color:var(--gold-light);
+    font-size:11px;
+    font-weight:800;
+    letter-spacing:2px;
+    text-transform:uppercase;
+
+    margin-bottom:10px;
 }
 
 .hero h1{
     margin:0 0 8px;
-    font-size:28px;
+
+    font-family:Georgia,"Times New Roman",serif;
+
+    font-size:30px;
+    line-height:1.15;
 }
 
 .hero p{
     margin:0;
-    color:#777;
+
+    color:#eadfe2;
+
+    line-height:1.5;
+    font-size:14px;
+
+    max-width:400px;
 }
 
 .data-btn{
     width:100%;
-    border:0;
-    border-radius:15px;
+
+    border:1px solid #b89227;
+    border-radius:16px;
+
     padding:17px;
-    font-size:16px;
-    font-weight:700;
+
+    font-size:14px;
+    font-weight:800;
+    letter-spacing:1.3px;
+
     cursor:pointer;
-    background:#111;
-    color:white;
+
+    background:
+        linear-gradient(
+            135deg,
+            #e3c15a,
+            #c49b2e
+        );
+
+    color:#3b0018;
+
+    box-shadow:
+        0 8px 20px rgba(151,113,21,.22);
+
+    transition:.2s;
 }
+
+.data-btn:hover{
+    transform:translateY(-1px);
+}
+
+.data-btn:active{
+    transform:scale(.98);
+}
+
+/* =========================
+   PAGES
+========================= */
 
 .page{
     display:none;
+    min-height:100vh;
+    background:#fff;
 }
 
 .page.active{
     display:block;
 }
 
+/* =========================
+   PAGE HEADER
+========================= */
+
 .page-header{
-    height:64px;
+    min-height:70px;
+
     display:flex;
     align-items:center;
     gap:12px;
+
     padding:0 16px;
-    border-bottom:1px solid #e7e7e7;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--burgundy-dark),
+            var(--burgundy)
+        );
+
+    color:white;
+
     position:sticky;
     top:0;
-    background:#fff;
-    z-index:10;
+    z-index:20;
+
+    box-shadow:0 5px 20px rgba(75,0,31,.22);
 }
 
 .back{
-    border:0;
-    background:transparent;
-    font-size:25px;
+    width:40px;
+    height:40px;
+
+    border:1px solid rgba(212,175,55,.35);
+    border-radius:12px;
+
+    background:rgba(255,255,255,.06);
+
+    color:var(--gold-light);
+
+    font-size:29px;
+    line-height:1;
+
     cursor:pointer;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
 }
 
 .page-title{
+    font-family:Georgia,"Times New Roman",serif;
+
     font-size:20px;
     font-weight:700;
+
+    letter-spacing:.2px;
 }
 
+/* =========================
+   SEARCH
+========================= */
+
 .search{
-    padding:16px;
-    border-bottom:1px solid #eee;
+    padding:17px 16px;
+
+    background:#faf8f7;
+
+    border-bottom:1px solid var(--border);
+}
+
+.search-box{
+    position:relative;
+}
+
+.search-icon{
+    position:absolute;
+    left:15px;
+    top:50%;
+    transform:translateY(-50%);
+
+    color:#9a8d91;
+
+    font-size:17px;
 }
 
 .search input{
     width:100%;
-    border:1px solid #ddd;
-    background:#f7f7f7;
-    border-radius:12px;
-    padding:13px 15px;
+
+    border:1px solid #e2d7da;
+
+    background:white;
+
+    border-radius:15px;
+
+    padding:14px 15px 14px 43px;
+
     outline:none;
+
     font-size:15px;
+
+    color:var(--text);
+
+    box-shadow:
+        0 3px 12px rgba(60,20,30,.04);
+
+    transition:.2s;
 }
 
+.search input:focus{
+    border-color:var(--gold);
+    box-shadow:
+        0 0 0 3px rgba(212,175,55,.12);
+}
+
+/* =========================
+   ACCOUNTS
+========================= */
+
 .accounts{
-    padding:8px 0 30px;
+    padding:9px 12px 35px;
+
+    background:#faf8f7;
 }
 
 .account{
     width:100%;
+
     text-align:left;
-    border:0;
-    border-bottom:1px solid #eee;
+
+    border:1px solid transparent;
+    border-bottom:1px solid #eee5e7;
+
     background:#fff;
-    padding:16px;
+
+    padding:15px 12px;
+
     cursor:pointer;
+
     display:flex;
     align-items:center;
+
     gap:13px;
+
+    transition:.2s;
+}
+
+.account:first-child{
+    border-radius:16px 16px 0 0;
+}
+
+.account:last-child{
+    border-radius:0 0 16px 16px;
 }
 
 .account:hover{
-    background:#fafafa;
+    background:#fffaf2;
+}
+
+.account:active{
+    transform:scale(.995);
 }
 
 .avatar{
-    width:45px;
-    height:45px;
-    border-radius:50%;
-    background:#e9e9e9;
+    width:47px;
+    height:47px;
+
+    border-radius:15px;
+
+    flex:none;
+
     display:flex;
     align-items:center;
     justify-content:center;
+
+    font-family:Georgia,"Times New Roman",serif;
+
+    font-size:19px;
     font-weight:700;
-    font-size:18px;
-    flex:none;
+
+    color:var(--gold-light);
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--burgundy),
+            var(--burgundy-dark)
+        );
+
+    box-shadow:
+        0 5px 12px rgba(75,0,31,.18);
 }
 
 .account-info{
     min-width:0;
+    flex:1;
 }
 
 .account-name{
-    font-weight:700;
-    margin-bottom:4px;
+    font-size:15px;
+    font-weight:750;
+
+    margin-bottom:5px;
+
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
 }
 
 .account-phone{
-    color:#777;
+    color:var(--muted);
     font-size:13px;
 }
 
-.empty{
-    padding:45px 20px;
-    text-align:center;
-    color:#777;
+.account-arrow{
+    color:#b3a5a9;
+    font-size:22px;
 }
 
+/* =========================
+   CUSTOMER PROFILE
+========================= */
+
 .profile{
-    padding:20px 16px;
+    padding:18px 16px 40px;
+
+    background:#faf8f7;
+
+    min-height:calc(100vh - 70px);
 }
 
 .profile-card{
-    border:1px solid #e7e7e7;
-    border-radius:18px;
-    padding:20px;
+    position:relative;
+    overflow:hidden;
+
+    border-radius:22px;
+
+    padding:22px;
+
     display:flex;
     align-items:center;
+
     gap:15px;
+
+    color:white;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--burgundy-dark),
+            var(--burgundy),
+            var(--burgundy-light)
+        );
+
+    box-shadow:
+        0 12px 28px rgba(75,0,31,.20);
+}
+
+.profile-card:after{
+    content:"";
+
+    position:absolute;
+
+    width:140px;
+    height:140px;
+
+    border:1px solid rgba(212,175,55,.18);
+    border-radius:50%;
+
+    right:-65px;
+    top:-55px;
 }
 
 .big-avatar{
-    width:62px;
-    height:62px;
-    border-radius:50%;
-    background:#111;
-    color:#fff;
+    width:64px;
+    height:64px;
+
+    border-radius:19px;
+
+    flex:none;
+
     display:flex;
     align-items:center;
     justify-content:center;
-    font-size:24px;
+
+    font-family:Georgia,"Times New Roman",serif;
+
+    font-size:25px;
     font-weight:700;
+
+    color:var(--burgundy);
+
+    background:
+        linear-gradient(
+            135deg,
+            #f5d979,
+            #c99f32
+        );
+
+    box-shadow:
+        0 7px 18px rgba(0,0,0,.18);
+
+    position:relative;
+    z-index:2;
+}
+
+.profile-info{
+    min-width:0;
+    position:relative;
+    z-index:2;
 }
 
 .profile-name{
+    font-family:Georgia,"Times New Roman",serif;
+
     font-size:21px;
     font-weight:700;
+
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
 }
 
 .profile-phone{
-    color:#777;
+    color:#e8dfe2;
+
     margin-top:5px;
+
+    font-size:13px;
 }
+
+/* =========================
+   STATS
+========================= */
 
 .stats{
     display:grid;
+
     grid-template-columns:repeat(2,1fr);
+
     gap:10px;
+
     margin-top:12px;
 }
 
 .stat{
-    border:1px solid #e7e7e7;
-    border-radius:14px;
-    padding:15px;
+    position:relative;
+
+    border:1px solid var(--border);
+
+    border-radius:17px;
+
+    padding:17px;
+
+    background:white;
+
+    box-shadow:
+        0 5px 15px rgba(50,20,30,.035);
+
+    overflow:hidden;
+}
+
+.stat:first-child{
+    background:
+        linear-gradient(
+            145deg,
+            #fffdf5,
+            #f9f1d7
+        );
+
+    border-color:#ead59a;
 }
 
 .stat-label{
-    font-size:12px;
-    color:#777;
-    margin-bottom:7px;
+    font-size:10px;
+
+    color:#918488;
+
+    margin-bottom:8px;
+
+    font-weight:800;
+
+    letter-spacing:1px;
 }
 
 .stat-value{
     font-size:19px;
-    font-weight:700;
+
+    font-weight:800;
+
+    color:var(--burgundy);
 }
 
+.stat:first-child .stat-value{
+    color:#9a7411;
+}
+
+/* =========================
+   HISTORY
+========================= */
+
 .history-title{
-    font-size:18px;
+    display:flex;
+    align-items:center;
+    gap:9px;
+
+    font-family:Georgia,"Times New Roman",serif;
+
+    font-size:20px;
+
     font-weight:700;
-    margin:28px 0 12px;
+
+    margin:29px 0 12px;
+
+    color:var(--burgundy);
+}
+
+.history-title:before{
+    content:"";
+
+    width:4px;
+    height:21px;
+
+    border-radius:5px;
+
+    background:var(--gold);
 }
 
 .purchase{
-    border-bottom:1px solid #eee;
-    padding:17px 2px;
+    border:1px solid var(--border);
+
+    border-radius:16px;
+
+    background:white;
+
+    padding:16px;
+
+    margin-bottom:10px;
+
+    box-shadow:
+        0 4px 14px rgba(50,20,30,.035);
 }
 
 .purchase-top{
     display:flex;
+
     justify-content:space-between;
+
+    align-items:center;
+
     gap:10px;
 }
 
 .purchase-date{
-    font-size:13px;
-    color:#777;
+    font-size:12px;
+
+    color:var(--muted);
 }
 
 .purchase-total{
-    font-weight:700;
+    font-size:16px;
+
+    font-weight:800;
+
+    color:var(--burgundy);
 }
 
 .items{
-    margin-top:10px;
-    line-height:1.55;
+    margin-top:12px;
+
+    line-height:1.65;
+
     font-size:14px;
+
+    color:#443b3e;
 }
 
 .points{
-    margin-top:10px;
-    font-size:13px;
-    font-weight:700;
+    display:inline-flex;
+
+    align-items:center;
+
+    margin-top:12px;
+
+    padding:6px 9px;
+
+    border-radius:8px;
+
+    background:#fff8df;
+
+    border:1px solid #f0dfa8;
+
+    color:#9a7411;
+
+    font-size:12px;
+
+    font-weight:800;
+}
+
+/* =========================
+   EMPTY / LOADING
+========================= */
+
+.empty{
+    padding:50px 20px;
+
+    text-align:center;
+
+    color:#8a7e82;
+
+    font-size:14px;
 }
 
 .loading{
-    padding:35px;
+    padding:45px 20px;
+
     text-align:center;
-    color:#777;
+
+    color:#8a7e82;
+
+    font-size:14px;
+}
+
+.loading:before{
+    content:"";
+
+    display:block;
+
+    width:28px;
+    height:28px;
+
+    margin:0 auto 12px;
+
+    border:3px solid #eadfe2;
+
+    border-top-color:var(--gold);
+
+    border-radius:50%;
+
+    animation:spin .8s linear infinite;
+}
+
+@keyframes spin{
+    to{
+        transform:rotate(360deg);
+    }
 }
 
 .error{
     margin:16px;
-    padding:14px;
-    border-radius:12px;
-    background:#fff0f0;
-    color:#a00000;
+
+    padding:16px;
+
+    border-radius:14px;
+
+    background:#fff0f2;
+
+    border:1px solid #f2cbd1;
+
+    color:#9d2030;
+
     font-size:14px;
+
+    line-height:1.5;
 }
 
-@media(min-width:601px){
+/* =========================
+   DESKTOP
+========================= */
+
+@media(min-width:651px){
+
     body{
-        padding:20px 0;
+        padding:24px 0;
     }
 
     .app{
-        border-radius:18px;
-        overflow:hidden;
-        box-shadow:0 5px 30px #00000012;
+        border-radius:22px;
+
+        box-shadow:
+            0 15px 50px rgba(30,10,20,.15);
+    }
+
+    .header,
+    .page-header{
+        position:sticky;
+    }
+}
+
+/* =========================
+   SMALL PHONES
+========================= */
+
+@media(max-width:380px){
+
+    .hero h1{
+        font-size:26px;
+    }
+
+    .profile-name{
+        font-size:18px;
+    }
+
+    .stat{
+        padding:14px;
+    }
+
+    .stat-value{
+        font-size:17px;
     }
 }
 </style>
@@ -316,35 +889,52 @@ body{
 
         <header class="header">
 
-            <div class="logo">
-                Loyalty
+            <div class="logo-area">
+
+                <div class="logo-mark">
+                    ★
+                </div>
+
+                <div class="logo">
+                    Loyalty
+                </div>
+
             </div>
 
-            <small>
-                Admin
-            </small>
+            <small>Admin</small>
 
         </header>
+
 
         <main class="home">
 
             <div class="hero">
 
-                <h1>
-                    Customer Loyalty
-                </h1>
+                <div class="hero-content">
 
-                <p>
-                    Manage customer accounts, purchases and loyalty points.
-                </p>
+                    <div class="hero-label">
+                        Customer Rewards
+                    </div>
+
+                    <h1>
+                        Customer Loyalty
+                    </h1>
+
+                    <p>
+                        Manage customer accounts, purchases
+                        and loyalty points in one place.
+                    </p>
+
+                </div>
 
             </div>
+
 
             <button
                 class="data-btn"
                 onclick="openAccounts()"
             >
-                DATAS
+                VIEW LOYALTY DATA
             </button>
 
         </main>
@@ -353,10 +943,7 @@ body{
 
 
     <!-- ACCOUNTS -->
-    <section
-        id="accountsPage"
-        class="page"
-    >
+    <section id="accountsPage" class="page">
 
         <header class="page-header">
 
@@ -376,12 +963,20 @@ body{
 
         <div class="search">
 
-            <input
-                id="searchInput"
-                type="text"
-                placeholder="Search name or phone..."
-                oninput="filterAccounts()"
-            >
+            <div class="search-box">
+
+                <span class="search-icon">
+                    ⌕
+                </span>
+
+                <input
+                    id="searchInput"
+                    type="text"
+                    placeholder="Search name or phone..."
+                    oninput="filterAccounts()"
+                >
+
+            </div>
 
         </div>
 
@@ -401,10 +996,7 @@ body{
 
 
     <!-- CUSTOMER -->
-    <section
-        id="customerPage"
-        class="page"
-    >
+    <section id="customerPage" class="page">
 
         <header class="page-header">
 
@@ -429,45 +1021,29 @@ body{
 </div>
 
 
-<!-- SUPABASE -->
-
+<!-- Supabase -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <script src="supabase.js?v=4"></script>
 
 
 <script>
 
 /*
-==================================================
-LOYALTY SYSTEM
-==================================================
+    Uses the same Supabase connection as the billing page.
 
-RULES:
-
-1 PURCHASE = 1 VISIT
-
-₹50 SPENT = 1 LOYALTY POINT
-
-POINTS = FLOOR(PURCHASE AMOUNT / 50)
-
-LIFETIME SPEND = SUM OF ALL PURCHASE AMOUNTS
-
-PURCHASES = NUMBER OF PURCHASE TRANSACTIONS
-
-The values are calculated from loyalty_transactions
-so old transactions are automatically included.
-==================================================
+    Tables:
+    loyalty_customers
+    loyalty_transactions
 */
 
 
 if (
-    typeof supabaseClient === "undefined" ||
-    !supabaseClient
+    typeof supabaseClient === "undefined"
+    || !supabaseClient
 ) {
 
     console.error(
-        "Supabase client is not available."
+        "Supabase client is not available. Check supabase.js."
     );
 
 }
@@ -476,18 +1052,12 @@ if (
 let allCustomers = [];
 
 
-/* =========================================
-   PAGE CONTROL
-========================================= */
-
 function showPage(id){
 
     document
         .querySelectorAll(".app > section")
-        .forEach(section => {
-
+        .forEach(section=>{
             section.classList.remove("active");
-
         });
 
 
@@ -508,10 +1078,6 @@ function showPage(id){
 }
 
 
-/* =========================================
-   OPEN ACCOUNTS
-========================================= */
-
 function openAccounts(){
 
     showPage("accountsPage");
@@ -520,10 +1086,6 @@ function openAccounts(){
 
 }
 
-
-/* =========================================
-   LOAD CUSTOMERS
-========================================= */
 
 async function loadCustomers(){
 
@@ -534,13 +1096,13 @@ async function loadCustomers(){
     if(!supabaseClient){
 
         list.innerHTML = `
-
             <div class="error">
+                Supabase is not connected yet.<br><br>
 
-                Supabase is not connected yet.
-
+                Open this file and enter your Supabase URL
+                and anon key in the two variables near
+                the bottom.
             </div>
-
         `;
 
         return;
@@ -548,45 +1110,35 @@ async function loadCustomers(){
     }
 
 
-    list.innerHTML = `
-
-        <div class="loading">
-            Loading accounts...
-        </div>
-
-    `;
+    list.innerHTML =
+        `<div class="loading">Loading accounts...</div>`;
 
 
     const {
         data,
         error
-    } =
-
-        await supabaseClient
+    } = await supabaseClient
 
         .from("loyalty_customers")
 
         .select("*")
 
-        .order("name", {
-            ascending:true
-        });
+        .order(
+            "name",
+            {
+                ascending:true
+            }
+        );
 
 
     if(error){
 
         list.innerHTML = `
-
             <div class="error">
-
-                Could not load loyalty accounts.
-
-                <br><br>
+                Could not load loyalty accounts.<br><br>
 
                 ${escapeHtml(error.message)}
-
             </div>
-
         `;
 
         return;
@@ -594,20 +1146,12 @@ async function loadCustomers(){
     }
 
 
-    allCustomers =
-        data || [];
+    allCustomers = data || [];
 
-
-    renderCustomers(
-        allCustomers
-    );
+    renderCustomers(allCustomers);
 
 }
 
-
-/* =========================================
-   DISPLAY CUSTOMER LIST
-========================================= */
 
 function renderCustomers(customers){
 
@@ -617,101 +1161,84 @@ function renderCustomers(customers){
 
     if(!customers.length){
 
-        list.innerHTML = `
-
-            <div class="empty">
+        list.innerHTML =
+            `<div class="empty">
                 No loyalty accounts found.
-            </div>
-
-        `;
+            </div>`;
 
         return;
 
     }
 
 
-    list.innerHTML =
+    list.innerHTML = customers.map(customer => {
 
-        customers.map(customer => {
+        const name =
+            customer.name ||
+            "Unnamed Customer";
 
-            const name =
-                customer.name ||
-                "Unnamed Customer";
-
-
-            const phone =
-                customer.phone ||
-                "No phone";
+        const phone =
+            customer.phone ||
+            "No phone";
 
 
-            return `
+        return `
 
-                <button
-                    class="account"
-                    onclick="openCustomer('${escapeAttr(customer.id)}')"
-                >
+            <button
+                class="account"
+                onclick="openCustomer('${escapeAttr(customer.id)}')"
+            >
 
-                    <div class="avatar">
+                <div class="avatar">
+                    ${escapeHtml(
+                        name.charAt(0).toUpperCase()
+                    )}
+                </div>
 
-                        ${escapeHtml(
-                            name
-                            .charAt(0)
-                            .toUpperCase()
-                        )}
 
+                <div class="account-info">
+
+                    <div class="account-name">
+                        ${escapeHtml(name)}
                     </div>
 
-
-                    <div class="account-info">
-
-                        <div class="account-name">
-
-                            ${escapeHtml(name)}
-
-                        </div>
-
-
-                        <div class="account-phone">
-
-                            ${escapeHtml(phone)}
-
-                        </div>
-
+                    <div class="account-phone">
+                        ${escapeHtml(phone)}
                     </div>
 
-                </button>
+                </div>
 
-            `;
 
-        }).join("");
+                <div class="account-arrow">
+                    ›
+                </div>
+
+            </button>
+
+        `;
+
+    }).join("");
 
 }
 
 
-/* =========================================
-   SEARCH
-========================================= */
-
 function filterAccounts(){
 
     const query =
-
         document
-        .getElementById("searchInput")
-        .value
-        .trim()
-        .toLowerCase();
+            .getElementById("searchInput")
+            .value
+            .trim()
+            .toLowerCase();
 
 
     const filtered =
-
         allCustomers.filter(customer => {
 
             const name =
                 String(
                     customer.name || ""
                 ).toLowerCase();
-
 
             const phone =
                 String(
@@ -720,26 +1247,18 @@ function filterAccounts(){
 
 
             return (
-
-                name.includes(query) ||
-
+                name.includes(query)
+                ||
                 phone.includes(query)
-
             );
 
         });
 
 
-    renderCustomers(
-        filtered
-    );
+    renderCustomers(filtered);
 
 }
 
-
-/* =========================================
-   OPEN CUSTOMER
-========================================= */
 
 async function openCustomer(id){
 
@@ -752,49 +1271,37 @@ async function openCustomer(id){
         );
 
 
-    content.innerHTML = `
-
-        <div class="loading">
+    content.innerHTML =
+        `<div class="loading">
             Loading customer...
-        </div>
-
-    `;
+        </div>`;
 
 
     const customer =
-
         allCustomers.find(
             c =>
-                String(c.id) ===
+                String(c.id)
+                ===
                 String(id)
         );
 
 
     if(!customer){
 
-        content.innerHTML = `
-
-            <div class="error">
+        content.innerHTML =
+            `<div class="error">
                 Customer not found.
-            </div>
-
-        `;
+            </div>`;
 
         return;
 
     }
 
 
-    /* =========================================
-       LOAD ALL TRANSACTIONS
-    ========================================= */
-
     const {
-        data: transactions,
+        data: purchases,
         error
-    } =
-
-        await supabaseClient
+    } = await supabaseClient
 
         .from("loyalty_transactions")
 
@@ -816,77 +1323,19 @@ async function openCustomer(id){
     if(error){
 
         content.innerHTML = `
-
             <div class="error">
 
                 Could not load purchase history.
-
                 <br><br>
 
-                ${escapeHtml(
-                    error.message
-                )}
+                ${escapeHtml(error.message)}
 
             </div>
-
         `;
 
         return;
 
     }
-
-
-    const history =
-        (transactions || [])
-        .filter(transaction => {
-
-            return (
-                !transaction.type ||
-                transaction.type === "purchase"
-            );
-
-        });
-
-
-    /* =========================================
-       CALCULATE LOYALTY VALUES
-    ========================================= */
-
-    let lifetimeSpend = 0;
-
-    let totalPoints = 0;
-
-    let visits = 0;
-
-
-    history.forEach(purchase => {
-
-        const amount =
-            Number(
-                purchase.amount || 0
-            );
-
-
-        /*
-        ₹50 = 1 POINT
-
-        ₹180 = 3 POINTS
-        ₹655 = 13 POINTS
-        */
-
-        const points =
-            Math.floor(
-                amount / 50
-            );
-
-
-        lifetimeSpend += amount;
-
-        totalPoints += points;
-
-        visits += 1;
-
-    });
 
 
     const name =
@@ -899,9 +1348,9 @@ async function openCustomer(id){
         "No phone";
 
 
-    /* =========================================
-       DISPLAY CUSTOMER
-    ========================================= */
+    const history =
+        purchases || [];
+
 
     content.innerHTML = `
 
@@ -910,41 +1359,36 @@ async function openCustomer(id){
 
             <div class="profile-card">
 
+
                 <div class="big-avatar">
 
                     ${escapeHtml(
-                        name
-                        .charAt(0)
-                        .toUpperCase()
+                        name.charAt(0).toUpperCase()
                     )}
 
                 </div>
 
 
-                <div>
+                <div class="profile-info">
 
                     <div class="profile-name">
-
                         ${escapeHtml(name)}
-
                     </div>
 
 
                     <div class="profile-phone">
-
                         ${escapeHtml(phone)}
-
                     </div>
 
                 </div>
 
+
             </div>
+
 
 
             <div class="stats">
 
-
-                <!-- POINTS -->
 
                 <div class="stat">
 
@@ -953,15 +1397,14 @@ async function openCustomer(id){
                     </div>
 
                     <div class="stat-value">
-
-                        ⭐ ${totalPoints}
-
+                        ⭐ ${Number(
+                            customer.points || 0
+                        )}
                     </div>
 
                 </div>
 
 
-                <!-- VISITS -->
 
                 <div class="stat">
 
@@ -970,15 +1413,14 @@ async function openCustomer(id){
                     </div>
 
                     <div class="stat-value">
-
-                        ${visits}
-
+                        ${Number(
+                            customer.visit_count || 0
+                        )}
                     </div>
 
                 </div>
 
 
-                <!-- LIFETIME SPEND -->
 
                 <div class="stat">
 
@@ -987,15 +1429,14 @@ async function openCustomer(id){
                     </div>
 
                     <div class="stat-value">
-
-                        ₹${lifetimeSpend.toFixed(2)}
-
+                        ₹${Number(
+                            customer.lifetime_spend || 0
+                        ).toFixed(2)}
                     </div>
 
                 </div>
 
 
-                <!-- PURCHASES -->
 
                 <div class="stat">
 
@@ -1004,9 +1445,7 @@ async function openCustomer(id){
                     </div>
 
                     <div class="stat-value">
-
                         ${history.length}
-
                     </div>
 
                 </div>
@@ -1015,10 +1454,9 @@ async function openCustomer(id){
             </div>
 
 
+
             <div class="history-title">
-
                 Purchase History
-
             </div>
 
 
@@ -1027,18 +1465,14 @@ async function openCustomer(id){
                 ${
                     history.length
 
-                    ?
+                    ? history
+                        .map(renderPurchase)
+                        .join("")
 
-                    history
-                    .map(renderPurchase)
-                    .join("")
-
-                    :
-
-                    `
-                    <div class="empty">
-                        No purchase history.
-                    </div>
+                    : `
+                        <div class="empty">
+                            No purchase history.
+                        </div>
                     `
                 }
 
@@ -1052,10 +1486,6 @@ async function openCustomer(id){
 }
 
 
-/* =========================================
-   RENDER PURCHASE
-========================================= */
-
 function renderPurchase(purchase){
 
     const date =
@@ -1065,7 +1495,6 @@ function renderPurchase(purchase){
 
 
     const dateText =
-
         date.toLocaleDateString(
             "en-IN",
             {
@@ -1077,34 +1506,12 @@ function renderPurchase(purchase){
 
 
     const timeText =
-
         date.toLocaleTimeString(
             "en-IN",
             {
                 hour:"2-digit",
                 minute:"2-digit"
             }
-        );
-
-
-    const amount =
-        Number(
-            purchase.amount || 0
-        );
-
-
-    /*
-    CALCULATE POINTS FROM AMOUNT
-
-    ₹50 = 1
-    ₹100 = 2
-    ₹180 = 3
-    ₹655 = 13
-    */
-
-    const points =
-        Math.floor(
-            amount / 50
         );
 
 
@@ -1127,7 +1534,9 @@ function renderPurchase(purchase){
 
                 <div class="purchase-total">
 
-                    ₹${amount.toFixed(2)}
+                    ₹${Number(
+                        purchase.amount || 0
+                    ).toFixed(2)}
 
                 </div>
 
@@ -1146,7 +1555,19 @@ function renderPurchase(purchase){
 
             <div class="points">
 
-                +${points} points
+                ${
+                    Number(
+                        purchase.points || 0
+                    ) >= 0
+
+                    ? `+${Number(
+                        purchase.points || 0
+                    )} points`
+
+                    : `${Number(
+                        purchase.points || 0
+                    )} points`
+                }
 
             </div>
 
@@ -1158,17 +1579,10 @@ function renderPurchase(purchase){
 }
 
 
-/* =========================================
-   FORMAT PURCHASE DESCRIPTION
-========================================= */
-
 function formatDescription(description){
 
-    if(!description){
-
+    if(!description)
         return "Purchase";
-
-    }
 
 
     try{
@@ -1179,43 +1593,38 @@ function formatDescription(description){
 
         if(Array.isArray(parsed)){
 
-            return parsed
-                .map(item => {
+            return parsed.map(item => {
 
-                    if(
-                        typeof item ===
-                        "string"
-                    ){
+                if(typeof item === "string"){
 
-                        return escapeHtml(
-                            item
-                        );
+                    return escapeHtml(item);
 
-                    }
+                }
 
 
-                    const name =
-                        item.name ||
-                        item.item ||
-                        "Item";
+                const name =
+                    item.name
+                    ||
+                    item.item
+                    ||
+                    "Item";
 
 
-                    const qty =
-                        item.quantity ||
-                        item.qty ||
-                        1;
+                const qty =
+                    item.quantity
+                    ||
+                    item.qty
+                    ||
+                    1;
 
 
-                    return `
+                return `
+                    ${escapeHtml(name)}
+                    ×
+                    ${escapeHtml(qty)}
+                `;
 
-                        ${escapeHtml(name)}
-                        ×
-                        ${escapeHtml(qty)}
-
-                    `;
-
-                })
-                .join("<br>");
+            }).join("<br>");
 
         }
 
@@ -1224,15 +1633,13 @@ function formatDescription(description){
 
     return escapeHtml(
         String(description)
-    )
-    .replace(/\n/g,"<br>");
+    ).replace(
+        /\n/g,
+        "<br>"
+    );
 
 }
 
-
-/* =========================================
-   SECURITY HELPERS
-========================================= */
 
 function escapeHtml(value){
 
@@ -1276,10 +1683,6 @@ function escapeAttr(value){
 
 }
 
-
-/* =========================================
-   START
-========================================= */
 
 showPage("homePage");
 
