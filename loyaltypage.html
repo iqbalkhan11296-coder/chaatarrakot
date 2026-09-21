@@ -4,20 +4,24 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Loyalty Admin</title>
+
 <style>
 *{box-sizing:border-box}
+
 body{
     margin:0;
     font-family:Arial,Helvetica,sans-serif;
     background:#f3f3f3;
     color:#171717;
 }
+
 .app{
     max-width:600px;
     min-height:100vh;
     margin:auto;
     background:#fff;
 }
+
 .header{
     height:64px;
     padding:0 20px;
@@ -30,16 +34,20 @@ body{
     background:#fff;
     z-index:10;
 }
+
 .logo{
     font-size:21px;
     font-weight:700;
 }
+
 .header small{
     color:#777;
 }
+
 .home{
     padding:24px 18px;
 }
+
 .hero{
     padding:26px 20px;
     border-radius:18px;
@@ -47,14 +55,17 @@ body{
     border:1px solid #e8e8e8;
     margin-bottom:20px;
 }
+
 .hero h1{
     margin:0 0 8px;
     font-size:28px;
 }
+
 .hero p{
     margin:0;
     color:#777;
 }
+
 .data-btn{
     width:100%;
     border:0;
@@ -66,12 +77,15 @@ body{
     background:#111;
     color:white;
 }
+
 .page{
     display:none;
 }
+
 .page.active{
     display:block;
 }
+
 .page-header{
     height:64px;
     display:flex;
@@ -84,20 +98,24 @@ body{
     background:#fff;
     z-index:10;
 }
+
 .back{
     border:0;
     background:transparent;
     font-size:25px;
     cursor:pointer;
 }
+
 .page-title{
     font-size:20px;
     font-weight:700;
 }
+
 .search{
     padding:16px;
     border-bottom:1px solid #eee;
 }
+
 .search input{
     width:100%;
     border:1px solid #ddd;
@@ -107,9 +125,11 @@ body{
     outline:none;
     font-size:15px;
 }
+
 .accounts{
     padding:8px 0 30px;
 }
+
 .account{
     width:100%;
     text-align:left;
@@ -122,9 +142,11 @@ body{
     align-items:center;
     gap:13px;
 }
+
 .account:hover{
     background:#fafafa;
 }
+
 .avatar{
     width:45px;
     height:45px;
@@ -137,25 +159,31 @@ body{
     font-size:18px;
     flex:none;
 }
+
 .account-info{
     min-width:0;
 }
+
 .account-name{
     font-weight:700;
     margin-bottom:4px;
 }
+
 .account-phone{
     color:#777;
     font-size:13px;
 }
+
 .empty{
     padding:45px 20px;
     text-align:center;
     color:#777;
 }
+
 .profile{
     padding:20px 16px;
 }
+
 .profile-card{
     border:1px solid #e7e7e7;
     border-radius:18px;
@@ -164,6 +192,7 @@ body{
     align-items:center;
     gap:15px;
 }
+
 .big-avatar{
     width:62px;
     height:62px;
@@ -176,70 +205,85 @@ body{
     font-size:24px;
     font-weight:700;
 }
+
 .profile-name{
     font-size:21px;
     font-weight:700;
 }
+
 .profile-phone{
     color:#777;
     margin-top:5px;
 }
+
 .stats{
     display:grid;
     grid-template-columns:repeat(2,1fr);
     gap:10px;
     margin-top:12px;
 }
+
 .stat{
     border:1px solid #e7e7e7;
     border-radius:14px;
     padding:15px;
 }
+
 .stat-label{
     font-size:12px;
     color:#777;
     margin-bottom:7px;
 }
+
 .stat-value{
     font-size:19px;
     font-weight:700;
 }
+
 .history-title{
     font-size:18px;
     font-weight:700;
     margin:28px 0 12px;
 }
+
 .purchase{
     border-bottom:1px solid #eee;
     padding:17px 2px;
 }
+
 .purchase-top{
     display:flex;
     justify-content:space-between;
     gap:10px;
 }
+
 .purchase-date{
     font-size:13px;
     color:#777;
 }
+
 .purchase-total{
     font-weight:700;
 }
+
 .items{
     margin-top:10px;
     line-height:1.55;
     font-size:14px;
 }
+
 .points{
     margin-top:10px;
     font-size:13px;
     font-weight:700;
 }
+
 .loading{
     padding:35px;
     text-align:center;
     color:#777;
 }
+
 .error{
     margin:16px;
     padding:14px;
@@ -248,377 +292,997 @@ body{
     color:#a00000;
     font-size:14px;
 }
+
 @media(min-width:601px){
-    body{padding:20px 0}
-    .app{border-radius:18px;overflow:hidden;box-shadow:0 5px 30px #00000012}
+    body{
+        padding:20px 0;
+    }
+
+    .app{
+        border-radius:18px;
+        overflow:hidden;
+        box-shadow:0 5px 30px #00000012;
+    }
 }
 </style>
 </head>
+
 <body>
 
 <div class="app">
 
     <!-- HOME -->
     <section id="homePage">
+
         <header class="header">
-            <div class="logo">Loyalty</div>
-            <small>Admin</small>
+
+            <div class="logo">
+                Loyalty
+            </div>
+
+            <small>
+                Admin
+            </small>
+
         </header>
 
         <main class="home">
+
             <div class="hero">
-                <h1>Customer Loyalty</h1>
-                <p>Manage customer accounts, purchases and loyalty points.</p>
+
+                <h1>
+                    Customer Loyalty
+                </h1>
+
+                <p>
+                    Manage customer accounts, purchases and loyalty points.
+                </p>
+
             </div>
 
-            <button class="data-btn" onclick="openAccounts()">
+            <button
+                class="data-btn"
+                onclick="openAccounts()"
+            >
                 DATAS
             </button>
+
         </main>
+
     </section>
+
 
     <!-- ACCOUNTS -->
-    <section id="accountsPage" class="page">
+    <section
+        id="accountsPage"
+        class="page"
+    >
+
         <header class="page-header">
-            <button class="back" onclick="showPage('homePage')">‹</button>
-            <div class="page-title">Loyalty Accounts</div>
+
+            <button
+                class="back"
+                onclick="showPage('homePage')"
+            >
+                ‹
+            </button>
+
+            <div class="page-title">
+                Loyalty Accounts
+            </div>
+
         </header>
+
 
         <div class="search">
-            <input id="searchInput" type="text"
-                   placeholder="Search name or phone..."
-                   oninput="filterAccounts()">
+
+            <input
+                id="searchInput"
+                type="text"
+                placeholder="Search name or phone..."
+                oninput="filterAccounts()"
+            >
+
         </div>
 
-        <div id="accountsList" class="accounts">
-            <div class="loading">Loading accounts...</div>
+
+        <div
+            id="accountsList"
+            class="accounts"
+        >
+
+            <div class="loading">
+                Loading accounts...
+            </div>
+
         </div>
+
     </section>
 
+
     <!-- CUSTOMER -->
-    <section id="customerPage" class="page">
+    <section
+        id="customerPage"
+        class="page"
+    >
+
         <header class="page-header">
-            <button class="back" onclick="showPage('accountsPage')">‹</button>
-            <div class="page-title">Customer</div>
+
+            <button
+                class="back"
+                onclick="showPage('accountsPage')"
+            >
+                ‹
+            </button>
+
+            <div class="page-title">
+                Customer
+            </div>
+
         </header>
 
+
         <div id="customerContent"></div>
+
     </section>
 
 </div>
 
-<!-- Supabase -->
+
+<!-- SUPABASE -->
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script src="supabase.js?v=4"></script>
 
-<script>
-/*
-    Uses the same Supabase connection as the billing page.
 
-    Tables:
-    loyalty_customers
-    loyalty_transactions
+<script>
+
+/*
+==================================================
+LOYALTY SYSTEM
+==================================================
+
+RULES:
+
+1 PURCHASE = 1 VISIT
+
+₹50 SPENT = 1 LOYALTY POINT
+
+POINTS = FLOOR(PURCHASE AMOUNT / 50)
+
+LIFETIME SPEND = SUM OF ALL PURCHASE AMOUNTS
+
+PURCHASES = NUMBER OF PURCHASE TRANSACTIONS
+
+The values are calculated from loyalty_transactions
+so old transactions are automatically included.
+==================================================
 */
 
-if (typeof supabaseClient === "undefined" || !supabaseClient) {
-    console.error("Supabase client is not available. Check supabase.js.");
+
+if (
+    typeof supabaseClient === "undefined" ||
+    !supabaseClient
+) {
+
+    console.error(
+        "Supabase client is not available."
+    );
+
 }
+
 
 let allCustomers = [];
 
-function showPage(id){
-    document.querySelectorAll(".app > section").forEach(section=>{
-        section.classList.remove("active");
-    });
 
-    const page = document.getElementById(id);
+/* =========================================
+   PAGE CONTROL
+========================================= */
+
+function showPage(id){
+
+    document
+        .querySelectorAll(".app > section")
+        .forEach(section => {
+
+            section.classList.remove("active");
+
+        });
+
+
+    const page =
+        document.getElementById(id);
+
 
     if(id === "homePage"){
+
         page.style.display = "block";
+
     }else{
+
         page.classList.add("active");
+
     }
+
 }
 
+
+/* =========================================
+   OPEN ACCOUNTS
+========================================= */
+
 function openAccounts(){
+
     showPage("accountsPage");
+
     loadCustomers();
+
 }
+
+
+/* =========================================
+   LOAD CUSTOMERS
+========================================= */
 
 async function loadCustomers(){
 
-    const list = document.getElementById("accountsList");
+    const list =
+        document.getElementById("accountsList");
+
 
     if(!supabaseClient){
+
         list.innerHTML = `
+
             <div class="error">
-                Supabase is not connected yet.<br><br>
-                Open this file and enter your Supabase URL and anon key
-                in the two variables near the bottom.
-            </div>`;
+
+                Supabase is not connected yet.
+
+            </div>
+
+        `;
+
         return;
+
     }
 
-    list.innerHTML = `<div class="loading">Loading accounts...</div>`;
 
-    const { data, error } = await supabaseClient
+    list.innerHTML = `
+
+        <div class="loading">
+            Loading accounts...
+        </div>
+
+    `;
+
+
+    const {
+        data,
+        error
+    } =
+
+        await supabaseClient
+
         .from("loyalty_customers")
+
         .select("*")
-        .order("name", { ascending:true });
+
+        .order("name", {
+            ascending:true
+        });
+
 
     if(error){
+
         list.innerHTML = `
+
             <div class="error">
-                Could not load loyalty accounts.<br><br>
+
+                Could not load loyalty accounts.
+
+                <br><br>
+
                 ${escapeHtml(error.message)}
-            </div>`;
+
+            </div>
+
+        `;
+
         return;
+
     }
 
-    allCustomers = data || [];
-    renderCustomers(allCustomers);
+
+    allCustomers =
+        data || [];
+
+
+    renderCustomers(
+        allCustomers
+    );
+
 }
+
+
+/* =========================================
+   DISPLAY CUSTOMER LIST
+========================================= */
 
 function renderCustomers(customers){
 
-    const list = document.getElementById("accountsList");
+    const list =
+        document.getElementById("accountsList");
+
 
     if(!customers.length){
-        list.innerHTML = `<div class="empty">No loyalty accounts found.</div>`;
+
+        list.innerHTML = `
+
+            <div class="empty">
+                No loyalty accounts found.
+            </div>
+
+        `;
+
         return;
+
     }
 
-    list.innerHTML = customers.map(customer => {
 
-        const name = customer.name || "Unnamed Customer";
-        const phone = customer.phone || "No phone";
+    list.innerHTML =
 
-        return `
-            <button class="account"
-                onclick="openCustomer('${escapeAttr(customer.id)}')">
+        customers.map(customer => {
 
-                <div class="avatar">
-                    ${escapeHtml(name.charAt(0).toUpperCase())}
-                </div>
+            const name =
+                customer.name ||
+                "Unnamed Customer";
 
-                <div class="account-info">
-                    <div class="account-name">
-                        ${escapeHtml(name)}
+
+            const phone =
+                customer.phone ||
+                "No phone";
+
+
+            return `
+
+                <button
+                    class="account"
+                    onclick="openCustomer('${escapeAttr(customer.id)}')"
+                >
+
+                    <div class="avatar">
+
+                        ${escapeHtml(
+                            name
+                            .charAt(0)
+                            .toUpperCase()
+                        )}
+
                     </div>
 
-                    <div class="account-phone">
-                        ${escapeHtml(phone)}
-                    </div>
-                </div>
 
-            </button>
-        `;
-    }).join("");
+                    <div class="account-info">
+
+                        <div class="account-name">
+
+                            ${escapeHtml(name)}
+
+                        </div>
+
+
+                        <div class="account-phone">
+
+                            ${escapeHtml(phone)}
+
+                        </div>
+
+                    </div>
+
+                </button>
+
+            `;
+
+        }).join("");
+
 }
+
+
+/* =========================================
+   SEARCH
+========================================= */
 
 function filterAccounts(){
 
     const query =
-        document.getElementById("searchInput").value
+
+        document
+        .getElementById("searchInput")
+        .value
         .trim()
         .toLowerCase();
 
-    const filtered = allCustomers.filter(customer => {
 
-        const name = String(customer.name || "").toLowerCase();
-        const phone = String(customer.phone || "").toLowerCase();
+    const filtered =
 
-        return name.includes(query) || phone.includes(query);
-    });
+        allCustomers.filter(customer => {
 
-    renderCustomers(filtered);
+            const name =
+                String(
+                    customer.name || ""
+                ).toLowerCase();
+
+
+            const phone =
+                String(
+                    customer.phone || ""
+                ).toLowerCase();
+
+
+            return (
+
+                name.includes(query) ||
+
+                phone.includes(query)
+
+            );
+
+        });
+
+
+    renderCustomers(
+        filtered
+    );
+
 }
+
+
+/* =========================================
+   OPEN CUSTOMER
+========================================= */
 
 async function openCustomer(id){
 
     showPage("customerPage");
 
-    const content = document.getElementById("customerContent");
-    content.innerHTML = `<div class="loading">Loading customer...</div>`;
 
-    const customer = allCustomers.find(c => String(c.id) === String(id));
+    const content =
+        document.getElementById(
+            "customerContent"
+        );
 
-    if(!customer){
-        content.innerHTML = `<div class="error">Customer not found.</div>`;
-        return;
-    }
-
-    const { data: purchases, error } = await supabaseClient
-        .from("loyalty_transactions")
-        .select("*")
-        .eq("customer_id", customer.id)
-        .order("created_at", { ascending:false });
-
-    if(error){
-        content.innerHTML = `
-            <div class="error">
-                Could not load purchase history.<br><br>
-                ${escapeHtml(error.message)}
-            </div>`;
-        return;
-    }
-
-    const name = customer.name || "Unnamed Customer";
-    const phone = customer.phone || "No phone";
-
-    const history = purchases || [];
 
     content.innerHTML = `
+
+        <div class="loading">
+            Loading customer...
+        </div>
+
+    `;
+
+
+    const customer =
+
+        allCustomers.find(
+            c =>
+                String(c.id) ===
+                String(id)
+        );
+
+
+    if(!customer){
+
+        content.innerHTML = `
+
+            <div class="error">
+                Customer not found.
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    /* =========================================
+       LOAD ALL TRANSACTIONS
+    ========================================= */
+
+    const {
+        data: transactions,
+        error
+    } =
+
+        await supabaseClient
+
+        .from("loyalty_transactions")
+
+        .select("*")
+
+        .eq(
+            "customer_id",
+            customer.id
+        )
+
+        .order(
+            "created_at",
+            {
+                ascending:false
+            }
+        );
+
+
+    if(error){
+
+        content.innerHTML = `
+
+            <div class="error">
+
+                Could not load purchase history.
+
+                <br><br>
+
+                ${escapeHtml(
+                    error.message
+                )}
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    const history =
+        (transactions || [])
+        .filter(transaction => {
+
+            return (
+                !transaction.type ||
+                transaction.type === "purchase"
+            );
+
+        });
+
+
+    /* =========================================
+       CALCULATE LOYALTY VALUES
+    ========================================= */
+
+    let lifetimeSpend = 0;
+
+    let totalPoints = 0;
+
+    let visits = 0;
+
+
+    history.forEach(purchase => {
+
+        const amount =
+            Number(
+                purchase.amount || 0
+            );
+
+
+        /*
+        ₹50 = 1 POINT
+
+        ₹180 = 3 POINTS
+        ₹655 = 13 POINTS
+        */
+
+        const points =
+            Math.floor(
+                amount / 50
+            );
+
+
+        lifetimeSpend += amount;
+
+        totalPoints += points;
+
+        visits += 1;
+
+    });
+
+
+    const name =
+        customer.name ||
+        "Unnamed Customer";
+
+
+    const phone =
+        customer.phone ||
+        "No phone";
+
+
+    /* =========================================
+       DISPLAY CUSTOMER
+    ========================================= */
+
+    content.innerHTML = `
+
         <main class="profile">
 
+
             <div class="profile-card">
+
                 <div class="big-avatar">
-                    ${escapeHtml(name.charAt(0).toUpperCase())}
+
+                    ${escapeHtml(
+                        name
+                        .charAt(0)
+                        .toUpperCase()
+                    )}
+
                 </div>
+
 
                 <div>
+
                     <div class="profile-name">
+
                         ${escapeHtml(name)}
+
                     </div>
 
+
                     <div class="profile-phone">
+
                         ${escapeHtml(phone)}
+
                     </div>
+
                 </div>
+
             </div>
+
 
             <div class="stats">
 
-                <div class="stat">
-                    <div class="stat-label">LOYALTY POINTS</div>
-                    <div class="stat-value">
-                        ⭐ ${Number(customer.points || 0)}
-                    </div>
-                </div>
+
+                <!-- POINTS -->
 
                 <div class="stat">
-                    <div class="stat-label">VISITS</div>
-                    <div class="stat-value">
-                        ${Number(customer.visit_count || 0)}
+
+                    <div class="stat-label">
+                        LOYALTY POINTS
                     </div>
+
+                    <div class="stat-value">
+
+                        ⭐ ${totalPoints}
+
+                    </div>
+
                 </div>
 
-                <div class="stat">
-                    <div class="stat-label">LIFETIME SPEND</div>
-                    <div class="stat-value">
-                        ₹${Number(customer.lifetime_spend || 0).toFixed(2)}
-                    </div>
-                </div>
+
+                <!-- VISITS -->
 
                 <div class="stat">
-                    <div class="stat-label">PURCHASES</div>
+
+                    <div class="stat-label">
+                        VISITS
+                    </div>
+
                     <div class="stat-value">
+
+                        ${visits}
+
+                    </div>
+
+                </div>
+
+
+                <!-- LIFETIME SPEND -->
+
+                <div class="stat">
+
+                    <div class="stat-label">
+                        LIFETIME SPEND
+                    </div>
+
+                    <div class="stat-value">
+
+                        ₹${lifetimeSpend.toFixed(2)}
+
+                    </div>
+
+                </div>
+
+
+                <!-- PURCHASES -->
+
+                <div class="stat">
+
+                    <div class="stat-label">
+                        PURCHASES
+                    </div>
+
+                    <div class="stat-value">
+
                         ${history.length}
+
                     </div>
+
                 </div>
+
 
             </div>
+
 
             <div class="history-title">
+
                 Purchase History
+
             </div>
+
 
             <div>
+
                 ${
                     history.length
-                    ? history.map(renderPurchase).join("")
-                    : `<div class="empty">No purchase history.</div>`
+
+                    ?
+
+                    history
+                    .map(renderPurchase)
+                    .join("")
+
+                    :
+
+                    `
+                    <div class="empty">
+                        No purchase history.
+                    </div>
+                    `
                 }
+
             </div>
 
+
         </main>
+
     `;
+
 }
+
+
+/* =========================================
+   RENDER PURCHASE
+========================================= */
 
 function renderPurchase(purchase){
 
-    const date = new Date(purchase.created_at);
+    const date =
+        new Date(
+            purchase.created_at
+        );
 
-    const dateText = date.toLocaleDateString("en-IN", {
-        day:"2-digit",
-        month:"short",
-        year:"numeric"
-    });
 
-    const timeText = date.toLocaleTimeString("en-IN", {
-        hour:"2-digit",
-        minute:"2-digit"
-    });
+    const dateText =
+
+        date.toLocaleDateString(
+            "en-IN",
+            {
+                day:"2-digit",
+                month:"short",
+                year:"numeric"
+            }
+        );
+
+
+    const timeText =
+
+        date.toLocaleTimeString(
+            "en-IN",
+            {
+                hour:"2-digit",
+                minute:"2-digit"
+            }
+        );
+
+
+    const amount =
+        Number(
+            purchase.amount || 0
+        );
+
+
+    /*
+    CALCULATE POINTS FROM AMOUNT
+
+    ₹50 = 1
+    ₹100 = 2
+    ₹180 = 3
+    ₹655 = 13
+    */
+
+    const points =
+        Math.floor(
+            amount / 50
+        );
+
 
     return `
+
         <div class="purchase">
+
 
             <div class="purchase-top">
 
+
                 <div class="purchase-date">
-                    ${dateText} • ${timeText}
+
+                    ${dateText}
+                    •
+                    ${timeText}
+
                 </div>
+
 
                 <div class="purchase-total">
-                    ₹${Number(purchase.amount || 0).toFixed(2)}
+
+                    ₹${amount.toFixed(2)}
+
                 </div>
 
+
             </div>
+
 
             <div class="items">
-                ${formatDescription(purchase.description)}
+
+                ${formatDescription(
+                    purchase.description
+                )}
+
             </div>
+
 
             <div class="points">
-                ${
-                    Number(purchase.points || 0) >= 0
-                    ? `+${Number(purchase.points || 0)} points`
-                    : `${Number(purchase.points || 0)} points`
-                }
+
+                +${points} points
+
             </div>
 
+
         </div>
+
     `;
+
 }
+
+
+/* =========================================
+   FORMAT PURCHASE DESCRIPTION
+========================================= */
 
 function formatDescription(description){
 
-    if(!description) return "Purchase";
+    if(!description){
+
+        return "Purchase";
+
+    }
+
 
     try{
-        const parsed = JSON.parse(description);
+
+        const parsed =
+            JSON.parse(description);
+
 
         if(Array.isArray(parsed)){
-            return parsed.map(item => {
-                if(typeof item === "string"){
-                    return escapeHtml(item);
-                }
 
-                const name = item.name || item.item || "Item";
-                const qty = item.quantity || item.qty || 1;
+            return parsed
+                .map(item => {
 
-                return `${escapeHtml(name)} × ${escapeHtml(qty)}`;
-            }).join("<br>");
+                    if(
+                        typeof item ===
+                        "string"
+                    ){
+
+                        return escapeHtml(
+                            item
+                        );
+
+                    }
+
+
+                    const name =
+                        item.name ||
+                        item.item ||
+                        "Item";
+
+
+                    const qty =
+                        item.quantity ||
+                        item.qty ||
+                        1;
+
+
+                    return `
+
+                        ${escapeHtml(name)}
+                        ×
+                        ${escapeHtml(qty)}
+
+                    `;
+
+                })
+                .join("<br>");
+
         }
+
     }catch(e){}
 
-    return escapeHtml(String(description)).replace(/\n/g,"<br>");
+
+    return escapeHtml(
+        String(description)
+    )
+    .replace(/\n/g,"<br>");
+
 }
+
+
+/* =========================================
+   SECURITY HELPERS
+========================================= */
 
 function escapeHtml(value){
+
     return String(value)
-        .replace(/&/g,"&amp;")
-        .replace(/</g,"&lt;")
-        .replace(/>/g,"&gt;")
-        .replace(/"/g,"&quot;")
-        .replace(/'/g,"&#039;");
+
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+
+        .replace(
+            /</g,
+            "&lt;"
+        )
+
+        .replace(
+            />/g,
+            "&gt;"
+        )
+
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
 }
+
 
 function escapeAttr(value){
-    return escapeHtml(value).replace(/`/g,"&#096;");
+
+    return escapeHtml(value)
+        .replace(
+            /`/g,
+            "&#096;"
+        );
+
 }
 
+
+/* =========================================
+   START
+========================================= */
+
 showPage("homePage");
+
 </script>
 
 </body>
