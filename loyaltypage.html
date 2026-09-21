@@ -309,47 +309,22 @@ body{
 
 <!-- Supabase -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js?v=4"></script>
 
 <script>
 /*
-    ADD YOUR SUPABASE DETAILS HERE.
+    Uses the same Supabase connection as the billing page.
 
-    This first version expects these two tables:
-
+    Tables:
     loyalty_customers
-      id
-      phone
-      name
-      points
-      lifetime_spend
-      visit_count
-
     loyalty_transactions
-      id
-      customer_id
-      order_id
-      type
-      points
-      amount
-      description
-      created_at
 */
 
-const SUPABASE_URL = "YOUR_SUPABASE_URL";
-const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
-
-let supabaseClient = null;
-let allCustomers = [];
-
-if (
-    SUPABASE_URL !== "YOUR_SUPABASE_URL" &&
-    SUPABASE_ANON_KEY !== "YOUR_SUPABASE_ANON_KEY"
-) {
-    supabaseClient = window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_ANON_KEY
-    );
+if (typeof supabaseClient === "undefined" || !supabaseClient) {
+    console.error("Supabase client is not available. Check supabase.js.");
 }
+
+let allCustomers = [];
 
 function showPage(id){
     document.querySelectorAll(".app > section").forEach(section=>{
