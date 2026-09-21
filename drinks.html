@@ -75,6 +75,19 @@ header p {
     margin-top: 5px;
 }
 
+.customer {
+    font-size: 16px;
+    color: #333;
+    margin-top: 6px;
+    font-weight: bold;
+}
+
+.phone {
+    font-size: 15px;
+    color: #555;
+    margin-top: 3px;
+}
+
 .item {
     display: flex;
     justify-content: space-between;
@@ -161,7 +174,7 @@ header p {
 
 <h1>🥤 BLENDARRA COUNTER</h1>
 
-<p>K    itchen Orders</p>
+<p>Kitchen Orders</p>
 
 </header>
 
@@ -186,7 +199,11 @@ let kots = {};
 
 async function loadOrders() {
 
-    const { data, error } =
+    /* -----------------------------------------
+       LOAD KOT ROWS FIRST
+       ----------------------------------------- */
+
+    const { data: kotData, error: kotError } =
 
         await supabaseClient
 
@@ -198,12 +215,7 @@ async function loadOrders() {
             counter,
             items,
             status,
-            created_at,
-
-            orders (
-                order_number,
-                table_number
-            )
+            created_at
         `)
 
         .eq("counter", "drinks")
@@ -215,9 +227,9 @@ async function loadOrders() {
         });
 
 
-    if (error) {
+    if (kotError) {
 
-        console.error(error);
+        console.error("KOT ERROR:", kotError);
 
         document.getElementById("orders").innerHTML =
 
@@ -229,11 +241,85 @@ async function loadOrders() {
     }
 
 
+    /* -----------------------------------------
+       GET ORDER IDs
+       ----------------------------------------- */
+
+    const orderIds =
+
+        [...new Set(
+            (kotData || [])
+            .map(kot => kot.order_id)
+            .filter(id => id != null)
+        )];
+
+
+    let ordersMap = {};
+
+
+    /* -----------------------------------------
+       LOAD ORDER INFORMATION SEPARATELY
+       ----------------------------------------- */
+
+    if (orderIds.length > 0) {
+
+        const {
+            data: orderData,
+            error: orderError
+        } =
+
+            await supabaseClient
+
+            .from("orders")
+
+            .select(`
+                id,
+                order_number,
+                table_number,
+                customer_name,
+                customer_phone
+            `)
+
+            .in("id", orderIds);
+
+
+        if (orderError) {
+
+            console.error(
+                "ORDER INFORMATION ERROR:",
+                orderError
+            );
+
+        } else {
+
+            (orderData || []).forEach(order => {
+
+                ordersMap[order.id] = order;
+
+            });
+
+        }
+
+    }
+
+
+    /* -----------------------------------------
+       COMBINE KOT + ORDER INFORMATION
+       ----------------------------------------- */
+
     kots = {};
 
-    data.forEach(kot => {
 
-        kots[kot.id] = kot;
+    (kotData || []).forEach(kot => {
+
+        kots[kot.id] = {
+
+            ...kot,
+
+            orderInfo:
+                ordersMap[kot.order_id] || null
+
+        };
 
     });
 
@@ -274,28 +360,79 @@ function renderOrders() {
 
     orders.forEach(kot => {
 
+        const orderInfo =
+            kot.orderInfo || {};
+
+
         const orderNumber =
-            kot.orders?.order_number || kot.order_id;
+            orderInfo.order_number ||
+            kot.order_id;
+
 
         const tableNumber =
-            kot.orders?.table_number || "-";
+            orderInfo.table_number ||
+            "-";
+
+
+        const customerName =
+            orderInfo.customer_name ||
+            "";
+
+
+        const customerPhone =
+            orderInfo.customer_phone ||
+            "";
 
 
         let itemsHTML = "";
 
 
-        kot.items.forEach(item => {
+        /* -----------------------------------------
+           SAFELY HANDLE ITEMS
+           ----------------------------------------- */
+
+        let items = kot.items;
+
+
+        if (typeof items === "string") {
+
+            try {
+
+                items = JSON.parse(items);
+
+            } catch (e) {
+
+                console.error(
+                    "Invalid items JSON:",
+                    items
+                );
+
+                items = [];
+
+            }
+
+        }
+
+
+        if (!Array.isArray(items)) {
+
+            items = [];
+
+        }
+
+
+        items.forEach(item => {
 
             itemsHTML += `
 
                 <div class="item">
 
                     <span>
-                        ${item.name}
+                        ${item.name || "Item"}
                     </span>
 
                     <span class="quantity">
-                        × ${item.quantity}
+                        × ${item.quantity || 1}
                     </span>
 
                 </div>
@@ -306,7 +443,8 @@ function renderOrders() {
 
 
         let statusClass =
-            kot.status.toLowerCase();
+            String(kot.status || "Pending")
+            .toLowerCase();
 
 
         container.innerHTML += `
@@ -324,6 +462,26 @@ function renderOrders() {
                         <div class="table">
                             Table: ${tableNumber}
                         </div>
+
+                        ${
+                            customerName
+                            ? `
+                                <div class="customer">
+                                    Customer: ${customerName}
+                                </div>
+                            `
+                            : ""
+                        }
+
+                        ${
+                            customerPhone
+                            ? `
+                                <div class="phone">
+                                    Phone: ${customerPhone}
+                                </div>
+                            `
+                            : ""
+                        }
 
                     </div>
 
