@@ -160,7 +160,7 @@ body{
     border-radius:9px;
     padding:8px 10px;
     background:#25D366;
-    color:white;
+    color:#fff;
     font-size:12px;
     font-weight:700;
     cursor:pointer;
@@ -398,20 +398,21 @@ async function loadCustomers(){
     allCustomers = data || [];
 
     /*
-        Load purchase transactions once and attach them to each customer.
-        This keeps the account list fast while making the WhatsApp point
-        message use the customer's current purchase history.
+        Purchase transactions are the source of truth for loyalty.
+        This deliberately does not depend on points, visit_count or
+        lifetime_spend stored in loyalty_customers because older rows
+        may contain stale zero values.
     */
-    const customerIds = allCustomers.map(customer => customer.id);
+    if(allCustomers.length){
 
-    if(customerIds.length){
+        const customerIds = allCustomers.map(customer => customer.id);
 
         const {
             data: transactions,
             error: transactionError
         } = await supabaseClient
             .from("loyalty_transactions")
-            .select("customer_id, amount, type, created_at")
+            .select("customer_id, amount, points, type, created_at")
             .in("customer_id", customerIds)
             .eq("type", "purchase");
 
@@ -434,7 +435,7 @@ async function loadCustomers(){
             });
 
             allCustomers.forEach(customer => {
-                customer._loyaltyPurchases =
+                customer._purchases =
                     purchasesByCustomer[customer.id] || [];
             });
         }
@@ -457,7 +458,7 @@ function renderCustomers(customers){
         const name = customer.name || "Unnamed Customer";
         const phone = customer.phone || "No phone";
 
-        const points = getCurrentLoyaltyPoints(customer);
+        const stats = calculateStats(customer._purchases || []);
 
         return `
             <button class="account"
@@ -477,77 +478,25 @@ function renderCustomers(customers){
                     </div>
                 </div>
 
-                <div class="account-actions">
-                    ${
-                        customer.phone
-                        ? `<button
+                ${
+                    customer.phone
+                    ? `
+                        <div class="account-actions">
+                            <button
                                 class="whatsapp-btn"
                                 type="button"
-                                onclick="event.stopPropagation(); sendLoyaltyWhatsApp('${escapeAttr(customer.phone)}','${escapeAttr(name)}',${points})"
-                           >
+                                onclick="event.stopPropagation(); sendLoyaltyWhatsApp('${escapeAttr(customer.phone)}','${escapeAttr(name)}',${stats.points})">
                                 WhatsApp
-                           </button>`
-                        : ""
-                    }
-                </div>
+                            </button>
+                        </div>
+                      `
+                    : ""
+                }
 
             </button>
         `;
     }).join("");
 }
-
-function getCurrentLoyaltyPoints(customer){
-
-    /*
-        Loyalty rule:
-        ₹50 spent = 1 point.
-
-        The transaction history is the source of truth, so this
-        does not depend on an old/stale points value in the customer row.
-    */
-
-    if(
-        customer &&
-        Array.isArray(customer._loyaltyPurchases)
-    ){
-        return customer._loyaltyPurchases.reduce(
-            (total, purchase) => {
-                const amount = Number(purchase.amount || 0);
-                return total + Math.floor(amount / 50);
-            },
-            0
-        );
-    }
-
-    return Number(customer.points || 0);
-}
-
-
-function sendLoyaltyWhatsApp(phone, name, points){
-
-    let number =
-        String(phone || "").replace(/\\D/g, "");
-
-    if(number.startsWith("00")){
-        number = number.substring(2);
-    }
-
-    if(number.length === 10){
-        number = "91" + number;
-    }
-
-    const message =
-        `Hi ${name}! 🎉 You currently have ${points} loyalty points with Chaatarra. Thank you for being our valued customer! ❤️`;
-
-    const url =
-        "https://wa.me/" +
-        number +
-        "?text=" +
-        encodeURIComponent(message);
-
-    window.open(url, "_blank");
-}
-
 
 function filterAccounts(){
 
@@ -601,6 +550,14 @@ async function openCustomer(id){
 
     const history = purchases || [];
 
+    /*
+        Calculate loyalty directly from purchase history.
+        Rule: ₹50 spent = 1 point.
+        Visits = number of purchase transactions.
+        Lifetime spend = sum of purchase transaction amounts.
+    */
+    const stats = calculateStats(history);
+
     content.innerHTML = `
         <main class="profile">
 
@@ -625,21 +582,21 @@ async function openCustomer(id){
                 <div class="stat">
                     <div class="stat-label">LOYALTY POINTS</div>
                     <div class="stat-value">
-                        ⭐ ${Number(customer.points || 0)}
+                        ⭐ ${stats.points}
                     </div>
                 </div>
 
                 <div class="stat">
                     <div class="stat-label">VISITS</div>
                     <div class="stat-value">
-                        ${Number(customer.visit_count || 0)}
+                        ${stats.visits}
                     </div>
                 </div>
 
                 <div class="stat">
                     <div class="stat-label">LIFETIME SPEND</div>
                     <div class="stat-value">
-                        ₹${Number(customer.lifetime_spend || 0).toFixed(2)}
+                        ₹${stats.lifetimeSpend.toFixed(2)}
                     </div>
                 </div>
 
@@ -683,6 +640,9 @@ function renderPurchase(purchase){
         minute:"2-digit"
     });
 
+    const amount = Number(purchase.amount || 0);
+    const calculatedPoints = Math.floor(amount / 50);
+
     return `
         <div class="purchase">
 
@@ -693,7 +653,7 @@ function renderPurchase(purchase){
                 </div>
 
                 <div class="purchase-total">
-                    ₹${Number(purchase.amount || 0).toFixed(2)}
+                    ₹${amount.toFixed(2)}
                 </div>
 
             </div>
@@ -703,16 +663,69 @@ function renderPurchase(purchase){
             </div>
 
             <div class="points">
-                ${
-                    Number(purchase.points || 0) >= 0
-                    ? `+${Number(purchase.points || 0)} points`
-                    : `${Number(purchase.points || 0)} points`
-                }
+                +${calculatedPoints} points
             </div>
 
         </div>
     `;
 }
+
+function calculateStats(purchases){
+
+    const history = Array.isArray(purchases)
+        ? purchases
+        : [];
+
+    let lifetimeSpend = 0;
+    let points = 0;
+
+    history.forEach(purchase => {
+
+        const amount =
+            Number(purchase.amount || 0);
+
+        lifetimeSpend += amount;
+
+        /*
+            Loyalty rule:
+            ₹50 spent = 1 point.
+        */
+        points += Math.floor(amount / 50);
+    });
+
+    return {
+        points: points,
+        visits: history.length,
+        lifetimeSpend: lifetimeSpend
+    };
+}
+
+
+function sendLoyaltyWhatsApp(phone, name, points){
+
+    let number =
+        String(phone || "").replace(/\\D/g, "");
+
+    if(number.startsWith("00")){
+        number = number.substring(2);
+    }
+
+    if(number.length === 10){
+        number = "91" + number;
+    }
+
+    const message =
+        `Hi ${name}! 🎉 You currently have ${points} loyalty points with Chaatarra. Thank you for being our valued customer! ❤️`;
+
+    const url =
+        "https://wa.me/" +
+        number +
+        "?text=" +
+        encodeURIComponent(message);
+
+    window.open(url, "_blank");
+}
+
 
 function formatDescription(description){
 
