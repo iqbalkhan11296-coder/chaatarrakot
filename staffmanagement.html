@@ -538,7 +538,10 @@ function showSalaryDetails(staffId){
       <td>${formatSalaryDate(p.paid_date)}</td>
       <td><b>${money(p.amount_paid)}</b></td>
       <td>${esc(p.note||'—')}</td>
-      <td><button class="smallbtn account" data-print-payment="${p.id}">🖨 Print Slip</button></td>
+      <td style="white-space:nowrap">
+        <button class="smallbtn account" data-print-payment="${p.id}">🖨 Print Slip</button>
+        <button class="smallbtn" style="margin-left:6px;background:#fff0f0;color:#a11;border:1px solid #e5bcbc" data-delete-payment="${p.id}">🗑 Delete</button>
+      </td>
     </tr>`).join('');
 
   if(!rows)rows='<tr><td colspan="7" style="text-align:center;padding:25px;color:#777">No salary payments recorded for this month.</td></tr>';
@@ -570,6 +573,27 @@ function showSalaryDetails(staffId){
   document.querySelectorAll('[data-print-payment]').forEach(b=>{
     b.onclick=()=>printSalarySlip(staffId,b.dataset.printPayment);
   });
+  document.querySelectorAll('[data-delete-payment]').forEach(b=>{
+    b.onclick=()=>deleteSalaryPayment(staffId,b.dataset.deletePayment);
+  });
+}
+
+async function deleteSalaryPayment(staffId,paymentId){
+  const p=(payments[staffId]||[]).find(x=>x.id===paymentId);
+  if(!p)return;
+  if(!confirm(`Delete this salary payment of ${money(p.amount_paid)}?`))return;
+
+  const {error}=await sb.from('salary_payments').delete().eq('id',paymentId);
+  if(error){
+    console.error(error);
+    toast('Could not delete salary payment.');
+    return;
+  }
+
+  await loadAccountData();
+  renderAccount();
+  showSalaryDetails(staffId);
+  toast('Salary payment deleted.');
 }
 function closeSalaryDetails(){ $('salaryDetailsBackdrop').classList.remove('show'); }
 $('closeSalaryDetails').onclick=closeSalaryDetails;
