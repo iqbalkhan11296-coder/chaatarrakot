@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Staff • Attendance & Salary</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Inter,Arial,sans-serif;background:#f5f2ed;color:#241a1e}
+:root{--burg:#4b001f;--burg2:#650028;--gold:#caa24a;--cream:#fbf8f2;--muted:#756b70}
+header{background:linear-gradient(135deg,var(--burg),#300014);color:white;padding:24px 34px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 4px 18px #0002}
+.brand h1{margin:0;font-family:Georgia,serif;font-size:28px}.brand p{margin:5px 0 0;color:#e6cf91}
+button{border:0;border-radius:10px;padding:11px 16px;font-weight:700;cursor:pointer}
+.primary{background:var(--gold);color:#2b1820}.outline{background:transparent;border:1px solid #d8bc71;color:white}
+main{max-width:1250px;margin:28px auto;padding:0 20px}.tabs{display:flex;gap:10px;margin-bottom:20px}.tab{background:white;color:var(--burg);border:1px solid #e4dfe0}.tab.active{background:var(--burg);color:white}
+.card{background:var(--cream);border:1px solid #e7e0d9;border-radius:16px;padding:22px;box-shadow:0 5px 20px #4b001f0b;margin-bottom:20px}
+.toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.date{font-size:18px;font-weight:800}.date input{padding:10px;border:1px solid #d9d0d2;border-radius:9px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}.stat{background:white;border-radius:14px;padding:17px;border:1px solid #e8e2df}.stat small{color:var(--muted)}.stat strong{display:block;font-size:25px;margin-top:7px;color:var(--burg)}
+table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:14px 12px;border-bottom:1px solid #e8e1df}th{font-size:12px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
+.staffname{font-weight:800}.role{color:var(--muted);font-size:13px}.badge{padding:7px 10px;border-radius:20px;font-size:12px;font-weight:800;display:inline-block}.present{background:#e5f5e9;color:#176b32}.absent{background:#fde8e8;color:#a32626}.half{background:#fff2d6;color:#8b5a00}.leave{background:#e7edf9;color:#315a9b}
+.att{display:flex;gap:6px;flex-wrap:wrap}.att button{padding:8px 10px;font-size:12px;background:#eee6e9;color:var(--burg)}.att button.sel{background:var(--burg);color:white}
+.hidden{display:none}.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.field label{display:block;font-size:13px;font-weight:700;margin-bottom:6px}.field input,.field select,.field textarea{width:100%;padding:12px;border:1px solid #d9d0d2;border-radius:9px;background:white}.field{margin-bottom:14px}.full{grid-column:1/-1}.actions{display:flex;gap:8px;justify-content:flex-end}.danger{background:#f8e3e3;color:#9a2222}.edit{background:#eee8df;color:var(--burg)}
+.empty{text-align:center;color:var(--muted);padding:35px}
+@media(max-width:800px){.stats{grid-template-columns:1fr 1fr}.grid{grid-template-columns:1fr}header{padding:20px}.brand h1{font-size:23px}main{padding:0 12px}table{min-width:850px}.tablewrap{overflow:auto}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><h1>Staff Management</h1><p>Attendance • Daily Wage • Salary</p></div>
+  <button class="primary" onclick="showStaff()">＋ Staff Management</button>
+</header>
+
+<main>
+  <div class="tabs">
+    <button id="tabAttendance" class="tab active" onclick="showAttendance()">Attendance</button>
+    <button id="tabStaff" class="tab" onclick="showStaff()">Staff Management</button>
+    <button id="tabSalary" class="tab" onclick="showSalary()">Salary Summary</button>
+  </div>
+
+  <section id="attendanceView">
+    <div class="card toolbar">
+      <div><div class="date">Daily Attendance</div><div style="color:var(--muted);margin-top:4px">Mark every staff member for the selected date.</div></div>
+      <input id="attendanceDate" type="date" onchange="renderAttendance()">
+    </div>
+    <div class="stats">
+      <div class="stat"><small>Total Staff</small><strong id="total">0</strong></div>
+      <div class="stat"><small>Present</small><strong id="present">0</strong></div>
+      <div class="stat"><small>Absent</small><strong id="absent">0</strong></div>
+      <div class="stat"><small>Half Day / Leave</small><strong id="other">0</strong></div>
+    </div>
+    <div class="card tablewrap">
+      <table><thead><tr><th>Staff</th><th>Role</th><th>Daily Wage</th><th>Attendance</th></tr></thead>
+      <tbody id="attendanceBody"></tbody></table>
+    </div>
+  </section>
+
+  <section id="staffView" class="hidden">
+    <div class="card">
+      <div class="toolbar"><div><div class="date">Staff Management</div><div style="color:var(--muted)">Add, edit or deactivate staff members.</div></div><button class="primary" onclick="newStaff()">＋ Add Staff</button></div>
+    </div>
+    <div id="formCard" class="card hidden">
+      <h2 id="formTitle">Add Staff</h2>
+      <div class="grid">
+        <div class="field"><label>Name</label><input id="name"></div>
+        <div class="field"><label>Phone</label><input id="phone" type="tel"></div>
+        <div class="field"><label>Role</label><input id="role" placeholder="Counter / Kitchen / Cashier"></div>
+        <div class="field"><label>Daily Wage (₹)</label><input id="wage" type="number" min="0"></div>
+        <div class="field"><label>Joining Date</label><input id="joining" type="date"></div>
+        <div class="field"><label>Status</label><select id="status"><option value="active">Active</option><option value="inactive">Inactive</option></select></div>
+        <div class="field full"><label>Notes</label><textarea id="notes" rows="3"></textarea></div>
+      </div>
+      <div class="actions"><button class="edit" onclick="closeForm()">Cancel</button><button class="primary" onclick="saveStaff()">Save Staff</button></div>
+    </div>
+    <div class="card tablewrap"><table><thead><tr><th>Name</th><th>Role</th><th>Phone</th><th>Daily Wage</th><th>Status</th><th>Action</th></tr></thead><tbody id="staffBody"></tbody></table></div>
+  </section>
+
+  <section id="salaryView" class="hidden">
+    <div class="card toolbar"><div><div class="date">Salary Summary</div><div style="color:var(--muted)">Salary is calculated from attendance × daily wage. Half Day = 50%.</div></div><input id="salaryMonth" type="month" onchange="renderSalary()"></div>
+    <div class="card tablewrap"><table><thead><tr><th>Staff</th><th>Daily Wage</th><th>Present</th><th>Half Day</th><th>Absent</th><th>Leave</th><th>Payable</th></tr></thead><tbody id="salaryBody"></tbody></table></div>
+  </section>
+</main>
+
+<script>
+let staff=JSON.parse(localStorage.getItem('staff_manager_data')||'[]');
+let attendance=JSON.parse(localStorage.getItem('staff_manager_attendance')||'{}');
+let editing=null;
+const today=new Date(); const iso=d=>d.toISOString().slice(0,10);
+document.getElementById('attendanceDate').value=iso(today);
+document.getElementById('salaryMonth').value=iso(today).slice(0,7);
+
+function save(){localStorage.setItem('staff_manager_data',JSON.stringify(staff));localStorage.setItem('staff_manager_attendance',JSON.stringify(attendance))}
+function activeStaff(){return staff.filter(s=>s.status==='active')}
+function statusFor(id,date){return attendance[date+'_'+id]||'absent'}
+function setAttendance(id,date,val){attendance[date+'_'+id]=val;save();renderAttendance()}
+function renderAttendance(){
+ const date=document.getElementById('attendanceDate').value; const list=activeStaff();
+ let counts={present:0,absent:0,half:0,leave:0}; list.forEach(s=>counts[statusFor(s.id,date)]++);
+ total.textContent=list.length;present.textContent=counts.present;absent.textContent=counts.absent;other.textContent=counts.half+counts.leave;
+ attendanceBody.innerHTML=list.length?list.map(s=>`<tr><td><div class="staffname">${esc(s.name)}</div></td><td><span class="role">${esc(s.role||'—')}</span></td><td>₹${num(s.wage)}</td><td><div class="att">${[['present','Present'],['half','Half Day'],['absent','Absent'],['leave','Leave']].map(x=>`<button class="${statusFor(s.id,date)===x[0]?'sel':''}" onclick="setAttendance('${s.id}','${date}','${x[0]}')">${x[1]}</button>`).join('')}</div></td></tr>`).join(''):'<tr><td colspan="4" class="empty">No staff added yet. Open Staff Management to add staff.</td></tr>';
+}
+function showAttendance(){view('attendanceView','tabAttendance');renderAttendance()}
+function showStaff(){view('staffView','tabStaff');renderStaff()}
+function showSalary(){view('salaryView','tabSalary');renderSalary()}
+function view(v,t){['attendanceView','staffView','salaryView'].forEach(x=>document.getElementById(x).classList.toggle('hidden',x!==v));['tabAttendance','tabStaff','tabSalary'].forEach(x=>document.getElementById(x).classList.toggle('active',x===t))}
+function newStaff(){editing=null;formTitle.textContent='Add Staff';formCard.classList.remove('hidden');['name','phone','role','wage','joining','notes'].forEach(x=>document.getElementById(x).value='');status.value='active'}
+function editStaff(id){let s=staff.find(x=>x.id===id);editing=id;formTitle.textContent='Edit Staff';formCard.classList.remove('hidden');name.value=s.name;phone.value=s.phone||'';role.value=s.role||'';wage.value=s.wage||'';joining.value=s.joining||'';status.value=s.status||'active';notes.value=s.notes||''}
+function closeForm(){formCard.classList.add('hidden')}
+function saveStaff(){
+ if(!name.value.trim()||!wage.value){alert('Please enter the staff name and daily wage.');return}
+ let data={name:name.value.trim(),phone:phone.value.trim(),role:role.value.trim(),wage:Number(wage.value),joining:joining.value,status:status.value,notes:notes.value.trim()};
+ if(editing){let i=staff.findIndex(s=>s.id===editing);staff[i]={...staff[i],...data}}else staff.push({id:Date.now().toString(),...data});
+ save();closeForm();renderStaff();renderAttendance();renderSalary();
+}
+function deactivate(id){let s=staff.find(x=>x.id===id);if(confirm('Deactivate '+s.name+'?')){s.status='inactive';save();renderStaff();renderAttendance();renderSalary()}}
+function renderStaff(){staffBody.innerHTML=staff.length?staff.map(s=>`<tr><td class="staffname">${esc(s.name)}</td><td>${esc(s.role||'—')}</td><td>${esc(s.phone||'—')}</td><td>₹${num(s.wage)}</td><td><span class="badge ${s.status==='active'?'present':'absent'}">${s.status}</span></td><td><button class="edit" onclick="editStaff('${s.id}')">Edit</button> ${s.status==='active'?`<button class="danger" onclick="deactivate('${s.id}')">Deactivate</button>`:''}</td></tr>`).join(''):'<tr><td colspan="6" class="empty">No staff members yet.</td></tr>'}
+function renderSalary(){
+ let month=salaryMonth.value, list=activeStaff();
+ salaryBody.innerHTML=list.length?list.map(s=>{let c={present:0,half:0,absent:0,leave:0};let days=new Date(new Date(month+'-01').getFullYear(),new Date(month+'-01').getMonth()+1,0).getDate();for(let d=1;d<=days;d++){let dt=month+'-'+String(d).padStart(2,'0');let v=statusFor(s.id,dt);c[v]++}let pay=(c.present+c.half*.5)*Number(s.wage);return `<tr><td class="staffname">${esc(s.name)}<div class="role">${esc(s.role||'')}</div></td><td>₹${num(s.wage)}</td><td>${c.present}</td><td>${c.half}</td><td>${c.absent}</td><td>${c.leave}</td><td><strong>₹${num(pay)}</strong></td></tr>`}).join(''):'<tr><td colspan="7" class="empty">No active staff.</td></tr>'
+}
+function num(n){return Number(n||0).toLocaleString('en-IN')}
+function esc(x){return String(x??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+renderAttendance();renderStaff();renderSalary();
+</script>
+</body>
+</html>
