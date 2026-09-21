@@ -1,2455 +1,758 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
-    <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <title>Loyalty Admin</title>
-
-
-    <!-- SUPABASE -->
-
-    <script
-        src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
-    ></script>
-
-    <script src="supabase.js?v=4"></script>
-
-
-    <style>
-
-        * {
-            box-sizing: border-box;
-        }
-
-
-        body {
-
-            margin: 0;
-
-            font-family:
-                Arial,
-                Helvetica,
-                sans-serif;
-
-            background:
-                #faf7f0;
-
-            color:
-                #2b1a20;
-
-        }
-
-
-        button,
-        input {
-
-            font-family:
-                inherit;
-
-        }
-
-
-        /* =========================================
-           MAIN APP
-        ========================================= */
-
-        .app {
-
-            min-height: 100vh;
-
-        }
-
-
-        /* =========================================
-           HOME
-        ========================================= */
-
-        #homePage {
-
-            min-height: 100vh;
-
-        }
-
-
-        .hero {
-
-            background:
-                linear-gradient(
-                    135deg,
-                    #300014,
-                    #4b001f,
-                    #650028
-                );
-
-            color: white;
-
-            padding:
-                50px 25px 45px;
-
-            text-align: center;
-
-            border-bottom:
-                3px solid #d4af37;
-
-        }
-
-
-        .logo-mark {
-
-            width: 68px;
-
-            height: 68px;
-
-            margin:
-                0 auto 18px;
-
-            border:
-                2px solid #d4af37;
-
-            border-radius: 50%;
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: center;
-
-            color:
-                #d4af37;
-
-            font-size:
-                30px;
-
-            font-weight:
-                bold;
-
-        }
-
-
-        .hero h1 {
-
-            margin:
-                0;
-
-            font-family:
-                Georgia,
-                "Times New Roman",
-                serif;
-
-            font-size:
-                36px;
-
-            letter-spacing:
-                1px;
-
-        }
-
-
-        .hero p {
-
-            margin:
-                10px 0 0;
-
-            color:
-                #f3d77a;
-
-            font-size:
-                14px;
-
-            letter-spacing:
-                2px;
-
-            text-transform:
-                uppercase;
-
-        }
-
-
-        .hero-line {
-
-            width:
-                70px;
-
-            height:
-                2px;
-
-            background:
-                #d4af37;
-
-            margin:
-                22px auto 0;
-
-        }
-
-
-        .home-content {
-
-            max-width:
-                900px;
-
-            margin:
-                auto;
-
-            padding:
-                30px 18px 50px;
-
-        }
-
-
-        .welcome-card {
-
-            background:
-                white;
-
-            border:
-                1px solid #e5d7b0;
-
-            border-radius:
-                18px;
-
-            padding:
-                28px;
-
-            text-align:
-                center;
-
-            box-shadow:
-                0 10px 35px
-                rgba(75, 0, 31, 0.08);
-
-        }
-
-
-        .welcome-card h2 {
-
-            margin:
-                0 0 8px;
-
-            color:
-                #4b001f;
-
-            font-family:
-                Georgia,
-                "Times New Roman",
-                serif;
-
-            font-size:
-                27px;
-
-        }
-
-
-        .welcome-card p {
-
-            color:
-                #75666b;
-
-            margin:
-                0 0 25px;
-
-        }
-
-
-        .data-button {
-
-            width:
-                100%;
-
-            max-width:
-                450px;
-
-            padding:
-                18px;
-
-            border:
-                1px solid #d4af37;
-
-            border-radius:
-                12px;
-
-            background:
-                #4b001f;
-
-            color:
-                #f3d77a;
-
-            font-size:
-                17px;
-
-            font-weight:
-                bold;
-
-            cursor:
-                pointer;
-
-            transition:
-                0.2s;
-
-        }
-
-
-        .data-button:hover {
-
-            background:
-                #650028;
-
-            transform:
-                translateY(-2px);
-
-        }
-
-
-        /* =========================================
-           PAGES
-        ========================================= */
-
-        .page {
-
-            display:
-                none;
-
-            min-height:
-                100vh;
-
-            background:
-                #faf7f0;
-
-        }
-
-
-        .page.active {
-
-            display:
-                block;
-
-        }
-
-
-        /* =========================================
-           PAGE HEADER
-        ========================================= */
-
-        .page-header {
-
-            background:
-                #4b001f;
-
-            color:
-                white;
-
-            padding:
-                18px;
-
-            display:
-                flex;
-
-            align-items:
-                center;
-
-            gap:
-                14px;
-
-            border-bottom:
-                2px solid #d4af37;
-
-            position:
-                sticky;
-
-            top:
-                0;
-
-            z-index:
-                10;
-
-        }
-
-
-        .back-button {
-
-            width:
-                42px;
-
-            height:
-                42px;
-
-            border:
-                1px solid #d4af37;
-
-            border-radius:
-                10px;
-
-            background:
-                transparent;
-
-            color:
-                #f3d77a;
-
-            font-size:
-                25px;
-
-            cursor:
-                pointer;
-
-        }
-
-
-        .page-header-text {
-
-            flex:
-                1;
-
-        }
-
-
-        .page-header h1 {
-
-            margin:
-                0;
-
-            font-family:
-                Georgia,
-                "Times New Roman",
-                serif;
-
-            font-size:
-                24px;
-
-        }
-
-
-        .page-header p {
-
-            margin:
-                3px 0 0;
-
-            color:
-                #e9d99e;
-
-            font-size:
-                12px;
-
-        }
-
-
-        /* =========================================
-           ACCOUNTS
-        ========================================= */
-
-        .accounts-container {
-
-            max-width:
-                900px;
-
-            margin:
-                auto;
-
-            padding:
-                20px;
-
-        }
-
-
-        .search-box {
-
-            margin-bottom:
-                18px;
-
-        }
-
-
-        .search-box input {
-
-            width:
-                100%;
-
-            padding:
-                15px 17px;
-
-            border:
-                1px solid #d8c9a0;
-
-            border-radius:
-                12px;
-
-            background:
-                white;
-
-            font-size:
-                16px;
-
-            outline:
-                none;
-
-        }
-
-
-        .search-box input:focus {
-
-            border-color:
-                #b28b20;
-
-            box-shadow:
-                0 0 0 3px
-                rgba(212, 175, 55, 0.12);
-
-        }
-
-
-        #accountsList {
-
-            display:
-                flex;
-
-            flex-direction:
-                column;
-
-            gap:
-                10px;
-
-        }
-
-
-        .account {
-
-            width:
-                100%;
-
-            display:
-                flex;
-
-            align-items:
-                center;
-
-            gap:
-                15px;
-
-            padding:
-                16px;
-
-            border:
-                1px solid #e3d7ba;
-
-            border-radius:
-                14px;
-
-            background:
-                white;
-
-            cursor:
-                pointer;
-
-            text-align:
-                left;
-
-            transition:
-                0.2s;
-
-        }
-
-
-        .account:hover {
-
-            border-color:
-                #d4af37;
-
-            transform:
-                translateY(-1px);
-
-            box-shadow:
-                0 7px 20px
-                rgba(75, 0, 31, 0.08);
-
-        }
-
-
-        .avatar {
-
-            width:
-                48px;
-
-            height:
-                48px;
-
-            flex-shrink:
-                0;
-
-            border-radius:
-                50%;
-
-            background:
-                #4b001f;
-
-            color:
-                #f3d77a;
-
-            display:
-                flex;
-
-            align-items:
-                center;
-
-            justify-content:
-                center;
-
-            font-size:
-                20px;
-
-            font-weight:
-                bold;
-
-            border:
-                1px solid #d4af37;
-
-        }
-
-
-        .account-info {
-
-            flex:
-                1;
-
-            min-width:
-                0;
-
-        }
-
-
-        .account-name {
-
-            color:
-                #4b001f;
-
-            font-size:
-                17px;
-
-            font-weight:
-                bold;
-
-            margin-bottom:
-                4px;
-
-            overflow:
-                hidden;
-
-            text-overflow:
-                ellipsis;
-
-            white-space:
-                nowrap;
-
-        }
-
-
-        .account-phone {
-
-            color:
-                #817278;
-
-            font-size:
-                13px;
-
-        }
-
-
-        .account-arrow {
-
-            color:
-                #b28b20;
-
-            font-size:
-                28px;
-
-        }
-
-
-        /* =========================================
-           CUSTOMER PROFILE
-        ========================================= */
-
-        .profile {
-
-            max-width:
-                900px;
-
-            margin:
-                auto;
-
-            padding:
-                20px;
-
-        }
-
-
-        .profile-card {
-
-            background:
-                linear-gradient(
-                    135deg,
-                    #4b001f,
-                    #650028
-                );
-
-            border:
-                1px solid #d4af37;
-
-            border-radius:
-                18px;
-
-            padding:
-                25px;
-
-            display:
-                flex;
-
-            align-items:
-                center;
-
-            gap:
-                18px;
-
-            color:
-                white;
-
-            box-shadow:
-                0 12px 30px
-                rgba(75, 0, 31, 0.16);
-
-        }
-
-
-        .big-avatar {
-
-            width:
-                72px;
-
-            height:
-                72px;
-
-            flex-shrink:
-                0;
-
-            border:
-                2px solid #d4af37;
-
-            border-radius:
-                50%;
-
-            display:
-                flex;
-
-            align-items:
-                center;
-
-            justify-content:
-                center;
-
-            color:
-                #f3d77a;
-
-            font-size:
-                30px;
-
-            font-weight:
-                bold;
-
-        }
-
-
-        .profile-info {
-
-            min-width:
-                0;
-
-        }
-
-
-        .profile-name {
-
-            font-family:
-                Georgia,
-                "Times New Roman",
-                serif;
-
-            font-size:
-                27px;
-
-            margin-bottom:
-                7px;
-
-        }
-
-
-        .profile-phone {
-
-            color:
-                #eadca7;
-
-            font-size:
-                14px;
-
-        }
-
-
-        /* =========================================
-           STATISTICS
-        ========================================= */
-
-        .stats {
-
-            display:
-                grid;
-
-            grid-template-columns:
-                repeat(4, 1fr);
-
-            gap:
-                12px;
-
-            margin:
-                18px 0 30px;
-
-        }
-
-
-        .stat {
-
-            background:
-                white;
-
-            border:
-                1px solid #e3d7ba;
-
-            border-radius:
-                14px;
-
-            padding:
-                18px 12px;
-
-            text-align:
-                center;
-
-            box-shadow:
-                0 5px 18px
-                rgba(75, 0, 31, 0.05);
-
-        }
-
-
-        .stat-label {
-
-            color:
-                #89777e;
-
-            font-size:
-                10px;
-
-            font-weight:
-                bold;
-
-            letter-spacing:
-                1px;
-
-            margin-bottom:
-                9px;
-
-        }
-
-
-        .stat-value {
-
-            color:
-                #4b001f;
-
-            font-size:
-                21px;
-
-            font-weight:
-                bold;
-
-        }
-
-
-        /* =========================================
-           HISTORY
-        ========================================= */
-
-        .history-title {
-
-            color:
-                #4b001f;
-
-            font-family:
-                Georgia,
-                "Times New Roman",
-                serif;
-
-            font-size:
-                25px;
-
-            font-weight:
-                bold;
-
-            margin:
-                0 0 14px;
-
-        }
-
-
-        .purchase {
-
-            background:
-                white;
-
-            border:
-                1px solid #e3d7ba;
-
-            border-radius:
-                14px;
-
-            padding:
-                17px;
-
-            margin-bottom:
-                11px;
-
-            box-shadow:
-                0 5px 18px
-                rgba(75, 0, 31, 0.04);
-
-        }
-
-
-        .purchase-top {
-
-            display:
-                flex;
-
-            justify-content:
-                space-between;
-
-            align-items:
-                center;
-
-            gap:
-                10px;
-
-            margin-bottom:
-                12px;
-
-        }
-
-
-        .purchase-date {
-
-            color:
-                #88777c;
-
-            font-size:
-                12px;
-
-        }
-
-
-        .purchase-total {
-
-            color:
-                #4b001f;
-
-            font-size:
-                19px;
-
-            font-weight:
-                bold;
-
-            white-space:
-                nowrap;
-
-        }
-
-
-        .items {
-
-            padding:
-                11px 0;
-
-            border-top:
-                1px solid #eee5d3;
-
-            border-bottom:
-                1px solid #eee5d3;
-
-            color:
-                #44363b;
-
-            font-size:
-                14px;
-
-            line-height:
-                1.8;
-
-        }
-
-
-        .points {
-
-            margin-top:
-                10px;
-
-            color:
-                #a07b15;
-
-            font-size:
-                13px;
-
-            font-weight:
-                bold;
-
-        }
-
-
-        /* =========================================
-           STATES
-        ========================================= */
-
-        .loading,
-        .empty,
-        .error {
-
-            background:
-                white;
-
-            border:
-                1px solid #e3d7ba;
-
-            border-radius:
-                14px;
-
-            padding:
-                30px 20px;
-
-            text-align:
-                center;
-
-            color:
-                #776a70;
-
-        }
-
-
-        .error {
-
-            color:
-                #a00020;
-
-            border-color:
-                #e3a9b7;
-
-        }
-
-
-        /* =========================================
-           MOBILE
-        ========================================= */
-
-        @media (
-            max-width: 700px
-        ){
-
-            .hero {
-
-                padding:
-                    38px 20px 35px;
-
-            }
-
-
-            .hero h1 {
-
-                font-size:
-                    30px;
-
-            }
-
-
-            .stats {
-
-                grid-template-columns:
-                    repeat(2, 1fr);
-
-            }
-
-
-            .profile-card {
-
-                padding:
-                    20px;
-
-            }
-
-
-            .big-avatar {
-
-                width:
-                    60px;
-
-                height:
-                    60px;
-
-                font-size:
-                    25px;
-
-            }
-
-
-            .profile-name {
-
-                font-size:
-                    23px;
-
-            }
-
-        }
-
-
-        @media (
-            max-width: 420px
-        ){
-
-            .stats {
-
-                gap:
-                    8px;
-
-            }
-
-
-            .stat {
-
-                padding:
-                    15px 8px;
-
-            }
-
-
-            .stat-value {
-
-                font-size:
-                    18px;
-
-            }
-
-
-            .stat-label {
-
-                font-size:
-                    9px;
-
-            }
-
-        }
-
-    </style>
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Loyalty Admin</title>
+<style>
+*{box-sizing:border-box}
+body{
+    margin:0;
+    font-family:Arial,Helvetica,sans-serif;
+    background:#f3f3f3;
+    color:#171717;
+}
+.app{
+    max-width:600px;
+    min-height:100vh;
+    margin:auto;
+    background:#fff;
+}
+.header{
+    height:64px;
+    padding:0 20px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    border-bottom:1px solid #e7e7e7;
+    position:sticky;
+    top:0;
+    background:#fff;
+    z-index:10;
+}
+.logo{
+    font-size:21px;
+    font-weight:700;
+}
+.header small{
+    color:#777;
+}
+.home{
+    padding:24px 18px;
+}
+.hero{
+    padding:26px 20px;
+    border-radius:18px;
+    background:#fafafa;
+    border:1px solid #e8e8e8;
+    margin-bottom:20px;
+}
+.hero h1{
+    margin:0 0 8px;
+    font-size:28px;
+}
+.hero p{
+    margin:0;
+    color:#777;
+}
+.data-btn{
+    width:100%;
+    border:0;
+    border-radius:15px;
+    padding:17px;
+    font-size:16px;
+    font-weight:700;
+    cursor:pointer;
+    background:#111;
+    color:white;
+}
+.page{
+    display:none;
+}
+.page.active{
+    display:block;
+}
+.page-header{
+    height:64px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:0 16px;
+    border-bottom:1px solid #e7e7e7;
+    position:sticky;
+    top:0;
+    background:#fff;
+    z-index:10;
+}
+.back{
+    border:0;
+    background:transparent;
+    font-size:25px;
+    cursor:pointer;
+}
+.page-title{
+    font-size:20px;
+    font-weight:700;
+}
+.search{
+    padding:16px;
+    border-bottom:1px solid #eee;
+}
+.search input{
+    width:100%;
+    border:1px solid #ddd;
+    background:#f7f7f7;
+    border-radius:12px;
+    padding:13px 15px;
+    outline:none;
+    font-size:15px;
+}
+.accounts{
+    padding:8px 0 30px;
+}
+.account{
+    width:100%;
+    text-align:left;
+    border:0;
+    border-bottom:1px solid #eee;
+    background:#fff;
+    padding:16px;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    gap:13px;
+}
+.account:hover{
+    background:#fafafa;
+}
+.avatar{
+    width:45px;
+    height:45px;
+    border-radius:50%;
+    background:#e9e9e9;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:700;
+    font-size:18px;
+    flex:none;
+}
+.account-info{
+    min-width:0;
+}
+.account-name{
+    font-weight:700;
+    margin-bottom:4px;
+}
+.account-phone{
+    color:#777;
+    font-size:13px;
+}
+.account-actions{
+    margin-left:auto;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    flex:none;
+}
+.whatsapp-btn{
+    border:0;
+    border-radius:9px;
+    padding:8px 10px;
+    background:#25D366;
+    color:white;
+    font-size:12px;
+    font-weight:700;
+    cursor:pointer;
+}
+.whatsapp-btn:hover{
+    opacity:.9;
+}
+.empty{
+    padding:45px 20px;
+    text-align:center;
+    color:#777;
+}
+.profile{
+    padding:20px 16px;
+}
+.profile-card{
+    border:1px solid #e7e7e7;
+    border-radius:18px;
+    padding:20px;
+    display:flex;
+    align-items:center;
+    gap:15px;
+}
+.big-avatar{
+    width:62px;
+    height:62px;
+    border-radius:50%;
+    background:#111;
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:24px;
+    font-weight:700;
+}
+.profile-name{
+    font-size:21px;
+    font-weight:700;
+}
+.profile-phone{
+    color:#777;
+    margin-top:5px;
+}
+.stats{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:10px;
+    margin-top:12px;
+}
+.stat{
+    border:1px solid #e7e7e7;
+    border-radius:14px;
+    padding:15px;
+}
+.stat-label{
+    font-size:12px;
+    color:#777;
+    margin-bottom:7px;
+}
+.stat-value{
+    font-size:19px;
+    font-weight:700;
+}
+.history-title{
+    font-size:18px;
+    font-weight:700;
+    margin:28px 0 12px;
+}
+.purchase{
+    border-bottom:1px solid #eee;
+    padding:17px 2px;
+}
+.purchase-top{
+    display:flex;
+    justify-content:space-between;
+    gap:10px;
+}
+.purchase-date{
+    font-size:13px;
+    color:#777;
+}
+.purchase-total{
+    font-weight:700;
+}
+.items{
+    margin-top:10px;
+    line-height:1.55;
+    font-size:14px;
+}
+.points{
+    margin-top:10px;
+    font-size:13px;
+    font-weight:700;
+}
+.loading{
+    padding:35px;
+    text-align:center;
+    color:#777;
+}
+.error{
+    margin:16px;
+    padding:14px;
+    border-radius:12px;
+    background:#fff0f0;
+    color:#a00000;
+    font-size:14px;
+}
+@media(min-width:601px){
+    body{padding:20px 0}
+    .app{border-radius:18px;overflow:hidden;box-shadow:0 5px 30px #00000012}
+}
+</style>
 </head>
-
-
 <body>
-
 
 <div class="app">
 
-
-    <!-- =================================================
-         HOME PAGE
-    ================================================== -->
-
+    <!-- HOME -->
     <section id="homePage">
+        <header class="header">
+            <div class="logo">Loyalty</div>
+            <small>Admin</small>
+        </header>
 
-
-        <div class="hero">
-
-
-            <div class="logo-mark">
-
-                ★
-
+        <main class="home">
+            <div class="hero">
+                <h1>Customer Loyalty</h1>
+                <p>Manage customer accounts, purchases and loyalty points.</p>
             </div>
 
-
-            <h1>
-
-                Loyalty Admin
-
-            </h1>
-
-
-            <p>
-
-                Customer Loyalty
-
-            </p>
-
-
-            <div class="hero-line"></div>
-
-
-        </div>
-
-
-        <div class="home-content">
-
-
-            <div class="welcome-card">
-
-
-                <h2>
-
-                    Customer Loyalty
-
-                </h2>
-
-
-                <p>
-
-                    Manage customer accounts,
-                    purchases and loyalty points.
-
-                </p>
-
-
-                <button
-                    class="data-button"
-                    onclick="openAccounts()"
-                >
-
-                    VIEW CUSTOMER ACCOUNTS
-
-                </button>
-
-
-            </div>
-
-
-        </div>
-
-
-    </section>
-
-
-
-    <!-- =================================================
-         ACCOUNTS PAGE
-    ================================================== -->
-
-    <section
-        id="accountsPage"
-        class="page"
-    >
-
-
-        <div class="page-header">
-
-
-            <button
-                class="back-button"
-                onclick="showPage('homePage')"
-            >
-
-                ‹
-
+            <button class="data-btn" onclick="openAccounts()">
+                DATAS
             </button>
-
-
-            <div class="page-header-text">
-
-
-                <h1>
-
-                    Customer Accounts
-
-                </h1>
-
-
-                <p>
-
-                    Loyalty customer database
-
-                </p>
-
-
-            </div>
-
-
-        </div>
-
-
-        <div class="accounts-container">
-
-
-            <div class="search-box">
-
-
-                <input
-                    type="text"
-                    id="searchInput"
-                    placeholder="Search by name or phone..."
-                    oninput="filterAccounts()"
-                >
-
-
-            </div>
-
-
-            <div id="accountsList">
-
-
-                <div class="loading">
-
-                    Loading accounts...
-
-                </div>
-
-
-            </div>
-
-
-        </div>
-
-
+        </main>
     </section>
 
+    <!-- ACCOUNTS -->
+    <section id="accountsPage" class="page">
+        <header class="page-header">
+            <button class="back" onclick="showPage('homePage')">‹</button>
+            <div class="page-title">Loyalty Accounts</div>
+        </header>
 
-
-    <!-- =================================================
-         CUSTOMER PAGE
-    ================================================== -->
-
-    <section
-        id="customerPage"
-        class="page"
-    >
-
-
-        <div class="page-header">
-
-
-            <button
-                class="back-button"
-                onclick="openAccounts()"
-            >
-
-                ‹
-
-            </button>
-
-
-            <div class="page-header-text">
-
-
-                <h1>
-
-                    Customer Profile
-
-                </h1>
-
-
-                <p>
-
-                    Loyalty account details
-
-                </p>
-
-
-            </div>
-
-
+        <div class="search">
+            <input id="searchInput" type="text"
+                   placeholder="Search name or phone..."
+                   oninput="filterAccounts()">
         </div>
 
-
-        <div id="customerContent">
-
-
-            <div class="loading">
-
-                Loading customer...
-
-            </div>
-
-
+        <div id="accountsList" class="accounts">
+            <div class="loading">Loading accounts...</div>
         </div>
-
-
     </section>
 
+    <!-- CUSTOMER -->
+    <section id="customerPage" class="page">
+        <header class="page-header">
+            <button class="back" onclick="showPage('accountsPage')">‹</button>
+            <div class="page-title">Customer</div>
+        </header>
+
+        <div id="customerContent"></div>
+    </section>
 
 </div>
 
-
-
-<!-- =====================================================
-     JAVASCRIPT
-====================================================== -->
+<!-- Supabase -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js?v=4"></script>
 
 <script>
+/*
+    Uses the same Supabase connection as the billing page.
 
+    Tables:
+    loyalty_customers
+    loyalty_transactions
+*/
 
-/* =========================================================
-   SUPABASE CHECK
-========================================================= */
-
-if (
-    typeof supabaseClient === "undefined"
-    ||
-    !supabaseClient
-) {
-
-    console.error(
-        "Supabase client is not available. Check supabase.js."
-    );
-
+if (typeof supabaseClient === "undefined" || !supabaseClient) {
+    console.error("Supabase client is not available. Check supabase.js.");
 }
-
-
-/* =========================================================
-   GLOBAL CUSTOMER DATA
-========================================================= */
 
 let allCustomers = [];
 
+function showPage(id){
+    document.querySelectorAll(".app > section").forEach(section=>{
+        section.classList.remove("active");
+    });
 
-/* =========================================================
-   PAGE NAVIGATION
-========================================================= */
+    const page = document.getElementById(id);
 
-function showPage(id) {
-
-
-    document
-        .querySelectorAll(".app > section")
-        .forEach(section => {
-
-            section.style.display = "none";
-
-            section.classList.remove(
-                "active"
-            );
-
-        });
-
-
-    const page =
-        document.getElementById(id);
-
-
-    if (!page) {
-
-        return;
-
+    if(id === "homePage"){
+        page.style.display = "block";
+    }else{
+        page.classList.add("active");
     }
-
-
-    page.style.display = "block";
-
-
-    if (id !== "homePage") {
-
-        page.classList.add(
-            "active"
-        );
-
-    }
-
 }
 
-
-/* =========================================================
-   OPEN ACCOUNTS
-========================================================= */
-
-function openAccounts() {
-
-
-    showPage(
-        "accountsPage"
-    );
-
-
+function openAccounts(){
+    showPage("accountsPage");
     loadCustomers();
-
 }
 
+async function loadCustomers(){
 
-/* =========================================================
-   LOAD CUSTOMERS
-========================================================= */
+    const list = document.getElementById("accountsList");
 
-async function loadCustomers() {
-
-
-    const list =
-        document.getElementById(
-            "accountsList"
-        );
-
-
-    if (
-        typeof supabaseClient === "undefined"
-        ||
-        !supabaseClient
-    ) {
-
+    if(!supabaseClient){
         list.innerHTML = `
-
             <div class="error">
-
-                Supabase is not connected.
-
-                <br><br>
-
-                Please check supabase.js.
-
-            </div>
-
-        `;
-
+                Supabase is not connected yet.<br><br>
+                Open this file and enter your Supabase URL and anon key
+                in the two variables near the bottom.
+            </div>`;
         return;
-
     }
 
+    list.innerHTML = `<div class="loading">Loading accounts...</div>`;
 
-    list.innerHTML = `
+    const { data, error } = await supabaseClient
+        .from("loyalty_customers")
+        .select("*")
+        .order("name", { ascending:true });
 
-        <div class="loading">
+    if(error){
+        list.innerHTML = `
+            <div class="error">
+                Could not load loyalty accounts.<br><br>
+                ${escapeHtml(error.message)}
+            </div>`;
+        return;
+    }
 
-            Loading accounts...
+    allCustomers = data || [];
 
-        </div>
+    /*
+        Load purchase transactions once and attach them to each customer.
+        This keeps the account list fast while making the WhatsApp point
+        message use the customer's current purchase history.
+    */
+    const customerIds = allCustomers.map(customer => customer.id);
 
-    `;
+    if(customerIds.length){
 
+        const {
+            data: transactions,
+            error: transactionError
+        } = await supabaseClient
+            .from("loyalty_transactions")
+            .select("customer_id, amount, type, created_at")
+            .in("customer_id", customerIds)
+            .eq("type", "purchase");
 
-    const {
-        data,
-        error
-    } =
-        await supabaseClient
-
-            .from(
-                "loyalty_customers"
-            )
-
-            .select("*")
-
-            .order(
-                "name",
-                {
-                    ascending: true
-                }
+        if(transactionError){
+            console.error(
+                "Could not load loyalty transactions:",
+                transactionError
             );
+        }else{
 
+            const purchasesByCustomer = {};
 
-    if (error) {
+            (transactions || []).forEach(transaction => {
 
+                if(!purchasesByCustomer[transaction.customer_id]){
+                    purchasesByCustomer[transaction.customer_id] = [];
+                }
 
-        console.error(
-            "Customer loading error:",
-            error
-        );
+                purchasesByCustomer[transaction.customer_id].push(transaction);
+            });
 
-
-        list.innerHTML = `
-
-            <div class="error">
-
-                Could not load customer accounts.
-
-                <br><br>
-
-                ${escapeHtml(
-                    error.message
-                )}
-
-            </div>
-
-        `;
-
-        return;
-
+            allCustomers.forEach(customer => {
+                customer._loyaltyPurchases =
+                    purchasesByCustomer[customer.id] || [];
+            });
+        }
     }
 
+    renderCustomers(allCustomers);
+}
 
-    allCustomers =
-        data || [];
+function renderCustomers(customers){
 
+    const list = document.getElementById("accountsList");
 
-    renderCustomers(
-        allCustomers
-    );
+    if(!customers.length){
+        list.innerHTML = `<div class="empty">No loyalty accounts found.</div>`;
+        return;
+    }
 
+    list.innerHTML = customers.map(customer => {
+
+        const name = customer.name || "Unnamed Customer";
+        const phone = customer.phone || "No phone";
+
+        const points = getCurrentLoyaltyPoints(customer);
+
+        return `
+            <button class="account"
+                onclick="openCustomer('${escapeAttr(customer.id)}')">
+
+                <div class="avatar">
+                    ${escapeHtml(name.charAt(0).toUpperCase())}
+                </div>
+
+                <div class="account-info">
+                    <div class="account-name">
+                        ${escapeHtml(name)}
+                    </div>
+
+                    <div class="account-phone">
+                        ${escapeHtml(phone)}
+                    </div>
+                </div>
+
+                <div class="account-actions">
+                    ${
+                        customer.phone
+                        ? `<button
+                                class="whatsapp-btn"
+                                type="button"
+                                onclick="event.stopPropagation(); sendLoyaltyWhatsApp('${escapeAttr(customer.phone)}','${escapeAttr(name)}',${points})"
+                           >
+                                WhatsApp
+                           </button>`
+                        : ""
+                    }
+                </div>
+
+            </button>
+        `;
+    }).join("");
+}
+
+function getCurrentLoyaltyPoints(customer){
+
+    /*
+        Loyalty rule:
+        ₹50 spent = 1 point.
+
+        The transaction history is the source of truth, so this
+        does not depend on an old/stale points value in the customer row.
+    */
+
+    if(
+        customer &&
+        Array.isArray(customer._loyaltyPurchases)
+    ){
+        return customer._loyaltyPurchases.reduce(
+            (total, purchase) => {
+                const amount = Number(purchase.amount || 0);
+                return total + Math.floor(amount / 50);
+            },
+            0
+        );
+    }
+
+    return Number(customer.points || 0);
 }
 
 
-/* =========================================================
-   RENDER CUSTOMER LIST
-========================================================= */
+function sendLoyaltyWhatsApp(phone, name, points){
 
-function renderCustomers(
-    customers
-) {
+    let number =
+        String(phone || "").replace(/\\D/g, "");
 
-
-    const list =
-        document.getElementById(
-            "accountsList"
-        );
-
-
-    if (!customers.length) {
-
-
-        list.innerHTML = `
-
-            <div class="empty">
-
-                No loyalty accounts found.
-
-            </div>
-
-        `;
-
-        return;
-
+    if(number.startsWith("00")){
+        number = number.substring(2);
     }
 
+    if(number.length === 10){
+        number = "91" + number;
+    }
 
-    list.innerHTML =
+    const message =
+        `Hi ${name}! 🎉 You currently have ${points} loyalty points with Chaatarra. Thank you for being our valued customer! ❤️`;
 
-        customers
-            .map(customer => {
+    const url =
+        "https://wa.me/" +
+        number +
+        "?text=" +
+        encodeURIComponent(message);
 
-
-                const name =
-                    customer.name
-                    ||
-                    "Unnamed Customer";
-
-
-                const phone =
-                    customer.phone
-                    ||
-                    "No phone number";
-
-
-                return `
-
-                    <button
-                        class="account"
-                        onclick="
-                            openCustomer(
-                                '${escapeAttr(customer.id)}'
-                            )
-                        "
-                    >
-
-
-                        <div class="avatar">
-
-                            ${escapeHtml(
-                                name
-                                    .charAt(0)
-                                    .toUpperCase()
-                            )}
-
-                        </div>
-
-
-                        <div class="account-info">
-
-
-                            <div class="account-name">
-
-                                ${escapeHtml(
-                                    name
-                                )}
-
-                            </div>
-
-
-                            <div class="account-phone">
-
-                                ${escapeHtml(
-                                    phone
-                                )}
-
-                            </div>
-
-
-                        </div>
-
-
-                        <div class="account-arrow">
-
-                            ›
-
-                        </div>
-
-
-                    </button>
-
-                `;
-
-
-            })
-            .join("");
-
+    window.open(url, "_blank");
 }
 
 
-/* =========================================================
-   SEARCH
-========================================================= */
-
-function filterAccounts() {
-
-
-    const input =
-        document.getElementById(
-            "searchInput"
-        );
-
+function filterAccounts(){
 
     const query =
-        input
-            .value
-            .trim()
-            .toLowerCase();
+        document.getElementById("searchInput").value
+        .trim()
+        .toLowerCase();
 
+    const filtered = allCustomers.filter(customer => {
 
-    const filtered =
-        allCustomers.filter(
-            customer => {
+        const name = String(customer.name || "").toLowerCase();
+        const phone = String(customer.phone || "").toLowerCase();
 
+        return name.includes(query) || phone.includes(query);
+    });
 
-                const name =
-                    String(
-                        customer.name
-                        ||
-                        ""
-                    )
-                    .toLowerCase();
-
-
-                const phone =
-                    String(
-                        customer.phone
-                        ||
-                        ""
-                    )
-                    .toLowerCase();
-
-
-                return (
-
-                    name.includes(
-                        query
-                    )
-
-                    ||
-
-                    phone.includes(
-                        query
-                    )
-
-                );
-
-            }
-        );
-
-
-    renderCustomers(
-        filtered
-    );
-
+    renderCustomers(filtered);
 }
 
+async function openCustomer(id){
 
-/* =========================================================
-   OPEN CUSTOMER
-========================================================= */
+    showPage("customerPage");
 
-async function openCustomer(
-    id
-) {
+    const content = document.getElementById("customerContent");
+    content.innerHTML = `<div class="loading">Loading customer...</div>`;
 
+    const customer = allCustomers.find(c => String(c.id) === String(id));
 
-    showPage(
-        "customerPage"
-    );
-
-
-    const content =
-        document.getElementById(
-            "customerContent"
-        );
-
-
-    content.innerHTML = `
-
-        <div class="profile">
-
-            <div class="loading">
-
-                Loading customer...
-
-            </div>
-
-        </div>
-
-    `;
-
-
-    const customer =
-        allCustomers.find(
-            c =>
-                String(c.id)
-                ===
-                String(id)
-        );
-
-
-    if (!customer) {
-
-
-        content.innerHTML = `
-
-            <div class="profile">
-
-                <div class="error">
-
-                    Customer not found.
-
-                </div>
-
-            </div>
-
-        `;
-
+    if(!customer){
+        content.innerHTML = `<div class="error">Customer not found.</div>`;
         return;
-
     }
 
+    const { data: purchases, error } = await supabaseClient
+        .from("loyalty_transactions")
+        .select("*")
+        .eq("customer_id", customer.id)
+        .order("created_at", { ascending:false });
 
-    /* =====================================================
-       LOAD ALL PURCHASES
-    ===================================================== */
-
-    const {
-        data: purchases,
-        error
-    } =
-        await supabaseClient
-
-            .from(
-                "loyalty_transactions"
-            )
-
-            .select("*")
-
-            .eq(
-                "customer_id",
-                customer.id
-            )
-
-            .eq(
-                "type",
-                "purchase"
-            )
-
-            .order(
-                "created_at",
-                {
-                    ascending: false
-                }
-            );
-
-
-    if (error) {
-
-
-        console.error(
-            "Purchase history error:",
-            error
-        );
-
-
+    if(error){
         content.innerHTML = `
-
-            <div class="profile">
-
-                <div class="error">
-
-                    Could not load purchase history.
-
-                    <br><br>
-
-                    ${escapeHtml(
-                        error.message
-                    )}
-
-                </div>
-
-            </div>
-
-        `;
-
+            <div class="error">
+                Could not load purchase history.<br><br>
+                ${escapeHtml(error.message)}
+            </div>`;
         return;
-
     }
 
+    const name = customer.name || "Unnamed Customer";
+    const phone = customer.phone || "No phone";
 
-    const history =
-        purchases || [];
-
-
-    /* =====================================================
-       CALCULATE LOYALTY VALUES FROM TRANSACTIONS
-
-       ₹50 = 1 point
-       1 purchase = 1 visit
-       Lifetime spend = sum of purchases
-    ===================================================== */
-
-    let lifetimeSpend = 0;
-
-    let totalPoints = 0;
-
-    let visits = 0;
-
-
-    history.forEach(
-        purchase => {
-
-
-            const amount =
-                Number(
-                    purchase.amount
-                    ||
-                    0
-                );
-
-
-            lifetimeSpend +=
-                amount;
-
-
-            totalPoints +=
-                Math.floor(
-                    amount / 50
-                );
-
-
-            visits++;
-
-
-        }
-    );
-
-
-    const name =
-        customer.name
-        ||
-        "Unnamed Customer";
-
-
-    const phone =
-        customer.phone
-        ||
-        "No phone number";
-
-
-    /* =====================================================
-       DISPLAY CUSTOMER
-    ===================================================== */
+    const history = purchases || [];
 
     content.innerHTML = `
-
-        <div class="profile">
-
-
-            <!-- CUSTOMER -->
+        <main class="profile">
 
             <div class="profile-card">
-
-
                 <div class="big-avatar">
-
-                    ${escapeHtml(
-                        name
-                            .charAt(0)
-                            .toUpperCase()
-                    )}
-
+                    ${escapeHtml(name.charAt(0).toUpperCase())}
                 </div>
 
-
-                <div class="profile-info">
-
-
+                <div>
                     <div class="profile-name">
-
-                        ${escapeHtml(
-                            name
-                        )}
-
+                        ${escapeHtml(name)}
                     </div>
-
 
                     <div class="profile-phone">
-
-                        ${escapeHtml(
-                            phone
-                        )}
-
+                        ${escapeHtml(phone)}
                     </div>
-
-
                 </div>
-
-
             </div>
-
-
-
-            <!-- STATISTICS -->
 
             <div class="stats">
 
-
                 <div class="stat">
-
-
-                    <div class="stat-label">
-
-                        LOYALTY POINTS
-
-                    </div>
-
-
+                    <div class="stat-label">LOYALTY POINTS</div>
                     <div class="stat-value">
-
-                        ⭐ ${totalPoints}
-
+                        ⭐ ${Number(customer.points || 0)}
                     </div>
-
-
                 </div>
 
-
-
                 <div class="stat">
-
-
-                    <div class="stat-label">
-
-                        VISITS
-
-                    </div>
-
-
+                    <div class="stat-label">VISITS</div>
                     <div class="stat-value">
-
-                        ${visits}
-
+                        ${Number(customer.visit_count || 0)}
                     </div>
-
-
                 </div>
 
-
-
                 <div class="stat">
-
-
-                    <div class="stat-label">
-
-                        LIFETIME SPEND
-
-                    </div>
-
-
+                    <div class="stat-label">LIFETIME SPEND</div>
                     <div class="stat-value">
-
-                        ₹${lifetimeSpend.toFixed(2)}
-
+                        ₹${Number(customer.lifetime_spend || 0).toFixed(2)}
                     </div>
-
-
                 </div>
 
-
-
                 <div class="stat">
-
-
-                    <div class="stat-label">
-
-                        PURCHASES
-
-                    </div>
-
-
+                    <div class="stat-label">PURCHASES</div>
                     <div class="stat-value">
-
                         ${history.length}
-
                     </div>
-
-
                 </div>
-
 
             </div>
-
-
-
-            <!-- PURCHASE HISTORY -->
 
             <div class="history-title">
-
                 Purchase History
-
             </div>
-
 
             <div>
-
-
                 ${
-                    history.length > 0
-
-                    ?
-
-                    history
-                        .map(
-                            renderPurchase
-                        )
-                        .join("")
-
-                    :
-
-                    `
-
-                        <div class="empty">
-
-                            No purchase history.
-
-                        </div>
-
-                    `
-
+                    history.length
+                    ? history.map(renderPurchase).join("")
+                    : `<div class="empty">No purchase history.</div>`
                 }
-
-
             </div>
 
-
-        </div>
-
+        </main>
     `;
-
 }
 
+function renderPurchase(purchase){
 
-/* =========================================================
-   PURCHASE CARD
-========================================================= */
+    const date = new Date(purchase.created_at);
 
-function renderPurchase(
-    purchase
-) {
+    const dateText = date.toLocaleDateString("en-IN", {
+        day:"2-digit",
+        month:"short",
+        year:"numeric"
+    });
 
-
-    const date =
-        new Date(
-            purchase.created_at
-        );
-
-
-    const dateText =
-        date.toLocaleDateString(
-            "en-IN",
-            {
-                day: "2-digit",
-                month: "short",
-                year: "numeric"
-            }
-        );
-
-
-    const timeText =
-        date.toLocaleTimeString(
-            "en-IN",
-            {
-                hour: "2-digit",
-                minute: "2-digit"
-            }
-        );
-
-
-    const amount =
-        Number(
-            purchase.amount
-            ||
-            0
-        );
-
-
-    const points =
-        Math.floor(
-            amount / 50
-        );
-
+    const timeText = date.toLocaleTimeString("en-IN", {
+        hour:"2-digit",
+        minute:"2-digit"
+    });
 
     return `
-
         <div class="purchase">
-
 
             <div class="purchase-top">
 
-
                 <div class="purchase-date">
-
-                    ${dateText}
-
-                    •
-
-                    ${timeText}
-
+                    ${dateText} • ${timeText}
                 </div>
-
 
                 <div class="purchase-total">
-
-                    ₹${amount.toFixed(2)}
-
+                    ₹${Number(purchase.amount || 0).toFixed(2)}
                 </div>
 
-
             </div>
-
 
             <div class="items">
-
-                ${formatDescription(
-                    purchase.description
-                )}
-
+                ${formatDescription(purchase.description)}
             </div>
-
 
             <div class="points">
-
-                +${points} points
-
+                ${
+                    Number(purchase.points || 0) >= 0
+                    ? `+${Number(purchase.points || 0)} points`
+                    : `${Number(purchase.points || 0)} points`
+                }
             </div>
 
-
         </div>
-
     `;
-
 }
 
+function formatDescription(description){
 
-/* =========================================================
-   FORMAT PURCHASE DESCRIPTION
-========================================================= */
+    if(!description) return "Purchase";
 
-function formatDescription(
-    description
-) {
+    try{
+        const parsed = JSON.parse(description);
 
+        if(Array.isArray(parsed)){
+            return parsed.map(item => {
+                if(typeof item === "string"){
+                    return escapeHtml(item);
+                }
 
-    if (!description) {
+                const name = item.name || item.item || "Item";
+                const qty = item.quantity || item.qty || 1;
 
-        return "Purchase";
-
-    }
-
-
-    try {
-
-
-        const parsed =
-            JSON.parse(
-                description
-            );
-
-
-        if (
-            Array.isArray(parsed)
-        ) {
-
-
-            return parsed
-                .map(item => {
-
-
-                    if (
-                        typeof item
-                        ===
-                        "string"
-                    ) {
-
-                        return escapeHtml(
-                            item
-                        );
-
-                    }
-
-
-                    const itemName =
-                        item.name
-                        ||
-                        item.item
-                        ||
-                        "Item";
-
-
-                    const quantity =
-                        item.quantity
-                        ||
-                        item.qty
-                        ||
-                        1;
-
-
-                    return `
-
-                        ${escapeHtml(
-                            itemName
-                        )}
-
-                        ×
-
-                        ${escapeHtml(
-                            quantity
-                        )}
-
-                    `;
-
-
-                })
-                .join(
-                    "<br>"
-                );
-
+                return `${escapeHtml(name)} × ${escapeHtml(qty)}`;
+            }).join("<br>");
         }
+    }catch(e){}
 
-
-    } catch (error) {
-
-
-        console.warn(
-            "Could not parse purchase description:",
-            error
-        );
-
-
-    }
-
-
-    return escapeHtml(
-        String(
-            description
-        )
-    )
-    .replace(
-        /\n/g,
-        "<br>"
-    );
-
+    return escapeHtml(String(description)).replace(/\n/g,"<br>");
 }
 
-
-/* =========================================================
-   ESCAPE HTML
-========================================================= */
-
-function escapeHtml(
-    value
-) {
-
-
+function escapeHtml(value){
     return String(value)
-
-        .replace(
-            /&/g,
-            "&amp;"
-        )
-
-        .replace(
-            /</g,
-            "&lt;"
-        )
-
-        .replace(
-            />/g,
-            "&gt;"
-        )
-
-        .replace(
-            /"/g,
-            "&quot;"
-        )
-
-        .replace(
-            /'/g,
-            "&#039;"
-        );
-
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
 }
 
-
-/* =========================================================
-   ESCAPE ATTRIBUTE
-========================================================= */
-
-function escapeAttr(
-    value
-) {
-
-
-    return escapeHtml(
-        value
-    )
-    .replace(
-        /`/g,
-        "&#096;"
-    );
-
+function escapeAttr(value){
+    return escapeHtml(value).replace(/`/g,"&#096;");
 }
 
-
-/* =========================================================
-   START
-========================================================= */
-
-showPage(
-    "homePage"
-);
-
+showPage("homePage");
 </script>
 
-
 </body>
-
 </html>
