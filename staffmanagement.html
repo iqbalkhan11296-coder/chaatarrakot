@@ -213,6 +213,21 @@ nav{
     </form>
   </div>
 </div>
+<div id="paymentBackdrop" class="modal-backdrop">
+  <div class="modal">
+    <div class="modal-head"><h2>Salary Paid</h2><button class="close" id="closePayment">×</button></div>
+    <form id="paymentForm">
+      <input type="hidden" id="paymentStaffId">
+      <div class="form-grid">
+        <div class="field"><label>Salary Month</label><input id="paymentMonth" type="month" required></div>
+        <div class="field"><label>Amount Paid *</label><input id="paymentAmount" type="number" min="0" step="0.01" required placeholder="Enter amount paid"></div>
+        <div class="field"><label>Payment Date</label><input id="paymentDate" type="date" required></div>
+        <div class="field full"><label>Note</label><textarea id="paymentNote" rows="3" placeholder="Optional note"></textarea></div>
+      </div>
+      <div class="modal-actions"><button type="button" class="secondary" id="cancelPayment">Cancel</button><button class="primary" type="submit">Save Salary Paid</button></div>
+    </form>
+  </div>
+</div>
 <div id="toast" class="toast"></div>
 
 <script>
@@ -224,6 +239,9 @@ let staff = [];
 let attendance = {};
 let attendanceMonth = new Date().toISOString().slice(0,7);
 let accountMonth = new Date().toISOString().slice(0,7);
+let payments = {};
+let paymentsLoadedFor = '';
+let attendanceLoadedFor = '';
 
 const $ = id => document.getElementById(id);
 const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
@@ -259,6 +277,7 @@ async function loadAttendance(){
   if(error){ console.error(error); return; }
   attendance={};
   (data||[]).forEach(r=>attendance[`${r.staff_id}_${r.attendance_date}`]=r.status);
+  attendanceLoadedFor=attendanceMonth;
   renderAttendance();
   if($('accountView').classList.contains('active')) renderAccount();
 }
@@ -391,7 +410,57 @@ $('attendanceArea').addEventListener('click',async e=>{
 });
 
 $('accountStaff').onchange=renderAccount;
-function renderAccount(){
+
+async function loadAccountData(){
+  if(!sb) return;
+  // Load the selected account's month attendance if it differs from the main attendance month.
+  if(attendanceLoadedFor!==accountMonth){
+    const [y,m]=accountMonth.split('-').map(Number);
+    const start=`${accountMonth}-01`, end=`${accountMonth}-${String(new Date(y,m,0).getDate()).padStart(2,'0')}`;
+    const {data,error}=await sb.from('staff_attendance').select('*').gte('attendance_date',start).lte('attendance_date',end);
+    if(error){console.error(error);return;}
+    attendance={};
+    (data||[]).forEach(r=>attendance[`${r.staff_id}_${r.attendance_date}`]=r.status);
+    attendanceLoadedFor=accountMonth;
+  }
+  const {data,error}=await sb.from('salary_payments').select('*').eq('salary_month',accountMonth);
+  if(error){console.error(error);toast('Could not load salary payments.');return;}
+  payments={};
+  (data||[]).forEach(r=>{
+    payments[r.staff_id]=(payments[r.staff_id]||0)+Number(r.amount_paid||0);
+  });
+}
+
+function openPayment(staffId){
+  $('paymentStaffId').value=staffId;
+  $('paymentMonth').value=accountMonth;
+  $('paymentDate').value=new Date().toISOString().slice(0,10);
+  $('paymentAmount').value='';
+  $('paymentNote').value='';
+  $('paymentBackdrop').classList.add('show');
+  setTimeout(()=>$('paymentAmount').focus(),50);
+}
+function closePayment(){ $('paymentBackdrop').classList.remove('show'); }
+$('closePayment').onclick=closePayment;
+$('cancelPayment').onclick=closePayment;
+$('paymentForm').onsubmit=async e=>{
+  e.preventDefault();
+  const staffId=$('paymentStaffId').value;
+  const amount=Number($('paymentAmount').value);
+  const month=$('paymentMonth').value;
+  const date=$('paymentDate').value;
+  if(!staffId||!month||!date||!Number.isFinite(amount)||amount<0){toast('Enter a valid payment amount.');return;}
+  const {error}=await sb.from('salary_payments').insert({staff_id:staffId,salary_month:month,amount_paid:amount,paid_date:date,note:$('paymentNote').value.trim()||null});
+  if(error){console.error(error);toast('Could not save salary payment.');return;}
+  closePayment();
+  accountMonth=month;
+  await loadAccountData();
+  renderAccount();
+  toast('Salary payment saved.');
+};
+
+async function renderAccount(){
+  await loadAccountData();
   const id=$('accountStaff').value,s=staff.find(x=>x.id===id);
   if(!s){$('accountArea').innerHTML='<div class="card empty">Add staff to create staff accounts.</div>';return;}
   const days=daysInMonth(accountMonth);
@@ -424,12 +493,15 @@ function renderAccount(){
           <div class="stat"><small>Half Day</small><strong>${counts.half}</strong></div>
         </div>
         <div class="salary-box"><div><small>Calculated Salary</small><div style="margin-top:5px">Present + ½ Half Days</div></div><strong>${money(salary)}</strong></div>
+        <div class="salary-box" style="margin-top:10px;background:#fffaf0;border-color:#e7d39a"><div><small>Salary Paid</small><div style="margin-top:5px">Amount entered manually</div></div><strong>${money(payments[s.id]||0)}</strong></div>
+        <div style="display:flex;justify-content:flex-end;margin:12px 0;gap:10px"><button class="primary" id="salaryPaidBtn" type="button">💰 Salary Paid</button></div>
         <div class="card account-calendar"><div style="max-height:430px;overflow:auto">${rows}</div></div>
       </div>
     </div>`;
-  $('accPrev').onclick=()=>{accountMonth=shiftMonth(accountMonth,-1);renderAccount();};
-  $('accNext').onclick=()=>{accountMonth=shiftMonth(accountMonth,1);renderAccount();};
-  $('accMonth').onchange=e=>{accountMonth=e.target.value;renderAccount();};
+  $('salaryPaidBtn').onclick=()=>openPayment(s.id);
+  $('accPrev').onclick=async()=>{accountMonth=shiftMonth(accountMonth,-1);await renderAccount();};
+  $('accNext').onclick=async()=>{accountMonth=shiftMonth(accountMonth,1);await renderAccount();};
+  $('accMonth').onchange=async e=>{accountMonth=e.target.value;await renderAccount();};
 }
 
 document.querySelectorAll('.navbtn').forEach(b=>b.onclick=()=>setView(b.dataset.view));
