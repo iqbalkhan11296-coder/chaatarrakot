@@ -124,6 +124,14 @@ nav{
 }
 .salary-box small{color:#ead7dd}.salary-box strong{font:700 28px Georgia,serif;color:var(--gold2)}
 .account-calendar{margin-top:16px}
+
+.salary-actions{display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap;margin:12px 0}
+.payment-details{margin-top:16px}
+.payment-table{width:100%;border-collapse:collapse;font-size:13px}
+.payment-table th,.payment-table td{padding:11px 10px;border-bottom:1px solid var(--line);text-align:left}
+.payment-table th{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.05em}
+.payment-total{display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding:14px 16px;background:#fff8e7;border:1px solid #ead39a;border-radius:12px}
+.payment-total strong{font-size:20px;color:var(--burgundy)}
 .modal-backdrop{position:fixed;inset:0;background:rgba(32,10,20,.52);display:none;align-items:center;justify-content:center;padding:20px;z-index:20}
 .modal-backdrop.show{display:flex}
 .modal{width:min(650px,100%);background:var(--paper);border-radius:20px;box-shadow:0 25px 70px rgba(0,0,0,.25);padding:24px}
@@ -220,12 +228,21 @@ nav{
       <input type="hidden" id="paymentStaffId">
       <div class="form-grid">
         <div class="field"><label>Salary Month</label><input id="paymentMonth" type="month" required></div>
+        <div class="field"><label>From Date *</label><input id="paymentFromDate" type="date" required></div>
+        <div class="field"><label>To Date *</label><input id="paymentToDate" type="date" required></div>
+        <div class="field"><label>Salary Paid Date *</label><input id="paymentDate" type="date" required></div>
         <div class="field"><label>Amount Paid *</label><input id="paymentAmount" type="number" min="0" step="0.01" required placeholder="Enter amount paid"></div>
-        <div class="field"><label>Payment Date</label><input id="paymentDate" type="date" required></div>
         <div class="field full"><label>Note</label><textarea id="paymentNote" rows="3" placeholder="Optional note"></textarea></div>
       </div>
       <div class="modal-actions"><button type="button" class="secondary" id="cancelPayment">Cancel</button><button class="primary" type="submit">Save Salary Paid</button></div>
     </form>
+  </div>
+</div>
+<div id="paymentDetailsBackdrop" class="modal-backdrop">
+  <div class="modal" style="width:min(900px,100%)">
+    <div class="modal-head"><h2>Salary Payment Details</h2><button class="close" id="closePaymentDetails">×</button></div>
+    <div id="paymentDetailsArea"></div>
+    <div class="modal-actions"><button type="button" class="secondary" id="cancelPaymentDetails">Close</button></div>
   </div>
 </div>
 <div id="toast" class="toast"></div>
@@ -423,17 +440,22 @@ async function loadAccountData(){
     (data||[]).forEach(r=>attendance[`${r.staff_id}_${r.attendance_date}`]=r.status);
     attendanceLoadedFor=accountMonth;
   }
-  const {data,error}=await sb.from('salary_payments').select('*').eq('salary_month',accountMonth);
+  const {data,error}=await sb.from('salary_payments').select('*').eq('salary_month',accountMonth).order('paid_date',{ascending:false}).order('created_at',{ascending:false});
   if(error){console.error(error);toast('Could not load salary payments.');return;}
   payments={};
   (data||[]).forEach(r=>{
-    payments[r.staff_id]=(payments[r.staff_id]||0)+Number(r.amount_paid||0);
+    if(!payments[r.staff_id]) payments[r.staff_id]=[];
+    payments[r.staff_id].push(r);
   });
 }
 
 function openPayment(staffId){
   $('paymentStaffId').value=staffId;
   $('paymentMonth').value=accountMonth;
+  const first=`${accountMonth}-01`;
+  const last=`${accountMonth}-${String(daysInMonth(accountMonth)).padStart(2,'0')}`;
+  $('paymentFromDate').value=first;
+  $('paymentToDate').value=last;
   $('paymentDate').value=new Date().toISOString().slice(0,10);
   $('paymentAmount').value='';
   $('paymentNote').value='';
@@ -448,16 +470,117 @@ $('paymentForm').onsubmit=async e=>{
   const staffId=$('paymentStaffId').value;
   const amount=Number($('paymentAmount').value);
   const month=$('paymentMonth').value;
-  const date=$('paymentDate').value;
-  if(!staffId||!month||!date||!Number.isFinite(amount)||amount<0){toast('Enter a valid payment amount.');return;}
-  const {error}=await sb.from('salary_payments').insert({staff_id:staffId,salary_month:month,amount_paid:amount,paid_date:date,note:$('paymentNote').value.trim()||null});
-  if(error){console.error(error);toast('Could not save salary payment.');return;}
+  const fromDate=$('paymentFromDate').value;
+  const toDate=$('paymentToDate').value;
+  const paidDate=$('paymentDate').value;
+  if(!staffId||!month||!fromDate||!toDate||!paidDate||toDate<fromDate||!Number.isFinite(amount)||amount<0){
+    toast('Enter valid payment dates and amount.');
+    return;
+  }
+  const {error}=await sb.from('salary_payments').insert({
+    staff_id:staffId,
+    salary_month:month,
+    amount_paid:amount,
+    paid_date:paidDate,
+    from_date:fromDate,
+    to_date:toDate,
+    note:$('paymentNote').value.trim()||null
+  });
+  if(error){console.error(error);toast('Could not save salary payment. Check the salary_payments table columns.');return;}
   closePayment();
   accountMonth=month;
   await loadAccountData();
   renderAccount();
   toast('Salary payment saved.');
 };
+
+function closePaymentDetails(){ $('paymentDetailsBackdrop').classList.remove('show'); }
+$('closePaymentDetails').onclick=closePaymentDetails;
+$('cancelPaymentDetails').onclick=closePaymentDetails;
+
+function formatDate(value){
+  if(!value) return '—';
+  const d=new Date(`${value}T00:00:00`);
+  return d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+}
+
+function printSalarySlip(staffId,paymentId){
+  const s=staff.find(x=>x.id===staffId);
+  const list=payments[staffId]||[];
+  const p=list.find(x=>x.id===paymentId);
+  if(!s||!p) return;
+
+  const win=window.open('','_blank','width=800,height=900');
+  if(!win){toast('Please allow pop-ups to print the salary slip.');return;}
+
+  const salaryText=money(p.amount_paid);
+  win.document.write(`<!doctype html><html><head><title>Salary Slip - ${esc(s.name)}</title>
+  <style>
+    *{box-sizing:border-box}body{font-family:Arial,sans-serif;margin:0;padding:35px;color:#222}
+    .slip{max-width:720px;margin:auto;border:1px solid #ddd;padding:34px}
+    .head{text-align:center;border-bottom:3px solid #4b001f;padding-bottom:18px;margin-bottom:24px}
+    h1{margin:0;color:#4b001f;font-family:Georgia,serif;font-size:28px}
+    .tag{margin-top:6px;color:#777}.title{text-align:center;font-size:20px;font-weight:bold;margin:20px 0;color:#4b001f}
+    table{width:100%;border-collapse:collapse;margin-top:12px}td{padding:11px 8px;border-bottom:1px solid #eee}
+    td:first-child{font-weight:bold;width:42%;color:#555}
+    .amount{margin-top:24px;background:#4b001f;color:white;padding:20px;text-align:center}
+    .amount small{display:block;color:#ead7dd}.amount strong{font-size:30px;color:#f0d36b}
+    .sign{display:flex;justify-content:space-between;margin-top:70px}.sign div{border-top:1px solid #777;width:38%;text-align:center;padding-top:8px;font-size:12px}
+    @media print{body{padding:0}.slip{border:0}}
+  </style></head><body>
+  <div class="slip">
+    <div class="head"><h1>CHAATARRA</h1><div class="tag">The House of Chaats</div></div>
+    <div class="title">SALARY PAYMENT SLIP</div>
+    <table>
+      <tr><td>Staff Name</td><td>${esc(s.name)}</td></tr>
+      <tr><td>Role</td><td>${esc(s.role||'Staff')}</td></tr>
+      <tr><td>Daily Wage</td><td>${money(s.daily_wage)}</td></tr>
+      <tr><td>Salary Period</td><td>${formatDate(p.from_date)} to ${formatDate(p.to_date)}</td></tr>
+      <tr><td>Salary Month</td><td>${fmtMonth(p.salary_month)}</td></tr>
+      <tr><td>Salary Paid Date</td><td>${formatDate(p.paid_date)}</td></tr>
+      <tr><td>Note</td><td>${esc(p.note||'—')}</td></tr>
+    </table>
+    <div class="amount"><small>AMOUNT PAID</small><strong>${salaryText}</strong></div>
+    <div class="sign"><div>Staff Signature</div><div>Authorized Signature</div></div>
+  </div>
+  <script>window.onload=()=>{window.print();};<\/script>
+  </body></html>`);
+  win.document.close();
+}
+
+function showPaymentDetails(staffId){
+  const s=staff.find(x=>x.id===staffId);
+  if(!s) return;
+  const list=payments[staffId]||[];
+  const total=list.reduce((sum,p)=>sum+Number(p.amount_paid||0),0);
+  const rows=list.length?list.map((p,i)=>`
+    <tr>
+      <td>${i+1}</td>
+      <td>${formatDate(p.from_date)}</td>
+      <td>${formatDate(p.to_date)}</td>
+      <td>${formatDate(p.paid_date)}</td>
+      <td><b>${money(p.amount_paid)}</b></td>
+      <td>${esc(p.note||'—')}</td>
+      <td><button class="smallbtn account printPayment" data-payment-id="${p.id}">🖨 Print Slip</button></td>
+    </tr>`).join(''):`<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:28px">No salary payments recorded for ${fmtMonth(accountMonth)}.</td></tr>`;
+
+  $('paymentDetailsArea').innerHTML=`
+    <div style="margin-bottom:16px">
+      <h3 style="margin:0;color:var(--burgundy);font:700 21px Georgia,serif">${esc(s.name)}</h3>
+      <div class="role">${esc(s.role||'Staff')} · ${fmtMonth(accountMonth)}</div>
+    </div>
+    <div class="card" style="padding:0;overflow:auto">
+      <table class="payment-table">
+        <thead><tr><th>#</th><th>From</th><th>To</th><th>Paid Date</th><th>Amount</th><th>Note</th><th>Slip</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+    <div class="payment-total"><span>Total Paid This Month</span><strong>${money(total)}</strong></div>`;
+  $('paymentDetailsBackdrop').classList.add('show');
+  document.querySelectorAll('.printPayment').forEach(btn=>{
+    btn.onclick=()=>printSalarySlip(staffId,btn.dataset.paymentId);
+  });
+}
 
 async function renderAccount(){
   await loadAccountData();
@@ -493,12 +616,16 @@ async function renderAccount(){
           <div class="stat"><small>Half Day</small><strong>${counts.half}</strong></div>
         </div>
         <div class="salary-box"><div><small>Calculated Salary</small><div style="margin-top:5px">Present + ½ Half Days</div></div><strong>${money(salary)}</strong></div>
-        <div class="salary-box" style="margin-top:10px;background:#fffaf0;border-color:#e7d39a"><div><small>Salary Paid</small><div style="margin-top:5px">Amount entered manually</div></div><strong>${money(payments[s.id]||0)}</strong></div>
-        <div style="display:flex;justify-content:flex-end;margin:12px 0;gap:10px"><button class="primary" id="salaryPaidBtn" type="button">💰 Salary Paid</button></div>
+        <div class="salary-box" style="margin-top:10px;background:#fffaf0;border-color:#e7d39a"><div><small>Salary Paid</small><div style="margin-top:5px">Amount entered manually</div></div><strong>${money((payments[s.id]||[]).reduce((sum,p)=>sum+Number(p.amount_paid||0),0))}</strong></div>
+        <div class="salary-actions">
+          <button class="secondary" id="paymentDetailsBtn" type="button">📋 Salary Payment Details</button>
+          <button class="primary" id="salaryPaidBtn" type="button">💰 Salary Paid</button>
+        </div>
         <div class="card account-calendar"><div style="max-height:430px;overflow:auto">${rows}</div></div>
       </div>
     </div>`;
   $('salaryPaidBtn').onclick=()=>openPayment(s.id);
+  $('paymentDetailsBtn').onclick=()=>showPaymentDetails(s.id);
   $('accPrev').onclick=async()=>{accountMonth=shiftMonth(accountMonth,-1);await renderAccount();};
   $('accNext').onclick=async()=>{accountMonth=shiftMonth(accountMonth,1);await renderAccount();};
   $('accMonth').onchange=async e=>{accountMonth=e.target.value;await renderAccount();};
