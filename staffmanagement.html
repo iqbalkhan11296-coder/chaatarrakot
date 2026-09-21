@@ -26,20 +26,20 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:14px 12p
 <body>
 <header>
   <div class="brand"><h1>Staff Management</h1><p>Attendance • Daily Wage • Salary</p></div>
-  <button class="primary" onclick="showStaff()">＋ Staff Management</button>
+  <button class="primary">＋ Staff Management</button>
 </header>
 
 <main>
   <div class="tabs">
-    <button id="tabAttendance" class="tab active" onclick="showAttendance()">Attendance</button>
-    <button id="tabStaff" class="tab" onclick="showStaff()">Staff Management</button>
-    <button id="tabSalary" class="tab" onclick="showSalary()">Salary Summary</button>
+    <button id="tabAttendance" class="tab active">Attendance</button>
+    <button id="tabStaff" class="tab">Staff Management</button>
+    <button id="tabSalary" class="tab">Salary Summary</button>
   </div>
 
   <section id="attendanceView">
     <div class="card toolbar">
       <div><div class="date">Daily Attendance</div><div style="color:var(--muted);margin-top:4px">Mark every staff member for the selected date.</div></div>
-      <input id="attendanceDate" type="date" onchange="renderAttendance()">
+      <input id="attendanceDate" type="date">
     </div>
     <div class="stats">
       <div class="stat"><small>Total Staff</small><strong id="total">0</strong></div>
@@ -74,56 +74,345 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:14px 12p
   </section>
 
   <section id="salaryView" class="hidden">
-    <div class="card toolbar"><div><div class="date">Salary Summary</div><div style="color:var(--muted)">Salary is calculated from attendance × daily wage. Half Day = 50%.</div></div><input id="salaryMonth" type="month" onchange="renderSalary()"></div>
+    <div class="card toolbar"><div><div class="date">Salary Summary</div><div style="color:var(--muted)">Salary is calculated from attendance × daily wage. Half Day = 50%.</div></div><input id="salaryMonth" type="month"></div>
     <div class="card tablewrap"><table><thead><tr><th>Staff</th><th>Daily Wage</th><th>Present</th><th>Half Day</th><th>Absent</th><th>Leave</th><th>Payable</th></tr></thead><tbody id="salaryBody"></tbody></table></div>
   </section>
 </main>
 
 <script>
-let staff=JSON.parse(localStorage.getItem('staff_manager_data')||'[]');
-let attendance=JSON.parse(localStorage.getItem('staff_manager_attendance')||'{}');
-let editing=null;
-const today=new Date(); const iso=d=>d.toISOString().slice(0,10);
-document.getElementById('attendanceDate').value=iso(today);
-document.getElementById('salaryMonth').value=iso(today).slice(0,7);
+document.addEventListener('DOMContentLoaded', function () {
+  let staff = JSON.parse(localStorage.getItem('staff_manager_data') || '[]');
+  let attendance = JSON.parse(localStorage.getItem('staff_manager_attendance') || '{}');
+  let editing = null;
 
-function save(){localStorage.setItem('staff_manager_data',JSON.stringify(staff));localStorage.setItem('staff_manager_attendance',JSON.stringify(attendance))}
-function activeStaff(){return staff.filter(s=>s.status==='active')}
-function statusFor(id,date){return attendance[date+'_'+id]||'absent'}
-function setAttendance(id,date,val){attendance[date+'_'+id]=val;save();renderAttendance()}
-function renderAttendance(){
- const date=document.getElementById('attendanceDate').value; const list=activeStaff();
- let counts={present:0,absent:0,half:0,leave:0}; list.forEach(s=>counts[statusFor(s.id,date)]++);
- total.textContent=list.length;present.textContent=counts.present;absent.textContent=counts.absent;other.textContent=counts.half+counts.leave;
- attendanceBody.innerHTML=list.length?list.map(s=>`<tr><td><div class="staffname">${esc(s.name)}</div></td><td><span class="role">${esc(s.role||'—')}</span></td><td>₹${num(s.wage)}</td><td><div class="att">${[['present','Present'],['half','Half Day'],['absent','Absent'],['leave','Leave']].map(x=>`<button class="${statusFor(s.id,date)===x[0]?'sel':''}" onclick="setAttendance('${s.id}','${date}','${x[0]}')">${x[1]}</button>`).join('')}</div></td></tr>`).join(''):'<tr><td colspan="4" class="empty">No staff added yet. Open Staff Management to add staff.</td></tr>';
-}
-function showAttendance(){view('attendanceView','tabAttendance');renderAttendance()}
-function showStaff(){view('staffView','tabStaff');renderStaff()}
-function showSalary(){view('salaryView','tabSalary');renderSalary()}
-function view(v,t){['attendanceView','staffView','salaryView'].forEach(x=>document.getElementById(x).classList.toggle('hidden',x!==v));['tabAttendance','tabStaff','tabSalary'].forEach(x=>document.getElementById(x).classList.toggle('active',x===t))}
-function newStaff(){editing=null;formTitle.textContent='Add Staff';formCard.classList.remove('hidden');['name','phone','role','wage','joining','notes'].forEach(x=>document.getElementById(x).value='');status.value='active'}
-function editStaff(id){let s=staff.find(x=>x.id===id);editing=id;formTitle.textContent='Edit Staff';formCard.classList.remove('hidden');name.value=s.name;phone.value=s.phone||'';role.value=s.role||'';wage.value=s.wage||'';joining.value=s.joining||'';status.value=s.status||'active';notes.value=s.notes||''}
-function closeForm(){formCard.classList.add('hidden')}
-function saveStaff(){
- if(!name.value.trim()||!wage.value){alert('Please enter the staff name and daily wage.');return}
- let data={name:name.value.trim(),phone:phone.value.trim(),role:role.value.trim(),wage:Number(wage.value),joining:joining.value,status:status.value,notes:notes.value.trim()};
- if(editing){let i=staff.findIndex(s=>s.id===editing);staff[i]={...staff[i],...data}}else staff.push({id:Date.now().toString(),...data});
- save();closeForm();renderStaff();renderAttendance();renderSalary();
-}
-function deactivate(id){let s=staff.find(x=>x.id===id);if(confirm('Deactivate '+s.name+'?')){s.status='inactive';save();renderStaff();renderAttendance();renderSalary()}}
-function renderStaff(){staffBody.innerHTML=staff.length?staff.map(s=>`<tr><td class="staffname">${esc(s.name)}</td><td>${esc(s.role||'—')}</td><td>${esc(s.phone||'—')}</td><td>₹${num(s.wage)}</td><td><span class="badge ${s.status==='active'?'present':'absent'}">${s.status}</span></td><td><button class="edit" onclick="editStaff('${s.id}')">Edit</button> ${s.status==='active'?`<button class="danger" onclick="deactivate('${s.id}')">Deactivate</button>`:''}</td></tr>`).join(''):'<tr><td colspan="6" class="empty">No staff members yet.</td></tr>'}
-function renderSalary(){
- let month=salaryMonth.value, list=activeStaff();
- salaryBody.innerHTML=list.length?list.map(s=>{let c={present:0,half:0,absent:0,leave:0};let days=new Date(new Date(month+'-01').getFullYear(),new Date(month+'-01').getMonth()+1,0).getDate();for(let d=1;d<=days;d++){let dt=month+'-'+String(d).padStart(2,'0');let v=statusFor(s.id,dt);c[v]++}let pay=(c.present+c.half*.5)*Number(s.wage);return `<tr><td class="staffname">${esc(s.name)}<div class="role">${esc(s.role||'')}</div></td><td>₹${num(s.wage)}</td><td>${c.present}</td><td>${c.half}</td><td>${c.absent}</td><td>${c.leave}</td><td><strong>₹${num(pay)}</strong></td></tr>`}).join(''):'<tr><td colspan="7" class="empty">No active staff.</td></tr>'
-}
-function num(n){return Number(n||0).toLocaleString('en-IN')}
-function esc(x){return String(x??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
-document.getElementById('addStaffBtn').addEventListener('click', newStaff);
-document.getElementById('saveStaffBtn').addEventListener('click', saveStaff);
-document.getElementById('cancelStaffBtn').addEventListener('click', closeForm);
-document.getElementById('attendanceDate').addEventListener('change', renderAttendance);
-document.getElementById('salaryMonth').addEventListener('change', renderSalary);
-renderAttendance();renderStaff();renderSalary();
+  const $ = id => document.getElementById(id);
+  const today = new Date();
+  const iso = d => {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  };
+
+  $('attendanceDate').value = iso(today);
+  $('salaryMonth').value = iso(today).slice(0, 7);
+
+  function saveData() {
+    try {
+      localStorage.setItem('staff_manager_data', JSON.stringify(staff));
+      localStorage.setItem('staff_manager_attendance', JSON.stringify(attendance));
+      return true;
+    } catch (error) {
+      alert('The browser could not save the staff information. Please make sure this page is allowed to use local storage.');
+      console.error(error);
+      return false;
+    }
+  }
+
+  function activeStaff() {
+    return staff.filter(s => s.status === 'active');
+  }
+
+  function statusFor(id, date) {
+    return attendance[date + '_' + id] || 'absent';
+  }
+
+  function setAttendance(id, date, value) {
+    attendance[date + '_' + id] = value;
+    saveData();
+    renderAttendance();
+  }
+
+  function renderAttendance() {
+    const date = $('attendanceDate').value;
+    const list = activeStaff();
+    const counts = { present: 0, absent: 0, half: 0, leave: 0 };
+
+    list.forEach(s => counts[statusFor(s.id, date)]++);
+
+    $('total').textContent = list.length;
+    $('present').textContent = counts.present;
+    $('absent').textContent = counts.absent;
+    $('other').textContent = counts.half + counts.leave;
+
+    $('attendanceBody').innerHTML = list.length
+      ? list.map(s => `
+        <tr>
+          <td><div class="staffname">${esc(s.name)}</div></td>
+          <td><span class="role">${esc(s.role || '—')}</span></td>
+          <td>₹${num(s.wage)}</td>
+          <td>
+            <div class="att">
+              ${[
+                ['present', 'Present'],
+                ['half', 'Half Day'],
+                ['absent', 'Absent'],
+                ['leave', 'Leave']
+              ].map(x => `
+                <button type="button"
+                  class="${statusFor(s.id, date) === x[0] ? 'sel' : ''}"
+                  data-action="attendance"
+                  data-id="${escAttr(s.id)}"
+                  data-value="${x[0]}"
+                  data-date="${date}">
+                  ${x[1]}
+                </button>
+              `).join('')}
+            </div>
+          </td>
+        </tr>
+      `).join('')
+      : '<tr><td colspan="4" class="empty">No staff added yet. Open Staff Management to add staff.</td></tr>';
+  }
+
+  function showAttendance() {
+    view('attendanceView', 'tabAttendance');
+    renderAttendance();
+  }
+
+  function showStaff() {
+    view('staffView', 'tabStaff');
+    renderStaff();
+  }
+
+  function showSalary() {
+    view('salaryView', 'tabSalary');
+    renderSalary();
+  }
+
+  function view(viewId, tabId) {
+    ['attendanceView', 'staffView', 'salaryView'].forEach(id =>
+      $(id).classList.toggle('hidden', id !== viewId)
+    );
+    ['tabAttendance', 'tabStaff', 'tabSalary'].forEach(id =>
+      $(id).classList.toggle('active', id === tabId)
+    );
+  }
+
+  function newStaff() {
+    editing = null;
+    $('formTitle').textContent = 'Add Staff';
+    $('formCard').classList.remove('hidden');
+
+    $('name').value = '';
+    $('phone').value = '';
+    $('role').value = '';
+    $('wage').value = '';
+    $('joining').value = '';
+    $('status').value = 'active';
+    $('notes').value = '';
+
+    $('name').focus();
+  }
+
+  function editStaff(id) {
+    const s = staff.find(x => String(x.id) === String(id));
+    if (!s) return;
+
+    editing = String(id);
+    $('formTitle').textContent = 'Edit Staff';
+    $('formCard').classList.remove('hidden');
+
+    $('name').value = s.name || '';
+    $('phone').value = s.phone || '';
+    $('role').value = s.role || '';
+    $('wage').value = s.wage ?? '';
+    $('joining').value = s.joining || '';
+    $('status').value = s.status || 'active';
+    $('notes').value = s.notes || '';
+
+    $('name').focus();
+  }
+
+  function closeForm() {
+    $('formCard').classList.add('hidden');
+    editing = null;
+  }
+
+  function saveStaff() {
+    const name = $('name').value.trim();
+    const wageText = $('wage').value.trim();
+
+    if (!name) {
+      alert('Please enter the staff name.');
+      $('name').focus();
+      return;
+    }
+
+    if (wageText === '' || Number(wageText) < 0 || !Number.isFinite(Number(wageText))) {
+      alert('Please enter a valid daily wage.');
+      $('wage').focus();
+      return;
+    }
+
+    const data = {
+      name: name,
+      phone: $('phone').value.trim(),
+      role: $('role').value.trim(),
+      wage: Number(wageText),
+      joining: $('joining').value,
+      status: $('status').value,
+      notes: $('notes').value.trim()
+    };
+
+    if (editing !== null) {
+      const index = staff.findIndex(s => String(s.id) === String(editing));
+      if (index === -1) {
+        alert('Staff member could not be found.');
+        return;
+      }
+      staff[index] = { ...staff[index], ...data };
+    } else {
+      staff.push({
+        id: String(Date.now()) + '_' + Math.random().toString(36).slice(2, 8),
+        ...data
+      });
+    }
+
+    if (!saveData()) return;
+
+    closeForm();
+    renderStaff();
+    renderAttendance();
+    renderSalary();
+
+    alert('Staff information saved successfully.');
+  }
+
+  function deactivate(id) {
+    const s = staff.find(x => String(x.id) === String(id));
+    if (!s) return;
+
+    if (confirm('Deactivate ' + s.name + '?')) {
+      s.status = 'inactive';
+      saveData();
+      renderStaff();
+      renderAttendance();
+      renderSalary();
+    }
+  }
+
+  function renderStaff() {
+    $('staffBody').innerHTML = staff.length
+      ? staff.map(s => `
+        <tr>
+          <td class="staffname">${esc(s.name)}</td>
+          <td>${esc(s.role || '—')}</td>
+          <td>${esc(s.phone || '—')}</td>
+          <td>₹${num(s.wage)}</td>
+          <td>
+            <span class="badge ${s.status === 'active' ? 'present' : 'absent'}">
+              ${esc(s.status)}
+            </span>
+          </td>
+          <td>
+            <button type="button" class="edit" data-action="edit" data-id="${escAttr(s.id)}">Edit</button>
+            ${s.status === 'active'
+              ? `<button type="button" class="danger" data-action="deactivate" data-id="${escAttr(s.id)}">Deactivate</button>`
+              : ''}
+          </td>
+        </tr>
+      `).join('')
+      : '<tr><td colspan="6" class="empty">No staff members yet.</td></tr>';
+  }
+
+  function renderSalary() {
+    const month = $('salaryMonth').value;
+    const list = activeStaff();
+
+    if (!month) {
+      $('salaryBody').innerHTML = '<tr><td colspan="7" class="empty">Select a month.</td></tr>';
+      return;
+    }
+
+    const first = new Date(month + '-01T00:00:00');
+    const year = first.getFullYear();
+    const monthIndex = first.getMonth();
+    const days = new Date(year, monthIndex + 1, 0).getDate();
+
+    $('salaryBody').innerHTML = list.length
+      ? list.map(s => {
+          const c = { present: 0, half: 0, absent: 0, leave: 0 };
+
+          for (let d = 1; d <= days; d++) {
+            const dt = `${month}-${String(d).padStart(2, '0')}`;
+            const v = statusFor(s.id, dt);
+            c[v]++;
+          }
+
+          const pay = (c.present + c.half * 0.5) * Number(s.wage);
+
+          return `
+            <tr>
+              <td class="staffname">
+                ${esc(s.name)}
+                <div class="role">${esc(s.role || '')}</div>
+              </td>
+              <td>₹${num(s.wage)}</td>
+              <td>${c.present}</td>
+              <td>${c.half}</td>
+              <td>${c.absent}</td>
+              <td>${c.leave}</td>
+              <td><strong>₹${num(pay)}</strong></td>
+            </tr>
+          `;
+        }).join('')
+      : '<tr><td colspan="7" class="empty">No active staff.</td></tr>';
+  }
+
+  function num(n) {
+    return Number(n || 0).toLocaleString('en-IN');
+  }
+
+  function esc(x) {
+    return String(x ?? '').replace(/[&<>"']/g, m => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#039;'
+    }[m]));
+  }
+
+  function escAttr(x) {
+    return esc(x);
+  }
+
+  // Main navigation buttons
+  $('addStaffBtn').addEventListener('click', newStaff);
+  $('saveStaffBtn').addEventListener('click', saveStaff);
+  $('cancelStaffBtn').addEventListener('click', closeForm);
+  $('attendanceDate').addEventListener('change', renderAttendance);
+  $('salaryMonth').addEventListener('change', renderSalary);
+
+  // Remove dependence on inline onclick handlers.
+  document.querySelector('header .primary').addEventListener('click', showStaff);
+  $('tabAttendance').addEventListener('click', showAttendance);
+  $('tabStaff').addEventListener('click', showStaff);
+  $('tabSalary').addEventListener('click', showSalary);
+
+  // One event handler for all dynamically-created table buttons.
+  document.addEventListener('click', function (event) {
+    const button = event.target.closest('button[data-action]');
+    if (!button) return;
+
+    const action = button.dataset.action;
+    const id = button.dataset.id;
+
+    if (action === 'attendance') {
+      setAttendance(id, button.dataset.date, button.dataset.value);
+    } else if (action === 'edit') {
+      editStaff(id);
+    } else if (action === 'deactivate') {
+      deactivate(id);
+    }
+  });
+
+  // Initial display
+  renderAttendance();
+  renderStaff();
+  renderSalary();
+});
 </script>
 </body>
 </html>
