@@ -332,8 +332,12 @@
             <input
                 type="tel"
                 id="customerPhone"
+                list="savedCustomerPhones"
                 placeholder="Customer Phone Number"
+                autocomplete="off"
             >
+
+            <datalist id="savedCustomerPhones"></datalist>
 
         </div>
 
@@ -697,6 +701,175 @@
 
     let lastOrder = null;
 
+    /*
+    ==========================================
+    SAVED CUSTOMER NUMBERS
+    ==========================================
+    */
+
+    let savedCustomers = [];
+
+
+    /*
+    ==========================================
+    LOAD SAVED CUSTOMER NUMBERS
+    ==========================================
+    */
+
+    async function loadSavedCustomers() {
+
+        try {
+
+            const { data, error } =
+                await supabaseClient
+                    .from("loyalty_customers")
+                    .select("phone, name")
+                    .not("phone", "is", null)
+                    .order("name", { ascending: true });
+
+            if (error) {
+
+                console.error(
+                    "Could not load saved customer numbers:",
+                    error
+                );
+
+                return;
+
+            }
+
+            savedCustomers = data || [];
+
+            const datalist =
+                document.getElementById(
+                    "savedCustomerPhones"
+                );
+
+            datalist.innerHTML = "";
+
+            savedCustomers.forEach(customer => {
+
+                if (!customer.phone) {
+                    return;
+                }
+
+                const option =
+                    document.createElement("option");
+
+                option.value =
+                    customer.phone;
+
+                if (customer.name) {
+
+                    option.label =
+                        customer.name;
+
+                }
+
+                datalist.appendChild(option);
+
+            });
+
+        } catch (error) {
+
+            console.error(
+                "Saved customer loading failed:",
+                error
+            );
+
+        }
+
+    }
+
+
+    /*
+    ==========================================
+    FIND SAVED CUSTOMER BY PHONE
+    ==========================================
+    */
+
+    function normalizePhone(phone) {
+
+        let digits =
+            String(phone || "")
+                .replace(/\D/g, "");
+
+        if (
+            digits.length === 12 &&
+            digits.startsWith("91")
+        ) {
+
+            digits =
+                digits.substring(2);
+
+        }
+
+        return digits;
+
+    }
+
+
+    function findSavedCustomer() {
+
+        const phoneInput =
+            document.getElementById(
+                "customerPhone"
+            );
+
+        const nameInput =
+            document.getElementById(
+                "customerName"
+            );
+
+        if (!phoneInput || !nameInput) {
+            return;
+        }
+
+        const phone =
+            normalizePhone(
+                phoneInput.value
+            );
+
+        if (!phone) {
+            return;
+        }
+
+        const customer =
+            savedCustomers.find(item => {
+
+                const savedPhone =
+                    normalizePhone(
+                        item.phone
+                    );
+
+                return savedPhone === phone;
+
+            });
+
+        if (customer && customer.name) {
+
+            nameInput.value =
+                customer.name;
+
+        }
+
+    }
+
+
+    document
+        .getElementById("customerPhone")
+        .addEventListener(
+            "input",
+            findSavedCustomer
+        );
+
+    document
+        .getElementById("customerPhone")
+        .addEventListener(
+            "change",
+            findSavedCustomer
+        );
+
 
     /*
     ==========================================
@@ -859,6 +1032,8 @@
     );
 
     createComboMenu();
+
+    loadSavedCustomers();
 
 
     /*
