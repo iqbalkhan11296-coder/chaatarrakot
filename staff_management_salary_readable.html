@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chaatarra Staff Management</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{
+  --burgundy:#4b001f;
+  --burgundy2:#650028;
+  --burgundy3:#82003a;
+  --gold:#d4af37;
+  --gold2:#f0d36b;
+  --cream:#fbf8f2;
+  --paper:#fffdf9;
+  --ink:#261c20;
+  --muted:#786c70;
+  --line:#eadfe2;
+  --green:#287a52;
+  --greenbg:#eaf6ef;
+  --red:#b43b45;
+  --redbg:#fbecee;
+  --yellow:#a06b12;
+  --yellowbg:#fff5dc;
+  --shadow:0 14px 35px rgba(75,0,31,.10);
+}
+*{box-sizing:border-box}
+body{
+  margin:0;background:linear-gradient(135deg,#f7f0e9,#fffdf9 48%,#f5edf0);
+  color:var(--ink);font-family:Inter,Segoe UI,Arial,sans-serif;min-height:100vh
+}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.app{max-width:1500px;margin:auto;padding:24px}
+header{
+  background:linear-gradient(110deg,var(--burgundy),var(--burgundy2));
+  color:white;border-radius:22px;padding:24px 28px;box-shadow:var(--shadow);
+  display:flex;align-items:center;justify-content:space-between;gap:20px
+}
+.brand{display:flex;align-items:center;gap:16px}
+.logo{
+  width:56px;height:56px;border:1px solid rgba(240,211,107,.55);border-radius:16px;
+  display:grid;place-items:center;color:var(--gold2);font-family:Georgia,serif;font-size:25px
+}
+.brand h1{margin:0;font:700 28px Georgia,serif;letter-spacing:.2px}
+.brand p{margin:5px 0 0;color:#ead7dd;font-size:13px;letter-spacing:1.5px;text-transform:uppercase}
+.header-right{text-align:right}
+.header-right strong{display:block;font-size:14px;color:var(--gold2)}
+.header-right span{font-size:12px;color:#ead7dd}
+nav{
+  margin:18px 0;display:flex;gap:10px;flex-wrap:wrap
+}
+.navbtn{
+  border:1px solid var(--line);background:white;color:var(--burgundy);padding:12px 18px;
+  border-radius:12px;font-weight:700;box-shadow:0 4px 12px rgba(75,0,31,.04)
+}
+.navbtn.active,.navbtn:hover{background:var(--burgundy);color:white;border-color:var(--burgundy)}
+.view{display:none}.view.active{display:block}
+.section-head{
+  display:flex;align-items:flex-end;justify-content:space-between;gap:18px;margin:10px 0 18px
+}
+.section-head h2{margin:0;font:700 28px Georgia,serif;color:var(--burgundy)}
+.section-head p{margin:6px 0 0;color:var(--muted);font-size:14px}
+.primary{
+  border:0;background:var(--burgundy);color:white;padding:13px 18px;border-radius:12px;font-weight:800
+}
+.primary:hover{background:var(--burgundy3)}
+.card{
+  background:rgba(255,253,249,.95);border:1px solid var(--line);border-radius:18px;
+  box-shadow:0 8px 25px rgba(75,0,31,.06);padding:20px
+}
+.staff-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px}
+.staff-card{position:relative}
+.staff-top{display:flex;gap:13px;align-items:center}
+.avatar{
+  width:48px;height:48px;border-radius:14px;background:var(--burgundy);color:var(--gold2);
+  display:grid;place-items:center;font:700 17px Georgia,serif
+}
+.staff-top h3{margin:0;font-size:17px}.role{margin-top:4px;color:var(--muted);font-size:13px}
+.staff-meta{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:18px 0}
+.meta{background:#faf5f2;border-radius:11px;padding:10px}.meta small{display:block;color:var(--muted);font-size:11px}.meta strong{font-size:14px}
+.actions{display:flex;gap:8px}.smallbtn{padding:9px 12px;border:1px solid var(--line);background:white;border-radius:9px;font-weight:700;color:var(--burgundy)}
+.smallbtn.danger{color:var(--red)}
+.empty{padding:50px;text-align:center;color:var(--muted)}
+.toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.field{display:flex;flex-direction:column;gap:7px}.field label{font-size:12px;color:var(--muted);font-weight:700}
+.field input,.field select,.field textarea{
+  border:1px solid #dacbd0;background:white;border-radius:10px;padding:11px 12px;outline:none
+}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--gold)}
+.month-control{display:flex;align-items:center;gap:8px}.month-control button{
+  width:40px;height:40px;border:1px solid var(--line);background:white;border-radius:10px;color:var(--burgundy);font-weight:900
+}
+.month-control input{height:40px}
+.att-summary{display:flex;gap:8px;flex-wrap:wrap}
+.pill{padding:8px 11px;border-radius:20px;font-size:12px;font-weight:800}
+.pill.p{background:var(--greenbg);color:var(--green)}.pill.a{background:var(--redbg);color:var(--red)}
+.pill.l{background:var(--yellowbg);color:var(--yellow)}.pill.h{background:#eee8fa;color:#67469a}
+.calendar-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:13px;margin-top:18px}
+.calendar{border-collapse:collapse;min-width:900px;width:100%;background:white}
+.calendar th,.calendar td{border-bottom:1px solid #eee5e7;border-right:1px solid #eee5e7;text-align:center}
+.calendar th{background:#f8f1ee;color:var(--burgundy);font-size:11px;padding:9px 5px;min-width:34px}
+.calendar th.staffcol{min-width:190px;text-align:left;padding-left:14px}
+.calendar td{height:43px;font-size:12px;font-weight:800}
+.calendar td.staffcol{text-align:left;padding:8px 14px;background:#fffdfa;position:sticky;left:0;z-index:2}
+.daynum{display:block;font-size:10px;color:var(--muted);font-weight:600;margin-bottom:2px}
+.cell-btn{width:100%;height:42px;border:0;background:white;font-size:12px;font-weight:900}
+.cell-btn.p{background:var(--greenbg);color:var(--green)}.cell-btn.a{background:var(--redbg);color:var(--red)}
+.cell-btn.l{background:var(--yellowbg);color:var(--yellow)}.cell-btn.h{background:#eee8fa;color:#67469a}
+.cell-btn:hover{filter:brightness(.96)}
+.calendar .weekend{background:#faf7f5}
+.legend{display:flex;gap:10px;flex-wrap:wrap;margin-top:13px;color:var(--muted);font-size:12px}
+.legend span{font-weight:800}
+.account-grid{display:grid;grid-template-columns:300px 1fr;gap:18px}
+.profile h2{font:700 24px Georgia,serif;color:var(--burgundy);margin:12px 0 4px}
+.profile .bigavatar{width:72px;height:72px;border-radius:20px;background:var(--burgundy);color:var(--gold2);display:grid;place-items:center;font:700 25px Georgia,serif}
+.profile .wage{font-size:20px;font-weight:900;margin-top:18px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+.stat{background:white;border:1px solid var(--line);border-radius:14px;padding:15px}.stat small{color:var(--muted);display:block}.stat strong{display:block;font-size:22px;margin-top:5px}
+.salary-box{
+  margin-top:16px;background:linear-gradient(120deg,var(--burgundy),var(--burgundy2));
+  color:white;border-radius:16px;padding:20px;display:flex;justify-content:space-between;align-items:center
+}
+.salary-box small{color:#ead7dd}.salary-box strong{font:700 28px Georgia,serif;color:var(--gold2)}
+.account-calendar{margin-top:16px}
+.modal-backdrop{position:fixed;inset:0;background:rgba(32,10,20,.52);display:none;align-items:center;justify-content:center;padding:20px;z-index:20}
+.modal-backdrop.show{display:flex}
+.modal{width:min(650px,100%);background:var(--paper);border-radius:20px;box-shadow:0 25px 70px rgba(0,0,0,.25);padding:24px}
+.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}.modal-head h2{margin:0;font:700 24px Georgia,serif;color:var(--burgundy)}
+.close{border:0;background:#f3e9eb;width:36px;height:36px;border-radius:50%;color:var(--burgundy);font-size:20px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.field.full{grid-column:1/-1}
+.modal-actions{display:flex;justify-content:flex-end;gap:9px;margin-top:20px}
+.secondary{border:1px solid var(--line);background:white;color:var(--burgundy);padding:12px 17px;border-radius:10px;font-weight:800}
+.status{font-size:11px;font-weight:900;padding:5px 8px;border-radius:10px}.status.active{background:var(--greenbg);color:var(--green)}.status.inactive{background:#eee;color:#777}
+.toast{position:fixed;right:22px;bottom:22px;background:var(--burgundy);color:white;padding:14px 18px;border-radius:12px;box-shadow:var(--shadow);display:none;z-index:30;font-weight:700}.toast.show{display:block}
+.loading{padding:30px;text-align:center;color:var(--muted)}
+@media(max-width:900px){
+  .app{padding:12px}.account-grid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}
+  header{padding:18px}.brand h1{font-size:23px}.header-right{display:none}
+}
+@media(max-width:600px){
+  .form-grid{grid-template-columns:1fr}.section-head{align-items:flex-start;flex-direction:column}
+}
+
+/* Readability improvements only */
+body{
+  font-family: Arial, Helvetica, sans-serif !important;
+  color:#222 !important;
+}
+h1,h2,h3,h4,h5,h6{
+  font-family: Arial, Helvetica, sans-serif !important;
+  color:#2b1820 !important;
+}
+label,.label,small,.role,.muted{
+  color:#444 !important;
+}
+.card,.staff-card,.salary-box,.panel{
+  color:#222 !important;
+}
+.salary-box small{
+  color:#333 !important;
+  font-weight:700 !important;
+  opacity:1 !important;
+}
+.salary-box strong{
+  color:#4b001f !important;
+  font-weight:800 !important;
+}
+table th{
+  color:#333 !important;
+  font-weight:700 !important;
+}
+table td{
+  color:#222 !important;
+}
+button{
+  font-family:Arial, Helvetica, sans-serif !important;
+  font-weight:600 !important;
+}
+input,select,textarea{
+  font-family:Arial, Helvetica, sans-serif !important;
+  color:#222 !important;
+}
+
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <div class="brand">
+    <div class="logo">C</div>
+    <div><h1>Staff Management</h1><p>Chaatarra · The House of Chaats</p></div>
+  </div>
+  <div class="header-right"><strong id="connectionText">Connecting to Supabase…</strong><span>Staff · Attendance · Salary</span></div>
+</header>
+
+<nav>
+  <button class="navbtn active" data-view="staffView">👥 Staff Management</button>
+  <button class="navbtn" data-view="attendanceView">📅 Attendance</button>
+  <button class="navbtn" data-view="accountView">👤 Staff Accounts</button>
+</nav>
+
+<section id="staffView" class="view active">
+  <div class="section-head">
+    <div><h2>Staff Management</h2><p>Add, edit and manage your staff members.</p></div>
+    <button class="primary" id="addStaff">＋ Add Staff</button>
+  </div>
+  <div id="staffList" class="staff-grid"><div class="loading">Loading staff…</div></div>
+</section>
+
+<section id="attendanceView" class="view">
+  <div class="section-head">
+    <div><h2>Monthly Attendance</h2><p>Each staff member is shown across the complete month.</p></div>
+    <div class="month-control">
+      <button id="prevMonth">‹</button>
+      <div class="field"><label>Month</label><input type="month" id="attendanceMonth"></div>
+      <button id="nextMonth">›</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="legend">
+      <span class="pill p">P = Present</span><span class="pill a">A = Absent</span><span class="pill l">L = Leave</span><span class="pill h">H = Half Day</span>
+      <span>Click any day to cycle: Present → Absent → Leave → Half Day → Present</span>
+    </div>
+    <div id="attendanceArea"><div class="loading">Loading attendance…</div></div>
+  </div>
+</section>
+
+<section id="accountView" class="view">
+  <div class="section-head">
+    <div><h2>Staff Accounts</h2><p>View each staff member's monthly attendance and salary.</p></div>
+    <div class="field"><label>Staff Member</label><select id="accountStaff"></select></div>
+  </div>
+  <div id="accountArea"><div class="loading">Select a staff member.</div></div>
+</section>
+</div>
+
+<div id="modalBackdrop" class="modal-backdrop">
+  <div class="modal">
+    <div class="modal-head"><h2 id="modalTitle">Add Staff</h2><button class="close" id="closeModal">×</button></div>
+    <form id="staffForm">
+      <input type="hidden" id="staffId">
+      <div class="form-grid">
+        <div class="field"><label>Staff Name *</label><input id="staffName" required></div>
+        <div class="field"><label>Phone</label><input id="staffPhone" inputmode="tel"></div>
+        <div class="field"><label>Role</label><input id="staffRole" placeholder="Kitchen Staff"></div>
+        <div class="field"><label>Daily Wage *</label><input id="staffWage" type="number" min="0" step="0.01" required></div>
+        <div class="field"><label>Joining Date</label><input id="staffJoining" type="date"></div>
+        <div class="field"><label>Status</label><select id="staffStatus"><option value="active">Active</option><option value="inactive">Inactive</option></select></div>
+        <div class="field full"><label>Notes</label><textarea id="staffNotes" rows="3"></textarea></div>
+      </div>
+      <div class="modal-actions"><button type="button" class="secondary" id="cancelModal">Cancel</button><button class="primary" type="submit">Save Staff</button></div>
+    </form>
+  </div>
+</div>
+<div id="paymentBackdrop" class="modal-backdrop">
+  <div class="modal">
+    <div class="modal-head"><h2>Salary Paid</h2><button class="close" id="closePayment">×</button></div>
+    <form id="paymentForm">
+      <input type="hidden" id="paymentStaffId">
+      <div class="form-grid">
+        <div class="field"><label>Salary Month</label><input id="paymentMonth" type="month" required></div>
+        <div class="field"><label>From Date *</label><input id="paymentFromDate" type="date" required></div>
+        <div class="field"><label>To Date *</label><input id="paymentToDate" type="date" required></div>
+        <div class="field"><label>Amount Paid *</label><input id="paymentAmount" type="number" min="0" step="0.01" required placeholder="Enter amount paid"></div>
+        <div class="field"><label>Salary Paid Date *</label><input id="paymentDate" type="date" required></div>
+        <div class="field full"><label>Note</label><textarea id="paymentNote" rows="3" placeholder="Optional note"></textarea></div>
+      </div>
+      <div class="modal-actions"><button type="button" class="secondary" id="cancelPayment">Cancel</button><button class="primary" type="submit">Save Salary Paid</button></div>
+    </form>
+  </div>
+</div>
+<div id="salaryDetailsBackdrop" class="modal-backdrop">
+  <div class="modal" style="width:min(1000px,100%)">
+    <div class="modal-head"><h2>Salary Payment Details</h2><button class="close" id="closeSalaryDetails">×</button></div>
+    <div id="salaryDetailsArea"></div>
+    <div class="modal-actions"><button type="button" class="secondary" id="cancelSalaryDetails">Close</button></div>
+  </div>
+</div>
+<div id="toast" class="toast"></div>
+
+<script>
+const SUPABASE_URL = "https://ucqeyhcycwksiubmlilg.supabase.co";
+const SUPABASE_KEY = "sb_publishable_YdIvl7IqdpT0UZOHBumEiw_ZThYEsgV";
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let staff = [];
+let attendance = {};
+let attendanceMonth = new Date().toISOString().slice(0,7);
+let accountMonth = new Date().toISOString().slice(0,7);
+let payments = {};
+let paymentsLoadedFor = '';
+let attendanceLoadedFor = '';
+
+const $ = id => document.getElementById(id);
+const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+const initials = n => String(n||'?').trim().split(/\s+/).slice(0,2).map(x=>x[0]).join('').toUpperCase();
+const money = n => '₹' + Number(n||0).toLocaleString('en-IN',{maximumFractionDigits:2});
+const daysInMonth = ym => { const [y,m]=ym.split('-').map(Number); return new Date(y,m,0).getDate(); };
+const dateKey = (ym,d) => `${ym}-${String(d).padStart(2,'0')}`;
+const fmtMonth = ym => { const [y,m]=ym.split('-').map(Number); return new Date(y,m-1,1).toLocaleDateString('en-IN',{month:'long',year:'numeric'}); };
+
+function toast(msg){ $('toast').textContent=msg; $('toast').classList.add('show'); setTimeout(()=> $('toast').classList.remove('show'),2500); }
+
+function setView(id){
+  document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===id));
+  document.querySelectorAll('.navbtn').forEach(b=>b.classList.toggle('active',b.dataset.view===id));
+  if(id==='attendanceView') renderAttendance();
+  if(id==='accountView') renderAccount();
+}
+
+async function loadStaff(){
+  if(!sb){ $('connectionText').textContent='Supabase unavailable'; renderStaff(); return; }
+  const {data,error}=await sb.from('staff').select('*').order('name');
+  if(error){ $('connectionText').textContent='Supabase error'; $('staffList').innerHTML='<div class="empty">Could not load staff. Check your Supabase URL and anon key.</div>'; console.error(error); return; }
+  staff=data||[];
+  $('connectionText').textContent='Supabase Connected';
+  renderStaff(); populateAccountStaff(); renderAttendance();
+}
+
+async function loadAttendance(){
+  if(!sb) return;
+  const [y,m]=attendanceMonth.split('-').map(Number);
+  const start=`${attendanceMonth}-01`, end=`${attendanceMonth}-${String(new Date(y,m,0).getDate()).padStart(2,'0')}`;
+  const {data,error}=await sb.from('staff_attendance').select('*').gte('attendance_date',start).lte('attendance_date',end);
+  if(error){ console.error(error); return; }
+  attendance={};
+  (data||[]).forEach(r=>attendance[`${r.staff_id}_${r.attendance_date}`]=r.status);
+  attendanceLoadedFor=attendanceMonth;
+  renderAttendance();
+  if($('accountView').classList.contains('active')) renderAccount();
+}
+
+function renderStaff(){
+  if(!staff.length){ $('staffList').innerHTML='<div class="card empty">No staff yet. Click <b>＋ Add Staff</b> to add your first staff member.</div>'; return; }
+  $('staffList').innerHTML=staff.map(s=>`
+    <div class="card staff-card">
+      <div class="staff-top">
+        <div class="avatar">${esc(initials(s.name))}</div>
+        <div style="flex:1"><h3>${esc(s.name)}</h3><div class="role">${esc(s.role||'Staff')}</div></div>
+        <span class="status ${s.status==='active'?'active':'inactive'}">${esc(s.status||'active')}</span>
+      </div>
+      <div class="staff-meta">
+        <div class="meta"><small>Phone</small><strong>${esc(s.phone||'—')}</strong></div>
+        <div class="meta"><small>Daily Wage</small><strong>${money(s.daily_wage)}</strong></div>
+      </div>
+      <div class="actions">
+        <button class="smallbtn edit" data-id="${s.id}">Edit</button>
+        ${s.status==='active'?`<button class="smallbtn danger deactivate" data-id="${s.id}">Deactivate</button>`:''}
+        <button class="smallbtn account" data-id="${s.id}">View Account</button>
+      </div>
+    </div>`).join('');
+}
+
+function openModal(s=null){
+  $('modalTitle').textContent=s?'Edit Staff':'Add Staff';
+  $('staffId').value=s?.id||'';
+  $('staffName').value=s?.name||'';
+  $('staffPhone').value=s?.phone||'';
+  $('staffRole').value=s?.role||'';
+  $('staffWage').value=s?.daily_wage??'';
+  $('staffJoining').value=s?.joining_date||'';
+  $('staffStatus').value=s?.status||'active';
+  $('staffNotes').value=s?.notes||'';
+  $('modalBackdrop').classList.add('show');
+  setTimeout(()=>$('staffName').focus(),50);
+}
+function closeModal(){ $('modalBackdrop').classList.remove('show'); }
+
+$('addStaff').onclick=()=>openModal();
+$('closeModal').onclick=closeModal;$('cancelModal').onclick=closeModal;
+$('staffForm').onsubmit=async e=>{
+  e.preventDefault();
+  if(!sb){toast('Supabase is unavailable.');return;}
+  const id=$('staffId').value;
+  const payload={
+    name:$('staffName').value.trim(),
+    phone:$('staffPhone').value.trim()||null,
+    role:$('staffRole').value.trim()||null,
+    daily_wage:Number($('staffWage').value),
+    joining_date:$('staffJoining').value||null,
+    status:$('staffStatus').value,
+    notes:$('staffNotes').value.trim()||null
+  };
+  if(!payload.name || !Number.isFinite(payload.daily_wage)){toast('Enter a valid name and daily wage.');return;}
+  let result;
+  if(id) result=await sb.from('staff').update(payload).eq('id',id);
+  else result=await sb.from('staff').insert(payload);
+  if(result.error){console.error(result.error);toast('Could not save staff.');return;}
+  closeModal();toast('Staff information saved.');await loadStaff();
+};
+
+$('staffList').addEventListener('click',e=>{
+  const id=e.target.dataset.id;if(!id)return;
+  const s=staff.find(x=>x.id===id);
+  if(e.target.classList.contains('edit'))openModal(s);
+  if(e.target.classList.contains('account')){ $('accountStaff').value=id;setView('accountView'); }
+  if(e.target.classList.contains('deactivate'))deactivateStaff(id);
+});
+async function deactivateStaff(id){
+  const s=staff.find(x=>x.id===id);if(!s)return;
+  if(!confirm(`Deactivate ${s.name}?`))return;
+  const {error}=await sb.from('staff').update({status:'inactive'}).eq('id',id);
+  if(error){toast('Could not deactivate staff.');return;}
+  toast('Staff deactivated.');loadStaff();
+}
+
+function populateAccountStaff(){
+  const current=$('accountStaff').value;
+  $('accountStaff').innerHTML=staff.map(s=>`<option value="${s.id}">${esc(s.name)} · ${esc(s.role||'Staff')}</option>`).join('');
+  if(staff.some(s=>s.id===current))$('accountStaff').value=current;
+}
+
+function shiftMonth(current,delta){
+  const [y,m]=current.split('-').map(Number);const d=new Date(y,m-1+delta,1);
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+}
+$('attendanceMonth').value=attendanceMonth;
+$('prevMonth').onclick=async()=>{attendanceMonth=shiftMonth(attendanceMonth,-1);$('attendanceMonth').value=attendanceMonth;await loadAttendance();};
+$('nextMonth').onclick=async()=>{attendanceMonth=shiftMonth(attendanceMonth,1);$('attendanceMonth').value=attendanceMonth;await loadAttendance();};
+$('attendanceMonth').onchange=async()=>{attendanceMonth=$('attendanceMonth').value;await loadAttendance();};
+
+function statusShort(s){return s==='present'?'P':s==='absent'?'A':s==='leave'?'L':s==='half'?'H':'';}
+function statusClass(s){return s||''}
+function nextStatus(s){return ({present:'absent',absent:'leave',leave:'half',half:'present','':'present'})[s]||'present';}
+
+function renderAttendance(){
+  if(!staff.length){$('attendanceArea').innerHTML='<div class="empty">Add staff first.</div>';return;}
+  const days=daysInMonth(attendanceMonth);
+  let html='<div class="calendar-wrap"><table class="calendar"><thead><tr><th class="staffcol">Staff</th>';
+  for(let d=1;d<=days;d++){
+    const dt=new Date(`${dateKey(attendanceMonth,d)}T00:00:00`);
+    const wd=dt.toLocaleDateString('en-US',{weekday:'short'}).slice(0,1);
+    html+=`<th><span class="daynum">${wd}</span>${d}</th>`;
+  }
+  html+='</tr></thead><tbody>';
+  staff.forEach(s=>{
+    let counts={present:0,absent:0,leave:0,half:0};
+    html+=`<tr><td class="staffcol"><b>${esc(s.name)}</b><div class="role">${esc(s.role||'Staff')} · ${money(s.daily_wage)}/day</div></td>`;
+    for(let d=1;d<=days;d++){
+      const date=dateKey(attendanceMonth,d), st=attendance[`${s.id}_${date}`]||'';
+      if(st)counts[st]++;
+      html+=`<td><button class="cell-btn ${statusClass(st)}" data-attendance="1" data-staff="${s.id}" data-date="${date}" title="${st||'Not marked'}">${statusShort(st)||'—'}</button></td>`;
+    }
+    html+='</tr>';
+    html+=`<tr><td class="staffcol" style="padding-top:0;padding-bottom:12px"><div class="att-summary"><span class="pill p">Present ${counts.present}</span><span class="pill a">Absent ${counts.absent}</span><span class="pill l">Leave ${counts.leave}</span><span class="pill h">Half ${counts.half}</span></div></td><td colspan="${days}"></td></tr>`;
+  });
+  html+='</tbody></table></div>';
+  $('attendanceArea').innerHTML=html;
+}
+
+$('attendanceArea').addEventListener('click',async e=>{
+  const b=e.target.closest('[data-attendance]');if(!b||!sb)return;
+  const staffId=b.dataset.staff,date=b.dataset.date,current=attendance[`${staffId}_${date}`]||'',status=nextStatus(current);
+  const {error}=await sb.from('staff_attendance').upsert({staff_id:staffId,attendance_date:date,status},{onConflict:'staff_id,attendance_date'});
+  if(error){console.error(error);toast('Could not save attendance.');return;}
+  attendance[`${staffId}_${date}`]=status;renderAttendance();
+  if($('accountView').classList.contains('active'))renderAccount();
+});
+
+$('accountStaff').onchange=renderAccount;
+
+async function loadAccountData(){
+  if(!sb) return;
+  // Load the selected account's month attendance if it differs from the main attendance month.
+  if(attendanceLoadedFor!==accountMonth){
+    const [y,m]=accountMonth.split('-').map(Number);
+    const start=`${accountMonth}-01`, end=`${accountMonth}-${String(new Date(y,m,0).getDate()).padStart(2,'0')}`;
+    const {data,error}=await sb.from('staff_attendance').select('*').gte('attendance_date',start).lte('attendance_date',end);
+    if(error){console.error(error);return;}
+    attendance={};
+    (data||[]).forEach(r=>attendance[`${r.staff_id}_${r.attendance_date}`]=r.status);
+    attendanceLoadedFor=accountMonth;
+  }
+  const {data,error}=await sb.from('salary_payments').select('*').eq('salary_month',accountMonth).order('paid_date',{ascending:false});
+  if(error){console.error(error);toast('Could not load salary payments.');return;}
+  payments={};
+  (data||[]).forEach(r=>{
+    payments[r.staff_id]=(payments[r.staff_id]||[]);
+    payments[r.staff_id].push(r);
+  });
+}
+
+function openPayment(staffId){
+  $('paymentStaffId').value=staffId;
+  $('paymentMonth').value=accountMonth;
+  $('paymentFromDate').value=`${accountMonth}-01`;
+  $('paymentToDate').value=`${accountMonth}-${String(daysInMonth(accountMonth)).padStart(2,'0')}`;
+  $('paymentDate').value=new Date().toISOString().slice(0,10);
+  $('paymentAmount').value='';
+  $('paymentNote').value='';
+  $('paymentBackdrop').classList.add('show');
+  setTimeout(()=>$('paymentAmount').focus(),50);
+}
+function closePayment(){ $('paymentBackdrop').classList.remove('show'); }
+$('closePayment').onclick=closePayment;
+$('cancelPayment').onclick=closePayment;
+
+$('paymentForm').onsubmit=async e=>{
+  e.preventDefault();
+  const staffId=$('paymentStaffId').value;
+  const amount=Number($('paymentAmount').value);
+  const month=$('paymentMonth').value;
+  const fromDate=$('paymentFromDate').value;
+  const toDate=$('paymentToDate').value;
+  const paidDate=$('paymentDate').value;
+  if(!staffId||!month||!fromDate||!toDate||!paidDate||toDate<fromDate||!Number.isFinite(amount)||amount<0){
+    toast('Enter valid salary payment details.');
+    return;
+  }
+  const {error}=await sb.from('salary_payments').insert({
+    staff_id:staffId,
+    salary_month:month,
+    from_date:fromDate,
+    to_date:toDate,
+    amount_paid:amount,
+    paid_date:paidDate,
+    note:$('paymentNote').value.trim()||null
+  });
+  if(error){console.error(error);toast('Could not save salary payment.');return;}
+  closePayment();
+  accountMonth=month;
+  await loadAccountData();
+  renderAccount();
+  toast('Salary payment saved.');
+};
+
+function formatSalaryDate(value){
+  if(!value)return '—';
+  return new Date(value+'T00:00:00').toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+}
+
+function printSalarySlip(staffId,paymentId){
+  const s=staff.find(x=>x.id===staffId);
+  const p=(payments[staffId]||[]).find(x=>x.id===paymentId);
+  if(!s||!p)return;
+
+  const w=window.open('','_blank','width=800,height=900');
+  if(!w){toast('Please allow pop-ups to print the salary slip.');return;}
+
+  w.document.write(`<!doctype html><html><head><title>Salary Slip</title>
+  <style>
+    body{font-family:Arial,sans-serif;padding:35px;color:#222}.slip{max-width:700px;margin:auto;border:1px solid #ddd;padding:35px}
+    h1{text-align:center;color:#4b001f;margin:0}.sub{text-align:center;color:#777;margin:6px 0 25px}
+    h2{text-align:center;color:#4b001f}.row{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid #eee}
+    .amount{text-align:center;background:#4b001f;color:white;padding:18px;margin-top:25px}.amount strong{display:block;font-size:30px;margin-top:5px;color:#f2d16b}
+    .sign{display:flex;justify-content:space-between;margin-top:70px}.sign div{width:40%;border-top:1px solid #777;text-align:center;padding-top:8px;font-size:12px}
+    @media print{body{padding:0}.slip{border:0}}
+  </style></head><body>
+  <div class="slip">
+    <h1>CHAATARRA</h1><div class="sub">The House of Chaats</div>
+    <h2>SALARY PAYMENT SLIP</h2>
+    <div class="row"><b>Staff Name</b><span>${esc(s.name)}</span></div>
+    <div class="row"><b>Role</b><span>${esc(s.role||'Staff')}</span></div>
+    <div class="row"><b>Daily Wage</b><span>${money(s.daily_wage)}</span></div>
+    <div class="row"><b>From Date</b><span>${formatSalaryDate(p.from_date)}</span></div>
+    <div class="row"><b>To Date</b><span>${formatSalaryDate(p.to_date)}</span></div>
+    <div class="row"><b>Salary Paid Date</b><span>${formatSalaryDate(p.paid_date)}</span></div>
+    <div class="row"><b>Note</b><span>${esc(p.note||'—')}</span></div>
+    <div class="amount">SALARY PAID<strong>${money(p.amount_paid)}</strong></div>
+    <div class="sign"><div>Staff Signature</div><div>Authorized Signature</div></div>
+  </div>
+  <script>window.onload=function(){window.print()}<\/script></body></html>`);
+  w.document.close();
+}
+
+function showSalaryDetails(staffId){
+  const s=staff.find(x=>x.id===staffId);
+  if(!s)return;
+  const list=payments[staffId]||[];
+  const total=list.reduce((sum,p)=>sum+Number(p.amount_paid||0),0);
+
+  let rows=list.map((p,i)=>`
+    <tr>
+      <td>${i+1}</td>
+      <td>${formatSalaryDate(p.from_date)}</td>
+      <td>${formatSalaryDate(p.to_date)}</td>
+      <td>${formatSalaryDate(p.paid_date)}</td>
+      <td><b>${money(p.amount_paid)}</b></td>
+      <td>${esc(p.note||'—')}</td>
+      <td style="white-space:nowrap">
+        <button class="smallbtn account" data-print-payment="${p.id}">🖨 Print Slip</button>
+        <button class="smallbtn" style="margin-left:6px;background:#fff0f0;color:#a11;border:1px solid #e5bcbc" data-delete-payment="${p.id}">🗑 Delete</button>
+      </td>
+    </tr>`).join('');
+
+  if(!rows)rows='<tr><td colspan="7" style="text-align:center;padding:25px;color:#777">No salary payments recorded for this month.</td></tr>';
+
+  $('salaryDetailsArea').innerHTML=`
+    <div style="margin-bottom:15px">
+      <h3 style="margin:0;color:var(--burgundy);font:700 21px Georgia,serif">${esc(s.name)}</h3>
+      <div class="role">${esc(s.role||'Staff')} · ${fmtMonth(accountMonth)}</div>
+    </div>
+    <div class="card" style="padding:0;overflow:auto">
+      <table style="width:100%;border-collapse:collapse;font-size:13px">
+        <thead><tr>
+          <th style="padding:10px;text-align:left">#</th>
+          <th style="padding:10px;text-align:left">From</th>
+          <th style="padding:10px;text-align:left">To</th>
+          <th style="padding:10px;text-align:left">Paid Date</th>
+          <th style="padding:10px;text-align:left">Amount</th>
+          <th style="padding:10px;text-align:left">Note</th>
+          <th style="padding:10px;text-align:left">Slip</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+    <div class="salary-box" style="margin-top:12px">
+      <div><small>Total Salary Paid</small></div><strong>${money(total)}</strong>
+    </div>`;
+
+  $('salaryDetailsBackdrop').classList.add('show');
+  document.querySelectorAll('[data-print-payment]').forEach(b=>{
+    b.onclick=()=>printSalarySlip(staffId,b.dataset.printPayment);
+  });
+  document.querySelectorAll('[data-delete-payment]').forEach(b=>{
+    b.onclick=()=>deleteSalaryPayment(staffId,b.dataset.deletePayment);
+  });
+}
+
+async function deleteSalaryPayment(staffId,paymentId){
+  const p=(payments[staffId]||[]).find(x=>x.id===paymentId);
+  if(!p)return;
+  if(!confirm(`Delete this salary payment of ${money(p.amount_paid)}?`))return;
+
+  const {error}=await sb.from('salary_payments').delete().eq('id',paymentId);
+  if(error){
+    console.error(error);
+    toast('Could not delete salary payment.');
+    return;
+  }
+
+  await loadAccountData();
+  renderAccount();
+  showSalaryDetails(staffId);
+  toast('Salary payment deleted.');
+}
+function closeSalaryDetails(){ $('salaryDetailsBackdrop').classList.remove('show'); }
+$('closeSalaryDetails').onclick=closeSalaryDetails;
+$('cancelSalaryDetails').onclick=closeSalaryDetails;
+
+async function renderAccount(){
+  await loadAccountData();
+  const id=$('accountStaff').value,s=staff.find(x=>x.id===id);
+  if(!s){$('accountArea').innerHTML='<div class="card empty">Add staff to create staff accounts.</div>';return;}
+  const days=daysInMonth(accountMonth);
+  const [y,m]=accountMonth.split('-').map(Number);
+  let counts={present:0,absent:0,leave:0,half:0};
+  let rows='';
+  for(let d=1;d<=days;d++){
+    const date=dateKey(accountMonth,d),st=attendance[`${s.id}_${date}`]||'';
+    if(st)counts[st]++;
+    rows+=`<div style="display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid #eee5e7"><span>${new Date(`${date}T00:00:00`).toLocaleDateString('en-IN',{weekday:'short',day:'2-digit',month:'short'})}</span><b class="pill ${st==='present'?'p':st==='absent'?'a':st==='leave'?'l':'h'}">${statusShort(st)||'Not marked'}</b></div>`;
+  }
+  const salary=(counts.present+counts.half*.5)*Number(s.daily_wage);
+  $('accountArea').innerHTML=`
+    <div class="account-grid">
+      <div class="card profile">
+        <div class="bigavatar">${esc(initials(s.name))}</div>
+        <h2>${esc(s.name)}</h2><div class="role">${esc(s.role||'Staff')}</div>
+        <div class="wage">${money(s.daily_wage)} <span style="font-size:12px;color:var(--muted);font-weight:600">per day</span></div>
+        <div style="margin-top:18px;color:var(--muted);font-size:13px">Phone: <b style="color:var(--ink)">${esc(s.phone||'—')}</b></div>
+        <div style="margin-top:8px;color:var(--muted);font-size:13px">Joined: <b style="color:var(--ink)">${s.joining_date?esc(s.joining_date):'—'}</b></div>
+      </div>
+      <div>
+        <div class="toolbar"><div><h3 style="margin:0;font:700 21px Georgia,serif;color:var(--burgundy)">${fmtMonth(accountMonth)}</h3><div class="role">Monthly attendance & salary</div></div>
+          <div class="month-control"><button id="accPrev">‹</button><div class="field"><label>Month</label><input type="month" id="accMonth" value="${accountMonth}"></div><button id="accNext">›</button></div>
+        </div>
+        <div class="stats">
+          <div class="stat"><small>Present</small><strong>${counts.present}</strong></div>
+          <div class="stat"><small>Absent</small><strong>${counts.absent}</strong></div>
+          <div class="stat"><small>Leave</small><strong>${counts.leave}</strong></div>
+          <div class="stat"><small>Half Day</small><strong>${counts.half}</strong></div>
+        </div>
+        <div class="salary-box" style="margin-top:10px">
+          <div><small>Calculated Salary</small><div style="margin-top:5px">Based on attendance × daily wage</div></div>
+          <strong>${money(salary)}</strong>
+        </div>
+        <div class="salary-box" style="margin-top:10px;background:#fffaf0;border-color:#e7d39a">
+          <div><small>Salary Paid</small><div style="margin-top:5px">Total payments recorded</div></div>
+          <strong>${money((payments[s.id]||[]).reduce((sum,p)=>sum+Number(p.amount_paid||0),0))}</strong>
+        </div>
+        <div class="salary-box" style="margin-top:10px;background:#fff7f7;border-color:#e3b9c2">
+          <div><small>Remaining Salary</small><div style="margin-top:5px">Calculated salary − salary paid</div></div>
+          <strong>${money(Math.max(0, salary-(payments[s.id]||[]).reduce((sum,p)=>sum+Number(p.amount_paid||0),0)))}</strong>
+        </div>
+        <div style="display:flex;justify-content:flex-end;margin:12px 0;gap:10px;flex-wrap:wrap">
+          <button class="secondary" id="salaryDetailsBtn" type="button">📋 Salary Payment Details</button>
+          <button class="primary" id="salaryPaidBtn" type="button">💰 Salary Paid</button>
+        </div>
+        <div class="card account-calendar"><div style="max-height:430px;overflow:auto">${rows}</div></div>
+      </div>
+    </div>`;
+  $('salaryPaidBtn').onclick=()=>openPayment(s.id);
+  $('salaryDetailsBtn').onclick=()=>showSalaryDetails(s.id);
+  $('accPrev').onclick=async()=>{accountMonth=shiftMonth(accountMonth,-1);await renderAccount();};
+  $('accNext').onclick=async()=>{accountMonth=shiftMonth(accountMonth,1);await renderAccount();};
+  $('accMonth').onchange=async e=>{accountMonth=e.target.value;await renderAccount();};
+}
+
+document.querySelectorAll('.navbtn').forEach(b=>b.onclick=()=>setView(b.dataset.view));
+(async()=>{await loadStaff();await loadAttendance();})();
+</script>
+</body>
+</html>
