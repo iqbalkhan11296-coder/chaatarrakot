@@ -2,2532 +2,563 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Inventory Management</title>
-
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Chaatarra Ledger</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
-
-body {
-    font-family: "Segoe UI", Arial, sans-serif;
-    background: #f5f2ec;
-    color: #202020;
-    min-height: 100vh;
-}
-
-header {
-    background: #171717;
-    color: white;
-    padding: 28px 40px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.12);
-}
-
-.shop-name {
-    font-size: 26px;
-    font-weight: 700;
-    letter-spacing: 1px;
-}
-
-.heading {
-    font-size: 17px;
-    color: #d6d6d6;
-    margin-top: 5px;
-}
-
-main {
-    max-width: 1400px;
-    margin: auto;
-    padding: 35px;
-}
-
-.dashboard-buttons {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 18px;
-    margin-bottom: 30px;
-}
-
-.dashboard-btn {
-    border: none;
-    background: white;
-    border-radius: 16px;
-    padding: 25px 20px;
-    text-align: left;
-    cursor: pointer;
-    box-shadow: 0 5px 22px rgba(0,0,0,0.07);
-    transition: 0.25s ease;
-    border: 1px solid #e5e1d9;
-}
-
-.dashboard-btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 28px rgba(0,0,0,0.11);
-}
-
-.dashboard-btn .icon {
-    font-size: 28px;
-    margin-bottom: 12px;
-}
-
-.dashboard-btn h3 {
-    font-size: 17px;
-    margin-bottom: 5px;
-}
-
-.dashboard-btn p {
-    font-size: 13px;
-    color: #777;
-}
-
-.content-card {
-    background: white;
-    border-radius: 18px;
-    padding: 28px;
-    box-shadow: 0 6px 25px rgba(0,0,0,0.07);
-    border: 1px solid #e5e1d9;
-}
-
-.content-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 22px;
-    gap: 15px;
-}
-
-.content-header h2 {
-    font-size: 24px;
-}
-
-.search {
-    padding: 11px 14px;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    width: 240px;
-    outline: none;
-}
-
-.table-wrapper {
-    overflow-x: auto;
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    min-width: 1050px;
-}
-
-th {
-    background: #f4f1eb;
-    padding: 14px;
-    text-align: left;
-    font-size: 13px;
-    color: #555;
-    font-weight: 700;
-}
-
-td {
-    padding: 15px 14px;
-    border-bottom: 1px solid #eee;
-    font-size: 14px;
-}
-
-tr:hover td {
-    background: #faf9f6;
-}
-
-.status {
-    display: inline-block;
-    padding: 6px 11px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 700;
-}
-
-.green {
-    background: #e6f5e9;
-    color: #21833a;
-}
-
-.orange {
-    background: #fff0d5;
-    color: #a96300;
-}
-
-.red {
-    background: #ffe3e3;
-    color: #bd2222;
-}
-
-.btn {
-    border: none;
-    border-radius: 9px;
-    padding: 9px 13px;
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 12px;
-    margin-right: 5px;
-    margin-bottom: 4px;
-}
-
-.btn-stock {
-    background: #202020;
-    color: white;
-}
-
-.btn-stock-in {
-    background: #21833a;
-    color: white;
-}
-
-.btn-edit {
-    background: #eeeae3;
-    color: #222;
-}
-
-.btn-delete {
-    background: #ffe3e3;
-    color: #a51f1f;
-}
-
-.btn-back {
-    background: #eeeae3;
-    color: #222;
-    margin-bottom: 20px;
-}
-
-.btn-view {
-    background: #171717;
-    color: white;
-}
-
-.btn:hover {
-    opacity: 0.82;
-}
-
-.modal {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.48);
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-    z-index: 1000;
-}
-
-.modal-box {
-    background: white;
-    width: 100%;
-    max-width: 600px;
-    border-radius: 20px;
-    padding: 30px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.25);
-    max-height: 90vh;
-    overflow-y: auto;
-}
-
-.modal-box h2 {
-    margin-bottom: 22px;
-}
-
-.form-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 15px;
-}
-
-.form-group {
-    margin-bottom: 5px;
-}
-
-.form-group.full {
-    grid-column: 1 / -1;
-}
-
-label {
-    display: block;
-    font-size: 13px;
-    font-weight: 700;
-    margin-bottom: 7px;
-    color: #444;
-}
-
-input, select {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #d8d5cf;
-    border-radius: 9px;
-    outline: none;
-    font-size: 14px;
-    background: #fff;
-}
-
-input:focus, select:focus {
-    border-color: #777;
-}
-
-.modal-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    margin-top: 25px;
-}
-
-.cancel-btn {
-    background: #eee;
-    color: #222;
-}
-
-.save-btn {
-    background: #171717;
-    color: white;
-}
-
-.current-stock {
-    background: #f5f2ec;
-    padding: 15px;
-    border-radius: 10px;
-    margin-bottom: 18px;
-    font-size: 14px;
-}
-
-.current-stock strong {
-    font-size: 20px;
-}
-
-.purchase-summary {
-    background: #f5f2ec;
-    border-radius: 10px;
-    padding: 15px;
-    margin-top: 15px;
-}
-
-.purchase-summary-row {
-    display: flex;
-    justify-content: space-between;
-    padding: 5px 0;
-}
-
-.purchase-total {
-    font-size: 19px;
-    font-weight: 700;
-    border-top: 1px solid #ddd;
-    margin-top: 8px;
-    padding-top: 10px;
-}
-
-.price-badge {
-    display: inline-block;
-    background: #f1eee7;
-    padding: 6px 9px;
-    border-radius: 7px;
-    font-weight: 600;
-}
-
-.history-in {
-    color: #21833a;
-    font-weight: 700;
-}
-
-.history-out {
-    color: #bd2222;
-    font-weight: 700;
-}
-
-/* HISTORY ITEM CARDS */
-
-.history-items {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 18px;
-}
-
-.history-card {
-    border: 1px solid #e5e1d9;
-    border-radius: 15px;
-    padding: 20px;
-    background: #fff;
-    transition: 0.25s ease;
-}
-
-.history-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
-}
-
-.history-card-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
-}
-
-.history-card h3 {
-    font-size: 18px;
-}
-
-.history-icon {
-    font-size: 25px;
-}
-
-.history-info {
-    font-size: 13px;
-    color: #777;
-    line-height: 1.8;
-}
-
-.history-stock {
-    font-size: 20px;
-    font-weight: 700;
-    color: #202020;
-    margin: 5px 0;
-}
-
-.history-details {
-    display: none;
-}
-
-.empty {
-    text-align: center;
-    padding: 50px 20px;
-    color: #888;
-}
-
-@media (max-width: 1000px) {
-    .history-items {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    .dashboard-buttons {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-@media (max-width: 600px) {
-
-    header {
-        padding: 22px;
-    }
-
-    main {
-        padding: 20px;
-    }
-
-    .dashboard-buttons {
-        grid-template-columns: 1fr 1fr;
-        gap: 10px;
-    }
-
-    .dashboard-btn {
-        padding: 18px 14px;
-    }
-
-    .content-card {
-        padding: 18px;
-    }
-
-    .form-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .form-group.full {
-        grid-column: auto;
-    }
-
-    .content-header {
-        align-items: flex-start;
-        flex-direction: column;
-    }
-
-    .search {
-        width: 100%;
-    }
-
-    .history-items {
-        grid-template-columns: 1fr;
-    }
-}
-
-/* ===== ENHANCED INVENTORY DASHBOARD ===== */
-.dashboard-stats {
-    display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    gap: 14px;
-    margin-bottom: 22px;
-}
-.stat-card {
-    background: #fff;
-    border: 1px solid #e5e1d9;
-    border-radius: 15px;
-    padding: 18px;
-    box-shadow: 0 5px 20px rgba(0,0,0,.05);
-}
-.stat-label {
-    color: #777;
-    font-size: 12px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: .4px;
-}
-.stat-value {
-    font-size: 25px;
-    font-weight: 800;
-    margin-top: 7px;
-}
-.stat-sub {
-    color: #999;
-    font-size: 11px;
-    margin-top: 4px;
-}
-.stat-danger .stat-value { color:#bd2222; }
-.stat-warning .stat-value { color:#a96300; }
-.stat-good .stat-value { color:#21833a; }
-
-.dashboard-buttons {
-    grid-template-columns: repeat(5, 1fr);
-}
-.dashboard-btn.active {
-    border-color: #171717;
-    box-shadow: 0 8px 25px rgba(0,0,0,.12);
-}
-
-.toolbar {
-    display:flex;
-    flex-wrap:wrap;
-    gap:10px;
-    margin-bottom:18px;
-}
-.toolbar select, .toolbar input {
-    width:auto;
-    min-width:145px;
-    padding:10px 12px;
-}
-.toolbar .search-wide {
-    flex:1;
-    min-width:220px;
-}
-.toolbar-btn {
-    border:1px solid #d8d5cf;
-    background:#fff;
-    border-radius:9px;
-    padding:10px 13px;
-    cursor:pointer;
-    font-weight:700;
-}
-.toolbar-btn:hover { background:#f4f1eb; }
-
-.stock-value {
-    font-weight:800;
-}
-.stock-value small {
-    display:block;
-    color:#888;
-    font-weight:500;
-    margin-top:2px;
-}
-.avg-price {
-    display:inline-block;
-    margin-top:5px;
-    color:#555;
-    font-size:12px;
-}
-.recent-grid {
-    display:grid;
-    grid-template-columns: 1.5fr 1fr;
-    gap:18px;
-    margin-top:22px;
-}
-.recent-panel {
-    background:#fff;
-    border:1px solid #e5e1d9;
-    border-radius:15px;
-    padding:20px;
-}
-.recent-panel h3 {
-    margin-bottom:14px;
-}
-.activity-row {
-    display:flex;
-    justify-content:space-between;
-    gap:12px;
-    padding:11px 0;
-    border-bottom:1px solid #eee;
-    font-size:13px;
-}
-.activity-row:last-child { border-bottom:none; }
-.activity-main strong { display:block; }
-.activity-meta { color:#888; margin-top:3px; }
-.movement-in { color:#21833a; font-weight:800; }
-.movement-out { color:#bd2222; font-weight:800; }
-.mini-list {
-    display:grid;
-    gap:10px;
-}
-.mini-item {
-    display:flex;
-    justify-content:space-between;
-    gap:10px;
-    padding:10px 12px;
-    background:#f7f5f0;
-    border-radius:10px;
-}
-.mini-item strong { font-size:13px; }
-.mini-item span { color:#777; font-size:12px; }
-.vendor-grid {
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:15px;
-}
-.vendor-card {
-    border:1px solid #e5e1d9;
-    border-radius:14px;
-    padding:18px;
-    background:#fff;
-}
-.vendor-card h3 { margin-bottom:8px; }
-.vendor-stat { color:#777; font-size:13px; line-height:1.8; }
-.summary-strip {
-    display:grid;
-    grid-template-columns:repeat(4,1fr);
-    gap:12px;
-    margin-bottom:18px;
-}
-.summary-box {
-    background:#f7f5f0;
-    border-radius:11px;
-    padding:13px;
-}
-.summary-box span { display:block; color:#777; font-size:12px; }
-.summary-box strong { display:block; margin-top:4px; font-size:18px; }
-.inline-actions { white-space:nowrap; }
-.loading {
-    text-align:center;
-    padding:40px;
-    color:#777;
-}
-.refresh-indicator {
-    font-size:12px;
-    color:#888;
-    margin-left:auto;
-}
-@media (max-width: 1200px) {
-    .dashboard-stats { grid-template-columns:repeat(3,1fr); }
-    .dashboard-buttons { grid-template-columns:repeat(3,1fr); }
-}
-@media (max-width: 900px) {
-    .recent-grid { grid-template-columns:1fr; }
-    .vendor-grid { grid-template-columns:repeat(2,1fr); }
-    .summary-strip { grid-template-columns:repeat(2,1fr); }
-}
-@media (max-width: 600px) {
-    .dashboard-stats { grid-template-columns:repeat(2,1fr); }
-    .dashboard-buttons { grid-template-columns:repeat(2,1fr); }
-    .vendor-grid { grid-template-columns:1fr; }
-    .summary-strip { grid-template-columns:1fr 1fr; }
-    .toolbar { flex-direction:column; }
-    .toolbar select, .toolbar input, .toolbar .search-wide { width:100%; }
-}
-
+:root{--burgundy:#4b001f;--burgundy2:#650028;--gold:#d4af37;--cream:#faf7f2;--paper:#fffdf9;--line:#e8dfe2;--ink:#261c20;--muted:#756b6e;--green:#287a52;--red:#b43b45;--shadow:0 12px 35px rgba(75,0,31,.08)}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:linear-gradient(135deg,#f7f0e9,#fffdf9 50%,#f5edf0);color:var(--ink);min-height:100vh}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+header{background:linear-gradient(110deg,var(--burgundy),var(--burgundy2));color:#fff;padding:25px 32px;box-shadow:0 5px 22px rgba(0,0,0,.12)}
+.header-inner{max-width:1450px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.brand{font:700 30px Georgia,serif;letter-spacing:.8px;color:#fff}
+.subtitle{margin-top:5px;font-size:13px;color:#ead7dd;letter-spacing:1.2px;text-transform:uppercase}
+.connection{font-size:12px;color:#f0d36b;font-weight:700}
+.container{max-width:1450px;margin:auto;padding:28px}
+.main-button{width:100%;background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:24px;text-align:left;box-shadow:var(--shadow);transition:.2s}
+.main-button:hover{transform:translateY(-2px);box-shadow:0 16px 40px rgba(75,0,31,.12)}
+.main-button h2{margin:0 0 7px;color:var(--burgundy);font:700 24px Georgia,serif}
+.main-button p{margin:0;color:var(--muted)}
+.window{display:none;margin-top:20px}
+.toolbar{background:var(--paper);border:1px solid var(--line);border-radius:15px;padding:15px;display:flex;gap:10px;align-items:end;flex-wrap:wrap;box-shadow:0 7px 22px rgba(75,0,31,.05)}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:12px;color:var(--muted);font-weight:700}
+input,select,textarea{padding:11px 12px;border:1px solid #d8ccd0;border-radius:9px;background:#fff;color:#222;outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--gold)}
+.secondary{padding:11px 15px;border-radius:9px;border:1px solid #ddd;background:#fff;color:var(--burgundy);font-weight:700}
+.primary{background:var(--burgundy);color:#fff;border:0;padding:11px 16px;border-radius:9px;font-weight:700}
+.primary:hover{background:var(--burgundy2)}
+.sections{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px}
+.section{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 7px 22px rgba(75,0,31,.05)}
+.section-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px}
+.section h3{margin:0;color:var(--burgundy);font:700 20px Georgia,serif}
+.badge{font-size:11px;padding:5px 8px;border-radius:20px;background:#f3eee8;color:#666;font-weight:700}
+.reference-note{margin:-5px 0 13px;color:var(--muted);font-size:12px}
+.table-wrap{overflow:auto}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:600px}
+th,td{padding:10px 7px;border-bottom:1px solid #eee;text-align:left;vertical-align:middle}
+th{color:#777;background:#faf8f5;font-size:12px}
+.num{text-align:right;white-space:nowrap}
+.amount{font-weight:800;white-space:nowrap}
+.source{font-size:11px;color:#8a7f82}
+.edit-btn,.reset-btn,.delete-btn{border:1px solid #ddd;background:#fff;border-radius:7px;padding:6px 9px;font-size:11px;font-weight:700}
+.edit-btn{color:var(--burgundy)}
+.reset-btn{color:#777;margin-left:4px}
+.delete-btn{color:var(--red);border-color:#efd0d3}
+.empty{text-align:center;color:#888;padding:25px 5px}
+.loading{text-align:center;padding:25px;color:var(--muted)}
+.summary{margin-top:18px;background:linear-gradient(110deg,var(--burgundy),var(--burgundy2));color:#fff;border-radius:17px;padding:20px;box-shadow:var(--shadow)}
+.summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:15px}
+.summary-card{background:#ffffff12;border:1px solid #ffffff22;border-radius:11px;padding:15px}
+.summary-label{font-size:12px;opacity:.75}
+.summary-value{font-size:25px;font-weight:900;margin-top:7px}
+.profit{color:#8ee4b0}.loss{color:#ffaaa9}
+.modal{display:none;position:fixed;inset:0;background:rgba(35,10,20,.5);align-items:center;justify-content:center;padding:20px;z-index:20}
+.modal.show{display:flex}
+.modal-box{width:min(620px,100%);background:var(--paper);border-radius:18px;padding:24px;box-shadow:0 25px 70px rgba(0,0,0,.25)}
+.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.modal-head h2{margin:0;color:var(--burgundy);font:700 23px Georgia,serif}
+.close{border:0;background:#f3e9eb;color:var(--burgundy);width:34px;height:34px;border-radius:50%;font-size:20px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-grid .full{grid-column:1/-1}
+.form-actions{display:flex;justify-content:flex-end;gap:9px;margin-top:20px}
+.helper{font-size:11px;color:var(--muted);margin-top:5px}
+.toast{position:fixed;right:22px;bottom:22px;background:var(--burgundy);color:#fff;padding:13px 17px;border-radius:10px;display:none;z-index:30;box-shadow:var(--shadow);font-weight:700}
+.toast.show{display:block}
+@media(max-width:900px){.container{padding:15px}.sections{grid-template-columns:1fr}.summary-grid{grid-template-columns:1fr}.header-inner{align-items:flex-start}.connection{display:none}}
+@media(max-width:600px){.form-grid{grid-template-columns:1fr}.form-grid .full{grid-column:auto}.brand{font-size:25px}}
 </style>
-
-<style id="purchase-analytics-css">
-.purchase-analytics-toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:18px}
-.purchase-analytics-toolbar select{min-width:155px;padding:10px 12px;border:1px solid #ddd;border-radius:10px;background:#fff;color:#222}
-.purchase-analytics-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:18px}
-.purchase-stat{background:#fff;border:1px solid #e7e2dc;border-radius:14px;padding:16px;box-shadow:0 4px 14px rgba(0,0,0,.04)}
-.purchase-stat-label{font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:#777;margin-bottom:7px}
-.purchase-stat-value{font-size:24px;font-weight:800;color:#222}
-.purchase-stat-sub{font-size:12px;color:#777;margin-top:5px}
-.purchase-analytics-panels{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.purchase-panel{background:#fff;border:1px solid #e7e2dc;border-radius:14px;padding:16px;overflow:hidden}
-.purchase-panel h3{margin:0 0 14px;font-size:17px}
-.purchase-table{width:100%;border-collapse:collapse;font-size:13px}
-.purchase-table th,.purchase-table td{padding:10px 8px;border-bottom:1px solid #eee;text-align:left}
-.purchase-table th{background:#faf8f5;color:#666;font-weight:700}
-.purchase-table .num{text-align:right}
-.purchase-empty{text-align:center;color:#777;padding:22px 6px}
-.purchase-bar-row{margin-bottom:13px}
-.purchase-bar-head{display:flex;justify-content:space-between;gap:10px;font-size:13px;margin-bottom:6px}
-.purchase-bar-track{height:9px;border-radius:20px;background:#eee;overflow:hidden}
-.purchase-bar-fill{height:100%;border-radius:20px;background:#222}
-@media(max-width:900px){.purchase-analytics-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.purchase-analytics-panels{grid-template-columns:1fr}}
-@media(max-width:560px){.purchase-analytics-grid{grid-template-columns:1fr}}
-</style>
-
 </head>
-
 <body>
 
 <header>
+  <div class="header-inner">
     <div>
-        <div class="shop-name">CHAATARRA</div>
-        <div class="heading">Inventory Management</div>
+      <div class="brand">CHAATARRA LEDGER</div>
+      <div class="subtitle">The House of Chaats · Sales & Expenses Reference</div>
     </div>
+    <div class="connection" id="connectionText">Connecting to Supabase…</div>
+  </div>
 </header>
 
+<div class="container">
+  <button class="main-button" id="openLedger">
+    <h2>Sales & Expenses</h2>
+    <p>Open the date-filtered ledger. Connected figures are references and can be corrected manually.</p>
+  </button>
 
-
-<div id="purchasingSection" class="page-section" style="display:none;">
-    <div class="section-header">
-        <div>
-            <h2>Purchase Analytics</h2>
-            <p>Track purchase spending and buying activity from your inventory history.</p>
-        </div>
-        <button class="secondary-btn" onclick="showDashboard()">← Back</button>
+  <div class="window" id="ledgerWindow">
+    <div class="toolbar">
+      <div class="field">
+        <label>Ledger Date</label>
+        <input type="date" id="ledgerDate">
+      </div>
+      <button class="primary" id="loadDate">Load Date</button>
+      <button class="secondary" id="todayBtn">Today</button>
+      <button class="secondary" id="closeLedger">Close</button>
+      <button class="primary" id="addExpenseBtn">＋ Add Expense</button>
     </div>
 
-    <div class="purchase-analytics-toolbar">
-        <select id="purchasePeriodFilter" onchange="renderPurchaseAnalytics()">
-            <option value="today">Today</option>
-            <option value="7">Last 7 Days</option>
-            <option value="30" selected>Last 30 Days</option>
-            <option value="month">This Month</option>
-            <option value="all">All Time</option>
-        </select>
-        <button class="secondary-btn" onclick="renderPurchaseAnalytics()">Refresh</button>
+    <div class="sections">
+      <section class="section">
+        <div class="section-head">
+          <h3>Fixed Sales</h3>
+          <span class="badge">Reference · Editable</span>
+        </div>
+        <div class="reference-note">Pulled from the existing Sales Tracking <b>orders</b> data. Corrections are saved only in this Ledger.</div>
+        <div id="salesArea" class="loading">Loading sales…</div>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <h3>Fixed Expenses</h3>
+          <span class="badge">Reference · Editable</span>
+        </div>
+        <div class="reference-note">Connected to existing <b>salary_payments</b> and inventory purchase history.</div>
+        <div id="fixedExpensesArea" class="loading">Loading fixed expenses…</div>
+      </section>
     </div>
 
-    <div class="purchase-analytics-grid">
-        <div class="purchase-stat">
-            <div class="purchase-stat-label">Purchase Cost</div>
-            <div class="purchase-stat-value" id="purchaseTotalCost">₹0</div>
-            <div class="purchase-stat-sub">Stock In purchase cost</div>
-        </div>
-        <div class="purchase-stat">
-            <div class="purchase-stat-label">Purchase Events</div>
-            <div class="purchase-stat-value" id="purchaseEventCount">0</div>
-            <div class="purchase-stat-sub">Stock In transactions</div>
-        </div>
-        <div class="purchase-stat">
-            <div class="purchase-stat-label">Quantity Purchased</div>
-            <div class="purchase-stat-value" id="purchaseQuantity">0</div>
-            <div class="purchase-stat-sub">Across all units</div>
-        </div>
-        <div class="purchase-stat">
-            <div class="purchase-stat-label">Average Purchase</div>
-            <div class="purchase-stat-value" id="purchaseAverage">₹0</div>
-            <div class="purchase-stat-sub">Cost per purchase event</div>
-        </div>
-    </div>
+    <section class="section" style="margin-top:18px">
+      <div class="section-head">
+        <h3>Daily Expenses</h3>
+        <button class="primary" id="addExpenseBtn2">＋ Add Expense</button>
+      </div>
+      <div class="reference-note">Manual expenses entered directly into the Ledger.</div>
+      <div id="dailyExpensesArea" class="loading">Loading daily expenses…</div>
+    </section>
 
-    <div class="purchase-analytics-panels">
-        <div class="purchase-panel">
-            <h3>Top Purchased Items</h3>
-            <div id="purchaseTopItems"></div>
+    <div class="summary">
+      <div class="summary-grid">
+        <div class="summary-card">
+          <div class="summary-label">TOTAL SALES</div>
+          <div class="summary-value" id="totalSales">₹0.00</div>
         </div>
-        <div class="purchase-panel">
-            <h3>Vendor Spending</h3>
-            <div id="purchaseVendorSpend"></div>
+        <div class="summary-card">
+          <div class="summary-label">TOTAL EXPENSES</div>
+          <div class="summary-value" id="totalExpenses">₹0.00</div>
         </div>
-        <div class="purchase-panel">
-            <h3>Purchase History</h3>
-            <div style="overflow-x:auto;">
-                <table class="purchase-table">
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Item</th>
-                            <th>Vendor</th>
-                            <th class="num">Qty</th>
-                            <th class="num">Price/Unit</th>
-                            <th class="num">Total</th>
-                        </tr>
-                    </thead>
-                    <tbody id="purchaseHistoryRows"></tbody>
-                </table>
-            </div>
+        <div class="summary-card">
+          <div class="summary-label" id="resultLabel">PROFIT / LOSS</div>
+          <div class="summary-value" id="profitLoss">₹0.00</div>
         </div>
-        <div class="purchase-panel">
-            <h3>Recent Purchase Spending</h3>
-            <div id="purchaseDailySpend"></div>
-        </div>
+      </div>
     </div>
+  </div>
 </div>
 
-<main>
-
-    <div class="dashboard-stats">
-        <div class="stat-card">
-            <div class="stat-label">Total Items</div>
-            <div class="stat-value" id="statItems">0</div>
-            <div class="stat-sub">Active inventory items</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-label">Inventory Value</div>
-            <div class="stat-value" id="statValue">₹0</div>
-            <div class="stat-sub">Current stock × latest price</div>
-        </div>
-        <div class="stat-card stat-warning">
-            <div class="stat-label">Low Stock</div>
-            <div class="stat-value" id="statLow">0</div>
-            <div class="stat-sub">Below alert level</div>
-        </div>
-        <div class="stat-card stat-danger">
-            <div class="stat-label">Out of Stock</div>
-            <div class="stat-value" id="statOut">0</div>
-            <div class="stat-sub">Needs immediate attention</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-label">Today's Purchases</div>
-            <div class="stat-value" id="statPurchases">₹0</div>
-            <div class="stat-sub">Stock In purchase cost</div>
-        </div>
-        <div class="stat-card stat-good">
-            <div class="stat-label">Today's Usage</div>
-            <div class="stat-value" id="statUsage">0</div>
-            <div class="stat-sub">Stock Out quantity</div>
-        </div>
+<div class="modal" id="expenseModal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h2 id="expenseModalTitle">Add Daily Expense</h2>
+      <button class="close" id="closeExpense">×</button>
     </div>
-
-    <div class="dashboard-buttons">
-        <button class="dashboard-btn" id="btnAdd" onclick="openAddInventory()">
-            <div class="icon">➕</div>
-            <h3>Add Inventory</h3>
-            <p>Add and manage inventory items</p>
-        </button>
-        <button class="dashboard-btn" id="btnInventory" onclick="showInventory()">
-            <div class="icon">📦</div>
-            <h3>Inventory</h3>
-            <p>View, filter and manage stock</p>
-        </button>
-        <button class="dashboard-btn" id="btnHistory" onclick="showHistory()">
-            <div class="icon">📜</div>
-            <h3>History</h3>
-            <p>View stock movements by item</p>
-        </button>
-        <button class="dashboard-btn" id="btnLowStock" onclick="showLowStock()">
-            <div class="icon">🔔</div>
-            <h3>Low Stock</h3>
-            <p>Items needing attention</p>
-        </button>
-        <button class="dashboard-btn" id="btnVendors" onclick="showVendors()">
-            <div class="icon">🏪</div>
-            <h3>Vendors</h3>
-            <p>Supplier and purchase overview</p>
-        </button>
-        <button class="dashboard-btn" id="btnPurchasing" onclick="showPurchasing()">
-            <div class="icon">🛒</div>
-            <h3>Purchase Analytics</h3>
-            <p>Purchase costs, events and vendor spending</p>
-        </button>
-    </div>
-
-    <div class="content-card">
-        <div class="content-header">
-            <h2 id="sectionTitle">Dashboard</h2>
-            <div class="refresh-indicator" id="refreshIndicator">Connected to Supabase</div>
+    <form id="expenseForm">
+      <input type="hidden" id="expenseId">
+      <div class="form-grid">
+        <div class="field">
+          <label>Expense Name *</label>
+          <input id="expenseName" required placeholder="Tea, petrol, cleaning…">
         </div>
-        <input type="hidden" id="searchInput" value="">
-        <div id="content"></div>
-    </div>
-
-</main>
-
-
-
-<!-- ADD / EDIT INVENTORY -->
-
-<div class="modal" id="inventoryModal">
-
-    <div class="modal-box">
-
-        <h2 id="inventoryModalTitle">Add Inventory</h2>
-
-        <form id="inventoryForm">
-
-            <div class="form-grid">
-
-                <div class="form-group">
-                    <label>Item Name</label>
-                    <input id="itemName" required>
-                </div>
-
-                <div class="form-group">
-                    <label>Type</label>
-                    <input id="itemType"
-                           placeholder="Vegetable, Dairy, etc."
-                           required>
-                </div>
-
-                <div class="form-group">
-                    <label>Unit</label>
-
-                    <select id="itemUnit" required>
-                        <option value="">Select Unit</option>
-                        <option>kg</option>
-                        <option>g</option>
-                        <option>litre</option>
-                        <option>ml</option>
-                        <option>piece</option>
-                        <option>packet</option>
-                        <option>box</option>
-                        <option>dozen</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>Vendor</label>
-                    <input id="itemVendor" required>
-                </div>
-
-                <div class="form-group">
-                    <label>Current Stock</label>
-                    <input
-                        id="itemStock"
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        required
-                    >
-                </div>
-
-                <div class="form-group">
-                    <label>Purchase Price / Unit (₹)</label>
-                    <input
-                        id="itemPrice"
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        placeholder="Example: 40"
-                        required
-                    >
-                </div>
-
-                <div class="form-group">
-                    <label>Alert Level</label>
-                    <input
-                        id="itemAlert"
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        required
-                    >
-                </div>
-
-            </div>
-
-            <div class="purchase-summary">
-
-                <div class="purchase-summary-row">
-                    <span>Initial Quantity</span>
-                    <strong id="initialQuantityDisplay">0</strong>
-                </div>
-
-                <div class="purchase-summary-row">
-                    <span>Price / Unit</span>
-                    <strong id="initialPriceDisplay">₹0.00</strong>
-                </div>
-
-                <div class="purchase-summary-row purchase-total">
-                    <span>Total Purchase Cost</span>
-                    <strong id="initialTotalDisplay">₹0.00</strong>
-                </div>
-
-            </div>
-
-            <div class="modal-actions">
-
-                <button
-                    type="button"
-                    class="btn cancel-btn"
-                    onclick="closeModal('inventoryModal')">
-                    Cancel
-                </button>
-
-                <button
-                    type="submit"
-                    class="btn save-btn">
-                    Save Item
-                </button>
-
-            </div>
-
-        </form>
-
-    </div>
-
+        <div class="field">
+          <label>Amount (₹) *</label>
+          <input id="expenseAmount" type="number" min="0" step="0.01" required>
+        </div>
+        <div class="field">
+          <label>Category</label>
+          <select id="expenseCategory">
+            <option>Food / Staff</option>
+            <option>Transport</option>
+            <option>Cleaning</option>
+            <option>Maintenance</option>
+            <option>Utilities</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Payment Method</label>
+          <select id="expensePayment">
+            <option>Cash</option>
+            <option>UPI</option>
+            <option>Card</option>
+            <option>Bank Transfer</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="field full">
+          <label>Notes / Description</label>
+          <textarea id="expenseNotes" rows="3" placeholder="Optional"></textarea>
+        </div>
+      </div>
+      <div class="helper">The selected Ledger Date is used automatically for this expense.</div>
+      <div class="form-actions">
+        <button type="button" class="secondary" id="cancelExpense">Cancel</button>
+        <button type="submit" class="primary">Save Expense</button>
+      </div>
+    </form>
+  </div>
 </div>
 
-
-<!-- STOCK IN -->
-
-<div class="modal" id="stockInModal">
-
-    <div class="modal-box">
-
-        <h2>Stock In / Purchase</h2>
-
-        <div class="current-stock">
-
-            Item:
-            <strong id="stockInItemName"></strong>
-
-            <br>
-
-            Current Stock:
-            <strong id="stockInCurrent"></strong>
-
-            <br>
-
-            Latest Purchase Price:
-            <strong id="stockInLatestPrice"></strong>
-
-        </div>
-
-        <div class="form-group">
-
-            <label>Quantity Purchased</label>
-
-            <input
-                id="stockInQuantity"
-                type="number"
-                min="0.01"
-                step="0.01"
-                oninput="calculatePurchaseTotal()"
-            >
-
-        </div>
-
-        <div class="form-group" style="margin-top:15px;">
-
-            <label>Purchase Price / Unit (₹)</label>
-
-            <input
-                id="stockInPrice"
-                type="number"
-                min="0"
-                step="0.01"
-                oninput="calculatePurchaseTotal()"
-            >
-
-        </div>
-
-        <div class="form-group" style="margin-top:15px;">
-
-            <label>Vendor</label>
-
-            <input id="stockInVendor">
-
-        </div>
-
-        <div class="form-group" style="margin-top:15px;">
-
-            <label>Reason</label>
-
-            <select id="stockInReason">
-
-                <option>Purchase</option>
-                <option>Restock</option>
-                <option>Return from supplier</option>
-                <option>Other</option>
-
-            </select>
-
-        </div>
-
-        <div class="purchase-summary">
-
-            <div class="purchase-summary-row purchase-total">
-
-                <span>Total Purchase Cost</span>
-
-                <strong id="stockInTotal">
-                    ₹0.00
-                </strong>
-
-            </div>
-
-        </div>
-
-        <div class="modal-actions">
-
-            <button
-                class="btn cancel-btn"
-                onclick="closeModal('stockInModal')">
-                Cancel
-            </button>
-
-            <button
-                class="btn save-btn"
-                onclick="confirmStockIn()">
-                Confirm Stock In
-            </button>
-
-        </div>
-
+<div class="modal" id="adjustModal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h2 id="adjustTitle">Correct Ledger Amount</h2>
+      <button class="close" id="closeAdjust">×</button>
     </div>
-
+    <div class="field">
+      <label>Source Amount</label>
+      <input id="adjustOriginal" readonly>
+    </div>
+    <div class="field" style="margin-top:13px">
+      <label>Ledger Amount *</label>
+      <input id="adjustAmount" type="number" min="0" step="0.01">
+    </div>
+    <div class="field" style="margin-top:13px">
+      <label>Correction Note</label>
+      <textarea id="adjustNote" rows="3" placeholder="Why was this corrected?"></textarea>
+    </div>
+    <div class="form-actions">
+      <button type="button" class="secondary" id="cancelAdjust">Cancel</button>
+      <button type="button" class="primary" id="saveAdjust">Save Correction</button>
+    </div>
+  </div>
 </div>
 
-
-<!-- STOCK OUT -->
-
-<div class="modal" id="stockOutModal">
-
-    <div class="modal-box">
-
-        <h2>Stock Out</h2>
-
-        <div class="current-stock">
-
-            Item:
-            <strong id="stockOutItemName"></strong>
-
-            <br>
-
-            Current Stock:
-            <strong id="stockOutCurrent"></strong>
-
-        </div>
-
-        <div class="form-group">
-
-            <label>Quantity Used</label>
-
-            <input
-                id="stockOutQuantity"
-                type="number"
-                min="0.01"
-                step="0.01"
-            >
-
-        </div>
-
-        <div class="form-group" style="margin-top:15px;">
-
-            <label>Reason</label>
-
-            <select id="stockOutReason">
-
-                <option>Kitchen use</option>
-                <option>Sold</option>
-                <option>Damaged</option>
-                <option>Expired</option>
-                <option>Other</option>
-
-            </select>
-
-        </div>
-
-        <div class="modal-actions">
-
-            <button
-                class="btn cancel-btn"
-                onclick="closeModal('stockOutModal')">
-                Cancel
-            </button>
-
-            <button
-                class="btn save-btn"
-                onclick="confirmStockOut()">
-                Confirm Stock Out
-            </button>
-
-        </div>
-
-    </div>
-
-</div>
-
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="supabase.js"></script>
-<script>
-/* =========================
-   CHAATARRA INVENTORY
-   SUPABASE + DASHBOARD
-========================= */
-
-let inventory = [];
-let history = [];
-let editingId = null;
-let stockOutId = null;
-let stockInId = null;
-let currentSection = "dashboard";
-let selectedHistoryItem = null;
-let realtimeChannel = null;
-let loadingData = false;
-
-const $ = id => document.getElementById(id);
-
-function money(value) {
-    return `₹${Number(value || 0).toLocaleString("en-IN", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-    })}`;
-}
-
-function formatNumber(value) {
-    const n = Number(value || 0);
-    return Number.isInteger(n) ? String(n) : n.toFixed(2).replace(/0+$/, "").replace(/\.$/, "");
-}
-
-function escapeHtml(value) {
-    return String(value ?? "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-}
-
-function localDate(value) {
-    const d = new Date(value);
-    return isNaN(d) ? String(value || "") : d.toLocaleString("en-IN", {
-        dateStyle: "medium",
-        timeStyle: "short"
-    });
-}
-
-function sameDay(value) {
-    const d = new Date(value);
-    const now = new Date();
-    return d.getFullYear() === now.getFullYear() &&
-           d.getMonth() === now.getMonth() &&
-           d.getDate() === now.getDate();
-}
-
-function getStatus(item) {
-    if (Number(item.stock) <= 0) return { text: "Out of Stock", class: "red" };
-    if (Number(item.stock) < Number(item.alert)) return { text: "Low Stock", class: "red" };
-    if (Number(item.stock) === Number(item.alert)) return { text: "Alert Level", class: "orange" };
-    return { text: "In Stock", class: "green" };
-}
-
-function stockValue(item) {
-    return Number(item.stock || 0) * Number(item.purchasePrice || 0);
-}
-
-function itemRecords(id) {
-    return history.filter(r => Number(r.inventoryItemId) === Number(id));
-}
-
-function weightedAveragePrice(id) {
-    const records = itemRecords(id).filter(r =>
-        r.movement === "Stock In" &&
-        Number(r.quantity) > 0 &&
-        r.pricePerUnit != null
-    );
-
-    let qty = 0, cost = 0;
-    records.forEach(r => {
-        qty += Number(r.quantity || 0);
-        cost += Number(r.totalCost || 0);
-    });
-
-    return qty > 0 ? cost / qty : 0;
-}
-
-function totalPurchased(id) {
-    return itemRecords(id)
-        .filter(r => r.movement === "Stock In")
-        .reduce((s, r) => s + Number(r.quantity || 0), 0);
-}
-
-function totalPurchaseCost(id) {
-    return itemRecords(id)
-        .filter(r => r.movement === "Stock In")
-        .reduce((s, r) => s + Number(r.totalCost || 0), 0);
-}
-
-function totalUsed(id) {
-    return itemRecords(id)
-        .filter(r => r.movement === "Stock Out")
-        .reduce((s, r) => s + Number(r.quantity || 0), 0);
-}
-
-function estimatedUsageCost(id) {
-    return totalUsed(id) * weightedAveragePrice(id);
-}
-
-/* =========================
-   LOAD
-========================= */
-
-async function loadData() {
-    loadingData = true;
-    $("refreshIndicator").textContent = "Loading…";
-
-    try {
-        const { data: items, error: itemError } = await supabaseClient
-            .from("inventory_items")
-            .select("*")
-            .order("name", { ascending: true });
-
-        if (itemError) throw itemError;
-
-        const { data: records, error: historyError } = await supabaseClient
-            .from("inventory_history")
-            .select("*")
-            .order("created_at", { ascending: true });
-
-        if (historyError) throw historyError;
-
-        inventory = (items || []).map(item => ({
-            id: item.id,
-            name: item.name,
-            type: item.type,
-            unit: item.unit,
-            vendor: item.vendor || "",
-            stock: Number(item.current_stock || 0),
-            purchasePrice: Number(item.purchase_price || 0),
-            alert: Number(item.alert_level || 0),
-            updatedAt: item.updated_at
-        }));
-
-        history = (records || []).map(record => ({
-            id: record.id,
-            inventoryItemId: record.inventory_item_id,
-            date: record.created_at,
-            item: record.item_name || "",
-            movement: record.movement,
-            quantity: Number(record.quantity || 0),
-            unit: record.unit || "",
-            balance: Number(record.balance || 0),
-            reason: record.reason || "",
-            pricePerUnit: record.price_per_unit == null ? null : Number(record.price_per_unit),
-            totalCost: record.total_cost == null ? null : Number(record.total_cost),
-            vendor: record.vendor || ""
-        }));
-
-        updateDashboardStats();
-        renderCurrentSection();
-        $("refreshIndicator").textContent = "Live • Supabase";
-    } catch (error) {
-        console.error(error);
-        $("refreshIndicator").textContent = "Connection error";
-        $("content").innerHTML = `
-            <div class="empty">
-                <strong>Unable to load inventory.</strong><br><br>
-                ${escapeHtml(error.message || "Please check your Supabase connection.")}
-            </div>`;
-    } finally {
-        loadingData = false;
-    }
-}
-
-/* =========================
-   REALTIME
-========================= */
-
-function setupRealtime() {
-    try {
-        realtimeChannel = supabaseClient
-            .channel("chaatarra-inventory-live")
-            .on("postgres_changes", { event: "*", schema: "public", table: "inventory_items" }, () => loadData())
-            .on("postgres_changes", { event: "*", schema: "public", table: "inventory_history" }, () => loadData())
-            .subscribe(status => {
-                if (status === "SUBSCRIBED") {
-                    $("refreshIndicator").textContent = "Live • Supabase";
-                }
-            });
-    } catch (e) {
-        console.warn("Realtime unavailable:", e);
-    }
-}
-
-/* =========================
-   DASHBOARD
-========================= */
-
-function updateDashboardStats() {
-    const low = inventory.filter(i => i.stock > 0 && i.stock < i.alert).length;
-    const out = inventory.filter(i => i.stock <= 0).length;
-    const value = inventory.reduce((s, i) => s + stockValue(i), 0);
-
-    const todayIn = history
-        .filter(r => r.movement === "Stock In" && sameDay(r.date))
-        .reduce((s, r) => s + Number(r.totalCost || 0), 0);
-
-    const todayOut = history
-        .filter(r => r.movement === "Stock Out" && sameDay(r.date))
-        .reduce((s, r) => s + Number(r.quantity || 0), 0);
-
-    $("statItems").textContent = inventory.length;
-    $("statValue").textContent = money(value);
-    $("statLow").textContent = low;
-    $("statOut").textContent = out;
-    $("statPurchases").textContent = money(todayIn);
-    $("statUsage").textContent = formatNumber(todayOut);
-}
-
-function renderDashboard() {
-    const recent = history.slice().reverse().slice(0, 8);
-    const low = inventory.filter(i => i.stock <= i.alert)
-        .sort((a,b) => a.stock - b.stock)
-        .slice(0, 6);
-
-    let html = `
-        <div class="summary-strip">
-            <div class="summary-box">
-                <span>Total purchase cost recorded</span>
-                <strong>${money(history.filter(r => r.movement === "Stock In").reduce((s,r) => s + Number(r.totalCost || 0), 0))}</strong>
-            </div>
-            <div class="summary-box">
-                <span>Total stock-out quantity</span>
-                <strong>${formatNumber(history.filter(r => r.movement === "Stock Out").reduce((s,r) => s + Number(r.quantity || 0), 0))}</strong>
-            </div>
-            <div class="summary-box">
-                <span>Items with movement</span>
-                <strong>${new Set(history.map(r => r.inventoryItemId)).size}</strong>
-            </div>
-            <div class="summary-box">
-                <span>Vendors</span>
-                <strong>${new Set(inventory.map(i => i.vendor).filter(Boolean)).size}</strong>
-            </div>
-        </div>
-
-        <div class="recent-grid">
-            <div class="recent-panel">
-                <h3>Recent Activity</h3>
-                ${recent.length ? recent.map(r => `
-                    <div class="activity-row">
-                        <div class="activity-main">
-                            <strong>${escapeHtml(r.item)}</strong>
-                            <div class="activity-meta">${escapeHtml(r.reason || "No reason")} • ${localDate(r.date)}</div>
-                        </div>
-                        <div class="${r.movement === "Stock In" ? "movement-in" : "movement-out"}">
-                            ${r.movement === "Stock In" ? "+" : "−"}${formatNumber(r.quantity)} ${escapeHtml(r.unit)}
-                        </div>
-                    </div>
-                `).join("") : `<div class="empty">No stock activity yet.</div>`}
-            </div>
-
-            <div class="recent-panel">
-                <h3>Needs Attention</h3>
-                <div class="mini-list">
-                    ${low.length ? low.map(i => `
-                        <div class="mini-item">
-                            <div>
-                                <strong>${escapeHtml(i.name)}</strong>
-                                <span>${formatNumber(i.stock)} / ${formatNumber(i.alert)} ${escapeHtml(i.unit)}</span>
-                            </div>
-                            <button class="btn btn-stock-in" onclick="openStockIn(${i.id})">Stock In</button>
-                        </div>
-                    `).join("") : `<div class="empty">Everything is above its alert level.</div>`}
-                </div>
-            </div>
-        </div>
-    `;
-    $("content").innerHTML = html;
-}
-
-/* =========================
-   SECTION NAVIGATION
-========================= */
-
-function setActiveButton(id) {
-    document.querySelectorAll(".dashboard-btn").forEach(b => b.classList.remove("active"));
-    const b = $(id);
-    if (b) b.classList.add("active");
-}
-
-function showDashboard() {
-    currentSection = "dashboard";
-    selectedHistoryItem = null;
-    $("sectionTitle").textContent = "Dashboard";
-    setActiveButton(null);
-    renderDashboard();
-}
-
-function showInventory() {
-    currentSection = "inventory";
-    selectedHistoryItem = null;
-    $("sectionTitle").textContent = "Inventory";
-    setActiveButton("btnInventory");
-    renderInventory();
-}
-
-function showLowStock() {
-    currentSection = "lowstock";
-    selectedHistoryItem = null;
-    $("sectionTitle").textContent = "Low Stock";
-    setActiveButton("btnLowStock");
-    renderLowStock();
-}
-
-function showHistory() {
-    currentSection = "history";
-    selectedHistoryItem = null;
-    $("sectionTitle").textContent = "Stock History";
-    setActiveButton("btnHistory");
-    renderHistoryItems();
-}
-
-function showVendors() {
-    currentSection = "vendors";
-    selectedHistoryItem = null;
-    $("sectionTitle").textContent = "Vendors";
-    setActiveButton("btnVendors");
-    renderVendors();
-}
-
-function renderCurrentSection() {
-    if (currentSection === "dashboard") renderDashboard();
-    if (currentSection === "inventory") renderInventory();
-    if (currentSection === "lowstock") renderLowStock();
-    if (currentSection === "vendors") renderVendors();
-    if (currentSection === "history") {
-        if (selectedHistoryItem) renderItemHistory(selectedHistoryItem);
-        else renderHistoryItems();
-    }
-    updateDashboardStats();
-}
-
-/* =========================
-   INVENTORY FILTERS
-========================= */
-
-function inventoryControls() {
-    const types = [...new Set(inventory.map(i => i.type).filter(Boolean))].sort();
-    const vendors = [...new Set(inventory.map(i => i.vendor).filter(Boolean))].sort();
-
-    return `
-        <div class="toolbar">
-            <input class="search-wide" id="inventorySearch" placeholder="Search item, type or vendor..."
-                   value="${escapeHtml($("searchInput").value)}"
-                   oninput="syncInventorySearch(this.value)">
-            <select id="inventoryStatusFilter" onchange="renderInventory()">
-                <option value="">All Status</option>
-                <option value="In Stock">In Stock</option>
-                <option value="Alert Level">Alert Level</option>
-                <option value="Low Stock">Low Stock</option>
-                <option value="Out of Stock">Out of Stock</option>
-            </select>
-            <select id="inventoryTypeFilter" onchange="renderInventory()">
-                <option value="">All Types</option>
-                ${types.map(t => `<option>${escapeHtml(t)}</option>`).join("")}
-            </select>
-            <select id="inventoryVendorFilter" onchange="renderInventory()">
-                <option value="">All Vendors</option>
-                ${vendors.map(v => `<option>${escapeHtml(v)}</option>`).join("")}
-            </select>
-            <select id="inventorySort" onchange="renderInventory()">
-                <option value="name">Name A–Z</option>
-                <option value="stockLow">Lowest Stock</option>
-                <option value="stockHigh">Highest Stock</option>
-                <option value="valueHigh">Highest Value</option>
-                <option value="priceHigh">Highest Price</option>
-                <option value="updated">Recently Updated</option>
-            </select>
-            <button class="toolbar-btn" onclick="exportInventoryCSV()">Export CSV</button>
-        </div>
-    `;
-}
-
-function syncInventorySearch(value) {
-    $("searchInput").value = value;
-    renderInventory();
-}
-
-function renderInventory() {
-    let search = ($("searchInput").value || "").toLowerCase().trim();
-    const statusFilter = $("inventoryStatusFilter")?.value || "";
-    const typeFilter = $("inventoryTypeFilter")?.value || "";
-    const vendorFilter = $("inventoryVendorFilter")?.value || "";
-    const sort = $("inventorySort")?.value || "name";
-
-    let items = inventory.filter(item => {
-        const status = getStatus(item).text;
-        const matchesSearch =
-            !search ||
-            item.name.toLowerCase().includes(search) ||
-            item.type.toLowerCase().includes(search) ||
-            item.vendor.toLowerCase().includes(search);
-
-        return matchesSearch &&
-            (!statusFilter || status === statusFilter) &&
-            (!typeFilter || item.type === typeFilter) &&
-            (!vendorFilter || item.vendor === vendorFilter);
-    });
-
-    if (sort === "stockLow") items.sort((a,b) => a.stock - b.stock);
-    else if (sort === "stockHigh") items.sort((a,b) => b.stock - a.stock);
-    else if (sort === "valueHigh") items.sort((a,b) => stockValue(b) - stockValue(a));
-    else if (sort === "priceHigh") items.sort((a,b) => b.purchasePrice - a.purchasePrice);
-    else if (sort === "updated") items.sort((a,b) => new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0));
-    else items.sort((a,b) => a.name.localeCompare(b.name));
-
-    let html = inventoryControls();
-
-    if (!items.length) {
-        html += `<div class="empty">No inventory items match your filters.</div>`;
-        $("content").innerHTML = html;
-        return;
-    }
-
-    html += `
-        <div class="table-wrapper">
-        <table>
-        <thead><tr>
-            <th>Item</th><th>Type</th><th>Unit</th><th>Vendor</th>
-            <th>Current Stock</th><th>Purchase Price</th><th>Avg Price</th>
-            <th>Stock Value</th><th>Alert Level</th><th>Status</th><th>Actions</th>
-        </tr></thead><tbody>
-    `;
-
-    items.forEach(item => {
-        const status = getStatus(item);
-        const avg = weightedAveragePrice(item.id);
-        html += `
-            <tr>
-                <td><strong>${escapeHtml(item.name)}</strong></td>
-                <td>${escapeHtml(item.type)}</td>
-                <td>${escapeHtml(item.unit)}</td>
-                <td>${escapeHtml(item.vendor || "—")}</td>
-                <td><strong>${formatNumber(item.stock)} ${escapeHtml(item.unit)}</strong></td>
-                <td><span class="price-badge">${money(item.purchasePrice)} / ${escapeHtml(item.unit)}</span></td>
-                <td><span class="avg-price">${avg ? money(avg) : "—"} / ${escapeHtml(item.unit)}</span></td>
-                <td><span class="stock-value">${money(stockValue(item))}</span></td>
-                <td>${formatNumber(item.alert)} ${escapeHtml(item.unit)}</td>
-                <td><span class="status ${status.class}">${status.text}</span></td>
-                <td class="inline-actions">
-                    <button class="btn btn-stock-in" onclick="openStockIn(${item.id})">Stock In</button>
-                    <button class="btn btn-stock" onclick="openStockOut(${item.id})">Stock Out</button>
-                    <button class="btn btn-edit" onclick="editInventory(${item.id})">Edit</button>
-                    <button class="btn btn-delete" onclick="deleteInventory(${item.id})">Delete</button>
-                </td>
-            </tr>`;
-    });
-
-    html += `</tbody></table></div>`;
-    $("content").innerHTML = html;
-}
-
-/* =========================
-   LOW STOCK
-========================= */
-
-function renderLowStock() {
-    const search = ($("searchInput").value || "").toLowerCase().trim();
-
-    const items = inventory
-        .filter(item => item.stock <= item.alert)
-        .filter(item =>
-            !search ||
-            item.name.toLowerCase().includes(search) ||
-            item.vendor.toLowerCase().includes(search) ||
-            item.type.toLowerCase().includes(search)
-        )
-        .sort((a,b) => a.stock - b.stock);
-
-    let html = `
-        <div class="toolbar">
-            <input class="search-wide" id="lowStockSearch" placeholder="Search low-stock items..."
-                   value="${escapeHtml($("searchInput").value)}"
-                   oninput="syncLowStockSearch(this.value)">
-            <button class="toolbar-btn" onclick="showInventory()">View All Inventory</button>
-        </div>
-    `;
-
-    if (!items.length) {
-        html += `<div class="empty">🎉 No items are currently at or below their alert level.</div>`;
-        $("content").innerHTML = html;
-        return;
-    }
-
-    html += `<div class="table-wrapper"><table>
-        <thead><tr>
-            <th>Item</th><th>Current Stock</th><th>Alert Level</th><th>Vendor</th>
-            <th>Latest Price</th><th>Stock Value</th><th>Status</th><th>Action</th>
-        </tr></thead><tbody>`;
-
-    items.forEach(item => {
-        const status = getStatus(item);
-        html += `<tr>
-            <td><strong>${escapeHtml(item.name)}</strong></td>
-            <td>${formatNumber(item.stock)} ${escapeHtml(item.unit)}</td>
-            <td>${formatNumber(item.alert)} ${escapeHtml(item.unit)}</td>
-            <td>${escapeHtml(item.vendor || "—")}</td>
-            <td>${money(item.purchasePrice)} / ${escapeHtml(item.unit)}</td>
-            <td>${money(stockValue(item))}</td>
-            <td><span class="status ${status.class}">${status.text}</span></td>
-            <td><button class="btn btn-stock-in" onclick="openStockIn(${item.id})">Stock In</button></td>
-        </tr>`;
-    });
-
-    html += `</tbody></table></div>`;
-    $("content").innerHTML = html;
-}
-
-function syncLowStockSearch(value) {
-    $("searchInput").value = value;
-    renderLowStock();
-}
-
-/* =========================
-   HISTORY
-========================= */
-
-function renderHistoryItems() {
-    const search = ($("searchInput").value || "").toLowerCase().trim();
-
-    const items = inventory.filter(item =>
-        !search ||
-        item.name.toLowerCase().includes(search) ||
-        item.type.toLowerCase().includes(search) ||
-        item.vendor.toLowerCase().includes(search)
-    );
-
-    if (!items.length) {
-        $("content").innerHTML = `<div class="empty">No inventory items available.</div>`;
-        return;
-    }
-
-    let html = `<div class="history-items">`;
-
-    items.forEach(item => {
-        const records = itemRecords(item.id);
-        const last = records[records.length - 1];
-        const avg = weightedAveragePrice(item.id);
-
-        html += `
-            <div class="history-card">
-                <div class="history-card-top">
-                    <h3>${escapeHtml(item.name)}</h3>
-                    <div class="history-icon">📦</div>
-                </div>
-                <div class="history-info">
-                    Current Stock
-                    <div class="history-stock">${formatNumber(item.stock)} ${escapeHtml(item.unit)}</div>
-
-                    Stock Value
-                    <div class="history-stock">${money(stockValue(item))}</div>
-
-                    Latest Purchase Price
-                    <div class="history-stock">${money(item.purchasePrice)} / ${escapeHtml(item.unit)}</div>
-
-                    Weighted Average Price
-                    <div>${avg ? money(avg) : "—"} / ${escapeHtml(item.unit)}</div>
-
-                    Last Movement
-                    <div class="${last?.movement === "Stock Out" ? "history-out" : "history-in"}">
-                        ${last ? (last.movement === "Stock Out" ? "−" : "+") + formatNumber(last.quantity) + " " + escapeHtml(last.unit) : "No movement yet"}
-                    </div>
-                </div>
-                <br>
-                <button class="btn btn-view" onclick="openItemHistory(${item.id})">View History →</button>
-            </div>`;
-    });
-
-    html += `</div>`;
-    $("content").innerHTML = html;
-}
-
-function openItemHistory(id) {
-    selectedHistoryItem = id;
-    renderItemHistory(id);
-}
-
-function renderItemHistory(id) {
-    const item = inventory.find(i => Number(i.id) === Number(id));
-    if (!item) return;
-
-    const search = ($("searchInput").value || "").toLowerCase().trim();
-
-    let records = itemRecords(id);
-    if (search) {
-        records = records.filter(r => (r.reason || "").toLowerCase().includes(search));
-    }
-
-    $("sectionTitle").textContent = `${item.name} — Stock History`;
-
-    const avg = weightedAveragePrice(id);
-    const purchased = totalPurchased(id);
-    const purchaseCost = totalPurchaseCost(id);
-    const used = totalUsed(id);
-    const usageCost = estimatedUsageCost(id);
-
-    let html = `
-        <button class="btn btn-back" onclick="showHistory()">← Back to History</button>
-
-        <div class="summary-strip">
-            <div class="summary-box"><span>Current Stock</span><strong>${formatNumber(item.stock)} ${escapeHtml(item.unit)}</strong></div>
-            <div class="summary-box"><span>Stock Value</span><strong>${money(stockValue(item))}</strong></div>
-            <div class="summary-box"><span>Weighted Avg. Price</span><strong>${avg ? money(avg) : "—"} / ${escapeHtml(item.unit)}</strong></div>
-            <div class="summary-box"><span>Estimated Usage Cost</span><strong>${money(usageCost)}</strong></div>
-        </div>
-
-        <div class="current-stock">
-            <strong>${escapeHtml(item.name)}</strong><br>
-            Latest Purchase Price: <strong>${money(item.purchasePrice)} / ${escapeHtml(item.unit)}</strong><br>
-            Total Purchased: <strong>${formatNumber(purchased)} ${escapeHtml(item.unit)}</strong>
-            &nbsp; • &nbsp;
-            Total Purchase Cost: <strong>${money(purchaseCost)}</strong><br>
-            Total Used/Stock Out: <strong>${formatNumber(used)} ${escapeHtml(item.unit)}</strong>
-        </div>
-    `;
-
-    if (!records.length) {
-        html += `<div class="empty">No history available for this item.</div>`;
-        $("content").innerHTML = html;
-        return;
-    }
-
-    html += `
-        <div class="table-wrapper"><table>
-        <thead><tr>
-            <th>Date & Time</th><th>Movement</th><th>Quantity</th><th>Balance</th>
-            <th>Purchase Price</th><th>Total Cost</th><th>Vendor</th><th>Reason</th>
-        </tr></thead><tbody>`;
-
-    records.slice().reverse().forEach(record => {
-        const isOut = record.movement === "Stock Out";
-        html += `<tr>
-            <td>${escapeHtml(localDate(record.date))}</td>
-            <td class="${isOut ? "history-out" : "history-in"}">${escapeHtml(record.movement)}</td>
-            <td class="${isOut ? "history-out" : "history-in"}">${isOut ? "−" : "+"}${formatNumber(record.quantity)} ${escapeHtml(record.unit)}</td>
-            <td><strong>${formatNumber(record.balance)} ${escapeHtml(record.unit)}</strong></td>
-            <td>${isOut || record.pricePerUnit == null ? "—" : money(record.pricePerUnit) + " / " + escapeHtml(record.unit)}</td>
-            <td>${isOut || record.totalCost == null ? "—" : money(record.totalCost)}</td>
-            <td>${escapeHtml(record.vendor || "—")}</td>
-            <td>${escapeHtml(record.reason || "—")}</td>
-        </tr>`;
-    });
-
-    html += `</tbody></table></div>`;
-    $("content").innerHTML = html;
-}
-
-/* =========================
-   VENDORS
-========================= */
-
-function renderVendors() {
-    const search = ($("searchInput").value || "").toLowerCase().trim();
-    const vendorNames = [...new Set(inventory.map(i => i.vendor).filter(Boolean))]
-        .filter(v => !search || v.toLowerCase().includes(search))
-        .sort();
-
-    let html = `
-        <div class="toolbar">
-            <input class="search-wide" placeholder="Search vendors..."
-                   value="${escapeHtml($("searchInput").value)}"
-                   oninput="syncVendorSearch(this.value)">
-            <button class="toolbar-btn" onclick="exportInventoryCSV()">Export Inventory CSV</button>
-        </div>
-        <div class="vendor-grid">
-    `;
-
-    vendorNames.forEach(vendor => {
-        const items = inventory.filter(i => i.vendor === vendor);
-        const ids = new Set(items.map(i => i.id));
-        const purchases = history
-            .filter(r => ids.has(r.inventoryItemId) && r.movement === "Stock In")
-            .reduce((s,r) => s + Number(r.totalCost || 0), 0);
-
-        const latest = history
-            .filter(r => ids.has(r.inventoryItemId) && r.movement === "Stock In")
-            .sort((a,b) => new Date(b.date) - new Date(a.date))[0];
-
-        html += `
-            <div class="vendor-card">
-                <h3>${escapeHtml(vendor)}</h3>
-                <div class="vendor-stat">
-                    Items supplied: <strong>${items.length}</strong><br>
-                    Total purchases recorded: <strong>${money(purchases)}</strong><br>
-                    Latest purchase: <strong>${latest ? localDate(latest.date) : "—"}</strong><br>
-                    Current stock value from vendor items: <strong>${money(items.reduce((s,i) => s + stockValue(i), 0))}</strong>
-                </div>
-            </div>`;
-    });
-
-    if (!vendorNames.length) {
-        html += `<div class="empty">No vendors found.</div>`;
-    }
-
-    html += `</div>`;
-    $("content").innerHTML = html;
-}
-
-function syncVendorSearch(value) {
-    $("searchInput").value = value;
-    renderVendors();
-}
-
-/* =========================
-   ADD / EDIT
-========================= */
-
-function openAddInventory() {
-    editingId = null;
-    $("inventoryModalTitle").textContent = "Add Inventory";
-    $("inventoryForm").reset();
-    updateInitialPurchaseTotal();
-    $("inventoryModal").style.display = "flex";
-}
-
-function editInventory(id) {
-    const item = inventory.find(i => Number(i.id) === Number(id));
-    if (!item) return;
-
-    editingId = id;
-    $("inventoryModalTitle").textContent = "Edit Inventory";
-    $("itemName").value = item.name;
-    $("itemType").value = item.type;
-    $("itemUnit").value = item.unit;
-    $("itemVendor").value = item.vendor;
-    $("itemStock").value = item.stock;
-    $("itemPrice").value = item.purchasePrice || 0;
-    $("itemAlert").value = item.alert;
-    updateInitialPurchaseTotal();
-    $("inventoryModal").style.display = "flex";
-}
-
-function updateInitialPurchaseTotal() {
-    const quantity = Number($("itemStock").value) || 0;
-    const price = Number($("itemPrice").value) || 0;
-    $("initialQuantityDisplay").textContent = formatNumber(quantity);
-    $("initialPriceDisplay").textContent = money(price);
-    $("initialTotalDisplay").textContent = money(quantity * price);
-}
-
-$("inventoryForm").addEventListener("submit", async function(e) {
-    e.preventDefault();
-
-    const name = $("itemName").value.trim();
-    const type = $("itemType").value.trim();
-    const unit = $("itemUnit").value;
-    const vendor = $("itemVendor").value.trim();
-    const stock = Number($("itemStock").value);
-    const purchasePrice = Number($("itemPrice").value);
-    const alertLevel = Number($("itemAlert").value);
-
-    if (!name || !type || !unit || !vendor || stock < 0 || purchasePrice < 0 || alertLevel < 0) {
-        alert("Please enter valid inventory details.");
-        return;
-    }
-
-    const button = $("inventoryForm").querySelector(".save-btn");
-    button.disabled = true;
-    button.textContent = "Saving…";
-
-    try {
-        if (editingId) {
-            const { data, error } = await supabaseClient
-                .from("inventory_items")
-                .update({
-                    name, type, unit, vendor,
-                    current_stock: stock,
-                    purchase_price: purchasePrice,
-                    alert_level: alertLevel
-                })
-                .eq("id", editingId)
-                .select()
-                .single();
-
-            if (error) throw error;
-
-            const item = inventory.find(i => Number(i.id) === Number(editingId));
-            if (item) {
-                Object.assign(item, {
-                    name: data.name,
-                    type: data.type,
-                    unit: data.unit,
-                    vendor: data.vendor || "",
-                    stock: Number(data.current_stock || 0),
-                    purchasePrice: Number(data.purchase_price || 0),
-                    alert: Number(data.alert_level || 0),
-                    updatedAt: data.updated_at
-                });
-            }
-        } else {
-            const { data: newItem, error: insertError } = await supabaseClient
-                .from("inventory_items")
-                .insert({
-                    name, type, unit, vendor,
-                    current_stock: stock,
-                    purchase_price: purchasePrice,
-                    alert_level: alertLevel
-                })
-                .select()
-                .single();
-
-            if (insertError) throw insertError;
-
-            const { data: newHistory, error: historyError } = await supabaseClient
-                .from("inventory_history")
-                .insert({
-                    inventory_item_id: newItem.id,
-                    item_name: newItem.name,
-                    movement: "Stock In",
-                    quantity: stock,
-                    unit,
-                    balance: stock,
-                    reason: "Initial stock",
-                    price_per_unit: purchasePrice,
-                    total_cost: Number((stock * purchasePrice).toFixed(2)),
-                    vendor
-                })
-                .select()
-                .single();
-
-            if (historyError) {
-                await supabaseClient.from("inventory_items").delete().eq("id", newItem.id);
-                throw historyError;
-            }
-
-            inventory.push({
-                id: newItem.id,
-                name: newItem.name,
-                type: newItem.type,
-                unit: newItem.unit,
-                vendor: newItem.vendor || "",
-                stock: Number(newItem.current_stock || 0),
-                purchasePrice: Number(newItem.purchase_price || 0),
-                alert: Number(newItem.alert_level || 0),
-                updatedAt: newItem.updated_at
-            });
-
-            history.push({
-                id: newHistory.id,
-                inventoryItemId: newHistory.inventory_item_id,
-                date: newHistory.created_at,
-                item: newHistory.item_name,
-                movement: newHistory.movement,
-                quantity: Number(newHistory.quantity),
-                unit: newHistory.unit,
-                balance: Number(newHistory.balance),
-                reason: newHistory.reason || "",
-                pricePerUnit: Number(newHistory.price_per_unit || 0),
-                totalCost: Number(newHistory.total_cost || 0),
-                vendor: newHistory.vendor || ""
-            });
-        }
-
-        closeModal("inventoryModal");
-        updateDashboardStats();
-        showInventory();
-    } catch (error) {
-        console.error(error);
-        alert("Could not save inventory.\n\n" + (error.message || "Unknown error"));
-    } finally {
-        button.disabled = false;
-        button.textContent = "Save Item";
-    }
-});
-
-/* =========================
-   DELETE
-========================= */
-
-async function deleteInventory(id) {
-    const item = inventory.find(i => Number(i.id) === Number(id));
-    if (!item) return;
-
-    if (!confirm(`Delete ${item.name}?\n\nThis will also permanently delete its stock history.`)) return;
-
-    try {
-        const { error } = await supabaseClient
-            .from("inventory_items")
-            .delete()
-            .eq("id", id);
-
-        if (error) throw error;
-
-        inventory = inventory.filter(i => Number(i.id) !== Number(id));
-        history = history.filter(r => Number(r.inventoryItemId) !== Number(id));
-
-        selectedHistoryItem = null;
-        updateDashboardStats();
-        renderCurrentSection();
-    } catch (error) {
-        alert("Could not delete item.\n\n" + (error.message || "Unknown error"));
-    }
-}
-
-/* =========================
-   STOCK IN
-========================= */
-
-function openStockIn(id) {
-    const item = inventory.find(i => Number(i.id) === Number(id));
-    if (!item) return;
-
-    stockInId = id;
-    $("stockInItemName").textContent = item.name;
-    $("stockInCurrent").textContent = `${formatNumber(item.stock)} ${item.unit}`;
-    $("stockInLatestPrice").textContent = `${money(item.purchasePrice)} / ${item.unit}`;
-    $("stockInQuantity").value = "";
-    $("stockInPrice").value = item.purchasePrice || "";
-    $("stockInVendor").value = item.vendor || "";
-    $("stockInReason").value = "Purchase";
-    calculatePurchaseTotal();
-    $("stockInModal").style.display = "flex";
-}
-
-function calculatePurchaseTotal() {
-    const quantity = Number($("stockInQuantity").value) || 0;
-    const price = Number($("stockInPrice").value) || 0;
-    $("stockInTotal").textContent = money(quantity * price);
-}
-
-async function confirmStockIn() {
-    const item = inventory.find(i => Number(i.id) === Number(stockInId));
-    if (!item) return;
-
-    const quantity = Number($("stockInQuantity").value);
-    const price = Number($("stockInPrice").value);
-    const vendor = $("stockInVendor").value.trim();
-    const reason = $("stockInReason").value;
-
-    if (!quantity || quantity <= 0 || isNaN(quantity)) {
-        alert("Please enter a valid purchase quantity.");
-        return;
-    }
-    if (price < 0 || isNaN(price)) {
-        alert("Please enter a valid purchase price.");
-        return;
-    }
-
-    const newStock = Number((item.stock + quantity).toFixed(2));
-    const totalCost = Number((quantity * price).toFixed(2));
-
-    const buttons = document.querySelectorAll("#stockInModal button");
-    buttons.forEach(b => b.disabled = true);
-
-    try {
-        const { data: updatedItem, error: updateError } = await supabaseClient
-            .from("inventory_items")
-            .update({
-                current_stock: newStock,
-                purchase_price: price,
-                vendor: vendor || item.vendor
-            })
-            .eq("id", stockInId)
-            .select()
-            .single();
-
-        if (updateError) throw updateError;
-
-        const { data: newHistory, error: historyError } = await supabaseClient
-            .from("inventory_history")
-            .insert({
-                inventory_item_id: item.id,
-                item_name: updatedItem.name,
-                movement: "Stock In",
-                quantity,
-                unit: updatedItem.unit,
-                balance: newStock,
-                reason,
-                price_per_unit: price,
-                total_cost: totalCost,
-                vendor: vendor || updatedItem.vendor || ""
-            })
-            .select()
-            .single();
-
-        if (historyError) {
-            await supabaseClient
-                .from("inventory_items")
-                .update({
-                    current_stock: item.stock,
-                    purchase_price: item.purchasePrice,
-                    vendor: item.vendor
-                })
-                .eq("id", item.id);
-            throw historyError;
-        }
-
-        Object.assign(item, {
-            stock: Number(updatedItem.current_stock),
-            purchasePrice: Number(updatedItem.purchase_price),
-            vendor: updatedItem.vendor || "",
-            updatedAt: updatedItem.updated_at
-        });
-
-        history.push({
-            id: newHistory.id,
-            inventoryItemId: newHistory.inventory_item_id,
-            date: newHistory.created_at,
-            item: newHistory.item_name,
-            movement: newHistory.movement,
-            quantity: Number(newHistory.quantity),
-            unit: newHistory.unit,
-            balance: Number(newHistory.balance),
-            reason: newHistory.reason || "",
-            pricePerUnit: Number(newHistory.price_per_unit || 0),
-            totalCost: Number(newHistory.total_cost || 0),
-            vendor: newHistory.vendor || ""
-        });
-
-        closeModal("stockInModal");
-        showInventory();
-    } catch (error) {
-        alert("Could not record Stock In.\n\n" + (error.message || "Unknown error"));
-    } finally {
-        buttons.forEach(b => b.disabled = false);
-    }
-}
-
-/* =========================
-   STOCK OUT
-========================= */
-
-function openStockOut(id) {
-    const item = inventory.find(i => Number(i.id) === Number(id));
-    if (!item) return;
-
-    stockOutId = id;
-    $("stockOutItemName").textContent = item.name;
-    $("stockOutCurrent").textContent = `${formatNumber(item.stock)} ${item.unit}`;
-    $("stockOutQuantity").value = "";
-    $("stockOutModal").style.display = "flex";
-}
-
-async function confirmStockOut() {
-    const item = inventory.find(i => Number(i.id) === Number(stockOutId));
-    if (!item) return;
-
-    const quantity = Number($("stockOutQuantity").value);
-    const reason = $("stockOutReason").value;
-
-    if (!quantity || quantity <= 0 || isNaN(quantity)) {
-        alert("Please enter a valid quantity.");
-        return;
-    }
-    if (quantity > item.stock) {
-        alert(`You cannot remove ${formatNumber(quantity)} ${item.unit}.\n\nCurrent stock: ${formatNumber(item.stock)} ${item.unit}`);
-        return;
-    }
-
-    const newStock = Number((item.stock - quantity).toFixed(2));
-    const buttons = document.querySelectorAll("#stockOutModal button");
-    buttons.forEach(b => b.disabled = true);
-
-    try {
-        const { data: updatedItem, error: updateError } = await supabaseClient
-            .from("inventory_items")
-            .update({ current_stock: newStock })
-            .eq("id", stockOutId)
-            .select()
-            .single();
-
-        if (updateError) throw updateError;
-
-        const { data: newHistory, error: historyError } = await supabaseClient
-            .from("inventory_history")
-            .insert({
-                inventory_item_id: item.id,
-                item_name: updatedItem.name,
-                movement: "Stock Out",
-                quantity,
-                unit: updatedItem.unit,
-                balance: newStock,
-                reason,
-                price_per_unit: null,
-                total_cost: null,
-                vendor: item.vendor || ""
-            })
-            .select()
-            .single();
-
-        if (historyError) {
-            await supabaseClient
-                .from("inventory_items")
-                .update({ current_stock: item.stock })
-                .eq("id", item.id);
-            throw historyError;
-        }
-
-        Object.assign(item, {
-            stock: Number(updatedItem.current_stock),
-            updatedAt: updatedItem.updated_at
-        });
-
-        history.push({
-            id: newHistory.id,
-            inventoryItemId: newHistory.inventory_item_id,
-            date: newHistory.created_at,
-            item: newHistory.item_name,
-            movement: newHistory.movement,
-            quantity: Number(newHistory.quantity),
-            unit: newHistory.unit,
-            balance: Number(newHistory.balance),
-            reason: newHistory.reason || "",
-            pricePerUnit: null,
-            totalCost: null,
-            vendor: newHistory.vendor || ""
-        });
-
-        closeModal("stockOutModal");
-        showInventory();
-    } catch (error) {
-        alert("Could not record Stock Out.\n\n" + (error.message || "Unknown error"));
-    } finally {
-        buttons.forEach(b => b.disabled = false);
-    }
-}
-
-/* =========================
-   CSV EXPORT
-========================= */
-
-function exportInventoryCSV() {
-    const rows = [
-        ["Item","Type","Unit","Vendor","Current Stock","Latest Purchase Price","Weighted Average Price","Stock Value","Alert Level","Status"]
-    ];
-
-    inventory.forEach(item => {
-        rows.push([
-            item.name,
-            item.type,
-            item.unit,
-            item.vendor,
-            item.stock,
-            item.purchasePrice,
-            weightedAveragePrice(item.id) || "",
-            stockValue(item).toFixed(2),
-            item.alert,
-            getStatus(item).text
-        ]);
-    });
-
-    const csv = rows.map(row =>
-        row.map(v => `"${String(v ?? "").replace(/"/g, '""')}"`).join(",")
-    ).join("\n");
-
-    const blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `chaatarra-inventory-${new Date().toISOString().slice(0,10)}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
-}
-
-/* =========================
-   MODALS / LIVE CALCULATIONS
-========================= */
-
-function closeModal(id) {
-    $(id).style.display = "none";
-}
-
-window.addEventListener("click", e => {
-    if (e.target.classList.contains("modal")) e.target.style.display = "none";
-});
-
-$("itemStock").addEventListener("input", updateInitialPurchaseTotal);
-$("itemPrice").addEventListener("input", updateInitialPurchaseTotal);
-
-$("searchInput")?.addEventListener("input", () => renderCurrentSection());
-
-/* =========================
-   START
-========================= */
-
-showDashboard();
-loadData();
-setupRealtime();
-</script>
+<div class="toast" id="toast"></div>
 
 <script>
+const SUPABASE_URL="https://ucqeyhcycwksiubmlilg.supabase.co";
+const SUPABASE_KEY="sb_publishable_YdIvl7IqdpT0UZOHBumEiw_ZThYEsgV";
+const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
-/* ==================== PURCHASE ANALYTICS ==================== */
-function showPurchasing() {
-    // Hide the existing app sections without changing their functionality.
-    document.querySelectorAll(".page-section").forEach(function(el) {
-        el.style.display = "none";
-    });
+let selectedDate=new Date().toISOString().slice(0,10);
+let salesRows=[];
+let fixedExpenseRows=[];
+let dailyExpenses=[];
+let overrides={};
+let adjustmentTarget=null;
+let editingExpenseId=null;
 
-    var section = document.getElementById("purchasingSection");
-    if (section) section.style.display = "block";
+const $=id=>document.getElementById(id);
+const money=n=>'₹'+Number(n||0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+const toast=msg=>{ $('toast').textContent=msg;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),2500); };
 
-    if (typeof currentSection !== "undefined") currentSection = "purchasing";
-    if (typeof renderPurchaseAnalytics === "function") renderPurchaseAnalytics();
+function parseItems(value){
+  if(Array.isArray(value)) return value;
+  if(typeof value==='string'){try{return JSON.parse(value)}catch{return[]}}
+  return [];
 }
 
-function purchaseAnalyticsDateStart(period) {
-    var now = new Date();
-    if (period === "today") {
-        var d = new Date(now);
-        d.setHours(0,0,0,0);
-        return d;
+/* Same normal prices used by the supplied Sales Tracking page for combo allocation. */
+const basePrices={
+  "Pani Puri":50,"Masala Puri":60,"Samosa Chaat":80,"Dahi Puri":80,
+  "Mango Shake":90,"Oreo Shake":80,"Strawberry Shake":90,"Mint Lime":35,
+  "Classic Burger":120,"Chicken Burger":150,"Cheese Burger":140,"Double Burger":180
+};
+
+function orderSalesAmount(order){
+  const items=parseItems(order.items);
+  if(!Array.isArray(items))return 0;
+  let total=0;
+
+  items.forEach(item=>{
+    const qty=Number(item.quantity??item.qty??1);
+    const price=Number(item.price??item.unit_price??0);
+    const isCombo=item.type==="combo";
+
+    if(isCombo && Array.isArray(item.components) && item.components.length){
+      const components=item.components.map(c=>({
+        name:c.name??c.item_name??"Unknown Item",
+        counter:c.counter||"-",
+        price:Number(c.price??c.unit_price??basePrices[c.name??c.item_name]??0)
+      }));
+      const fixed=components.filter(c=>c.counter==="chaats"||c.counter==="burgers");
+      const drinks=components.filter(c=>c.counter==="drinks");
+      const fixedTotal=fixed.reduce((s,c)=>s+c.price,0);
+      const comboTotal=qty*price;
+      const remaining=comboTotal-qty*fixedTotal;
+      if(components.length){
+        components.forEach(c=>{
+          if(c.counter==="chaats"||c.counter==="burgers") total+=qty*c.price;
+          else if(c.counter==="drinks"){
+            const normalDrinkTotal=drinks.reduce((s,d)=>s+d.price,0);
+            total+=normalDrinkTotal>0 ? remaining*(c.price/normalDrinkTotal) : 0;
+          }
+        });
+      }else total+=qty*price;
+    }else{
+      total+=qty*price;
     }
-    if (period === "month") {
-        return new Date(now.getFullYear(), now.getMonth(), 1);
-    }
-    if (period === "7" || period === "30") {
-        var days = Number(period);
-        var d2 = new Date(now);
-        d2.setDate(d2.getDate() - (days - 1));
-        d2.setHours(0,0,0,0);
-        return d2;
-    }
-    return null;
+  });
+  return Number(total.toFixed(2));
 }
 
-function purchaseMoney(value) {
-    return "₹" + Number(value || 0).toLocaleString("en-IN", {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 2
-    });
+function dateOfTimestamp(ts){
+  if(!ts)return "";
+  return new Date(ts).toISOString().slice(0,10);
 }
 
-function purchaseQty(value) {
-    return Number(value || 0).toLocaleString("en-IN", {
-        maximumFractionDigits: 2
-    });
+function effectiveAmount(row){
+  const key=row.source_type+"|"+String(row.source_id);
+  return overrides[key] ? Number(overrides[key].adjusted_amount) : Number(row.original_amount||0);
 }
 
-function renderPurchaseAnalytics() {
-    if (typeof historyData === "undefined") return;
+function sourceKey(type,id){return type+"|"+String(id)}
 
-    var period = document.getElementById("purchasePeriodFilter");
-    period = period ? period.value : "30";
+async function loadDate(){
+  selectedDate=$('ledgerDate').value;
+  if(!selectedDate)return;
+  $('salesArea').innerHTML='<div class="loading">Loading sales…</div>';
+  $('fixedExpensesArea').innerHTML='<div class="loading">Loading fixed expenses…</div>';
+  $('dailyExpensesArea').innerHTML='<div class="loading">Loading daily expenses…</div>';
 
-    var start = purchaseAnalyticsDateStart(period);
-    var rows = Array.isArray(historyData) ? historyData.filter(function(h) {
-        if (h.movement !== "Stock In") return false;
-        if (start && new Date(h.created_at) < start) return false;
-        return true;
-    }) : [];
+  try{
+    const [ordersRes,salaryRes,inventoryRes,dailyRes,overrideRes]=await Promise.all([
+      db.from("orders").select("*").order("created_at",{ascending:true}),
+      db.from("salary_payments").select("*").eq("paid_date",selectedDate).order("paid_date",{ascending:true}),
+      db.from("inventory_history").select("*").eq("movement","Stock In").gte("created_at",selectedDate+"T00:00:00").lt("created_at",selectedDate+"T23:59:59.999").order("created_at",{ascending:true}),
+      db.from("ledger_daily_expenses").select("*").eq("expense_date",selectedDate).order("created_at",{ascending:true}),
+      db.from("ledger_overrides").select("*").eq("ledger_date",selectedDate)
+    ]);
 
-    var totalCost = rows.reduce(function(sum, h) {
-        return sum + Number(h.total_cost || 0);
-    }, 0);
+    if(ordersRes.error)throw ordersRes.error;
+    if(salaryRes.error)throw salaryRes.error;
+    if(inventoryRes.error)throw inventoryRes.error;
+    if(dailyRes.error)throw dailyRes.error;
+    if(overrideRes.error)throw overrideRes.error;
 
-    var totalQty = rows.reduce(function(sum, h) {
-        return sum + Number(h.quantity || 0);
-    }, 0);
+    const orderMap=new Map();
+    (ordersRes.data||[]).forEach(order=>{
+      if(dateOfTimestamp(order.created_at)!==selectedDate)return;
+      const amount=orderSalesAmount(order);
+      orderMap.set(String(order.id),{
+        source_type:"sale_order",
+        source_id:order.id,
+        ledger_date:selectedDate,
+        label:"Order #"+(order.order_number??order.id),
+        detail:(order.customer_name||"Customer")+(order.status?" · "+order.status:""),
+        original_amount:amount,
+        kind:"sale",
+        created_at:order.created_at
+      });
+    });
+    salesRows=[...orderMap.values()];
 
-    var events = rows.length;
-    var avgPurchase = events ? totalCost / events : 0;
-
-    var setText = function(id, value) {
-        var el = document.getElementById(id);
-        if (el) el.textContent = value;
-    };
-
-    setText("purchaseTotalCost", purchaseMoney(totalCost));
-    setText("purchaseEventCount", events.toLocaleString("en-IN"));
-    setText("purchaseQuantity", purchaseQty(totalQty));
-    setText("purchaseAverage", purchaseMoney(avgPurchase));
-
-    /* Top purchased items */
-    var itemMap = {};
-    rows.forEach(function(h) {
-        var key = h.item_name || "Unknown";
-        if (!itemMap[key]) itemMap[key] = { name:key, qty:0, cost:0, unit:h.unit || "" };
-        itemMap[key].qty += Number(h.quantity || 0);
-        itemMap[key].cost += Number(h.total_cost || 0);
+    fixedExpenseRows=[];
+    (salaryRes.data||[]).forEach(p=>{
+      fixedExpenseRows.push({
+        source_type:"salary_payment",
+        source_id:p.id,
+        ledger_date:selectedDate,
+        label:"Staff Salary",
+        detail:"Paid "+(p.paid_date||selectedDate),
+        original_amount:Number(p.amount_paid||0),
+        kind:"expense",
+        created_at:p.paid_date
+      });
+    });
+    (inventoryRes.data||[]).forEach(h=>{
+      fixedExpenseRows.push({
+        source_type:"inventory_purchase",
+        source_id:h.id,
+        ledger_date:selectedDate,
+        label:h.item_name||"Inventory Purchase",
+        detail:(h.vendor?("Vendor: "+h.vendor+" · "):"")+(h.reason||"Stock In"),
+        original_amount:Number(h.total_cost||0),
+        kind:"expense",
+        created_at:h.created_at
+      });
     });
 
-    var items = Object.values(itemMap).sort(function(a,b) {
-        return b.cost - a.cost;
-    }).slice(0, 8);
+    dailyExpenses=dailyRes.data||[];
+    overrides={};
+    (overrideRes.data||[]).forEach(o=>overrides[sourceKey(o.source_type,o.source_id)]=o);
 
-    var topEl = document.getElementById("purchaseTopItems");
-    if (topEl) {
-        if (!items.length) {
-            topEl.innerHTML = '<div class="purchase-empty">No purchases found for this period.</div>';
-        } else {
-            var maxCost = Math.max.apply(null, items.map(function(x){ return x.cost; }).concat([1]));
-            topEl.innerHTML = items.map(function(x) {
-                var pct = Math.max(2, Math.round((x.cost / maxCost) * 100));
-                return '<div class="purchase-bar-row">' +
-                    '<div class="purchase-bar-head"><span>' + escapeHtml(x.name) + '</span><strong>' + purchaseMoney(x.cost) + '</strong></div>' +
-                    '<div class="purchase-bar-track"><div class="purchase-bar-fill" style="width:' + pct + '%"></div></div>' +
-                    '<div style="font-size:11px;color:#777;margin-top:4px;">' + purchaseQty(x.qty) + ' ' + escapeHtml(x.unit) + ' purchased</div>' +
-                    '</div>';
-            }).join("");
-        }
-    }
-
-    /* Vendor spending */
-    var vendorMap = {};
-    rows.forEach(function(h) {
-        var vendor = (h.vendor || "").trim() || "No Vendor";
-        vendorMap[vendor] = (vendorMap[vendor] || 0) + Number(h.total_cost || 0);
-    });
-
-    var vendors = Object.keys(vendorMap).map(function(name) {
-        return {name:name, cost:vendorMap[name]};
-    }).sort(function(a,b){ return b.cost - a.cost; }).slice(0, 8);
-
-    var vendorEl = document.getElementById("purchaseVendorSpend");
-    if (vendorEl) {
-        if (!vendors.length) {
-            vendorEl.innerHTML = '<div class="purchase-empty">No vendor purchase data found.</div>';
-        } else {
-            var maxVendor = Math.max.apply(null, vendors.map(function(x){ return x.cost; }).concat([1]));
-            vendorEl.innerHTML = vendors.map(function(x) {
-                var pct = Math.max(2, Math.round((x.cost / maxVendor) * 100));
-                return '<div class="purchase-bar-row">' +
-                    '<div class="purchase-bar-head"><span>' + escapeHtml(x.name) + '</span><strong>' + purchaseMoney(x.cost) + '</strong></div>' +
-                    '<div class="purchase-bar-track"><div class="purchase-bar-fill" style="width:' + pct + '%"></div></div>' +
-                    '</div>';
-            }).join("");
-        }
-    }
-
-    /* Purchase history */
-    var historyEl = document.getElementById("purchaseHistoryRows");
-    if (historyEl) {
-        var sorted = rows.slice().sort(function(a,b) {
-            return new Date(b.created_at) - new Date(a.created_at);
-        }).slice(0, 50);
-
-        if (!sorted.length) {
-            historyEl.innerHTML = '<tr><td colspan="6" class="purchase-empty">No purchases found.</td></tr>';
-        } else {
-            historyEl.innerHTML = sorted.map(function(h) {
-                var date = new Date(h.created_at);
-                var dateText = date.toLocaleDateString("en-IN", {day:"2-digit", month:"short", year:"numeric"}) +
-                    " " + date.toLocaleTimeString("en-IN", {hour:"2-digit", minute:"2-digit"});
-                return '<tr>' +
-                    '<td>' + escapeHtml(dateText) + '</td>' +
-                    '<td>' + escapeHtml(h.item_name || "") + '</td>' +
-                    '<td>' + escapeHtml((h.vendor || "").trim() || "—") + '</td>' +
-                    '<td class="num">' + purchaseQty(h.quantity) + ' ' + escapeHtml(h.unit || "") + '</td>' +
-                    '<td class="num">' + purchaseMoney(h.price_per_unit) + '</td>' +
-                    '<td class="num"><strong>' + purchaseMoney(h.total_cost) + '</strong></td>' +
-                    '</tr>';
-            }).join("");
-        }
-    }
-
-    /* Daily spending */
-    var dayMap = {};
-    rows.forEach(function(h) {
-        var date = new Date(h.created_at);
-        var key = date.getFullYear() + "-" + String(date.getMonth()+1).padStart(2,"0") + "-" + String(date.getDate()).padStart(2,"0");
-        dayMap[key] = (dayMap[key] || 0) + Number(h.total_cost || 0);
-    });
-
-    var days = Object.keys(dayMap).sort().reverse().slice(0, 10).map(function(key) {
-        return {key:key, cost:dayMap[key]};
-    });
-
-    var dailyEl = document.getElementById("purchaseDailySpend");
-    if (dailyEl) {
-        if (!days.length) {
-            dailyEl.innerHTML = '<div class="purchase-empty">No daily purchase spending to show.</div>';
-        } else {
-            var maxDay = Math.max.apply(null, days.map(function(x){ return x.cost; }).concat([1]));
-            dailyEl.innerHTML = days.map(function(x) {
-                var parts = x.key.split("-");
-                var label = new Date(Number(parts[0]), Number(parts[1])-1, Number(parts[2]))
-                    .toLocaleDateString("en-IN", {day:"2-digit", month:"short"});
-                var pct = Math.max(2, Math.round((x.cost / maxDay) * 100));
-                return '<div class="purchase-bar-row">' +
-                    '<div class="purchase-bar-head"><span>' + label + '</span><strong>' + purchaseMoney(x.cost) + '</strong></div>' +
-                    '<div class="purchase-bar-track"><div class="purchase-bar-fill" style="width:' + pct + '%"></div></div>' +
-                    '</div>';
-            }).join("");
-        }
-    }
+    renderAll();
+    $('connectionText').textContent="Supabase Connected";
+  }catch(err){
+    console.error(err);
+    $('connectionText').textContent="Supabase error";
+    $('salesArea').innerHTML='<div class="empty">Could not load sales: '+esc(err.message)+'</div>';
+    $('fixedExpensesArea').innerHTML='<div class="empty">Could not load fixed expenses.</div>';
+    $('dailyExpensesArea').innerHTML='<div class="empty">Could not load daily expenses.</div>';
+  }
 }
 
+function renderAll(){
+  renderSales();
+  renderFixedExpenses();
+  renderDailyExpenses();
+  updateSummary();
+}
+
+function renderSales(){
+  if(!salesRows.length){$('salesArea').innerHTML='<div class="empty">No sales records for this date.</div>';return}
+  let h='<div class="table-wrap"><table><thead><tr><th>Order</th><th>Details</th><th class="num">Source</th><th class="num">Ledger</th><th>Action</th></tr></thead><tbody>';
+  salesRows.forEach(r=>{
+    const actual=effectiveAmount(r);
+    const corrected=Math.abs(actual-Number(r.original_amount))>.001;
+    h+=`<tr>
+      <td><b>${esc(r.label)}</b><div class="source">${esc(new Date(r.created_at).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}))}</div></td>
+      <td>${esc(r.detail)}</td>
+      <td class="num">${money(r.original_amount)}</td>
+      <td class="num amount">${money(actual)}${corrected?'<div class="source">Corrected</div>':''}</td>
+      <td><button class="edit-btn" onclick='openAdjust(${JSON.stringify(r.source_type)},${JSON.stringify(String(r.source_id))},${JSON.stringify(r.label)},${Number(r.original_amount)},${Number(actual)},${JSON.stringify(overrides[sourceKey(r.source_type,r.source_id)]?.note||"")})'>Edit</button>${corrected?`<button class="reset-btn" onclick='resetAdjust(${JSON.stringify(r.source_type)},${JSON.stringify(String(r.source_id))})'>Reset</button>`:""}</td>
+    </tr>`;
+  });
+  h+='</tbody></table></div>';
+  $('salesArea').innerHTML=h;
+}
+
+function renderFixedExpenses(){
+  if(!fixedExpenseRows.length){$('fixedExpensesArea').innerHTML='<div class="empty">No connected fixed expenses for this date.</div>';return}
+  let h='<div class="table-wrap"><table><thead><tr><th>Expense</th><th>Details</th><th class="num">Source</th><th class="num">Ledger</th><th>Action</th></tr></thead><tbody>';
+  fixedExpenseRows.forEach(r=>{
+    const actual=effectiveAmount(r);
+    const corrected=Math.abs(actual-Number(r.original_amount))>.001;
+    h+=`<tr>
+      <td><b>${esc(r.label)}</b></td>
+      <td>${esc(r.detail)}</td>
+      <td class="num">${money(r.original_amount)}</td>
+      <td class="num amount">${money(actual)}${corrected?'<div class="source">Corrected</div>':''}</td>
+      <td><button class="edit-btn" onclick='openAdjust(${JSON.stringify(r.source_type)},${JSON.stringify(String(r.source_id))},${JSON.stringify(r.label)},${Number(r.original_amount)},${Number(actual)},${JSON.stringify(overrides[sourceKey(r.source_type,r.source_id)]?.note||"")})'>Edit</button>${corrected?`<button class="reset-btn" onclick='resetAdjust(${JSON.stringify(r.source_type)},${JSON.stringify(String(r.source_id))})'>Reset</button>`:""}</td>
+    </tr>`;
+  });
+  h+='</tbody></table></div>';
+  $('fixedExpensesArea').innerHTML=h;
+}
+
+function renderDailyExpenses(){
+  if(!dailyExpenses.length){$('dailyExpensesArea').innerHTML='<div class="empty">No daily expenses entered for this date.</div>';return}
+  let h='<div class="table-wrap"><table><thead><tr><th>Expense</th><th>Category</th><th>Payment</th><th>Notes</th><th class="num">Amount</th><th>Action</th></tr></thead><tbody>';
+  dailyExpenses.forEach(e=>{
+    h+=`<tr>
+      <td><b>${esc(e.expense_name)}</b></td>
+      <td>${esc(e.category||"—")}</td>
+      <td>${esc(e.payment_method||"—")}</td>
+      <td>${esc(e.notes||"—")}</td>
+      <td class="num amount">${money(e.amount)}</td>
+      <td><button class="edit-btn" onclick='editExpense(${JSON.stringify(e)})'>Edit</button><button class="delete-btn" onclick='deleteExpense(${JSON.stringify(String(e.id))})'>Delete</button></td>
+    </tr>`;
+  });
+  h+='</tbody></table></div>';
+  $('dailyExpensesArea').innerHTML=h;
+}
+
+function updateSummary(){
+  const sales=salesRows.reduce((s,r)=>s+effectiveAmount(r),0);
+  const fixed=fixedExpenseRows.reduce((s,r)=>s+effectiveAmount(r),0);
+  const daily=dailyExpenses.reduce((s,e)=>s+Number(e.amount||0),0);
+  const expenses=fixed+daily;
+  const result=sales-expenses;
+  $('totalSales').textContent=money(sales);
+  $('totalExpenses').textContent=money(expenses);
+  $('profitLoss').textContent=money(Math.abs(result));
+  $('resultLabel').textContent=result>=0?"PROFIT":"LOSS";
+  $('profitLoss').className="summary-value "+(result>=0?"profit":"loss");
+}
+
+function openAdjust(type,id,label,original,current,note){
+  adjustmentTarget={type,id,label,original};
+  $('adjustTitle').textContent="Correct: "+label;
+  $('adjustOriginal').value=money(original);
+  $('adjustAmount').value=Number(current||0).toFixed(2);
+  $('adjustNote').value=note||"";
+  $('adjustModal').classList.add('show');
+}
+async function saveAdjust(){
+  if(!adjustmentTarget)return;
+  const amount=Number($('adjustAmount').value);
+  if(!Number.isFinite(amount)||amount<0){toast("Enter a valid amount.");return}
+  const payload={
+    ledger_date:selectedDate,
+    source_type:adjustmentTarget.type,
+    source_id:String(adjustmentTarget.id),
+    source_label:adjustmentTarget.label,
+    original_amount:Number(adjustmentTarget.original||0),
+    adjusted_amount:amount,
+    note:$('adjustNote').value.trim()||null
+  };
+  const {error}=await db.from("ledger_overrides").upsert(payload,{onConflict:"ledger_date,source_type,source_id"});
+  if(error){console.error(error);toast("Could not save correction: "+error.message);return}
+  $('adjustModal').classList.remove('show');
+  await loadDate();
+  toast("Ledger correction saved.");
+}
+async function resetAdjust(type,id){
+  if(!confirm("Reset this entry back to its source value?"))return;
+  const {error}=await db.from("ledger_overrides").delete().eq("ledger_date",selectedDate).eq("source_type",type).eq("source_id",String(id));
+  if(error){toast("Could not reset correction.");return}
+  await loadDate();
+  toast("Ledger value reset.");
+}
+
+function openExpenseModal(exp=null){
+  editingExpenseId=exp?.id||null;
+  $('expenseModalTitle').textContent=exp?"Edit Daily Expense":"Add Daily Expense";
+  $('expenseName').value=exp?.expense_name||"";
+  $('expenseAmount').value=exp?.amount??"";
+  $('expenseCategory').value=exp?.category||"Other";
+  $('expensePayment').value=exp?.payment_method||"Cash";
+  $('expenseNotes').value=exp?.notes||"";
+  $('expenseModal').classList.add('show');
+}
+async function saveExpense(e){
+  e.preventDefault();
+  const name=$('expenseName').value.trim();
+  const amount=Number($('expenseAmount').value);
+  if(!name||!Number.isFinite(amount)||amount<0){toast("Enter a valid expense.");return}
+  const payload={
+    expense_date:selectedDate,
+    expense_name:name,
+    amount,
+    category:$('expenseCategory').value,
+    payment_method:$('expensePayment').value,
+    notes:$('expenseNotes').value.trim()||null
+  };
+  let res;
+  if(editingExpenseId)res=await db.from("ledger_daily_expenses").update(payload).eq("id",editingExpenseId);
+  else res=await db.from("ledger_daily_expenses").insert(payload);
+  if(res.error){console.error(res.error);toast("Could not save expense: "+res.error.message);return}
+  $('expenseModal').classList.remove('show');
+  await loadDate();
+  toast(editingExpenseId?"Expense updated.":"Expense added.");
+}
+async function deleteExpense(id){
+  if(!confirm("Delete this daily expense?"))return;
+  const {error}=await db.from("ledger_daily_expenses").delete().eq("id",id);
+  if(error){toast("Could not delete expense.");return}
+  await loadDate();
+  toast("Expense deleted.");
+}
+function editExpense(e){openExpenseModal(e)}
+
+$('openLedger').onclick=async()=>{
+  $('ledgerWindow').style.display='block';
+  $('ledgerDate').value=selectedDate;
+  await loadDate();
+};
+$('closeLedger').onclick=()=>$('ledgerWindow').style.display='none';
+$('loadDate').onclick=loadDate;
+$('todayBtn').onclick=async()=>{selectedDate=new Date().toISOString().slice(0,10);$('ledgerDate').value=selectedDate;await loadDate()};
+$('ledgerDate').onchange=()=>{selectedDate=$('ledgerDate').value};
+$('addExpenseBtn').onclick=()=>openExpenseModal();
+$('addExpenseBtn2').onclick=()=>openExpenseModal();
+$('expenseForm').onsubmit=saveExpense;
+$('closeExpense').onclick=()=>$('expenseModal').classList.remove('show');
+$('cancelExpense').onclick=()=>$('expenseModal').classList.remove('show');
+$('closeAdjust').onclick=()=>$('adjustModal').classList.remove('show');
+$('cancelAdjust').onclick=()=>$('adjustModal').classList.remove('show');
+$('saveAdjust').onclick=saveAdjust;
+
+window.addEventListener('click',e=>{
+  if(e.target.classList.contains('modal'))e.target.classList.remove('show');
+});
+
+$('ledgerDate').value=selectedDate;
 </script>
 </body>
 </html>
