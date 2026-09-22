@@ -823,407 +823,368 @@ input:focus, select:focus {
 </div>
 
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
 <script>
+/* =========================
+   SUPABASE INVENTORY APP
+========================= */
 
-let inventory =
-    JSON.parse(localStorage.getItem("inventoryData")) || [];
-
-let history =
-    JSON.parse(localStorage.getItem("inventoryHistory")) || [];
+let inventory = [];
+let history = [];
 
 let editingId = null;
 let stockOutId = null;
 let stockInId = null;
 
 let currentSection = "inventory";
-
 let selectedHistoryItem = null;
 
+let loadingData = false;
 
-/* SAVE */
+/* =========================
+   LOAD DATA FROM SUPABASE
+========================= */
 
-function saveData() {
+async function loadData() {
+    loadingData = true;
 
-    localStorage.setItem(
-        "inventoryData",
-        JSON.stringify(inventory)
-    );
+    try {
+        const { data: items, error: itemError } = await supabaseClient
+            .from("inventory_items")
+            .select("*")
+            .order("name", { ascending: true });
 
-    localStorage.setItem(
-        "inventoryHistory",
-        JSON.stringify(history)
-    );
+        if (itemError) throw itemError;
+
+        const { data: records, error: historyError } = await supabaseClient
+            .from("inventory_history")
+            .select("*")
+            .order("created_at", { ascending: true });
+
+        if (historyError) throw historyError;
+
+        inventory = (items || []).map(item => ({
+            id: item.id,
+            name: item.name,
+            type: item.type,
+            unit: item.unit,
+            vendor: item.vendor || "",
+            stock: Number(item.current_stock || 0),
+            purchasePrice: Number(item.purchase_price || 0),
+            alert: Number(item.alert_level || 0)
+        }));
+
+        history = (records || []).map(record => ({
+            id: record.id,
+            inventoryItemId: record.inventory_item_id,
+            date: record.created_at,
+            item: record.item_name || "",
+            movement: record.movement,
+            quantity: Number(record.quantity || 0),
+            unit: record.unit || "",
+            balance: Number(record.balance || 0),
+            reason: record.reason || "",
+            pricePerUnit: record.price_per_unit == null ? null : Number(record.price_per_unit),
+            totalCost: record.total_cost == null ? null : Number(record.total_cost),
+            vendor: record.vendor || ""
+        }));
+
+        renderCurrentSection();
+    } catch (error) {
+        console.error("Supabase load error:", error);
+        document.getElementById("content").innerHTML = `
+            <div class="empty">
+                <strong>Unable to load inventory.</strong><br><br>
+                ${escapeHtml(error.message || "Please check your Supabase connection.")}
+            </div>
+        `;
+    } finally {
+        loadingData = false;
+    }
 }
 
-
-/* ADD */
+/* =========================
+   ADD / EDIT INVENTORY
+========================= */
 
 function openAddInventory() {
-
     editingId = null;
 
-    document.getElementById(
-        "inventoryModalTitle"
-    ).textContent = "Add Inventory";
-
-    document.getElementById(
-        "inventoryForm"
-    ).reset();
-
+    document.getElementById("inventoryModalTitle").textContent = "Add Inventory";
+    document.getElementById("inventoryForm").reset();
     updateInitialPurchaseTotal();
-
-    document.getElementById(
-        "inventoryModal"
-    ).style.display = "flex";
+    document.getElementById("inventoryModal").style.display = "flex";
 }
 
-
-/* EDIT */
-
 function editInventory(id) {
-
     const item = inventory.find(i => i.id === id);
-
     if (!item) return;
 
     editingId = id;
 
-    document.getElementById(
-        "inventoryModalTitle"
-    ).textContent = "Edit Inventory";
-
-    document.getElementById("itemName").value =
-        item.name;
-
-    document.getElementById("itemType").value =
-        item.type;
-
-    document.getElementById("itemUnit").value =
-        item.unit;
-
-    document.getElementById("itemVendor").value =
-        item.vendor;
-
-    document.getElementById("itemStock").value =
-        item.stock;
-
-    document.getElementById("itemPrice").value =
-        item.purchasePrice || 0;
-
-    document.getElementById("itemAlert").value =
-        item.alert;
+    document.getElementById("inventoryModalTitle").textContent = "Edit Inventory";
+    document.getElementById("itemName").value = item.name;
+    document.getElementById("itemType").value = item.type;
+    document.getElementById("itemUnit").value = item.unit;
+    document.getElementById("itemVendor").value = item.vendor;
+    document.getElementById("itemStock").value = item.stock;
+    document.getElementById("itemPrice").value = item.purchasePrice || 0;
+    document.getElementById("itemAlert").value = item.alert;
 
     updateInitialPurchaseTotal();
-
-    document.getElementById(
-        "inventoryModal"
-    ).style.display = "flex";
+    document.getElementById("inventoryModal").style.display = "flex";
 }
-
-
-/* INITIAL PURCHASE TOTAL */
 
 function updateInitialPurchaseTotal() {
-
-    const quantity =
-        Number(document.getElementById("itemStock").value) || 0;
-
-    const price =
-        Number(document.getElementById("itemPrice").value) || 0;
-
+    const quantity = Number(document.getElementById("itemStock").value) || 0;
+    const price = Number(document.getElementById("itemPrice").value) || 0;
     const total = quantity * price;
 
-    document.getElementById(
-        "initialQuantityDisplay"
-    ).textContent =
-        quantity;
-
-    document.getElementById(
-        "initialPriceDisplay"
-    ).textContent =
-        `₹${price.toFixed(2)}`;
-
-    document.getElementById(
-        "initialTotalDisplay"
-    ).textContent =
-        `₹${total.toFixed(2)}`;
+    document.getElementById("initialQuantityDisplay").textContent = quantity;
+    document.getElementById("initialPriceDisplay").textContent = `₹${price.toFixed(2)}`;
+    document.getElementById("initialTotalDisplay").textContent = `₹${total.toFixed(2)}`;
 }
 
+/* =========================
+   SAVE INVENTORY
+========================= */
 
-/* SAVE INVENTORY */
-
-document
-.getElementById("inventoryForm")
-.addEventListener("submit", function(e) {
-
+document.getElementById("inventoryForm").addEventListener("submit", async function(e) {
     e.preventDefault();
 
-    const name =
-        document.getElementById("itemName").value.trim();
+    const name = document.getElementById("itemName").value.trim();
+    const type = document.getElementById("itemType").value.trim();
+    const unit = document.getElementById("itemUnit").value;
+    const vendor = document.getElementById("itemVendor").value.trim();
+    const stock = Number(document.getElementById("itemStock").value);
+    const purchasePrice = Number(document.getElementById("itemPrice").value);
+    const alertLevel = Number(document.getElementById("itemAlert").value);
 
-    const type =
-        document.getElementById("itemType").value.trim();
-
-    const unit =
-        document.getElementById("itemUnit").value;
-
-    const vendor =
-        document.getElementById("itemVendor").value.trim();
-
-    const stock =
-        Number(document.getElementById("itemStock").value);
-
-    const purchasePrice =
-        Number(document.getElementById("itemPrice").value);
-
-    const alert =
-        Number(document.getElementById("itemAlert").value);
-
-
-    if (editingId) {
-
-        const item =
-            inventory.find(i => i.id === editingId);
-
-        if (item) {
-
-            item.name = name;
-            item.type = type;
-            item.unit = unit;
-            item.vendor = vendor;
-            item.stock = stock;
-            item.purchasePrice = purchasePrice;
-            item.alert = alert;
-
-        }
-
-    } else {
-
-        const itemId = Date.now();
-
-        const newItem = {
-
-            id: itemId,
-
-            name,
-            type,
-            unit,
-            vendor,
-            stock,
-            purchasePrice,
-            alert
-
-        };
-
-        inventory.push(newItem);
-
-        history.push({
-
-            id: Date.now() + 1,
-
-            date: new Date().toLocaleString(),
-
-            item: name,
-
-            movement: "Stock In",
-
-            quantity: stock,
-
-            unit: unit,
-
-            balance: stock,
-
-            reason: "Initial stock",
-
-            pricePerUnit: purchasePrice,
-
-            totalCost: Number(
-                (stock * purchasePrice).toFixed(2)
-            ),
-
-            vendor: vendor
-
-        });
-
+    if (!name || !type || !unit || !vendor || stock < 0 || purchasePrice < 0 || alertLevel < 0) {
+        alert("Please enter valid inventory details.");
+        return;
     }
 
-    saveData();
+    const saveButton = document.querySelector("#inventoryForm .save-btn");
+    saveButton.disabled = true;
+    saveButton.textContent = "Saving...";
 
-    closeModal("inventoryModal");
+    try {
+        if (editingId) {
+            const { data, error } = await supabaseClient
+                .from("inventory_items")
+                .update({
+                    name,
+                    type,
+                    unit,
+                    vendor,
+                    current_stock: stock,
+                    purchase_price: purchasePrice,
+                    alert_level: alertLevel
+                })
+                .eq("id", editingId)
+                .select()
+                .single();
 
-    showInventory();
+            if (error) throw error;
 
+            const item = inventory.find(i => i.id === editingId);
+            if (item) {
+                item.name = data.name;
+                item.type = data.type;
+                item.unit = data.unit;
+                item.vendor = data.vendor || "";
+                item.stock = Number(data.current_stock || 0);
+                item.purchasePrice = Number(data.purchase_price || 0);
+                item.alert = Number(data.alert_level || 0);
+            }
+        } else {
+            const { data: newItem, error: insertError } = await supabaseClient
+                .from("inventory_items")
+                .insert({
+                    name,
+                    type,
+                    unit,
+                    vendor,
+                    current_stock: stock,
+                    purchase_price: purchasePrice,
+                    alert_level: alertLevel
+                })
+                .select()
+                .single();
+
+            if (insertError) throw insertError;
+
+            const { data: newHistory, error: historyError } = await supabaseClient
+                .from("inventory_history")
+                .insert({
+                    inventory_item_id: newItem.id,
+                    item_name: newItem.name,
+                    movement: "Stock In",
+                    quantity: stock,
+                    unit,
+                    balance: stock,
+                    reason: "Initial stock",
+                    price_per_unit: purchasePrice,
+                    total_cost: Number((stock * purchasePrice).toFixed(2)),
+                    vendor
+                })
+                .select()
+                .single();
+
+            if (historyError) {
+                await supabaseClient.from("inventory_items").delete().eq("id", newItem.id);
+                throw historyError;
+            }
+
+            inventory.push({
+                id: newItem.id,
+                name: newItem.name,
+                type: newItem.type,
+                unit: newItem.unit,
+                vendor: newItem.vendor || "",
+                stock: Number(newItem.current_stock || 0),
+                purchasePrice: Number(newItem.purchase_price || 0),
+                alert: Number(newItem.alert_level || 0)
+            });
+
+            history.push({
+                id: newHistory.id,
+                inventoryItemId: newHistory.inventory_item_id,
+                date: newHistory.created_at,
+                item: newHistory.item_name,
+                movement: newHistory.movement,
+                quantity: Number(newHistory.quantity),
+                unit: newHistory.unit,
+                balance: Number(newHistory.balance),
+                reason: newHistory.reason || "",
+                pricePerUnit: Number(newHistory.price_per_unit || 0),
+                totalCost: Number(newHistory.total_cost || 0),
+                vendor: newHistory.vendor || ""
+            });
+        }
+
+        closeModal("inventoryModal");
+        showInventory();
+    } catch (error) {
+        console.error("Save inventory error:", error);
+        alert("Could not save inventory.\n\n" + (error.message || "Unknown error"));
+    } finally {
+        saveButton.disabled = false;
+        saveButton.textContent = "Save Item";
+    }
 });
 
+/* =========================
+   DELETE
+========================= */
 
-/* DELETE */
-
-function deleteInventory(id) {
-
-    const item =
-        inventory.find(i => i.id === id);
-
+async function deleteInventory(id) {
+    const item = inventory.find(i => i.id === id);
     if (!item) return;
 
-    if (!confirm(`Delete ${item.name}?`))
-        return;
+    if (!confirm(`Delete ${item.name}?\n\nThis will also delete its stock history.`)) return;
 
-    inventory =
-        inventory.filter(i => i.id !== id);
+    try {
+        const { error } = await supabaseClient
+            .from("inventory_items")
+            .delete()
+            .eq("id", id);
 
-    saveData();
+        if (error) throw error;
 
-    renderCurrentSection();
+        inventory = inventory.filter(i => i.id !== id);
+        history = history.filter(record => record.inventoryItemId !== id);
+
+        if (selectedHistoryItem === id) selectedHistoryItem = null;
+        renderCurrentSection();
+    } catch (error) {
+        console.error("Delete error:", error);
+        alert("Could not delete item.\n\n" + (error.message || "Unknown error"));
+    }
 }
 
-
-/* STATUS */
+/* =========================
+   STATUS
+========================= */
 
 function getStatus(item) {
-
     if (item.stock <= 0) {
-
-        return {
-            text: "Out of Stock",
-            class: "red"
-        };
-
+        return { text: "Out of Stock", class: "red" };
     }
 
     if (item.stock < item.alert) {
-
-        return {
-            text: "Low Stock",
-            class: "red"
-        };
-
+        return { text: "Low Stock", class: "red" };
     }
 
     if (item.stock === item.alert) {
-
-        return {
-            text: "Alert Level",
-            class: "orange"
-        };
-
+        return { text: "Alert Level", class: "orange" };
     }
 
-    return {
-        text: "In Stock",
-        class: "green"
-    };
+    return { text: "In Stock", class: "green" };
 }
 
-
-/* INVENTORY */
+/* =========================
+   SECTIONS
+========================= */
 
 function showInventory() {
-
     currentSection = "inventory";
-
     selectedHistoryItem = null;
-
-    document.getElementById(
-        "sectionTitle"
-    ).textContent = "Inventory";
-
+    document.getElementById("sectionTitle").textContent = "Inventory";
     renderInventory();
 }
 
-
-/* LOW STOCK */
-
 function showLowStock() {
-
     currentSection = "lowstock";
-
     selectedHistoryItem = null;
-
-    document.getElementById(
-        "sectionTitle"
-    ).textContent = "Low Stock";
-
+    document.getElementById("sectionTitle").textContent = "Low Stock";
     renderLowStock();
 }
 
-
-/* HISTORY */
-
 function showHistory() {
-
     currentSection = "history";
-
     selectedHistoryItem = null;
-
-    document.getElementById(
-        "sectionTitle"
-    ).textContent = "Stock History";
-
+    document.getElementById("sectionTitle").textContent = "Stock History";
     renderHistoryItems();
 }
 
-
-/* SEARCH */
-
 function renderCurrentSection() {
-
-    if (currentSection === "inventory")
-        renderInventory();
-
-    if (currentSection === "lowstock")
-        renderLowStock();
+    if (currentSection === "inventory") renderInventory();
+    if (currentSection === "lowstock") renderLowStock();
 
     if (currentSection === "history") {
-
-        if (selectedHistoryItem)
-            renderItemHistory(selectedHistoryItem);
-        else
-            renderHistoryItems();
-
+        if (selectedHistoryItem) renderItemHistory(selectedHistoryItem);
+        else renderHistoryItems();
     }
 }
 
-
-/* INVENTORY TABLE */
+/* =========================
+   INVENTORY TABLE
+========================= */
 
 function renderInventory() {
+    const search = document.getElementById("searchInput").value.toLowerCase();
 
-    const search =
-        document
-        .getElementById("searchInput")
-        .value
-        .toLowerCase();
-
-    const items =
-        inventory.filter(item =>
-            item.name.toLowerCase().includes(search) ||
-            item.type.toLowerCase().includes(search) ||
-            item.vendor.toLowerCase().includes(search)
-        );
-
+    const items = inventory.filter(item =>
+        item.name.toLowerCase().includes(search) ||
+        item.type.toLowerCase().includes(search) ||
+        item.vendor.toLowerCase().includes(search)
+    );
 
     if (items.length === 0) {
-
         document.getElementById("content").innerHTML = `
-            <div class="empty">
-                No inventory items found.
-            </div>
+            <div class="empty">No inventory items found.</div>
         `;
-
         return;
     }
 
-
     let html = `
-
         <div class="table-wrapper">
-
         <table>
-
         <thead>
-
         <tr>
-
             <th>Item</th>
             <th>Type</th>
             <th>Unit</th>
@@ -1233,492 +1194,215 @@ function renderInventory() {
             <th>Alert Level</th>
             <th>Status</th>
             <th>Actions</th>
-
         </tr>
-
         </thead>
-
         <tbody>
     `;
 
-
     items.forEach(item => {
-
-        const status =
-            getStatus(item);
-
-        const price =
-            Number(item.purchasePrice || 0);
-
+        const status = getStatus(item);
+        const price = Number(item.purchasePrice || 0);
 
         html += `
-
         <tr>
-
+            <td><strong>${escapeHtml(item.name)}</strong></td>
+            <td>${escapeHtml(item.type)}</td>
+            <td>${escapeHtml(item.unit)}</td>
+            <td>${escapeHtml(item.vendor)}</td>
+            <td><strong>${formatNumber(item.stock)} ${escapeHtml(item.unit)}</strong></td>
+            <td><span class="price-badge">₹${price.toFixed(2)} / ${escapeHtml(item.unit)}</span></td>
+            <td>${formatNumber(item.alert)} ${escapeHtml(item.unit)}</td>
+            <td><span class="status ${status.class}">${status.text}</span></td>
             <td>
-                <strong>
-                    ${escapeHtml(item.name)}
-                </strong>
+                <button class="btn btn-stock-in" onclick="openStockIn(${item.id})">Stock In</button>
+                <button class="btn btn-stock" onclick="openStockOut(${item.id})">Stock Out</button>
+                <button class="btn btn-edit" onclick="editInventory(${item.id})">Edit</button>
+                <button class="btn btn-delete" onclick="deleteInventory(${item.id})">Delete</button>
             </td>
-
-            <td>
-                ${escapeHtml(item.type)}
-            </td>
-
-            <td>
-                ${escapeHtml(item.unit)}
-            </td>
-
-            <td>
-                ${escapeHtml(item.vendor)}
-            </td>
-
-            <td>
-                <strong>
-                    ${item.stock} ${item.unit}
-                </strong>
-            </td>
-
-            <td>
-                <span class="price-badge">
-                    ₹${price.toFixed(2)} / ${escapeHtml(item.unit)}
-                </span>
-            </td>
-
-            <td>
-                ${item.alert} ${item.unit}
-            </td>
-
-            <td>
-
-                <span class="status ${status.class}">
-                    ${status.text}
-                </span>
-
-            </td>
-
-            <td>
-
-                <button
-                    class="btn btn-stock-in"
-                    onclick="openStockIn(${item.id})">
-                    Stock In
-                </button>
-
-                <button
-                    class="btn btn-stock"
-                    onclick="openStockOut(${item.id})">
-                    Stock Out
-                </button>
-
-                <button
-                    class="btn btn-edit"
-                    onclick="editInventory(${item.id})">
-                    Edit
-                </button>
-
-                <button
-                    class="btn btn-delete"
-                    onclick="deleteInventory(${item.id})">
-                    Delete
-                </button>
-
-            </td>
-
         </tr>
         `;
-
     });
 
-
-    html += `
-
-        </tbody>
-
-        </table>
-
-        </div>
-    `;
-
-
-    document.getElementById(
-        "content"
-    ).innerHTML = html;
+    html += `</tbody></table></div>`;
+    document.getElementById("content").innerHTML = html;
 }
 
-
-/* LOW STOCK */
+/* =========================
+   LOW STOCK
+========================= */
 
 function renderLowStock() {
+    const search = document.getElementById("searchInput").value.toLowerCase();
 
-    const items =
-        inventory.filter(item =>
-            item.stock <= item.alert
-        );
-
+    const items = inventory.filter(item =>
+        item.stock <= item.alert &&
+        (item.name.toLowerCase().includes(search) ||
+         item.type.toLowerCase().includes(search) ||
+         item.vendor.toLowerCase().includes(search))
+    );
 
     if (items.length === 0) {
-
         document.getElementById("content").innerHTML = `
-
-            <div class="empty">
-                🎉 No items are currently at the alert level.
-            </div>
-
+            <div class="empty">🎉 No items are currently at the alert level.</div>
         `;
-
         return;
     }
 
-
     let html = `
-
         <div class="table-wrapper">
-
         <table>
-
         <thead>
-
         <tr>
-
             <th>Item</th>
             <th>Current Stock</th>
             <th>Alert Level</th>
             <th>Vendor</th>
             <th>Purchase Price</th>
             <th>Status</th>
-
         </tr>
-
         </thead>
-
         <tbody>
     `;
 
-
     items.forEach(item => {
-
-        const status =
-            getStatus(item);
-
-        const price =
-            Number(item.purchasePrice || 0);
-
+        const status = getStatus(item);
+        const price = Number(item.purchasePrice || 0);
 
         html += `
-
         <tr>
-
-            <td>
-                <strong>
-                    ${escapeHtml(item.name)}
-                </strong>
-            </td>
-
-            <td>
-                ${item.stock} ${item.unit}
-            </td>
-
-            <td>
-                ${item.alert} ${item.unit}
-            </td>
-
-            <td>
-                ${escapeHtml(item.vendor)}
-            </td>
-
-            <td>
-                ₹${price.toFixed(2)} / ${escapeHtml(item.unit)}
-            </td>
-
-            <td>
-
-                <span class="status ${status.class}">
-                    ${status.text}
-                </span>
-
-            </td>
-
+            <td><strong>${escapeHtml(item.name)}</strong></td>
+            <td>${formatNumber(item.stock)} ${escapeHtml(item.unit)}</td>
+            <td>${formatNumber(item.alert)} ${escapeHtml(item.unit)}</td>
+            <td>${escapeHtml(item.vendor)}</td>
+            <td>₹${price.toFixed(2)} / ${escapeHtml(item.unit)}</td>
+            <td><span class="status ${status.class}">${status.text}</span></td>
         </tr>
-
         `;
-
     });
 
-
-    html += `
-
-        </tbody>
-
-        </table>
-
-        </div>
-
-    `;
-
-
-    document.getElementById(
-        "content"
-    ).innerHTML = html;
+    html += `</tbody></table></div>`;
+    document.getElementById("content").innerHTML = html;
 }
-
 
 /* =========================
    HISTORY ITEM LIST
 ========================= */
 
 function renderHistoryItems() {
+    const search = document.getElementById("searchInput").value.toLowerCase();
 
-    const search =
-        document
-        .getElementById("searchInput")
-        .value
-        .toLowerCase();
-
-
-    const items =
-        inventory.filter(item =>
-            item.name.toLowerCase().includes(search) ||
-            item.type.toLowerCase().includes(search)
-        );
-
+    const items = inventory.filter(item =>
+        item.name.toLowerCase().includes(search) ||
+        item.type.toLowerCase().includes(search) ||
+        item.vendor.toLowerCase().includes(search)
+    );
 
     if (items.length === 0) {
-
         document.getElementById("content").innerHTML = `
-
-            <div class="empty">
-                No inventory items available.
-            </div>
-
+            <div class="empty">No inventory items available.</div>
         `;
-
         return;
     }
 
-
-    let html = `
-        <div class="history-items">
-    `;
-
+    let html = `<div class="history-items">`;
 
     items.forEach(item => {
-
-        const itemHistory =
-            history.filter(record =>
-                record.item === item.name
-            );
-
-
+        const itemHistory = history.filter(record => record.inventoryItemId === item.id);
         let lastMovement = "No movement yet";
         let lastMovementClass = "";
 
         if (itemHistory.length > 0) {
-
-            const last =
-                itemHistory[itemHistory.length - 1];
+            const last = itemHistory[itemHistory.length - 1];
 
             if (last.movement === "Stock Out") {
-
-                lastMovement =
-                    `−${last.quantity} ${last.unit}`;
-
-                lastMovementClass =
-                    "history-out";
-
+                lastMovement = `−${formatNumber(last.quantity)} ${last.unit}`;
+                lastMovementClass = "history-out";
             } else {
-
-                lastMovement =
-                    `+${last.quantity} ${last.unit}`;
-
-                lastMovementClass =
-                    "history-in";
+                lastMovement = `+${formatNumber(last.quantity)} ${last.unit}`;
+                lastMovementClass = "history-in";
             }
         }
 
-
         html += `
-
             <div class="history-card">
-
                 <div class="history-card-top">
-
-                    <h3>
-                        ${escapeHtml(item.name)}
-                    </h3>
-
-                    <div class="history-icon">
-                        📦
-                    </div>
-
+                    <h3>${escapeHtml(item.name)}</h3>
+                    <div class="history-icon">📦</div>
                 </div>
-
                 <div class="history-info">
-
                     Current Stock
-
-                    <div class="history-stock">
-                        ${item.stock} ${item.unit}
-                    </div>
-
+                    <div class="history-stock">${formatNumber(item.stock)} ${escapeHtml(item.unit)}</div>
                     Latest Purchase Price
-
-                    <div class="history-stock">
-                        ₹${Number(item.purchasePrice || 0).toFixed(2)}
-                        / ${escapeHtml(item.unit)}
-                    </div>
-
+                    <div class="history-stock">₹${Number(item.purchasePrice || 0).toFixed(2)} / ${escapeHtml(item.unit)}</div>
                     Last Movement
-
-                    <div class="${lastMovementClass}">
-                        ${lastMovement}
-                    </div>
-
+                    <div class="${lastMovementClass}">${escapeHtml(lastMovement)}</div>
                 </div>
-
                 <br>
-
-                <button
-                    class="btn btn-view"
-                    onclick="openItemHistory(${item.id})">
-
-                    View History →
-
-                </button>
-
+                <button class="btn btn-view" onclick="openItemHistory(${item.id})">View History →</button>
             </div>
-
         `;
-
     });
 
-
-    html += `
-        </div>
-    `;
-
-
-    document.getElementById(
-        "content"
-    ).innerHTML = html;
+    html += `</div>`;
+    document.getElementById("content").innerHTML = html;
 }
 
-
 /* =========================
-   OPEN INDIVIDUAL HISTORY
+   INDIVIDUAL HISTORY
 ========================= */
 
 function openItemHistory(id) {
-
     selectedHistoryItem = id;
-
     renderItemHistory(id);
 }
 
-
-/* =========================
-   INDIVIDUAL ITEM HISTORY
-========================= */
+function formatHistoryDate(value) {
+    if (!value) return "—";
+    const date = new Date(value);
+    if (isNaN(date.getTime())) return String(value);
+    return date.toLocaleString();
+}
 
 function renderItemHistory(id) {
-
-    const item =
-        inventory.find(i => i.id === id);
-
-
+    const item = inventory.find(i => i.id === id);
     if (!item) return;
 
+    const search = document.getElementById("searchInput").value.toLowerCase();
 
-    const search =
-        document
-        .getElementById("searchInput")
-        .value
-        .toLowerCase();
-
-
-    let records =
-        history.filter(record =>
-            record.item === item.name
-        );
-
+    let records = history.filter(record => record.inventoryItemId === id);
 
     if (search) {
-
-        records =
-            records.filter(record =>
-                record.reason
-                .toLowerCase()
-                .includes(search)
-            );
-
+        records = records.filter(record =>
+            String(record.reason || "").toLowerCase().includes(search) ||
+            String(record.movement || "").toLowerCase().includes(search) ||
+            String(record.vendor || "").toLowerCase().includes(search)
+        );
     }
 
-
-    document.getElementById(
-        "sectionTitle"
-    ).textContent =
-        `${item.name} — Stock History`;
-
+    document.getElementById("sectionTitle").textContent = `${item.name} — Stock History`;
 
     let html = `
-
-        <button
-            class="btn btn-back"
-            onclick="showHistory()">
-
-            ← Back to History
-
-        </button>
-
+        <button class="btn btn-back" onclick="showHistory()">← Back to History</button>
         <div class="current-stock">
-
             Current Stock:
-
-            <strong>
-                ${item.stock} ${item.unit}
-            </strong>
-
+            <strong>${formatNumber(item.stock)} ${escapeHtml(item.unit)}</strong>
             <br><br>
-
             Latest Purchase Price:
-
-            <strong>
-                ₹${Number(item.purchasePrice || 0).toFixed(2)}
-                / ${escapeHtml(item.unit)}
-            </strong>
-
+            <strong>₹${Number(item.purchasePrice || 0).toFixed(2)} / ${escapeHtml(item.unit)}</strong>
         </div>
     `;
 
-
     if (records.length === 0) {
-
-        html += `
-
-            <div class="empty">
-                No history available for this item.
-            </div>
-
-        `;
-
-        document.getElementById(
-            "content"
-        ).innerHTML = html;
-
+        html += `<div class="empty">No history available for this item.</div>`;
+        document.getElementById("content").innerHTML = html;
         return;
     }
 
-
     html += `
-
         <div class="table-wrapper">
-
         <table>
-
         <thead>
-
         <tr>
-
             <th>Date & Time</th>
             <th>Movement</th>
             <th>Quantity</th>
@@ -1727,500 +1411,292 @@ function renderItemHistory(id) {
             <th>Total Cost</th>
             <th>Vendor</th>
             <th>Reason</th>
-
         </tr>
-
         </thead>
-
         <tbody>
     `;
 
-
-    records
-    .slice()
-    .reverse()
-    .forEach(record => {
-
-        const isOut =
-            record.movement === "Stock Out";
-
-
-        const movementClass =
-            isOut
-            ? "history-out"
-            : "history-in";
-
-
-        const sign =
-            isOut
-            ? "−"
-            : "+";
-
-
-        const price =
-            Number(record.pricePerUnit || 0);
-
-        const totalCost =
-            Number(record.totalCost || 0);
-
+    records.slice().reverse().forEach(record => {
+        const isOut = record.movement === "Stock Out";
+        const movementClass = isOut ? "history-out" : "history-in";
+        const sign = isOut ? "−" : "+";
+        const price = Number(record.pricePerUnit || 0);
+        const totalCost = Number(record.totalCost || 0);
 
         html += `
-
         <tr>
-
-            <td>
-                ${escapeHtml(record.date)}
-            </td>
-
-            <td class="${movementClass}">
-
-                ${record.movement}
-
-            </td>
-
-            <td class="${movementClass}">
-
-                ${sign}${record.quantity}
-                ${escapeHtml(record.unit)}
-
-            </td>
-
-            <td>
-
-                <strong>
-                    ${record.balance}
-                    ${escapeHtml(record.unit)}
-                </strong>
-
-            </td>
-
-            <td>
-
-                ${
-                    isOut
-                    ? "—"
-                    : `₹${price.toFixed(2)} / ${escapeHtml(record.unit)}`
-                }
-
-            </td>
-
-            <td>
-
-                ${
-                    isOut
-                    ? "—"
-                    : `₹${totalCost.toFixed(2)}`
-                }
-
-            </td>
-
-            <td>
-
-                ${
-                    record.vendor
-                    ? escapeHtml(record.vendor)
-                    : "—"
-                }
-
-            </td>
-
-            <td>
-
-                ${escapeHtml(record.reason)}
-
-            </td>
-
+            <td>${escapeHtml(formatHistoryDate(record.date))}</td>
+            <td class="${movementClass}">${escapeHtml(record.movement)}</td>
+            <td class="${movementClass}">${sign}${formatNumber(record.quantity)} ${escapeHtml(record.unit)}</td>
+            <td><strong>${formatNumber(record.balance)} ${escapeHtml(record.unit)}</strong></td>
+            <td>${isOut ? "—" : `₹${price.toFixed(2)} / ${escapeHtml(record.unit)}`}</td>
+            <td>${isOut ? "—" : `₹${totalCost.toFixed(2)}`}</td>
+            <td>${record.vendor ? escapeHtml(record.vendor) : "—"}</td>
+            <td>${escapeHtml(record.reason || "—")}</td>
         </tr>
-
         `;
-
     });
 
-
-    html += `
-
-        </tbody>
-
-        </table>
-
-        </div>
-
-    `;
-
-
-    document.getElementById(
-        "content"
-    ).innerHTML = html;
+    html += `</tbody></table></div>`;
+    document.getElementById("content").innerHTML = html;
 }
-
 
 /* =========================
    STOCK IN
 ========================= */
 
 function openStockIn(id) {
-
-    const item =
-        inventory.find(i => i.id === id);
-
-
+    const item = inventory.find(i => i.id === id);
     if (!item) return;
-
 
     stockInId = id;
 
-
-    document.getElementById(
-        "stockInItemName"
-    ).textContent =
-        item.name;
-
-
-    document.getElementById(
-        "stockInCurrent"
-    ).textContent =
-        `${item.stock} ${item.unit}`;
-
-
-    document.getElementById(
-        "stockInLatestPrice"
-    ).textContent =
-        `₹${Number(item.purchasePrice || 0).toFixed(2)} / ${item.unit}`;
-
-
-    document.getElementById(
-        "stockInQuantity"
-    ).value = "";
-
-
-    document.getElementById(
-        "stockInPrice"
-    ).value =
-        item.purchasePrice || "";
-
-
-    document.getElementById(
-        "stockInVendor"
-    ).value =
-        item.vendor || "";
-
-
-    document.getElementById(
-        "stockInReason"
-    ).value =
-        "Purchase";
-
+    document.getElementById("stockInItemName").textContent = item.name;
+    document.getElementById("stockInCurrent").textContent = `${formatNumber(item.stock)} ${item.unit}`;
+    document.getElementById("stockInLatestPrice").textContent = `₹${Number(item.purchasePrice || 0).toFixed(2)} / ${item.unit}`;
+    document.getElementById("stockInQuantity").value = "";
+    document.getElementById("stockInPrice").value = item.purchasePrice || "";
+    document.getElementById("stockInVendor").value = item.vendor || "";
+    document.getElementById("stockInReason").value = "Purchase";
 
     calculatePurchaseTotal();
-
-
-    document.getElementById(
-        "stockInModal"
-    ).style.display = "flex";
+    document.getElementById("stockInModal").style.display = "flex";
 }
-
-
-/* PURCHASE TOTAL */
 
 function calculatePurchaseTotal() {
-
-    const quantity =
-        Number(
-            document.getElementById(
-                "stockInQuantity"
-            ).value
-        ) || 0;
-
-
-    const price =
-        Number(
-            document.getElementById(
-                "stockInPrice"
-            ).value
-        ) || 0;
-
-
-    const total =
-        quantity * price;
-
-
-    document.getElementById(
-        "stockInTotal"
-    ).textContent =
-        `₹${total.toFixed(2)}`;
+    const quantity = Number(document.getElementById("stockInQuantity").value) || 0;
+    const price = Number(document.getElementById("stockInPrice").value) || 0;
+    const total = quantity * price;
+    document.getElementById("stockInTotal").textContent = `₹${total.toFixed(2)}`;
 }
 
-
-/* CONFIRM STOCK IN */
-
-function confirmStockIn() {
-
-    const item =
-        inventory.find(i => i.id === stockInId);
-
-
+async function confirmStockIn() {
+    const item = inventory.find(i => i.id === stockInId);
     if (!item) return;
 
-
-    const quantity =
-        Number(
-            document.getElementById(
-                "stockInQuantity"
-            ).value
-        );
-
-
-    const price =
-        Number(
-            document.getElementById(
-                "stockInPrice"
-            ).value
-        );
-
-
-    const vendor =
-        document
-        .getElementById("stockInVendor")
-        .value
-        .trim();
-
-
-    const reason =
-        document
-        .getElementById("stockInReason")
-        .value;
-
+    const quantity = Number(document.getElementById("stockInQuantity").value);
+    const price = Number(document.getElementById("stockInPrice").value);
+    const vendor = document.getElementById("stockInVendor").value.trim();
+    const reason = document.getElementById("stockInReason").value;
 
     if (!quantity || quantity <= 0) {
-
-        alert(
-            "Please enter a valid purchase quantity."
-        );
-
+        alert("Please enter a valid purchase quantity.");
         return;
     }
 
-
-    if (price < 0 || isNaN(price)) {
-
-        alert(
-            "Please enter a valid purchase price."
-        );
-
+    if (isNaN(price) || price < 0) {
+        alert("Please enter a valid purchase price.");
         return;
     }
 
+    const newBalance = Number((item.stock + quantity).toFixed(2));
+    const totalCost = Number((quantity * price).toFixed(2));
 
-    item.stock =
-        Number(
-            (item.stock + quantity)
-            .toFixed(2)
-        );
+    const buttons = document.querySelectorAll("#stockInModal .modal-actions button");
+    buttons.forEach(button => button.disabled = true);
 
+    try {
+        const updateFields = {
+            current_stock: newBalance,
+            purchase_price: price
+        };
 
-    item.purchasePrice =
-        price;
+        if (vendor) updateFields.vendor = vendor;
 
+        const { data: updatedItem, error: updateError } = await supabaseClient
+            .from("inventory_items")
+            .update(updateFields)
+            .eq("id", item.id)
+            .select()
+            .single();
 
-    if (vendor) {
-        item.vendor = vendor;
+        if (updateError) throw updateError;
+
+        const { data: newHistory, error: historyError } = await supabaseClient
+            .from("inventory_history")
+            .insert({
+                inventory_item_id: item.id,
+                item_name: updatedItem.name,
+                movement: "Stock In",
+                quantity,
+                unit: updatedItem.unit,
+                balance: newBalance,
+                reason,
+                price_per_unit: price,
+                total_cost: totalCost,
+                vendor: vendor || updatedItem.vendor || null
+            })
+            .select()
+            .single();
+
+        if (historyError) {
+            await supabaseClient
+                .from("inventory_items")
+                .update({
+                    current_stock: item.stock,
+                    purchase_price: item.purchasePrice,
+                    vendor: item.vendor
+                })
+                .eq("id", item.id);
+            throw historyError;
+        }
+
+        item.stock = Number(updatedItem.current_stock || 0);
+        item.purchasePrice = Number(updatedItem.purchase_price || 0);
+        item.vendor = updatedItem.vendor || "";
+
+        history.push({
+            id: newHistory.id,
+            inventoryItemId: newHistory.inventory_item_id,
+            date: newHistory.created_at,
+            item: newHistory.item_name,
+            movement: newHistory.movement,
+            quantity: Number(newHistory.quantity),
+            unit: newHistory.unit,
+            balance: Number(newHistory.balance),
+            reason: newHistory.reason || "",
+            pricePerUnit: Number(newHistory.price_per_unit || 0),
+            totalCost: Number(newHistory.total_cost || 0),
+            vendor: newHistory.vendor || ""
+        });
+
+        closeModal("stockInModal");
+        showInventory();
+    } catch (error) {
+        console.error("Stock In error:", error);
+        alert("Could not record Stock In.\n\n" + (error.message || "Unknown error"));
+    } finally {
+        buttons.forEach(button => button.disabled = false);
     }
-
-
-    const totalCost =
-        Number(
-            (quantity * price)
-            .toFixed(2)
-        );
-
-
-    history.push({
-
-        id: Date.now(),
-
-        date:
-            new Date().toLocaleString(),
-
-        item:
-            item.name,
-
-        movement:
-            "Stock In",
-
-        quantity:
-            quantity,
-
-        unit:
-            item.unit,
-
-        balance:
-            item.stock,
-
-        reason:
-            reason,
-
-        pricePerUnit:
-            price,
-
-        totalCost:
-            totalCost,
-
-        vendor:
-            vendor || item.vendor
-
-    });
-
-
-    saveData();
-
-    closeModal("stockInModal");
-
-    showInventory();
 }
-
 
 /* =========================
    STOCK OUT
 ========================= */
 
 function openStockOut(id) {
-
-    const item =
-        inventory.find(i => i.id === id);
-
-
+    const item = inventory.find(i => i.id === id);
     if (!item) return;
-
 
     stockOutId = id;
 
-
-    document.getElementById(
-        "stockOutItemName"
-    ).textContent =
-        item.name;
-
-
-    document.getElementById(
-        "stockOutCurrent"
-    ).textContent =
-        `${item.stock} ${item.unit}`;
-
-
-    document.getElementById(
-        "stockOutQuantity"
-    ).value = "";
-
-
-    document.getElementById(
-        "stockOutModal"
-    ).style.display = "flex";
+    document.getElementById("stockOutItemName").textContent = item.name;
+    document.getElementById("stockOutCurrent").textContent = `${formatNumber(item.stock)} ${item.unit}`;
+    document.getElementById("stockOutQuantity").value = "";
+    document.getElementById("stockOutReason").value = "Kitchen use";
+    document.getElementById("stockOutModal").style.display = "flex";
 }
 
-
-/* =========================
-   CONFIRM STOCK OUT
-========================= */
-
-function confirmStockOut() {
-
-    const item =
-        inventory.find(i => i.id === stockOutId);
-
-
+async function confirmStockOut() {
+    const item = inventory.find(i => i.id === stockOutId);
     if (!item) return;
 
-
-    const quantity =
-        Number(
-            document
-            .getElementById("stockOutQuantity")
-            .value
-        );
-
-
-    const reason =
-        document
-        .getElementById("stockOutReason")
-        .value;
-
+    const quantity = Number(document.getElementById("stockOutQuantity").value);
+    const reason = document.getElementById("stockOutReason").value;
 
     if (!quantity || quantity <= 0) {
-
         alert("Please enter a valid quantity.");
-
         return;
     }
-
 
     if (quantity > item.stock) {
-
-        alert(
-            "Stock Out quantity cannot be greater than current stock."
-        );
-
+        alert("Stock Out quantity cannot be greater than current stock.");
         return;
     }
 
+    const newBalance = Number((item.stock - quantity).toFixed(2));
+    const buttons = document.querySelectorAll("#stockOutModal .modal-actions button");
+    buttons.forEach(button => button.disabled = true);
 
-    item.stock =
-        Number(
-            (item.stock - quantity)
-            .toFixed(2)
-        );
+    try {
+        const { data: updatedItem, error: updateError } = await supabaseClient
+            .from("inventory_items")
+            .update({ current_stock: newBalance })
+            .eq("id", item.id)
+            .select()
+            .single();
 
+        if (updateError) throw updateError;
 
-    history.push({
+        const { data: newHistory, error: historyError } = await supabaseClient
+            .from("inventory_history")
+            .insert({
+                inventory_item_id: item.id,
+                item_name: updatedItem.name,
+                movement: "Stock Out",
+                quantity,
+                unit: updatedItem.unit,
+                balance: newBalance,
+                reason,
+                price_per_unit: null,
+                total_cost: null,
+                vendor: updatedItem.vendor || null
+            })
+            .select()
+            .single();
 
-        id: Date.now(),
+        if (historyError) {
+            await supabaseClient
+                .from("inventory_items")
+                .update({ current_stock: item.stock })
+                .eq("id", item.id);
+            throw historyError;
+        }
 
-        date:
-            new Date().toLocaleString(),
+        item.stock = Number(updatedItem.current_stock || 0);
 
-        item:
-            item.name,
+        history.push({
+            id: newHistory.id,
+            inventoryItemId: newHistory.inventory_item_id,
+            date: newHistory.created_at,
+            item: newHistory.item_name,
+            movement: newHistory.movement,
+            quantity: Number(newHistory.quantity),
+            unit: newHistory.unit,
+            balance: Number(newHistory.balance),
+            reason: newHistory.reason || "",
+            pricePerUnit: null,
+            totalCost: null,
+            vendor: newHistory.vendor || ""
+        });
 
-        movement:
-            "Stock Out",
-
-        quantity:
-            quantity,
-
-        unit:
-            item.unit,
-
-        balance:
-            item.stock,
-
-        reason:
-            reason
-
-    });
-
-
-    saveData();
-
-    closeModal("stockOutModal");
-
-    showInventory();
+        closeModal("stockOutModal");
+        showInventory();
+    } catch (error) {
+        console.error("Stock Out error:", error);
+        alert("Could not record Stock Out.\n\n" + (error.message || "Unknown error"));
+    } finally {
+        buttons.forEach(button => button.disabled = false);
+    }
 }
 
-
-/* CLOSE MODAL */
+/* =========================
+   CLOSE MODAL
+========================= */
 
 function closeModal(id) {
-
-    document.getElementById(
-        id
-    ).style.display = "none";
+    document.getElementById(id).style.display = "none";
 }
 
+window.addEventListener("click", function(e) {
+    if (e.target.classList.contains("modal")) {
+        e.target.style.display = "none";
+    }
+});
 
-/* ESCAPE HTML */
+/* =========================
+   HELPERS
+========================= */
+
+function formatNumber(value) {
+    const number = Number(value || 0);
+    return Number.isInteger(number)
+        ? String(number)
+        : number.toFixed(2).replace(/0+$/, "").replace(/\.$/, "");
+}
 
 function escapeHtml(value) {
-
-    return String(value)
+    return String(value ?? "")
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
@@ -2228,45 +1704,18 @@ function escapeHtml(value) {
         .replace(/'/g, "&#039;");
 }
 
+/* =========================
+   LIVE CALCULATIONS
+========================= */
 
-/* CLOSE MODAL OUTSIDE */
+document.getElementById("itemStock").addEventListener("input", updateInitialPurchaseTotal);
+document.getElementById("itemPrice").addEventListener("input", updateInitialPurchaseTotal);
 
-window.addEventListener(
-    "click",
-    function(e) {
+/* =========================
+   INITIAL LOAD
+========================= */
 
-        if (
-            e.target.classList.contains("modal")
-        ) {
-
-            e.target.style.display =
-                "none";
-        }
-
-    }
-);
-
-
-/* PURCHASE PRICE LIVE CALCULATION */
-
-document
-.getElementById("itemStock")
-.addEventListener(
-    "input",
-    updateInitialPurchaseTotal
-);
-
-document
-.getElementById("itemPrice")
-.addEventListener(
-    "input",
-    updateInitialPurchaseTotal
-);
-
-
-/* INITIAL */
-
-showInventory();
+loadData();
 
 </script>
 
