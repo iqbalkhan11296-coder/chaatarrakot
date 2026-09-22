@@ -637,6 +637,31 @@ input:focus, select:focus {
 }
 
 </style>
+
+<style id="purchase-analytics-css">
+.purchase-analytics-toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:18px}
+.purchase-analytics-toolbar select{min-width:155px;padding:10px 12px;border:1px solid #ddd;border-radius:10px;background:#fff;color:#222}
+.purchase-analytics-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:18px}
+.purchase-stat{background:#fff;border:1px solid #e7e2dc;border-radius:14px;padding:16px;box-shadow:0 4px 14px rgba(0,0,0,.04)}
+.purchase-stat-label{font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:#777;margin-bottom:7px}
+.purchase-stat-value{font-size:24px;font-weight:800;color:#222}
+.purchase-stat-sub{font-size:12px;color:#777;margin-top:5px}
+.purchase-analytics-panels{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.purchase-panel{background:#fff;border:1px solid #e7e2dc;border-radius:14px;padding:16px;overflow:hidden}
+.purchase-panel h3{margin:0 0 14px;font-size:17px}
+.purchase-table{width:100%;border-collapse:collapse;font-size:13px}
+.purchase-table th,.purchase-table td{padding:10px 8px;border-bottom:1px solid #eee;text-align:left}
+.purchase-table th{background:#faf8f5;color:#666;font-weight:700}
+.purchase-table .num{text-align:right}
+.purchase-empty{text-align:center;color:#777;padding:22px 6px}
+.purchase-bar-row{margin-bottom:13px}
+.purchase-bar-head{display:flex;justify-content:space-between;gap:10px;font-size:13px;margin-bottom:6px}
+.purchase-bar-track{height:9px;border-radius:20px;background:#eee;overflow:hidden}
+.purchase-bar-fill{height:100%;border-radius:20px;background:#222}
+@media(max-width:900px){.purchase-analytics-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.purchase-analytics-panels{grid-template-columns:1fr}}
+@media(max-width:560px){.purchase-analytics-grid{grid-template-columns:1fr}}
+</style>
+
 </head>
 
 <body>
@@ -648,6 +673,84 @@ input:focus, select:focus {
     </div>
 </header>
 
+
+
+<div id="purchasingSection" class="page-section" style="display:none;">
+    <div class="section-header">
+        <div>
+            <h2>Purchase Analytics</h2>
+            <p>Track purchase spending and buying activity from your inventory history.</p>
+        </div>
+        <button class="secondary-btn" onclick="showDashboard()">← Back</button>
+    </div>
+
+    <div class="purchase-analytics-toolbar">
+        <select id="purchasePeriodFilter" onchange="renderPurchaseAnalytics()">
+            <option value="today">Today</option>
+            <option value="7">Last 7 Days</option>
+            <option value="30" selected>Last 30 Days</option>
+            <option value="month">This Month</option>
+            <option value="all">All Time</option>
+        </select>
+        <button class="secondary-btn" onclick="renderPurchaseAnalytics()">Refresh</button>
+    </div>
+
+    <div class="purchase-analytics-grid">
+        <div class="purchase-stat">
+            <div class="purchase-stat-label">Purchase Cost</div>
+            <div class="purchase-stat-value" id="purchaseTotalCost">₹0</div>
+            <div class="purchase-stat-sub">Stock In purchase cost</div>
+        </div>
+        <div class="purchase-stat">
+            <div class="purchase-stat-label">Purchase Events</div>
+            <div class="purchase-stat-value" id="purchaseEventCount">0</div>
+            <div class="purchase-stat-sub">Stock In transactions</div>
+        </div>
+        <div class="purchase-stat">
+            <div class="purchase-stat-label">Quantity Purchased</div>
+            <div class="purchase-stat-value" id="purchaseQuantity">0</div>
+            <div class="purchase-stat-sub">Across all units</div>
+        </div>
+        <div class="purchase-stat">
+            <div class="purchase-stat-label">Average Purchase</div>
+            <div class="purchase-stat-value" id="purchaseAverage">₹0</div>
+            <div class="purchase-stat-sub">Cost per purchase event</div>
+        </div>
+    </div>
+
+    <div class="purchase-analytics-panels">
+        <div class="purchase-panel">
+            <h3>Top Purchased Items</h3>
+            <div id="purchaseTopItems"></div>
+        </div>
+        <div class="purchase-panel">
+            <h3>Vendor Spending</h3>
+            <div id="purchaseVendorSpend"></div>
+        </div>
+        <div class="purchase-panel">
+            <h3>Purchase History</h3>
+            <div style="overflow-x:auto;">
+                <table class="purchase-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Item</th>
+                            <th>Vendor</th>
+                            <th class="num">Qty</th>
+                            <th class="num">Price/Unit</th>
+                            <th class="num">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody id="purchaseHistoryRows"></tbody>
+                </table>
+            </div>
+        </div>
+        <div class="purchase-panel">
+            <h3>Recent Purchase Spending</h3>
+            <div id="purchaseDailySpend"></div>
+        </div>
+    </div>
+</div>
 
 <main>
 
@@ -709,6 +812,11 @@ input:focus, select:focus {
             <div class="icon">🏪</div>
             <h3>Vendors</h3>
             <p>Supplier and purchase overview</p>
+        </button>
+        <button class="dashboard-btn" id="btnPurchasing" onclick="showPurchasing()">
+            <div class="icon">🛒</div>
+            <h3>Purchase Analytics</h3>
+            <p>Purchase costs, events and vendor spending</p>
         </button>
     </div>
 
@@ -2222,5 +2330,204 @@ loadData();
 setupRealtime();
 </script>
 
+<script>
+
+/* ==================== PURCHASE ANALYTICS ==================== */
+function showPurchasing() {
+    // Hide the existing app sections without changing their functionality.
+    document.querySelectorAll(".page-section").forEach(function(el) {
+        el.style.display = "none";
+    });
+
+    var section = document.getElementById("purchasingSection");
+    if (section) section.style.display = "block";
+
+    if (typeof currentSection !== "undefined") currentSection = "purchasing";
+    if (typeof renderPurchaseAnalytics === "function") renderPurchaseAnalytics();
+}
+
+function purchaseAnalyticsDateStart(period) {
+    var now = new Date();
+    if (period === "today") {
+        var d = new Date(now);
+        d.setHours(0,0,0,0);
+        return d;
+    }
+    if (period === "month") {
+        return new Date(now.getFullYear(), now.getMonth(), 1);
+    }
+    if (period === "7" || period === "30") {
+        var days = Number(period);
+        var d2 = new Date(now);
+        d2.setDate(d2.getDate() - (days - 1));
+        d2.setHours(0,0,0,0);
+        return d2;
+    }
+    return null;
+}
+
+function purchaseMoney(value) {
+    return "₹" + Number(value || 0).toLocaleString("en-IN", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2
+    });
+}
+
+function purchaseQty(value) {
+    return Number(value || 0).toLocaleString("en-IN", {
+        maximumFractionDigits: 2
+    });
+}
+
+function renderPurchaseAnalytics() {
+    if (typeof historyData === "undefined") return;
+
+    var period = document.getElementById("purchasePeriodFilter");
+    period = period ? period.value : "30";
+
+    var start = purchaseAnalyticsDateStart(period);
+    var rows = Array.isArray(historyData) ? historyData.filter(function(h) {
+        if (h.movement !== "Stock In") return false;
+        if (start && new Date(h.created_at) < start) return false;
+        return true;
+    }) : [];
+
+    var totalCost = rows.reduce(function(sum, h) {
+        return sum + Number(h.total_cost || 0);
+    }, 0);
+
+    var totalQty = rows.reduce(function(sum, h) {
+        return sum + Number(h.quantity || 0);
+    }, 0);
+
+    var events = rows.length;
+    var avgPurchase = events ? totalCost / events : 0;
+
+    var setText = function(id, value) {
+        var el = document.getElementById(id);
+        if (el) el.textContent = value;
+    };
+
+    setText("purchaseTotalCost", purchaseMoney(totalCost));
+    setText("purchaseEventCount", events.toLocaleString("en-IN"));
+    setText("purchaseQuantity", purchaseQty(totalQty));
+    setText("purchaseAverage", purchaseMoney(avgPurchase));
+
+    /* Top purchased items */
+    var itemMap = {};
+    rows.forEach(function(h) {
+        var key = h.item_name || "Unknown";
+        if (!itemMap[key]) itemMap[key] = { name:key, qty:0, cost:0, unit:h.unit || "" };
+        itemMap[key].qty += Number(h.quantity || 0);
+        itemMap[key].cost += Number(h.total_cost || 0);
+    });
+
+    var items = Object.values(itemMap).sort(function(a,b) {
+        return b.cost - a.cost;
+    }).slice(0, 8);
+
+    var topEl = document.getElementById("purchaseTopItems");
+    if (topEl) {
+        if (!items.length) {
+            topEl.innerHTML = '<div class="purchase-empty">No purchases found for this period.</div>';
+        } else {
+            var maxCost = Math.max.apply(null, items.map(function(x){ return x.cost; }).concat([1]));
+            topEl.innerHTML = items.map(function(x) {
+                var pct = Math.max(2, Math.round((x.cost / maxCost) * 100));
+                return '<div class="purchase-bar-row">' +
+                    '<div class="purchase-bar-head"><span>' + escapeHtml(x.name) + '</span><strong>' + purchaseMoney(x.cost) + '</strong></div>' +
+                    '<div class="purchase-bar-track"><div class="purchase-bar-fill" style="width:' + pct + '%"></div></div>' +
+                    '<div style="font-size:11px;color:#777;margin-top:4px;">' + purchaseQty(x.qty) + ' ' + escapeHtml(x.unit) + ' purchased</div>' +
+                    '</div>';
+            }).join("");
+        }
+    }
+
+    /* Vendor spending */
+    var vendorMap = {};
+    rows.forEach(function(h) {
+        var vendor = (h.vendor || "").trim() || "No Vendor";
+        vendorMap[vendor] = (vendorMap[vendor] || 0) + Number(h.total_cost || 0);
+    });
+
+    var vendors = Object.keys(vendorMap).map(function(name) {
+        return {name:name, cost:vendorMap[name]};
+    }).sort(function(a,b){ return b.cost - a.cost; }).slice(0, 8);
+
+    var vendorEl = document.getElementById("purchaseVendorSpend");
+    if (vendorEl) {
+        if (!vendors.length) {
+            vendorEl.innerHTML = '<div class="purchase-empty">No vendor purchase data found.</div>';
+        } else {
+            var maxVendor = Math.max.apply(null, vendors.map(function(x){ return x.cost; }).concat([1]));
+            vendorEl.innerHTML = vendors.map(function(x) {
+                var pct = Math.max(2, Math.round((x.cost / maxVendor) * 100));
+                return '<div class="purchase-bar-row">' +
+                    '<div class="purchase-bar-head"><span>' + escapeHtml(x.name) + '</span><strong>' + purchaseMoney(x.cost) + '</strong></div>' +
+                    '<div class="purchase-bar-track"><div class="purchase-bar-fill" style="width:' + pct + '%"></div></div>' +
+                    '</div>';
+            }).join("");
+        }
+    }
+
+    /* Purchase history */
+    var historyEl = document.getElementById("purchaseHistoryRows");
+    if (historyEl) {
+        var sorted = rows.slice().sort(function(a,b) {
+            return new Date(b.created_at) - new Date(a.created_at);
+        }).slice(0, 50);
+
+        if (!sorted.length) {
+            historyEl.innerHTML = '<tr><td colspan="6" class="purchase-empty">No purchases found.</td></tr>';
+        } else {
+            historyEl.innerHTML = sorted.map(function(h) {
+                var date = new Date(h.created_at);
+                var dateText = date.toLocaleDateString("en-IN", {day:"2-digit", month:"short", year:"numeric"}) +
+                    " " + date.toLocaleTimeString("en-IN", {hour:"2-digit", minute:"2-digit"});
+                return '<tr>' +
+                    '<td>' + escapeHtml(dateText) + '</td>' +
+                    '<td>' + escapeHtml(h.item_name || "") + '</td>' +
+                    '<td>' + escapeHtml((h.vendor || "").trim() || "—") + '</td>' +
+                    '<td class="num">' + purchaseQty(h.quantity) + ' ' + escapeHtml(h.unit || "") + '</td>' +
+                    '<td class="num">' + purchaseMoney(h.price_per_unit) + '</td>' +
+                    '<td class="num"><strong>' + purchaseMoney(h.total_cost) + '</strong></td>' +
+                    '</tr>';
+            }).join("");
+        }
+    }
+
+    /* Daily spending */
+    var dayMap = {};
+    rows.forEach(function(h) {
+        var date = new Date(h.created_at);
+        var key = date.getFullYear() + "-" + String(date.getMonth()+1).padStart(2,"0") + "-" + String(date.getDate()).padStart(2,"0");
+        dayMap[key] = (dayMap[key] || 0) + Number(h.total_cost || 0);
+    });
+
+    var days = Object.keys(dayMap).sort().reverse().slice(0, 10).map(function(key) {
+        return {key:key, cost:dayMap[key]};
+    });
+
+    var dailyEl = document.getElementById("purchaseDailySpend");
+    if (dailyEl) {
+        if (!days.length) {
+            dailyEl.innerHTML = '<div class="purchase-empty">No daily purchase spending to show.</div>';
+        } else {
+            var maxDay = Math.max.apply(null, days.map(function(x){ return x.cost; }).concat([1]));
+            dailyEl.innerHTML = days.map(function(x) {
+                var parts = x.key.split("-");
+                var label = new Date(Number(parts[0]), Number(parts[1])-1, Number(parts[2]))
+                    .toLocaleDateString("en-IN", {day:"2-digit", month:"short"});
+                var pct = Math.max(2, Math.round((x.cost / maxDay) * 100));
+                return '<div class="purchase-bar-row">' +
+                    '<div class="purchase-bar-head"><span>' + label + '</span><strong>' + purchaseMoney(x.cost) + '</strong></div>' +
+                    '<div class="purchase-bar-track"><div class="purchase-bar-fill" style="width:' + pct + '%"></div></div>' +
+                    '</div>';
+            }).join("");
+        }
+    }
+}
+
+</script>
 </body>
 </html>
