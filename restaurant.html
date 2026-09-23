@@ -1,125 +1,706 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Nexa Table AI</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<link rel="stylesheet" href="style.css">
+<title>Nexa Table AI</title>
 
-</head><body><div class="app">
+<style>
 
-    <!-- HEADER -->
-    <header class="topbar">
-        <div class="brand">
-            <div class="logo">N</div>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-            <div>
-                <h1>NEXA TABLE</h1>
-                <span>AI RESTAURANT ASSISTANT</span>
-            </div>
+:root {
+    --bg: #07080a;
+    --panel: rgba(255,255,255,.055);
+    --border: rgba(255,255,255,.11);
+    --text: #f5f2ea;
+    --muted: #858891;
+    --gold: #d7b56d;
+}
+
+body {
+    min-height: 100vh;
+    background:
+        radial-gradient(
+            circle at 50% 25%,
+            rgba(215,181,109,.14),
+            transparent 32%
+        ),
+        radial-gradient(
+            circle at 80% 85%,
+            rgba(100,80,160,.08),
+            transparent 30%
+        ),
+        var(--bg);
+
+    color: var(--text);
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+button {
+    font: inherit;
+    color: inherit;
+    border: 0;
+    cursor: pointer;
+}
+
+.app {
+    width: 100%;
+    max-width: 900px;
+    min-height: 100vh;
+    margin: auto;
+    padding: 22px;
+
+    overflow: hidden;
+}
+
+
+/* ================= HEADER ================= */
+
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.logo {
+    width: 44px;
+    height: 44px;
+
+    display: grid;
+    place-items: center;
+
+    border: 1px solid var(--border);
+    border-radius: 14px;
+
+    background: var(--panel);
+
+    color: var(--gold);
+
+    font-size: 20px;
+    font-weight: bold;
+
+    box-shadow:
+        0 0 30px rgba(215,181,109,.08);
+}
+
+.brand h1 {
+    font-size: 14px;
+    letter-spacing: 3px;
+}
+
+.brand small {
+    display: block;
+
+    margin-top: 4px;
+
+    color: var(--muted);
+
+    font-size: 8px;
+    letter-spacing: 2px;
+}
+
+.settings {
+    width: 42px;
+    height: 42px;
+
+    border: 1px solid var(--border);
+    border-radius: 50%;
+
+    background: var(--panel);
+
+    font-size: 18px;
+
+    transition: .3s;
+}
+
+.settings:hover {
+    transform: rotate(45deg);
+}
+
+
+/* ================= WELCOME ================= */
+
+.welcome {
+    margin-top: 55px;
+    text-align: center;
+}
+
+.status {
+    color: #8bc79a;
+
+    font-size: 9px;
+    letter-spacing: 2px;
+}
+
+.welcome h2 {
+    margin-top: 14px;
+
+    font-size: clamp(36px, 8vw, 60px);
+    font-weight: 400;
+
+    letter-spacing: -2px;
+}
+
+.welcome p {
+    margin-top: 8px;
+
+    color: var(--muted);
+}
+
+
+/* ================= AI CORE ================= */
+
+.ai-core {
+    height: 350px;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    position: relative;
+}
+
+.ai-orb {
+    width: 145px;
+    height: 145px;
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            circle at 35% 30%,
+            #fff5d6 0%,
+            #d7b56d 15%,
+            #8e6c36 45%,
+            #17130c 72%
+        );
+
+    box-shadow:
+        0 0 25px rgba(215,181,109,.45),
+        0 0 80px rgba(215,181,109,.18),
+        inset 0 0 30px rgba(255,255,255,.15);
+
+    display: grid;
+    place-items: center;
+
+    position: relative;
+    z-index: 5;
+
+    transition: .3s;
+
+    animation: breathe 3s infinite;
+}
+
+.ai-orb span {
+    font-size: 45px;
+}
+
+.ai-orb:hover {
+    transform: scale(1.07);
+}
+
+.ai-orb:active {
+    transform: scale(.93);
+}
+
+@keyframes breathe {
+
+    0%,100% {
+        box-shadow:
+            0 0 25px rgba(215,181,109,.4),
+            0 0 60px rgba(215,181,109,.15);
+    }
+
+    50% {
+        box-shadow:
+            0 0 40px rgba(215,181,109,.7),
+            0 0 110px rgba(215,181,109,.25);
+    }
+}
+
+
+/* ORBIT RINGS */
+
+.orb-ring {
+    position: absolute;
+
+    border: 1px solid rgba(215,181,109,.18);
+
+    border-radius: 50%;
+
+    pointer-events: none;
+}
+
+.ring1 {
+    width: 190px;
+    height: 190px;
+
+    animation: pulse 3s infinite;
+}
+
+.ring2 {
+    width: 245px;
+    height: 245px;
+
+    animation: pulse 3s infinite 1s;
+}
+
+.ring3 {
+    width: 305px;
+    height: 305px;
+
+    animation: pulse 3s infinite 2s;
+}
+
+@keyframes pulse {
+
+    0%,100% {
+        opacity: .15;
+        transform: scale(.95);
+    }
+
+    50% {
+        opacity: .6;
+        transform: scale(1.03);
+    }
+}
+
+
+/* VOICE TEXT */
+
+.voice-text {
+    margin-top: 35px;
+
+    text-align: center;
+
+    position: relative;
+    z-index: 10;
+}
+
+.voice-text strong {
+    display: block;
+    font-size: 15px;
+}
+
+.voice-text small {
+    display: block;
+
+    margin-top: 5px;
+
+    color: var(--muted);
+}
+
+
+/* ================= QUICK ACTIONS ================= */
+
+.quick-actions {
+    display: grid;
+
+    grid-template-columns: repeat(2,1fr);
+
+    gap: 12px;
+}
+
+.action-card {
+    min-height: 90px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 15px;
+
+    padding: 18px;
+
+    text-align: left;
+
+    border: 1px solid var(--border);
+
+    border-radius: 20px;
+
+    background: var(--panel);
+
+    backdrop-filter: blur(20px);
+
+    transition: .3s;
+}
+
+.action-card:hover {
+    transform: translateY(-4px);
+
+    border-color: rgba(215,181,109,.35);
+}
+
+.icon {
+    width: 42px;
+    height: 42px;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 13px;
+
+    background: rgba(215,181,109,.08);
+
+    color: var(--gold);
+
+    font-size: 20px;
+}
+
+.action-card strong {
+    display: block;
+
+    font-size: 14px;
+}
+
+.action-card small {
+    display: block;
+
+    margin-top: 5px;
+
+    color: var(--muted);
+
+    font-size: 11px;
+}
+
+
+/* ================= NAVIGATION ================= */
+
+.bottom-nav {
+    margin-top: 30px;
+
+    display: grid;
+
+    grid-template-columns: repeat(4,1fr);
+
+    padding: 10px;
+
+    border: 1px solid var(--border);
+
+    border-radius: 22px;
+
+    background: rgba(10,10,12,.8);
+
+    backdrop-filter: blur(20px);
+}
+
+.nav-item {
+    padding: 10px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    gap: 5px;
+
+    background: transparent;
+
+    color: var(--muted);
+
+    font-size: 10px;
+
+    transition: .3s;
+}
+
+.nav-item span {
+    font-size: 18px;
+}
+
+.nav-item.active {
+    color: var(--gold);
+}
+
+
+/* ================= MOBILE ================= */
+
+@media(max-width:500px) {
+
+    .app {
+        padding: 18px;
+    }
+
+    .welcome {
+        margin-top: 40px;
+    }
+
+    .ai-core {
+        height: 320px;
+    }
+
+    .ai-orb {
+        width: 125px;
+        height: 125px;
+    }
+
+    .ring1 {
+        width: 165px;
+        height: 165px;
+    }
+
+    .ring2 {
+        width: 215px;
+        height: 215px;
+    }
+
+    .ring3 {
+        width: 265px;
+        height: 265px;
+    }
+
+    .action-card {
+        min-height: 80px;
+        padding: 13px;
+    }
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="app">
+
+<!-- HEADER -->
+
+<header class="topbar">
+
+    <div class="brand">
+
+        <div class="logo">
+            N
         </div>
 
-        <button class="settings">⚙</button>
-    </header>
+        <div>
+
+            <h1>NEXA TABLE</h1>
+
+            <small>
+                AI RESTAURANT ASSISTANT
+            </small>
+
+        </div>
+
+    </div>
 
 
-    <!-- MAIN -->
-    <main>
+    <button class="settings">
+        ⚙
+    </button>
 
-        <section class="welcome">
-            <span class="status">● SYSTEM ONLINE</span>
-
-            <h2>Good evening.</h2>
-            <p>How can I help you today?</p>
-        </section>
+</header>
 
 
-        <!-- AI VOICE CORE -->
-        <section class="ai-core">
 
-            <div class="orb-ring ring-1"></div>
-            <div class="orb-ring ring-2"></div>
-            <div class="orb-ring ring-3"></div>
+<!-- WELCOME -->
 
-            <button class="ai-orb" id="voiceButton">
-                <span>⌁</span>
-            </button>
+<section class="welcome">
 
-            <div class="voice-text">
-                <strong>Talk to your AI</strong>
-                <small>Tap to speak</small>
-            </div>
+    <span class="status">
+        ● SYSTEM ONLINE
+    </span>
 
-        </section>
+    <h2>
+        Good evening.
+    </h2>
 
+    <p>
+        How can I help you today?
+    </p>
 
-        <!-- QUICK ACTIONS -->
-        <section class="quick-actions">
-
-            <button class="action-card">
-                <span class="icon">₹</span>
-                <div>
-                    <strong>Today's Sales</strong>
-                    <small>View revenue</small>
-                </div>
-            </button>
-
-            <button class="action-card">
-                <span class="icon">▣</span>
-                <div>
-                    <strong>Orders</strong>
-                    <small>Live orders</small>
-                </div>
-            </button>
-
-            <button class="action-card">
-                <span class="icon">◈</span>
-                <div>
-                    <strong>Inventory</strong>
-                    <small>Check stock</small>
-                </div>
-            </button>
-
-            <button class="action-card">
-                <span class="icon">⌁</span>
-                <div>
-                    <strong>Reports</strong>
-                    <small>Business insights</small>
-                </div>
-            </button>
-
-        </section>
-
-    </main>
+</section>
 
 
-    <!-- BOTTOM NAVIGATION -->
-    <nav class="bottom-nav">
 
-        <button class="nav-item active">
-            <span>⌂</span>
-            Home
-        </button>
+<!-- AI -->
 
-        <button class="nav-item">
-            <span>▣</span>
-            Orders
-        </button>
+<section class="ai-core">
 
-        <button class="nav-item">
-            <span>◈</span>
-            Stock
-        </button>
+    <div class="orb-ring ring1"></div>
+    <div class="orb-ring ring2"></div>
+    <div class="orb-ring ring3"></div>
 
-        <button class="nav-item">
-            <span>▤</span>
-            Reports
-        </button>
 
-    </nav>
+    <button
+        class="ai-orb"
+        id="voiceButton">
+
+        <span>
+            🎙
+        </span>
+
+    </button>
+
+
+    <div class="voice-text">
+
+        <strong>
+            Talk to your AI
+        </strong>
+
+        <small>
+            Tap to speak
+        </small>
+
+    </div>
+
+</section>
+
+
+
+<!-- QUICK ACTIONS -->
+
+<section class="quick-actions">
+
+
+    <button class="action-card">
+
+        <span class="icon">
+            ₹
+        </span>
+
+        <div>
+
+            <strong>
+                Today's Sales
+            </strong>
+
+            <small>
+                View revenue
+            </small>
+
+        </div>
+
+    </button>
+
+
+
+    <button class="action-card">
+
+        <span class="icon">
+            ▣
+        </span>
+
+        <div>
+
+            <strong>
+                Orders
+            </strong>
+
+            <small>
+                Live orders
+            </small>
+
+        </div>
+
+    </button>
+
+
+
+    <button class="action-card">
+
+        <span class="icon">
+            ◈
+        </span>
+
+        <div>
+
+            <strong>
+                Inventory
+            </strong>
+
+            <small>
+                Check stock
+            </small>
+
+        </div>
+
+    </button>
+
+
+
+    <button class="action-card">
+
+        <span class="icon">
+            ⌁
+        </span>
+
+        <div>
+
+            <strong>
+                Reports
+            </strong>
+
+            <small>
+                Business insights
+            </small>
+
+        </div>
+
+    </button>
+
+
+</section>
+
+
+
+<!-- BOTTOM NAVIGATION -->
+
+<nav class="bottom-nav">
+
+    <button class="nav-item active">
+        <span>⌂</span>
+        Home
+    </button>
+
+    <button class="nav-item">
+        <span>▣</span>
+        Orders
+    </button>
+
+    <button class="nav-item">
+        <span>◈</span>
+        Stock
+    </button>
+
+    <button class="nav-item">
+        <span>▤</span>
+        Reports
+    </button>
+
+</nav>
 
 </div>
 
-<script src="app.js"></script>
+<script>
+
+const voiceButton =
+    document.getElementById("voiceButton");
+
+voiceButton.addEventListener("click", () => {
+
+    alert("Voice assistant coming next 🎙️");
+
+});
+
+</script>
 
 </body>
 </html>
