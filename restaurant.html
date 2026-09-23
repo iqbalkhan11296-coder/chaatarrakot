@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 
@@ -572,7 +573,7 @@ button {
 <script>
 
 /* =========================
-   SUPABASE FUNCTION
+   AI FUNCTION
 ========================= */
 
 const SUPABASE_FUNCTION_URL =
@@ -685,7 +686,7 @@ async function startRecording() {
 
 
                 voiceStatus.textContent =
-                    "Connecting to Gemini...";
+                    "Processing...";
 
                 voiceHint.textContent =
                     "Please wait";
@@ -699,11 +700,11 @@ async function startRecording() {
 
                    The audio is captured,
                    but actual speech-to-text
-                   will be connected later.
+                   will be connected next.
                 */
 
-                await sendMessageToGemini(
-                    "Hello! I am speaking to you from my restaurant AI assistant. Please introduce yourself."
+                await sendMessageToAI(
+                    "Hello! Please introduce yourself as the restaurant AI assistant."
                 );
 
             };
@@ -787,10 +788,10 @@ function stopMicrophone() {
 
 
 /* =========================
-   SEND MESSAGE TO GEMINI
+   SEND MESSAGE TO AI
 ========================= */
 
-async function sendMessageToGemini(message) {
+async function sendMessageToAI(message) {
 
     try {
 
@@ -825,7 +826,7 @@ async function sendMessageToGemini(message) {
 
 
         console.log(
-            "Gemini response:",
+            "AI response:",
             data
         );
 
@@ -834,7 +835,7 @@ async function sendMessageToGemini(message) {
 
             throw new Error(
                 data.error ||
-                "Gemini request failed."
+                "AI request failed."
             );
 
         }
@@ -842,11 +843,11 @@ async function sendMessageToGemini(message) {
 
         const reply =
             data.answer ||
-            "Gemini returned no response.";
+            "The assistant did not return a response.";
 
 
         voiceStatus.textContent =
-            "Gemini is connected ✓";
+            "NEXA AI READY ✓";
 
         voiceHint.textContent =
             reply;
@@ -953,7 +954,7 @@ actionCards[0].addEventListener(
         voiceHint.textContent =
             "Reading restaurant data...";
 
-        sendMessageToGemini(
+        sendMessageToAI(
             "How much were today's sales? Calculate the total sales from today's orders using the order total field."
         );
 
@@ -967,7 +968,7 @@ actionCards[1].addEventListener(
     "click",
     function() {
 
-        sendMessageToGemini(
+        sendMessageToAI(
             "How many orders do we have today?"
         );
 
@@ -981,7 +982,7 @@ actionCards[2].addEventListener(
     "click",
     function() {
 
-        sendMessageToGemini(
+        sendMessageToAI(
             "Give me an overview of the restaurant inventory."
         );
 
@@ -995,7 +996,7 @@ actionCards[3].addEventListener(
     "click",
     function() {
 
-        sendMessageToGemini(
+        sendMessageToAI(
             "Give me a brief business report based on the restaurant data available to you."
         );
 
@@ -1014,7 +1015,7 @@ document
         function() {
 
             alert(
-                "Restaurant AI settings will be added here."
+                "NEXA AI settings will be added here."
             );
 
         }
@@ -1025,3 +1026,4 @@ document
 </body>
 
 </html>
+```
