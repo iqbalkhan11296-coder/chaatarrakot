@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <title>CHAATARRA AI Test</title>
 
   <style>
@@ -14,50 +13,47 @@
     body {
       margin: 0;
       font-family: Arial, sans-serif;
-      background: #f5f5f5;
-      color: #111;
+      background: #f3f3f3;
+      min-height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      min-height: 100vh;
     }
 
-    .container {
+    .box {
       width: 95%;
       max-width: 700px;
       background: white;
-      border-radius: 18px;
       padding: 25px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.12);
+      border-radius: 18px;
+      box-shadow: 0 10px 40px rgba(0,0,0,.12);
     }
 
     h1 {
+      text-align: center;
       margin-top: 0;
-      text-align: center;
-    }
-
-    .subtitle {
-      text-align: center;
-      color: #777;
-      margin-bottom: 25px;
     }
 
     #chat {
       height: 400px;
       overflow-y: auto;
+      background: #fafafa;
       border: 1px solid #ddd;
       border-radius: 12px;
       padding: 15px;
-      background: #fafafa;
       margin-bottom: 15px;
     }
 
     .message {
-      margin-bottom: 15px;
-      padding: 12px 15px;
-      border-radius: 12px;
-      line-height: 1.5;
+      padding: 12px;
+      margin-bottom: 12px;
+      border-radius: 10px;
       white-space: pre-wrap;
+      line-height: 1.5;
+    }
+
+    .ai {
+      background: #e8e8e8;
     }
 
     .user {
@@ -66,54 +62,41 @@
       margin-left: 15%;
     }
 
-    .ai {
-      background: #eaeaea;
-      color: #111;
-      margin-right: 15%;
-    }
-
     .error {
-      background: #ffe5e5;
-      color: #b00000;
-      margin-right: 5%;
+      background: #ffe1e1;
+      color: #a00000;
     }
 
-    .input-area {
+    .input {
       display: flex;
       gap: 10px;
     }
 
-    #messageInput {
+    input {
       flex: 1;
       padding: 14px;
       border: 1px solid #ccc;
       border-radius: 10px;
       font-size: 16px;
-      outline: none;
     }
 
-    #sendButton {
+    button {
+      padding: 14px 22px;
       border: none;
+      border-radius: 10px;
       background: #111;
       color: white;
-      padding: 14px 22px;
-      border-radius: 10px;
       cursor: pointer;
       font-size: 16px;
     }
 
-    #sendButton:hover {
-      background: #333;
+    button:disabled {
+      background: #888;
     }
 
-    #sendButton:disabled {
-      background: #999;
-      cursor: not-allowed;
-    }
-
-    .status {
+    #status {
       text-align: center;
-      margin-top: 15px;
+      margin-top: 12px;
       color: #777;
       font-size: 14px;
     }
@@ -122,216 +105,206 @@
 
 <body>
 
-  <div class="container">
+<div class="box">
 
-    <h1>CHAATARRA AI</h1>
+  <h1>CHAATARRA AI</h1>
 
-    <div class="subtitle">
-      Gemini Assistant Test
+  <div id="chat">
+    <div class="message ai">
+      CHAATARRA AI test connection.
     </div>
+  </div>
 
-    <div id="chat">
+  <div class="input">
 
-      <div class="message ai">
-        Hello! I'm the CHAATARRA AI assistant.
-        Ask me something to test the connection.
-      </div>
+    <input
+      id="messageInput"
+      placeholder="Type a message..."
+      autocomplete="off"
+    >
 
-    </div>
-
-    <div class="input-area">
-
-      <input
-        type="text"
-        id="messageInput"
-        placeholder="Type your message..."
-        autocomplete="off"
-      >
-
-      <button id="sendButton">
-        Send
-      </button>
-
-    </div>
-
-    <div class="status" id="status">
-      Ready
-    </div>
+    <button id="sendButton">
+      Send
+    </button>
 
   </div>
 
+  <div id="status">
+    Ready
+  </div>
 
-  <script>
+</div>
 
-    // =====================================================
-    // SUPABASE EDGE FUNCTION
-    // =====================================================
 
-    const AI_FUNCTION_URL =
-      "https://ucqeyhcycwksiubmlilg.supabase.co/functions/v1/restaurant-ai";
+<script>
 
+const FUNCTION_URL =
+  "https://ucqeyhcycwksiubmlilg.supabase.co/functions/v1/restaurant-ai";
 
-    // =====================================================
-    // ELEMENTS
-    // =====================================================
 
-    const chat = document.getElementById("chat");
-    const messageInput = document.getElementById("messageInput");
-    const sendButton = document.getElementById("sendButton");
-    const status = document.getElementById("status");
+const chat = document.getElementById("chat");
+const input = document.getElementById("messageInput");
+const button = document.getElementById("sendButton");
+const status = document.getElementById("status");
 
 
-    // =====================================================
-    // ADD MESSAGE TO CHAT
-    // =====================================================
+function addMessage(text, type) {
 
-    function addMessage(text, type) {
+  const div = document.createElement("div");
 
-      const message = document.createElement("div");
+  div.className = "message " + type;
 
-      message.className = "message " + type;
+  div.textContent = text;
 
-      message.textContent = text;
+  chat.appendChild(div);
 
-      chat.appendChild(message);
+  chat.scrollTop = chat.scrollHeight;
+}
 
-      chat.scrollTop = chat.scrollHeight;
-    }
 
+async function sendMessage() {
 
-    // =====================================================
-    // SEND MESSAGE
-    // =====================================================
+  const message = input.value.trim();
 
-    async function sendMessage() {
+  if (!message) return;
 
-      const message = messageInput.value.trim();
+  addMessage(message, "user");
 
-      if (!message) {
-        return;
-      }
+  input.value = "";
 
-      // Show user's message
-      addMessage(message, "user");
+  button.disabled = true;
 
-      // Clear input
-      messageInput.value = "";
+  status.textContent = "Connecting...";
 
-      // Disable button
-      sendButton.disabled = true;
 
-      status.textContent = "Gemini is thinking...";
+  try {
 
+    console.log("Calling:", FUNCTION_URL);
 
-      try {
 
-        const response = await fetch(AI_FUNCTION_URL, {
+    const response = await fetch(FUNCTION_URL, {
 
-          method: "POST",
+      method: "POST",
 
-          headers: {
-            "Content-Type": "application/json"
-          },
+      headers: {
+        "Content-Type": "application/json"
+      },
 
-          body: JSON.stringify({
-            message: message
-          })
-
-        });
-
-
-        // Get response
-        const data = await response.json();
-
-
-        console.log("AI Response:", data);
-
-
-        // Check for HTTP error
-        if (!response.ok) {
-
-          const errorMessage =
-            typeof data.error === "string"
-              ? data.error
-              : JSON.stringify(data.error, null, 2);
-
-          throw new Error(errorMessage);
-        }
-
-
-        // Display AI response
-        if (data.answer) {
-
-          addMessage(data.answer, "ai");
-
-          status.textContent = "Connected";
-
-        } else {
-
-          addMessage(
-            "The AI returned no answer.\n\n" +
-            JSON.stringify(data, null, 2),
-            "error"
-          );
-
-          status.textContent = "Unexpected response";
-
-        }
-
-
-      } catch (error) {
-
-        console.error("AI Error:", error);
-
-        addMessage(
-          "Connection error:\n\n" + error.message,
-          "error"
-        );
-
-        status.textContent = "Error";
-
-      }
-
-
-      // Enable button again
-      sendButton.disabled = false;
-
-      messageInput.focus();
-
-    }
-
-
-    // =====================================================
-    // BUTTON CLICK
-    // =====================================================
-
-    sendButton.addEventListener("click", sendMessage);
-
-
-    // =====================================================
-    // ENTER KEY
-    // =====================================================
-
-    messageInput.addEventListener("keydown", function(event) {
-
-      if (event.key === "Enter") {
-
-        event.preventDefault();
-
-        sendMessage();
-
-      }
+      body: JSON.stringify({
+        message: message
+      })
 
     });
 
 
-    // =====================================================
-    // INITIAL FOCUS
-    // =====================================================
+    console.log("HTTP status:", response.status);
+    console.log("HTTP status text:", response.statusText);
 
-    messageInput.focus();
 
-  </script>
+    const rawText = await response.text();
+
+    console.log("Raw response:", rawText);
+
+
+    if (!response.ok) {
+
+      addMessage(
+        "SERVER ERROR\n\n" +
+        "HTTP Status: " + response.status + "\n" +
+        "Status Text: " + response.statusText + "\n\n" +
+        "Response:\n" +
+        rawText,
+        "error"
+      );
+
+      status.textContent = "Server error";
+
+      return;
+    }
+
+
+    let data;
+
+    try {
+
+      data = JSON.parse(rawText);
+
+    } catch (jsonError) {
+
+      addMessage(
+        "INVALID JSON RESPONSE\n\n" +
+        rawText,
+        "error"
+      );
+
+      status.textContent = "Invalid response";
+
+      return;
+    }
+
+
+    console.log("Parsed response:", data);
+
+
+    if (data.answer) {
+
+      addMessage(data.answer, "ai");
+
+      status.textContent = "Connected to CHAATARRA AI";
+
+    } else {
+
+      addMessage(
+        "FUNCTION RESPONSE\n\n" +
+        JSON.stringify(data, null, 2),
+        "error"
+      );
+
+      status.textContent = "Unexpected response";
+
+    }
+
+
+  } catch (error) {
+
+    console.error("FETCH ERROR:", error);
+
+    addMessage(
+      "FETCH ERROR\n\n" +
+      "Name: " + error.name + "\n" +
+      "Message: " + error.message + "\n\n" +
+      "Check the browser Console (F12) for more details.",
+      "error"
+    );
+
+    status.textContent = "Connection failed";
+
+  }
+
+
+  button.disabled = false;
+
+  input.focus();
+
+}
+
+
+button.addEventListener("click", sendMessage);
+
+
+input.addEventListener("keydown", function(event) {
+
+  if (event.key === "Enter") {
+
+    event.preventDefault();
+
+    sendMessage();
+
+  }
+
+});
+
+</script>
 
 </body>
 </html>
