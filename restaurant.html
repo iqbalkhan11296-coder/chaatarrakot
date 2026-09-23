@@ -1227,10 +1227,13 @@ async function sendMessageToGemini(message) {
 
                     headers: {
 
-                        "Content-Type":
-                            "application/json"
+    "Content-Type":
+        "application/json",
 
-                    },
+    "Authorization":
+        "Bearer sb_publishable_YdIvl7IqdpT0UZOHBumEiw_ZThYEsgV"
+
+},
 
                     body:
                         JSON.stringify({
@@ -1264,8 +1267,8 @@ async function sendMessageToGemini(message) {
 
 
         const reply =
-            data.reply ||
-            "Gemini returned no response.";
+    data.answer ||
+    "Gemini returned no response.";
 
 
         voiceStatus.textContent =
