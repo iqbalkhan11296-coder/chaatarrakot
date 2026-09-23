@@ -1,13 +1,14 @@
-<!DOCTYPE html>
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta
+name="viewport"
+content="width=device-width, initial-scale=1.0"
 
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+«»
 
-<title>Nexa Table AI</title>
+<title>RARKS AI ASSISTANT</title><style>
 
-<style>
+/* =========================
+   RESET
+========================= */
 
 * {
     margin: 0;
@@ -15,74 +16,136 @@
     box-sizing: border-box;
 }
 
+
+/* =========================
+   THEME
+========================= */
+
 :root {
+
     --bg: #07080a;
+
     --panel: rgba(255,255,255,.055);
+
     --border: rgba(255,255,255,.11);
+
     --text: #f5f2ea;
+
     --muted: #858891;
+
     --gold: #d7b56d;
+
 }
 
+
+/* =========================
+   BODY
+========================= */
+
 body {
+
     min-height: 100vh;
+
     background:
+
         radial-gradient(
             circle at 50% 25%,
             rgba(215,181,109,.14),
             transparent 32%
         ),
+
         radial-gradient(
             circle at 80% 85%,
             rgba(100,80,160,.08),
             transparent 30%
         ),
+
         var(--bg);
 
     color: var(--text);
-    font-family: Arial, Helvetica, sans-serif;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
 }
 
-button {
-    font: inherit;
-    color: inherit;
-    border: 0;
-    cursor: pointer;
-}
+
+/* =========================
+   APP
+========================= */
 
 .app {
+
     width: 100%;
+
     max-width: 900px;
+
     min-height: 100vh;
+
     margin: auto;
+
     padding: 22px;
 
-    overflow: hidden;
 }
 
 
-/* ================= HEADER ================= */
+/* =========================
+   BUTTON
+========================= */
+
+button {
+
+    font: inherit;
+
+    color: inherit;
+
+    border: none;
+
+    cursor: pointer;
+
+}
+
+
+/* =========================
+   HEADER
+========================= */
 
 .topbar {
+
     display: flex;
+
     justify-content: space-between;
+
     align-items: center;
+
 }
+
 
 .brand {
+
     display: flex;
+
     align-items: center;
+
     gap: 12px;
+
 }
 
+
 .logo {
+
     width: 44px;
+
     height: 44px;
 
     display: grid;
+
     place-items: center;
 
     border: 1px solid var(--border);
+
     border-radius: 14px;
 
     background: var(--panel);
@@ -90,18 +153,27 @@ button {
     color: var(--gold);
 
     font-size: 20px;
+
     font-weight: bold;
 
     box-shadow:
-        0 0 30px rgba(215,181,109,.08);
+        0 0 30px
+        rgba(215,181,109,.08);
+
 }
+
 
 .brand h1 {
+
     font-size: 14px;
+
     letter-spacing: 3px;
+
 }
 
+
 .brand small {
+
     display: block;
 
     margin-top: 4px;
@@ -109,79 +181,107 @@ button {
     color: var(--muted);
 
     font-size: 8px;
+
     letter-spacing: 2px;
+
 }
 
+
 .settings {
+
     width: 42px;
+
     height: 42px;
 
     border: 1px solid var(--border);
+
     border-radius: 50%;
 
     background: var(--panel);
 
     font-size: 18px;
 
-    transition: .3s;
-}
-
-.settings:hover {
-    transform: rotate(45deg);
 }
 
 
-/* ================= WELCOME ================= */
+/* =========================
+   WELCOME
+========================= */
 
 .welcome {
+
     margin-top: 55px;
+
     text-align: center;
+
 }
 
+
 .status {
+
     color: #8bc79a;
 
     font-size: 9px;
+
     letter-spacing: 2px;
+
 }
 
+
 .welcome h2 {
+
     margin-top: 14px;
 
-    font-size: clamp(36px, 8vw, 60px);
+    font-size:
+        clamp(36px, 8vw, 60px);
+
     font-weight: 400;
 
     letter-spacing: -2px;
+
 }
 
+
 .welcome p {
+
     margin-top: 8px;
 
     color: var(--muted);
+
 }
 
 
-/* ================= AI CORE ================= */
+/* =========================
+   AI CORE
+========================= */
 
 .ai-core {
+
     height: 350px;
 
     display: flex;
+
     flex-direction: column;
 
     align-items: center;
+
     justify-content: center;
 
     position: relative;
+
 }
 
+
 .ai-orb {
+
     width: 145px;
+
     height: 145px;
 
     border-radius: 50%;
 
     background:
+
         radial-gradient(
             circle at 35% 30%,
             #fff5d6 0%,
@@ -191,132 +291,202 @@ button {
         );
 
     box-shadow:
-        0 0 25px rgba(215,181,109,.45),
-        0 0 80px rgba(215,181,109,.18),
-        inset 0 0 30px rgba(255,255,255,.15);
+
+        0 0 25px
+        rgba(215,181,109,.45),
+
+        0 0 80px
+        rgba(215,181,109,.18),
+
+        inset 0 0 30px
+        rgba(255,255,255,.15);
 
     display: grid;
+
     place-items: center;
 
     position: relative;
+
     z-index: 5;
 
     transition: .3s;
 
     animation: breathe 3s infinite;
+
 }
+
 
 .ai-orb span {
+
     font-size: 45px;
+
 }
 
-.ai-orb:hover {
-    transform: scale(1.07);
-}
 
 .ai-orb:active {
-    transform: scale(.93);
+
+    transform: scale(.92);
+
 }
+
 
 @keyframes breathe {
 
     0%,100% {
+
         box-shadow:
-            0 0 25px rgba(215,181,109,.4),
-            0 0 60px rgba(215,181,109,.15);
+
+            0 0 25px
+            rgba(215,181,109,.4),
+
+            0 0 60px
+            rgba(215,181,109,.15);
+
     }
 
     50% {
+
         box-shadow:
-            0 0 40px rgba(215,181,109,.7),
-            0 0 110px rgba(215,181,109,.25);
+
+            0 0 40px
+            rgba(215,181,109,.7),
+
+            0 0 110px
+            rgba(215,181,109,.25);
+
     }
+
 }
 
 
-/* ORBIT RINGS */
+/* =========================
+   RINGS
+========================= */
 
 .orb-ring {
+
     position: absolute;
 
-    border: 1px solid rgba(215,181,109,.18);
+    border:
+        1px solid
+        rgba(215,181,109,.18);
 
     border-radius: 50%;
 
-    pointer-events: none;
 }
 
+
 .ring1 {
+
     width: 190px;
+
     height: 190px;
 
     animation: pulse 3s infinite;
+
 }
+
 
 .ring2 {
+
     width: 245px;
+
     height: 245px;
 
-    animation: pulse 3s infinite 1s;
+    animation:
+        pulse 3s infinite 1s;
+
 }
+
 
 .ring3 {
+
     width: 305px;
+
     height: 305px;
 
-    animation: pulse 3s infinite 2s;
+    animation:
+        pulse 3s infinite 2s;
+
 }
+
 
 @keyframes pulse {
 
     0%,100% {
+
         opacity: .15;
+
         transform: scale(.95);
+
     }
 
     50% {
+
         opacity: .6;
+
         transform: scale(1.03);
+
     }
+
 }
 
 
-/* VOICE TEXT */
+/* =========================
+   VOICE TEXT
+========================= */
 
 .voice-text {
+
     margin-top: 35px;
 
     text-align: center;
 
     position: relative;
+
     z-index: 10;
+
 }
+
 
 .voice-text strong {
+
     display: block;
+
     font-size: 15px;
+
 }
 
+
 .voice-text small {
+
     display: block;
 
     margin-top: 5px;
 
     color: var(--muted);
+
 }
 
 
-/* ================= QUICK ACTIONS ================= */
+/* =========================
+   QUICK ACTIONS
+========================= */
 
 .quick-actions {
+
     display: grid;
 
-    grid-template-columns: repeat(2,1fr);
+    grid-template-columns:
+        repeat(2,1fr);
 
     gap: 12px;
+
 }
 
+
 .action-card {
+
     min-height: 90px;
 
     display: flex;
@@ -329,7 +499,9 @@ button {
 
     text-align: left;
 
-    border: 1px solid var(--border);
+    border:
+        1px solid
+        var(--border);
 
     border-radius: 20px;
 
@@ -338,37 +510,50 @@ button {
     backdrop-filter: blur(20px);
 
     transition: .3s;
+
 }
 
-.action-card:hover {
-    transform: translateY(-4px);
 
-    border-color: rgba(215,181,109,.35);
+.action-card:active {
+
+    transform: scale(.97);
+
 }
+
 
 .icon {
+
     width: 42px;
+
     height: 42px;
 
     display: grid;
+
     place-items: center;
 
     border-radius: 13px;
 
-    background: rgba(215,181,109,.08);
+    background:
+        rgba(215,181,109,.08);
 
     color: var(--gold);
 
     font-size: 20px;
+
 }
 
+
 .action-card strong {
+
     display: block;
 
     font-size: 14px;
+
 }
 
+
 .action-card small {
+
     display: block;
 
     margin-top: 5px;
@@ -376,30 +561,41 @@ button {
     color: var(--muted);
 
     font-size: 11px;
+
 }
 
 
-/* ================= NAVIGATION ================= */
+/* =========================
+   NAVIGATION
+========================= */
 
 .bottom-nav {
+
     margin-top: 30px;
 
     display: grid;
 
-    grid-template-columns: repeat(4,1fr);
+    grid-template-columns:
+        repeat(4,1fr);
 
     padding: 10px;
 
-    border: 1px solid var(--border);
+    border:
+        1px solid
+        var(--border);
 
     border-radius: 22px;
 
-    background: rgba(10,10,12,.8);
+    background:
+        rgba(10,10,12,.8);
 
     backdrop-filter: blur(20px);
+
 }
 
+
 .nav-item {
+
     padding: 10px;
 
     display: flex;
@@ -416,81 +612,116 @@ button {
 
     font-size: 10px;
 
-    transition: .3s;
 }
+
 
 .nav-item span {
+
     font-size: 18px;
+
 }
+
 
 .nav-item.active {
+
     color: var(--gold);
+
 }
 
 
-/* ================= MOBILE ================= */
+/* =========================
+   MOBILE
+========================= */
 
 @media(max-width:500px) {
 
     .app {
+
         padding: 18px;
+
     }
+
 
     .welcome {
+
         margin-top: 40px;
+
     }
+
 
     .ai-core {
+
         height: 320px;
+
     }
+
 
     .ai-orb {
+
         width: 125px;
+
         height: 125px;
+
     }
+
 
     .ring1 {
+
         width: 165px;
+
         height: 165px;
+
     }
+
 
     .ring2 {
+
         width: 215px;
+
         height: 215px;
+
     }
+
 
     .ring3 {
+
         width: 265px;
+
         height: 265px;
+
     }
+
 
     .action-card {
+
         min-height: 80px;
+
         padding: 13px;
+
     }
+
 }
 
-</style>
-
-</head>
-
-<body>
-
-<div class="app">
-
-<!-- HEADER -->
+</style></head><body><div class="app"><!-- ================= HEADER ================= -->
 
 <header class="topbar">
 
+
     <div class="brand">
 
+
         <div class="logo">
+
             N
+
         </div>
+
 
         <div>
 
-            <h1>NEXA TABLE</h1>
+            <h1>
+                NEXA TABLE
+            </h1>
 
             <small>
                 AI RESTAURANT ASSISTANT
@@ -498,83 +729,121 @@ button {
 
         </div>
 
+
     </div>
 
 
-    <button class="settings">
+    <button
+        class="settings"
+        id="settingsButton"
+    >
+
         ⚙
+
     </button>
+
 
 </header>
 
 
 
-<!-- WELCOME -->
+<!-- ================= WELCOME ================= -->
 
 <section class="welcome">
 
+
     <span class="status">
+
         ● SYSTEM ONLINE
+
     </span>
 
+
     <h2>
+
         Good evening.
+
     </h2>
 
+
     <p>
+
         How can I help you today?
+
     </p>
+
 
 </section>
 
 
 
-<!-- AI -->
+<!-- ================= AI CORE ================= -->
 
 <section class="ai-core">
 
+
     <div class="orb-ring ring1"></div>
+
     <div class="orb-ring ring2"></div>
+
     <div class="orb-ring ring3"></div>
+
 
 
     <button
         class="ai-orb"
-        id="voiceButton">
+        id="voiceButton"
+        aria-label="Voice assistant"
+    >
 
         <span>
-            🎙
+
+            🎙️
+
         </span>
 
     </button>
 
 
+
     <div class="voice-text">
 
-        <strong>
+
+        <strong id="voiceStatus">
+
             Talk to your AI
+
         </strong>
 
-        <small>
+
+        <small id="voiceHint">
+
             Tap to speak
+
         </small>
 
+
     </div>
+
 
 </section>
 
 
 
-<!-- QUICK ACTIONS -->
+<!-- ================= QUICK ACTIONS ================= -->
 
 <section class="quick-actions">
 
 
     <button class="action-card">
 
+
         <span class="icon">
+
             ₹
+
         </span>
+
 
         <div>
 
@@ -588,15 +857,20 @@ button {
 
         </div>
 
+
     </button>
 
 
 
     <button class="action-card">
 
+
         <span class="icon">
+
             ▣
+
         </span>
+
 
         <div>
 
@@ -610,15 +884,20 @@ button {
 
         </div>
 
+
     </button>
 
 
 
     <button class="action-card">
 
+
         <span class="icon">
+
             ◈
+
         </span>
+
 
         <div>
 
@@ -632,15 +911,20 @@ button {
 
         </div>
 
+
     </button>
 
 
 
     <button class="action-card">
 
+
         <span class="icon">
+
             ⌁
+
         </span>
+
 
         <div>
 
@@ -654,6 +938,7 @@ button {
 
         </div>
 
+
     </button>
 
 
@@ -661,123 +946,295 @@ button {
 
 
 
-<!-- BOTTOM NAVIGATION -->
+<!-- ================= NAVIGATION ================= -->
 
 <nav class="bottom-nav">
 
+
     <button class="nav-item active">
+
         <span>⌂</span>
+
         Home
+
     </button>
 
+
     <button class="nav-item">
+
         <span>▣</span>
+
         Orders
+
     </button>
 
+
     <button class="nav-item">
+
         <span>◈</span>
+
         Stock
+
     </button>
 
+
     <button class="nav-item">
+
         <span>▤</span>
+
         Reports
+
     </button>
+
 
 </nav>
 
-</div>
+</div><!-- ================= JAVASCRIPT ================= --><script>
 
-<script>
 
-<script>
+const voiceButton =
+    document.getElementById("voiceButton");
 
-<script>
+const voiceStatus =
+    document.getElementById("voiceStatus");
 
-const voiceButton = document.getElementById("voiceButton");
+const voiceHint =
+    document.getElementById("voiceHint");
 
-let recorder;
+
+let recorder = null;
+
 let audioChunks = [];
-let stream;
+
+let microphoneStream = null;
 
 
-voiceButton.addEventListener("click", async () => {
 
-    try {
-
-        stream = await navigator.mediaDevices.getUserMedia({
-            audio: true
-        });
-
-        recorder = new MediaRecorder(stream);
-
-        audioChunks = [];
-
-        recorder.ondataavailable = event => {
-            audioChunks.push(event.data);
-        };
-
-        recorder.onstop = () => {
-
-            const audioBlob = new Blob(
-                audioChunks,
-                { type: "audio/webm" }
-            );
-
-            console.log("Audio recorded:", audioBlob);
-
-            document.querySelector(".voice-text strong").textContent =
-                "Microphone working";
-
-            document.querySelector(".voice-text small").textContent =
-                "Audio captured successfully";
-
-            stream.getTracks().forEach(track => track.stop());
-        };
+voiceButton.addEventListener(
+    "click",
+    startRecording
+);
 
 
-        recorder.start();
 
-        document.querySelector(".voice-text strong").textContent =
-            "Listening...";
-
-        document.querySelector(".voice-text small").textContent =
-            "Speak for 5 seconds";
-
-        voiceButton.style.transform = "scale(1.12)";
+async function startRecording() {
 
 
-        setTimeout(() => {
+    /*
+       Check browser support
+    */
 
-            if (recorder && recorder.state === "recording") {
-                recorder.stop();
-            }
+    if (
+        !navigator.mediaDevices ||
+        !navigator.mediaDevices.getUserMedia
+    ) {
 
-        }, 5000);
+        showError(
+            "Microphone unavailable",
+            "Open this website using HTTPS."
+        );
 
-
-    } catch (error) {
-
-        console.error(error);
-
-        document.querySelector(".voice-text strong").textContent =
-            "Microphone blocked";
-
-        document.querySelector(".voice-text small").textContent =
-            "Allow microphone permission";
-
-        alert("Microphone access failed: " + error.message);
+        return;
 
     }
 
-});
 
-</script>
 
-</script>
+    try {
 
-</script>
 
-</body>
-</html>
+        /*
+           Ask Android for microphone permission
+        */
+
+        microphoneStream =
+            await navigator.mediaDevices.getUserMedia({
+                audio: true
+            });
+
+
+
+        /*
+           Create audio recorder
+        */
+
+        recorder =
+            new MediaRecorder(
+                microphoneStream
+            );
+
+
+        audioChunks = [];
+
+
+
+        recorder.ondataavailable =
+            function(event) {
+
+                if (event.data.size > 0) {
+
+                    audioChunks.push(
+                        event.data
+                    );
+
+                }
+
+            };
+
+
+
+        recorder.onstop =
+            function() {
+
+
+                const audioBlob =
+                    new Blob(
+                        audioChunks,
+                        {
+                            type:
+                                recorder.mimeType
+                        }
+                    );
+
+
+                console.log(
+                    "Audio captured:",
+                    audioBlob
+                );
+
+
+
+                voiceStatus.textContent =
+                    "Audio captured ✓";
+
+
+                voiceHint.textContent =
+                    "Gemini connection comes next";
+
+
+                stopMicrophone();
+
+
+            };
+
+
+
+        /*
+           Start recording
+        */
+
+        recorder.start();
+
+
+
+        voiceStatus.textContent =
+            "Listening...";
+
+
+        voiceHint.textContent =
+            "Speak now";
+
+
+        voiceButton.style.transform =
+            "scale(1.12)";
+
+
+
+        /*
+           Record for 5 seconds
+        */
+
+        setTimeout(
+            stopRecording,
+            5000
+        );
+
+
+    }
+
+    catch(error) {
+
+
+        console.error(error);
+
+
+        showError(
+            "Microphone blocked",
+            "Please allow microphone access."
+        );
+
+
+    }
+
+}
+
+
+
+function stopRecording() {
+
+
+    if (
+        recorder &&
+        recorder.state === "recording"
+    ) {
+
+        recorder.stop();
+
+    }
+
+}
+
+
+
+function stopMicrophone() {
+
+
+    if (microphoneStream) {
+
+
+        microphoneStream
+            .getTracks()
+            .forEach(
+                track => track.stop()
+            );
+
+
+        microphoneStream = null;
+
+    }
+
+
+    voiceButton.style.transform =
+        "scale(1)";
+
+}
+
+
+
+function showError(
+    title,
+    message
+) {
+
+
+    voiceStatus.textContent =
+        title;
+
+
+    voiceHint.textContent =
+        message;
+
+
+    voiceButton.style.transform =
+        "scale(1)";
+
+
+    console.error(
+        title,
+        message
+    );
+
+}
+
+
+</script></body></html>
