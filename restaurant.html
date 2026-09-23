@@ -693,82 +693,87 @@ button {
 
 <script>
 
+<script>
+
 const voiceButton = document.getElementById("voiceButton");
 
-const SpeechRecognition =
-    window.SpeechRecognition ||
-    window.webkitSpeechRecognition;
-
-if (!SpeechRecognition) {
-
-    alert("Voice recognition is not supported in this browser.");
-
-} else {
-
-    const recognition = new SpeechRecognition();
-
-    recognition.lang = "en-IN";
-
-    recognition.continuous = false;
-
-    recognition.interimResults = false;
+let recorder;
+let audioChunks = [];
+let stream;
 
 
-    voiceButton.addEventListener("click", () => {
+voiceButton.addEventListener("click", async () => {
 
-        recognition.start();
+    try {
+
+        stream = await navigator.mediaDevices.getUserMedia({
+            audio: true
+        });
+
+        recorder = new MediaRecorder(stream);
+
+        audioChunks = [];
+
+        recorder.ondataavailable = event => {
+            audioChunks.push(event.data);
+        };
+
+        recorder.onstop = () => {
+
+            const audioBlob = new Blob(
+                audioChunks,
+                { type: "audio/webm" }
+            );
+
+            console.log("Audio recorded:", audioBlob);
+
+            document.querySelector(".voice-text strong").textContent =
+                "Microphone working";
+
+            document.querySelector(".voice-text small").textContent =
+                "Audio captured successfully";
+
+            stream.getTracks().forEach(track => track.stop());
+        };
+
+
+        recorder.start();
 
         document.querySelector(".voice-text strong").textContent =
             "Listening...";
 
         document.querySelector(".voice-text small").textContent =
-            "Speak your command";
+            "Speak for 5 seconds";
 
         voiceButton.style.transform = "scale(1.12)";
 
-    });
+
+        setTimeout(() => {
+
+            if (recorder && recorder.state === "recording") {
+                recorder.stop();
+            }
+
+        }, 5000);
 
 
-    recognition.onresult = (event) => {
+    } catch (error) {
 
-        const transcript =
-            event.results[0][0].transcript;
-
-        document.querySelector(".voice-text strong").textContent =
-            transcript;
-
-        document.querySelector(".voice-text small").textContent =
-            "Command received";
-
-        voiceButton.style.transform = "scale(1)";
-
-        console.log("You said:", transcript);
-
-    };
-
-
-    recognition.onerror = (event) => {
-
-        console.log("Voice error:", event.error);
+        console.error(error);
 
         document.querySelector(".voice-text strong").textContent =
-            "Try again";
+            "Microphone blocked";
 
         document.querySelector(".voice-text small").textContent =
-            "Tap the microphone";
+            "Allow microphone permission";
 
-        voiceButton.style.transform = "scale(1)";
+        alert("Microphone access failed: " + error.message);
 
-    };
+    }
 
+});
 
-    recognition.onend = () => {
-
-        voiceButton.style.transform = "scale(1)";
-
-    };
-
-}
+</script>
 
 </script>
 
