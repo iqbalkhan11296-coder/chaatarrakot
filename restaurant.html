@@ -1236,5 +1236,29 @@ function showError(
 
 }
 
+async function testGemini() {
+  const functionUrl = "PASTE_YOUR_SUPABASE_FUNCTION_URL_HERE";
 
+  try {
+    const response = await fetch(functionUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        message: "Hello! Introduce yourself as my restaurant AI assistant."
+      })
+    });
+
+    const data = await response.json();
+
+    console.log("Gemini response:", data);
+    alert(data.reply || data.error || "No response");
+  } catch (error) {
+    console.error(error);
+    alert("Connection error: " + error.message);
+  }
+}
+
+testGemini();
 </script></body></html>
