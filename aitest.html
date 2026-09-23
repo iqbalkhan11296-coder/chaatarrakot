@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>CHAATARRA AI Test</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      color: #111;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      width: 95%;
+      max-width: 700px;
+      background: white;
+      border-radius: 18px;
+      padding: 25px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.12);
+    }
+
+    h1 {
+      margin-top: 0;
+      text-align: center;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #777;
+      margin-bottom: 25px;
+    }
+
+    #chat {
+      height: 400px;
+      overflow-y: auto;
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      padding: 15px;
+      background: #fafafa;
+      margin-bottom: 15px;
+    }
+
+    .message {
+      margin-bottom: 15px;
+      padding: 12px 15px;
+      border-radius: 12px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+    }
+
+    .user {
+      background: #111;
+      color: white;
+      margin-left: 15%;
+    }
+
+    .ai {
+      background: #eaeaea;
+      color: #111;
+      margin-right: 15%;
+    }
+
+    .error {
+      background: #ffe5e5;
+      color: #b00000;
+      margin-right: 5%;
+    }
+
+    .input-area {
+      display: flex;
+      gap: 10px;
+    }
+
+    #messageInput {
+      flex: 1;
+      padding: 14px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      font-size: 16px;
+      outline: none;
+    }
+
+    #sendButton {
+      border: none;
+      background: #111;
+      color: white;
+      padding: 14px 22px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    #sendButton:hover {
+      background: #333;
+    }
+
+    #sendButton:disabled {
+      background: #999;
+      cursor: not-allowed;
+    }
+
+    .status {
+      text-align: center;
+      margin-top: 15px;
+      color: #777;
+      font-size: 14px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+
+    <h1>CHAATARRA AI</h1>
+
+    <div class="subtitle">
+      Gemini Assistant Test
+    </div>
+
+    <div id="chat">
+
+      <div class="message ai">
+        Hello! I'm the CHAATARRA AI assistant.
+        Ask me something to test the connection.
+      </div>
+
+    </div>
+
+    <div class="input-area">
+
+      <input
+        type="text"
+        id="messageInput"
+        placeholder="Type your message..."
+        autocomplete="off"
+      >
+
+      <button id="sendButton">
+        Send
+      </button>
+
+    </div>
+
+    <div class="status" id="status">
+      Ready
+    </div>
+
+  </div>
+
+
+  <script>
+
+    // =====================================================
+    // SUPABASE EDGE FUNCTION
+    // =====================================================
+
+    const AI_FUNCTION_URL =
+      "https://ucqeyhcycwksiubmlilg.supabase.co/functions/v1/restaurant-ai";
+
+
+    // =====================================================
+    // ELEMENTS
+    // =====================================================
+
+    const chat = document.getElementById("chat");
+    const messageInput = document.getElementById("messageInput");
+    const sendButton = document.getElementById("sendButton");
+    const status = document.getElementById("status");
+
+
+    // =====================================================
+    // ADD MESSAGE TO CHAT
+    // =====================================================
+
+    function addMessage(text, type) {
+
+      const message = document.createElement("div");
+
+      message.className = "message " + type;
+
+      message.textContent = text;
+
+      chat.appendChild(message);
+
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+
+    // =====================================================
+    // SEND MESSAGE
+    // =====================================================
+
+    async function sendMessage() {
+
+      const message = messageInput.value.trim();
+
+      if (!message) {
+        return;
+      }
+
+      // Show user's message
+      addMessage(message, "user");
+
+      // Clear input
+      messageInput.value = "";
+
+      // Disable button
+      sendButton.disabled = true;
+
+      status.textContent = "Gemini is thinking...";
+
+
+      try {
+
+        const response = await fetch(AI_FUNCTION_URL, {
+
+          method: "POST",
+
+          headers: {
+            "Content-Type": "application/json"
+          },
+
+          body: JSON.stringify({
+            message: message
+          })
+
+        });
+
+
+        // Get response
+        const data = await response.json();
+
+
+        console.log("AI Response:", data);
+
+
+        // Check for HTTP error
+        if (!response.ok) {
+
+          const errorMessage =
+            typeof data.error === "string"
+              ? data.error
+              : JSON.stringify(data.error, null, 2);
+
+          throw new Error(errorMessage);
+        }
+
+
+        // Display AI response
+        if (data.answer) {
+
+          addMessage(data.answer, "ai");
+
+          status.textContent = "Connected";
+
+        } else {
+
+          addMessage(
+            "The AI returned no answer.\n\n" +
+            JSON.stringify(data, null, 2),
+            "error"
+          );
+
+          status.textContent = "Unexpected response";
+
+        }
+
+
+      } catch (error) {
+
+        console.error("AI Error:", error);
+
+        addMessage(
+          "Connection error:\n\n" + error.message,
+          "error"
+        );
+
+        status.textContent = "Error";
+
+      }
+
+
+      // Enable button again
+      sendButton.disabled = false;
+
+      messageInput.focus();
+
+    }
+
+
+    // =====================================================
+    // BUTTON CLICK
+    // =====================================================
+
+    sendButton.addEventListener("click", sendMessage);
+
+
+    // =====================================================
+    // ENTER KEY
+    // =====================================================
+
+    messageInput.addEventListener("keydown", function(event) {
+
+      if (event.key === "Enter") {
+
+        event.preventDefault();
+
+        sendMessage();
+
+      }
+
+    });
+
+
+    // =====================================================
+    // INITIAL FOCUS
+    // =====================================================
+
+    messageInput.focus();
+
+  </script>
+
+</body>
+</html>
