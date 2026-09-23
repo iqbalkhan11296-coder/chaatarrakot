@@ -1372,23 +1372,82 @@ function showError(
 }
 
 
-/* =========================
-   SETTINGS BUTTON
+//* =========================
+   QUICK ACTIONS
 ========================= */
 
-document
-    .getElementById("settingsButton")
-    .addEventListener(
-        "click",
-        function() {
+const actionCards =
+    document.querySelectorAll(".action-card");
 
-            alert(
-                "Restaurant AI settings will be added here."
-            );
 
-        }
-    );
+/* =========================
+   TODAY'S SALES
+========================= */
 
+actionCards[0].addEventListener(
+    "click",
+    function() {
+
+        voiceStatus.textContent =
+            "Checking today's sales...";
+
+        voiceHint.textContent =
+            "Reading restaurant data...";
+
+        sendMessageToGemini(
+            "How much were today's sales? Calculate the total sales from today's orders using the order total field."
+        );
+
+    }
+);
+
+
+/* =========================
+   ORDERS
+========================= */
+
+actionCards[1].addEventListener(
+    "click",
+    function() {
+
+        sendMessageToGemini(
+            "How many orders do we have today?"
+        );
+
+    }
+);
+
+
+/* =========================
+   INVENTORY
+========================= */
+
+actionCards[2].addEventListener(
+    "click",
+    function() {
+
+        sendMessageToGemini(
+            "Give me an overview of the restaurant inventory."
+        );
+
+    }
+);
+
+
+/* =========================
+   REPORTS
+========================= */
+
+actionCards[3].addEventListener(
+    "click",
+    function() {
+
+        sendMessageToGemini(
+            "Give me a brief business report based on the restaurant data available to you."
+        );
+
+    }
+);
 
 </script>
 
