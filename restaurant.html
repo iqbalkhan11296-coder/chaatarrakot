@@ -691,14 +691,86 @@ button {
 
 <script>
 
-const voiceButton =
-    document.getElementById("voiceButton");
+<script>
 
-voiceButton.addEventListener("click", () => {
+const voiceButton = document.getElementById("voiceButton");
 
-    alert("Voice assistant coming next 🎙️");
+const SpeechRecognition =
+    window.SpeechRecognition ||
+    window.webkitSpeechRecognition;
 
-});
+if (!SpeechRecognition) {
+
+    alert("Voice recognition is not supported in this browser.");
+
+} else {
+
+    const recognition = new SpeechRecognition();
+
+    recognition.lang = "en-IN";
+
+    recognition.continuous = false;
+
+    recognition.interimResults = false;
+
+
+    voiceButton.addEventListener("click", () => {
+
+        recognition.start();
+
+        document.querySelector(".voice-text strong").textContent =
+            "Listening...";
+
+        document.querySelector(".voice-text small").textContent =
+            "Speak your command";
+
+        voiceButton.style.transform = "scale(1.12)";
+
+    });
+
+
+    recognition.onresult = (event) => {
+
+        const transcript =
+            event.results[0][0].transcript;
+
+        document.querySelector(".voice-text strong").textContent =
+            transcript;
+
+        document.querySelector(".voice-text small").textContent =
+            "Command received";
+
+        voiceButton.style.transform = "scale(1)";
+
+        console.log("You said:", transcript);
+
+    };
+
+
+    recognition.onerror = (event) => {
+
+        console.log("Voice error:", event.error);
+
+        document.querySelector(".voice-text strong").textContent =
+            "Try again";
+
+        document.querySelector(".voice-text small").textContent =
+            "Tap the microphone";
+
+        voiceButton.style.transform = "scale(1)";
+
+    };
+
+
+    recognition.onend = () => {
+
+        voiceButton.style.transform = "scale(1)";
+
+    };
+
+}
+
+</script>
 
 </script>
 
