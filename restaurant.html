@@ -4,8 +4,7 @@
 
 <meta charset="UTF-8">
 
-<meta name="viewport"
-content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Darky AI — Chaatarra</title>
 
@@ -13,87 +12,89 @@ content="width=device-width, initial-scale=1.0">
 
 <style>
 
+/* ============================================================
+   RESET
+============================================================ */
+
 *{
     box-sizing:border-box;
     margin:0;
     padding:0;
 }
 
+html{
+    scroll-behavior:smooth;
+}
+
 body{
 
-    font-family:Inter,Arial,sans-serif;
+    font-family:
+        Inter,
+        Arial,
+        sans-serif;
 
     background:
         radial-gradient(
             circle at 50% -10%,
-            rgba(0,153,255,.16),
+            rgba(0,153,255,.20),
             transparent 38%
         ),
 
         radial-gradient(
-            circle at 10% 50%,
-            rgba(0,80,255,.08),
+            circle at 0% 50%,
+            rgba(0,80,255,.10),
             transparent 35%
         ),
 
-        radial-gradient(
-            circle at 90% 80%,
-            rgba(0,220,255,.07),
-            transparent 35%
-        ),
+        #020711;
 
-        #030811;
-
-    color:#edf8ff;
+    color:#edfaff;
 
     min-height:100vh;
 }
 
 button,
 input{
-
     font:inherit;
 }
 
 button{
-
     cursor:pointer;
 }
 
 .app{
 
-    max-width:1100px;
+    width:100%;
 
-    margin:auto;
+    max-width:1200px;
 
     min-height:100vh;
 
-    background:
-        radial-gradient(
-            circle at 50% 5%,
-            rgba(0,153,255,.12),
-            transparent 32%
-        ),
+    margin:auto;
 
+    background:
         linear-gradient(
             180deg,
             rgba(3,12,25,.98),
-            rgba(2,8,18,.98)
+            rgba(1,7,16,.99)
         );
 
     position:relative;
+
+    overflow:hidden;
 }
 
 
-/* =========================================
+/* ============================================================
    TOP BAR
-========================================= */
+============================================================ */
 
 .topbar{
 
     height:76px;
 
-    padding:0 24px;
+    padding:
+        0 24px;
 
     display:flex;
 
@@ -101,22 +102,24 @@ button{
 
     justify-content:space-between;
 
-    border-bottom:
-        1px solid
-        rgba(70,190,255,.14);
+    position:sticky;
+
+    top:0;
+
+    z-index:100;
 
     background:
-        rgba(5,18,35,.72);
+        rgba(3,14,27,.90);
+
+    border-bottom:
+        1px solid
+        rgba(65,190,255,.15);
 
     backdrop-filter:
-        blur(22px);
+        blur(25px);
 
     -webkit-backdrop-filter:
-        blur(22px);
-
-    position:relative;
-
-    z-index:20;
+        blur(25px);
 }
 
 .brand{
@@ -130,88 +133,89 @@ button{
 
 .logo{
 
-    width:42px;
-    height:42px;
+    width:43px;
 
-    border-radius:14px;
+    height:43px;
 
     display:grid;
 
     place-items:center;
 
+    border-radius:14px;
+
     background:
         linear-gradient(
             145deg,
-            #8ee7ff,
-            #0879d9 48%,
-            #06418f
+            #9beaff,
+            #1188d8 52%,
+            #063c80
         );
 
-    color:#02101e;
-
-    font-weight:900;
+    color:#02101d;
 
     font-size:20px;
 
-    box-shadow:
-        0 0 22px
-        rgba(0,174,255,.35),
+    font-weight:900;
 
-        inset 0 1px 1px
-        rgba(255,255,255,.55);
+    box-shadow:
+        0 0 25px
+        rgba(0,180,255,.38);
 }
 
 .brand-text strong{
 
     display:block;
 
-    letter-spacing:2px;
-
     font-size:16px;
 
-    color:#eaf9ff;
+    letter-spacing:2px;
 
-    text-shadow:
-        0 0 14px
-        rgba(50,190,255,.25);
+    color:#effcff;
 }
 
 .brand-text span{
 
-    font-size:10px;
+    display:block;
 
-    color:#6e91aa;
+    margin-top:2px;
 
-    letter-spacing:1px;
+    font-size:9px;
+
+    letter-spacing:1.4px;
+
+    color:#66869b;
 }
 
 .status{
 
-    font-size:10px;
-
-    color:#55d7ff;
-
-    border:
-        1px solid
-        rgba(40,190,255,.30);
-
-    padding:7px 11px;
+    padding:
+        7px 11px;
 
     border-radius:20px;
 
+    font-size:9px;
+
+    letter-spacing:1px;
+
+    color:#57ddff;
+
     background:
-        rgba(0,130,210,.08);
+        rgba(0,150,220,.08);
+
+    border:
+        1px solid
+        rgba(50,200,255,.25);
 }
 
 
-/* =========================================
-   MAIN
-========================================= */
+/* ============================================================
+   PAGE
+============================================================ */
 
 .page{
 
     padding:
-        22px
+        20px
         24px
         120px;
 
@@ -219,12 +223,60 @@ button{
         calc(100vh - 76px);
 }
 
+.page:not(.active){
 
-/* =========================================
+    display:none;
+}
+
+
+/* ============================================================
    LIVE BUSINESS OVERVIEW
-========================================= */
+============================================================ */
 
-.live-header{
+.live-section{
+
+    width:100%;
+
+    margin-bottom:30px;
+
+    padding:18px;
+
+    border-radius:22px;
+
+    border:
+        1px solid
+        rgba(60,205,255,.22);
+
+    background:
+
+        radial-gradient(
+            circle at 15% 0%,
+            rgba(0,175,255,.14),
+            transparent 35%
+        ),
+
+        linear-gradient(
+            145deg,
+            rgba(10,45,70,.75),
+            rgba(3,17,32,.88)
+        );
+
+    box-shadow:
+
+        0 15px 50px
+        rgba(0,0,0,.28),
+
+        0 0 40px
+        rgba(0,150,255,.05);
+
+    backdrop-filter:
+        blur(22px);
+
+    -webkit-backdrop-filter:
+        blur(22px);
+}
+
+.live-top{
 
     display:flex;
 
@@ -232,23 +284,69 @@ button{
 
     justify-content:space-between;
 
-    margin:
-        0 0 12px;
-
+    margin-bottom:15px;
 }
 
-.live-title{
+.live-heading{
 
-    color:#7192a9;
+    display:flex;
 
-    font-size:10px;
+    align-items:center;
 
-    letter-spacing:2px;
+    gap:10px;
+}
+
+.live-heading-icon{
+
+    width:34px;
+
+    height:34px;
+
+    display:grid;
+
+    place-items:center;
+
+    border-radius:11px;
+
+    background:
+        rgba(40,195,255,.10);
+
+    border:
+        1px solid
+        rgba(50,200,255,.20);
+
+    color:#59dbff;
+
+    font-size:16px;
+}
+
+.live-heading-text strong{
+
+    display:block;
+
+    font-size:13px;
+
+    letter-spacing:1.5px;
+
+    color:#dff8ff;
 
     text-transform:uppercase;
 }
 
-.live-indicator{
+.live-heading-text span{
+
+    display:block;
+
+    margin-top:3px;
+
+    color:#64859a;
+
+    font-size:9px;
+
+    letter-spacing:.5px;
+}
+
+.live-status{
 
     display:flex;
 
@@ -256,41 +354,61 @@ button{
 
     gap:6px;
 
-    color:#56dfff;
+    color:#55dcff;
 
     font-size:9px;
 
-    letter-spacing:1px;
+    letter-spacing:1.2px;
+
+    padding:
+        7px 10px;
+
+    border-radius:20px;
+
+    background:
+        rgba(0,180,240,.07);
+
+    border:
+        1px solid
+        rgba(60,205,255,.18);
 }
 
 .live-dot{
 
-    width:6px;
+    width:7px;
 
-    height:6px;
+    height:7px;
 
     border-radius:50%;
 
-    background:#42dcff;
+    background:#4ce0ff;
 
     box-shadow:
-        0 0 10px
-        rgba(50,220,255,.9);
+        0 0 12px
+        rgba(60,220,255,.95);
 
     animation:
-        livePulse 1.6s infinite;
+        livePulse 1.5s infinite;
 }
 
 @keyframes livePulse{
 
     50%{
+
         opacity:.35;
-        transform:scale(.75);
+
+        transform:
+            scale(.7);
     }
 
 }
 
-.live-grid{
+
+/* ============================================================
+   SALES CARDS
+============================================================ */
+
+.sales-grid{
 
     display:grid;
 
@@ -298,74 +416,55 @@ button{
         repeat(4,1fr);
 
     gap:10px;
-
-    margin-bottom:10px;
 }
 
-.live-card{
+.sales-card{
 
     min-width:0;
 
-    padding:15px;
+    padding:16px;
+
+    border-radius:17px;
+
+    background:
+        rgba(4,26,44,.72);
 
     border:
         1px solid
-        rgba(50,190,255,.16);
-
-    border-radius:16px;
-
-    background:
-        linear-gradient(
-            145deg,
-            rgba(15,57,84,.50),
-            rgba(4,20,37,.66)
-        );
-
-    backdrop-filter:
-        blur(18px);
-
-    -webkit-backdrop-filter:
-        blur(18px);
-
-    box-shadow:
-        0 8px 25px
-        rgba(0,0,0,.18),
-
-        inset 0 1px 0
-        rgba(255,255,255,.04);
+        rgba(50,190,255,.13);
 
     transition:.2s;
 }
 
-.live-card:hover{
-
-    border-color:
-        rgba(55,205,255,.32);
+.sales-card:hover{
 
     transform:
-        translateY(-1px);
+        translateY(-2px);
+
+    border-color:
+        rgba(50,205,255,.28);
 }
 
-.live-card-title{
+.sales-label{
 
-    color:#65869c;
+    color:#64869b;
 
     font-size:9px;
 
-    letter-spacing:1.3px;
+    letter-spacing:1.2px;
 
     text-transform:uppercase;
 
     white-space:nowrap;
 }
 
-.live-card-value{
+.sales-value{
 
-    margin-top:7px;
+    margin-top:8px;
 
-    color:#e9faff;
+    color:#ecfbff;
 
-    font-size:22px;
+    font-size:24px;
 
     font-weight:600;
 
@@ -374,16 +473,21 @@ button{
     overflow:hidden;
 
     text-overflow:ellipsis;
+}
+
+.sales-value.primary{
+
+    color:#59dcff;
 
     text-shadow:
-        0 0 16px
-        rgba(50,200,255,.15);
+        0 0 18px
+        rgba(40,200,255,.25);
 }
 
-.live-card-value.primary{
 
-    color:#58d9ff;
-}
+/* ============================================================
+   PAYMENT CARDS
+============================================================ */
 
 .payment-grid{
 
@@ -394,21 +498,10 @@ button{
 
     gap:10px;
 
-    margin-bottom:28px;
+    margin-top:10px;
 }
 
 .payment-card{
-
-    padding:11px 14px;
-
-    border:
-        1px solid
-        rgba(50,170,255,.11);
-
-    border-radius:13px;
-
-    background:
-        rgba(5,28,47,.48);
 
     display:flex;
 
@@ -416,71 +509,96 @@ button{
 
     justify-content:space-between;
 
-    gap:10px;
+    padding:
+        12px 15px;
+
+    border-radius:14px;
+
+    background:
+        rgba(2,20,35,.60);
+
+    border:
+        1px solid
+        rgba(50,175,255,.10);
 }
 
-.payment-name{
+.payment-label{
 
-    color:#62849a;
+    color:#5e7f93;
 
     font-size:9px;
 
-    letter-spacing:1.2px;
+    letter-spacing:1.3px;
 }
 
 .payment-value{
 
-    color:#bfeeff;
+    color:#bceeff;
 
-    font-size:13px;
+    font-size:14px;
 
-    font-weight:bold;
+    font-weight:600;
+}
+
+.sales-error{
+
+    display:none;
+
+    margin-top:10px;
+
+    color:#ff9a9a;
+
+    font-size:10px;
 }
 
 
-/* =========================================
-   HOME HEADER
-========================================= */
+/* ============================================================
+   HOME TITLE
+============================================================ */
 
 .home-title{
 
-    margin-top:8px;
+    margin-top:5px;
+
+    text-align:center;
 }
 
 .home-title small{
 
-    color:#6f8da4;
+    color:#6e8ba0;
 
     font-size:13px;
 }
 
 .home-title h1{
 
-    margin-top:8px;
+    margin-top:7px;
 
     font-size:
-        clamp(30px,5vw,48px);
+        clamp(
+            30px,
+            5vw,
+            46px
+        );
 
     font-weight:500;
 
     letter-spacing:-1px;
-
-    color:#eefaff;
 }
 
 .home-title h1 span{
 
-    color:#49cfff;
+    color:#51d7ff;
 
     text-shadow:
-        0 0 22px
-        rgba(0,190,255,.30);
+        0 0 25px
+        rgba(0,190,255,.28);
 }
 
 
-/* =========================================
+/* ============================================================
    DARKY ORB
-========================================= */
+============================================================ */
 
 .orb-wrap{
 
@@ -489,37 +607,16 @@ button{
     justify-content:center;
 
     margin:
-        40px 0 28px;
+        38px 0 34px;
 }
 
 .orb{
 
-    width:170px;
+    width:155px;
 
-    height:170px;
+    height:155px;
 
     border-radius:50%;
-
-    background:
-        radial-gradient(
-            circle at 35% 25%,
-            #dffaff,
-            #54d9ff 25%,
-            #087fcf 48%,
-            #063a78 68%,
-            #020d1b 90%
-        );
-
-    box-shadow:
-
-        0 0 35px
-        rgba(0,174,255,.35),
-
-        0 0 85px
-        rgba(0,95,255,.18),
-
-        inset 0 0 35px
-        rgba(255,255,255,.20);
 
     display:flex;
 
@@ -528,6 +625,32 @@ button{
     justify-content:center;
 
     position:relative;
+
+    background:
+
+        radial-gradient(
+            circle at 35% 25%,
+            #e6fbff,
+            #55dcff 25%,
+            #0785d5 48%,
+            #06376e 68%,
+            #020b17 90%
+        );
+
+    box-shadow:
+
+        0 0 35px
+        rgba(0,180,255,.35),
+
+        0 0 90px
+        rgba(0,90,255,.16),
+
+        inset 0 0 35px
+        rgba(255,255,255,.18);
+
+    transition:
+        transform .25s ease,
+        box-shadow .25s ease;
 }
 
 .orb::before{
@@ -536,11 +659,11 @@ button{
 
     position:absolute;
 
-    inset:-14px;
+    inset:-13px;
 
     border:
         1px solid
-        rgba(48,198,255,.35);
+        rgba(50,205,255,.30);
 
     border-radius:50%;
 }
@@ -551,45 +674,303 @@ button{
 
     position:absolute;
 
-    inset:-28px;
+    inset:-26px;
 
     border:
         1px solid
-        rgba(48,160,255,.12);
+        rgba(50,165,255,.10);
 
     border-radius:50%;
 }
 
 .orb-icon{
 
-    font-size:42px;
+    font-size:40px;
 
-    color:#e9fbff;
+    color:#f0fdff;
 
     text-shadow:
+
         0 0 15px #fff,
 
         0 0 35px
-        rgba(0,210,255,.9);
+        rgba(0,215,255,.95);
+
+    position:relative;
+
+    z-index:2;
 }
 
 
-/* =========================================
-   CHAT AREA
-========================================= */
+/* ============================================================
+   DARKY LISTENING ANIMATION
+============================================================ */
+
+.home-listening{
+
+    animation:
+        darkyListen 1.1s
+        infinite
+        ease-in-out;
+
+    box-shadow:
+
+        0 0 40px
+        rgba(0,200,255,.60),
+
+        0 0 80px
+        rgba(0,130,255,.35),
+
+        0 0 130px
+        rgba(0,90,255,.18),
+
+        inset 0 0 45px
+        rgba(255,255,255,.25);
+}
+
+.home-listening::before{
+
+    animation:
+        voiceRing 1.25s
+        infinite
+        ease-out;
+
+    border-color:
+        rgba(65,225,255,.80);
+}
+
+.home-listening::after{
+
+    animation:
+        voiceRingOuter 1.8s
+        infinite
+        ease-out;
+
+    border-color:
+        rgba(40,180,255,.40);
+}
+
+@keyframes darkyListen{
+
+    0%,
+    100%{
+
+        transform:
+            scale(1);
+
+    }
+
+    50%{
+
+        transform:
+            scale(1.09);
+
+    }
+
+}
+
+@keyframes voiceRing{
+
+    0%{
+
+        transform:
+            scale(.92);
+
+        opacity:.9;
+
+    }
+
+    70%{
+
+        transform:
+            scale(1.30);
+
+        opacity:.15;
+
+    }
+
+    100%{
+
+        transform:
+            scale(1.40);
+
+        opacity:0;
+
+    }
+
+}
+
+@keyframes voiceRingOuter{
+
+    0%{
+
+        transform:
+            scale(.90);
+
+        opacity:.65;
+
+    }
+
+    70%{
+
+        transform:
+            scale(1.28);
+
+        opacity:.08;
+
+    }
+
+    100%{
+
+        transform:
+            scale(1.42);
+
+        opacity:0;
+
+    }
+
+}
+
+
+/* ============================================================
+   DARKY THINKING
+============================================================ */
+
+.home-thinking{
+
+    animation:
+        darkyThinking .65s
+        infinite
+        alternate
+        ease-in-out;
+
+    box-shadow:
+
+        0 0 40px
+        rgba(0,180,255,.45),
+
+        0 0 85px
+        rgba(0,100,255,.25),
+
+        inset 0 0 40px
+        rgba(255,255,255,.20);
+}
+
+@keyframes darkyThinking{
+
+    from{
+
+        transform:
+            scale(.97);
+
+        filter:
+            brightness(.95);
+    }
+
+    to{
+
+        transform:
+            scale(1.07);
+
+        filter:
+            brightness(1.28);
+    }
+
+}
+
+
+/* ============================================================
+   DARKY SPEAKING
+============================================================ */
+
+.home-speaking{
+
+    animation:
+        darkySpeaking .42s
+        infinite
+        alternate
+        ease-in-out;
+
+    box-shadow:
+
+        0 0 50px
+        rgba(0,215,255,.70),
+
+        0 0 100px
+        rgba(0,130,255,.38),
+
+        0 0 150px
+        rgba(0,90,255,.20),
+
+        inset 0 0 48px
+        rgba(255,255,255,.28);
+}
+
+.home-speaking::before{
+
+    animation:
+        speakingRing .8s
+        infinite
+        ease-in-out;
+
+    border-color:
+        rgba(80,225,255,.55);
+}
+
+@keyframes darkySpeaking{
+
+    from{
+
+        transform:
+            scale(1);
+
+    }
+
+    to{
+
+        transform:
+            scale(1.08);
+
+    }
+
+}
+
+@keyframes speakingRing{
+
+    0%,
+    100%{
+
+        transform:
+            scale(1);
+
+        opacity:.5;
+
+    }
+
+    50%{
+
+        transform:
+            scale(1.16);
+
+        opacity:.95;
+
+    }
+
+}
+
+
+/* ============================================================
+   CHAT
+============================================================ */
 
 .chat-container{
 
-    width:min(800px,100%);
+    width:
+        min(820px,100%);
 
     margin:
         0 auto;
 }
-
-
-/* =========================================
-   CHAT MESSAGES
-========================================= */
 
 .chat-messages{
 
@@ -597,9 +978,9 @@ button{
 
     flex-direction:column;
 
-    gap:12px;
+    gap:13px;
 
-    margin-bottom:14px;
+    margin-bottom:15px;
 }
 
 .chat-row{
@@ -622,7 +1003,7 @@ button{
 .chat-bubble{
 
     max-width:
-        min(82%,650px);
+        min(82%,680px);
 
     padding:
         12px 15px;
@@ -635,7 +1016,7 @@ button{
 
     white-space:pre-wrap;
 
-    word-wrap:break-word;
+    word-break:break-word;
 }
 
 .user-bubble{
@@ -643,21 +1024,21 @@ button{
     background:
         linear-gradient(
             145deg,
-            #0d83d0,
+            #0e86d5,
             #07529b
         );
 
-    color:#f3fbff;
-
     border:
         1px solid
-        rgba(95,220,255,.30);
+        rgba(90,220,255,.25);
 
     border-bottom-right-radius:6px;
 
+    color:#f3fcff;
+
     box-shadow:
-        0 7px 22px
-        rgba(0,100,200,.18);
+        0 8px 24px
+        rgba(0,90,190,.18);
 }
 
 .darky-bubble{
@@ -665,55 +1046,58 @@ button{
     background:
         linear-gradient(
             145deg,
-            rgba(18,63,94,.48),
-            rgba(4,22,42,.68)
+            rgba(18,65,96,.55),
+            rgba(3,21,39,.78)
         );
-
-    color:#cce5ef;
 
     border:
         1px solid
-        rgba(45,190,255,.15);
+        rgba(50,190,255,.15);
 
     border-bottom-left-radius:6px;
 
+    color:#cce8f1;
+
     box-shadow:
-        0 7px 25px
-        rgba(0,0,0,.18);
+        0 8px 28px
+        rgba(0,0,0,.20);
 
     backdrop-filter:
-        blur(18px);
-
-    -webkit-backdrop-filter:
         blur(18px);
 }
 
 .chat-name{
 
+    margin-bottom:5px;
+
+    color:#5bdcff;
+
     font-size:9px;
 
     letter-spacing:1.2px;
-
-    color:#5bd9ff;
-
-    margin-bottom:5px;
 
     text-transform:uppercase;
 }
 
 .user-name{
 
-    color:#bcefff;
-
     text-align:right;
+
+    color:#c5f3ff;
 }
 
 
-/* =========================================
+/* ============================================================
    ASK BOX
-========================================= */
+============================================================ */
 
 .ask-box{
+
+    position:sticky;
+
+    bottom:92px;
+
+    z-index:20;
 
     display:flex;
 
@@ -721,45 +1105,36 @@ button{
 
     gap:8px;
 
-    padding:8px 9px;
+    padding:8px;
+
+    border-radius:21px;
 
     background:
-        rgba(7,28,50,.72);
+        rgba(5,25,44,.90);
 
     border:
         1px solid
-        rgba(50,190,255,.18);
-
-    border-radius:20px;
+        rgba(50,195,255,.20);
 
     box-shadow:
-        0 12px 45px
-        rgba(0,0,0,.30),
-
-        inset 0 1px 0
-        rgba(255,255,255,.04);
+        0 15px 45px
+        rgba(0,0,0,.35);
 
     backdrop-filter:
-        blur(20px);
+        blur(24px);
 
     -webkit-backdrop-filter:
-        blur(20px);
-
-    position:sticky;
-
-    bottom:95px;
-
-    z-index:5;
+        blur(24px);
 }
 
 .ask-box:focus-within{
 
     border-color:
-        rgba(40,195,255,.50);
+        rgba(50,205,255,.45);
 
     box-shadow:
         0 0 35px
-        rgba(0,155,255,.12);
+        rgba(0,160,255,.12);
 }
 
 .ask-box input{
@@ -768,22 +1143,23 @@ button{
 
     min-width:0;
 
+    padding:
+        12px 8px;
+
     background:transparent;
 
     border:none;
 
     outline:none;
 
-    color:#eaf9ff;
-
-    padding:12px 8px;
+    color:#eafaff;
 
     font-size:14px;
 }
 
 .ask-box input::placeholder{
 
-    color:#527188;
+    color:#537188;
 }
 
 .ask-button{
@@ -798,58 +1174,112 @@ button{
 
     border:
         1px solid
-        rgba(50,180,255,.14);
+        rgba(50,190,255,.16);
 
     background:
-        rgba(12,39,64,.65);
+        rgba(10,45,70,.75);
 
-    color:#5fd8ff;
+    color:#5edcff;
 
-    font-size:19px;
+    font-size:18px;
 
-    transition:.2s;
+    transition:
+        transform .2s,
+        background .2s,
+        box-shadow .2s;
 }
 
 .ask-button:hover{
 
-    background:
-        rgba(20,68,105,.75);
+    transform:
+        translateY(-1px);
 
     border-color:
-        rgba(50,200,255,.30);
+        rgba(50,210,255,.35);
 }
 
-.ask-send{
+
+/* ============================================================
+   ACTIVE MICROPHONE
+============================================================ */
+
+.mic-active{
+
+    animation:
+        micPulse 1s
+        infinite;
 
     background:
         linear-gradient(
             145deg,
-            #72e3ff,
-            #168edb 55%,
-            #07529b
-        );
+            #75e6ff,
+            #087ec8
+        ) !important;
 
-    color:#02101b;
+    color:#02101b !important;
+
+    border-color:
+        rgba(100,230,255,.70) !important;
+
+    box-shadow:
+
+        0 0 20px
+        rgba(0,195,255,.55),
+
+        0 0 40px
+        rgba(0,130,255,.25);
+}
+
+@keyframes micPulse{
+
+    0%,
+    100%{
+
+        transform:
+            scale(1);
+
+    }
+
+    50%{
+
+        transform:
+            scale(1.10);
+
+    }
+
+}
+
+.ask-send{
+
+    color:#03111e;
+
+    background:
+        linear-gradient(
+            145deg,
+            #79e7ff,
+            #168fda 55%,
+            #07539d
+        );
 
     border:none;
 
     box-shadow:
-        0 0 18px
-        rgba(0,174,255,.25);
+        0 0 20px
+        rgba(0,180,255,.25);
 }
 
 
-/* =========================================
+/* ============================================================
    TYPING
-========================================= */
+============================================================ */
 
 .typing{
 
     display:inline-flex;
 
-    gap:4px;
-
     align-items:center;
+
+    gap:4px;
 }
 
 .typing span{
@@ -858,25 +1288,19 @@ button{
 
     height:5px;
 
-    background:#52d8ff;
-
     border-radius:50%;
+
+    background:#54dbff;
 
     animation:
         typing 1s infinite;
-
-    box-shadow:
-        0 0 8px
-        rgba(50,210,255,.7);
 }
 
 .typing span:nth-child(2){
-
     animation-delay:.15s;
 }
 
 .typing span:nth-child(3){
-
     animation-delay:.3s;
 }
 
@@ -889,32 +1313,24 @@ button{
         transform:
             translateY(-3px);
     }
+
 }
 
 
-/* =========================================
+/* ============================================================
    VOICE PAGE
-========================================= */
+============================================================ */
 
 .voice-page{
-
-    display:none;
 
     text-align:center;
 }
 
-.voice-page.active{
-
-    display:block;
-}
-
 .voice-center{
 
-    max-width:650px;
+    max-width:700px;
 
     margin:auto;
-
-    padding-top:10px;
 }
 
 .page-heading{
@@ -930,34 +1346,35 @@ button{
 
     font-weight:500;
 
-    color:#e9f9ff;
+    color:#eafaff;
 }
 
 .page-heading p{
 
+    margin-top:5px;
+
     color:#638298;
 
     font-size:12px;
-
-    margin-top:5px;
 }
 
 .voice-orb{
 
-    width:230px;
+    width:225px;
 
-    height:230px;
-
-    border-radius:50%;
+    height:225px;
 
     margin:
         55px auto 35px;
+
+    border-radius:50%;
 
     display:grid;
 
     place-items:center;
 
     background:
+
         radial-gradient(
             circle at 35% 28%,
             #e8fbff,
@@ -967,38 +1384,23 @@ button{
             #020b17
         );
 
-    box-shadow:
-        0 0 55px
-        rgba(0,174,255,.30),
-
-        0 0 110px
-        rgba(0,85,255,.14),
-
-        inset 0 0 40px
-        rgba(255,255,255,.18);
-
     border:
         1px solid
         rgba(60,205,255,.35);
 
-    transition:.3s;
+    box-shadow:
+
+        0 0 55px
+        rgba(0,174,255,.30),
+
+        0 0 110px
+        rgba(0,85,255,.14);
 }
 
 .voice-orb.listening{
 
     animation:
         pulse 1.1s infinite;
-
-    box-shadow:
-
-        0 0 0 15px
-        rgba(0,180,255,.07),
-
-        0 0 0 30px
-        rgba(0,120,255,.04),
-
-        0 0 80px
-        rgba(0,190,255,.38);
 }
 
 .voice-orb.speaking{
@@ -1011,15 +1413,20 @@ button{
 @keyframes pulse{
 
     50%{
-        transform:scale(1.07);
+        transform:
+            scale(1.07);
     }
+
 }
 
 @keyframes speakPulse{
 
     to{
-        transform:scale(1.04);
+
+        transform:
+            scale(1.04);
     }
+
 }
 
 .voice-mic{
@@ -1027,32 +1434,29 @@ button{
     font-size:55px;
 
     text-shadow:
-        0 0 18px
-        rgba(255,255,255,.75),
-
-        0 0 30px
-        rgba(0,210,255,.7);
+        0 0 18px #fff,
+        0 0 30px rgba(0,210,255,.7);
 }
 
 .voice-status{
 
     font-size:22px;
 
-    font-weight:500;
-
     color:#e8f9ff;
 }
 
 .voice-hint{
 
+    margin-top:8px;
+
     color:#648399;
 
     font-size:13px;
-
-    margin-top:8px;
 }
 
 .voice-transcript{
+
+    max-width:600px;
 
     min-height:80px;
 
@@ -1061,7 +1465,7 @@ button{
 
     padding:18px;
 
-    max-width:600px;
+    border-radius:18px;
 
     border:
         1px solid
@@ -1070,8 +1474,6 @@ button{
     background:
         rgba(7,29,49,.48);
 
-    border-radius:18px;
-
     color:#9ebdcd;
 
     font-size:14px;
@@ -1079,9 +1481,6 @@ button{
     line-height:1.5;
 
     white-space:pre-wrap;
-
-    backdrop-filter:
-        blur(18px);
 }
 
 .voice-button{
@@ -1106,35 +1505,26 @@ button{
     color:#61dfff;
 
     font-size:28px;
-
-    transition:.2s;
-}
-
-.voice-button:hover{
-
-    transform:scale(1.05);
-
-    box-shadow:
-        0 0 30px
-        rgba(0,185,255,.22);
 }
 
 
-/* =========================================
+/* ============================================================
    SECONDARY PAGES
-========================================= */
-
-.secondary-page{
-
-    display:none;
-}
-
-.secondary-page.active{
-
-    display:block;
-}
+============================================================ */
 
 .data-card{
+
+    max-width:800px;
+
+    margin-top:20px;
+
+    padding:22px;
+
+    border-radius:20px;
+
+    border:
+        1px solid
+        rgba(50,180,255,.14);
 
     background:
         linear-gradient(
@@ -1142,28 +1532,13 @@ button{
             rgba(17,56,82,.42),
             rgba(4,22,41,.58)
         );
-
-    border:
-        1px solid
-        rgba(50,180,255,.14);
-
-    border-radius:20px;
-
-    padding:22px;
-
-    margin-top:20px;
-
-    max-width:800px;
-
-    backdrop-filter:
-        blur(18px);
 }
 
 .data-card h3{
 
-    font-size:15px;
-
     margin-bottom:8px;
+
+    font-size:15px;
 
     color:#dff6ff;
 }
@@ -1179,45 +1554,42 @@ button{
 
 .quick-card{
 
+    width:100%;
+
+    max-width:800px;
+
+    margin-top:12px;
+
+    padding:19px;
+
+    text-align:left;
+
+    color:#e7f7ff;
+
+    border-radius:18px;
+
+    border:
+        1px solid
+        rgba(50,180,255,.14);
+
     background:
         linear-gradient(
             145deg,
             rgba(18,55,82,.42),
             rgba(4,22,40,.55)
         );
-
-    border:
-        1px solid
-        rgba(50,180,255,.14);
-
-    border-radius:18px;
-
-    padding:20px 14px;
-
-    color:#e7f7ff;
-
-    transition:.2s;
-
-    text-align:left;
-
-    width:100%;
-
-    margin-top:12px;
 }
 
 .quick-card:hover{
 
     border-color:
         rgba(45,200,255,.40);
-
-    transform:
-        translateY(-2px);
 }
 
 
-/* =========================================
+/* ============================================================
    BOTTOM NAV
-========================================= */
+============================================================ */
 
 .bottom-nav{
 
@@ -1225,70 +1597,70 @@ button{
 
     left:50%;
 
-    bottom:15px;
+    bottom:14px;
 
     transform:
         translateX(-50%);
 
     width:
-        min(700px,calc(100% - 24px));
-
-    background:
-        rgba(4,20,37,.82);
-
-    backdrop-filter:
-        blur(24px);
-
-    -webkit-backdrop-filter:
-        blur(24px);
-
-    border:
-        1px solid
-        rgba(50,190,255,.17);
-
-    border-radius:23px;
-
-    padding:8px;
+        min(720px,calc(100% - 24px));
 
     display:grid;
 
     grid-template-columns:
         repeat(5,1fr);
 
-    z-index:100;
+    gap:4px;
+
+    padding:8px;
+
+    z-index:200;
+
+    border-radius:23px;
+
+    background:
+        rgba(4,20,37,.90);
+
+    border:
+        1px solid
+        rgba(50,190,255,.17);
+
+    backdrop-filter:
+        blur(25px);
+
+    -webkit-backdrop-filter:
+        blur(25px);
 
     box-shadow:
         0 15px 45px
-        rgba(0,0,0,.35),
-
-        inset 0 1px 0
-        rgba(255,255,255,.05);
+        rgba(0,0,0,.40);
 }
 
 .nav-btn{
 
-    background:transparent;
+    padding:
+        9px 4px;
 
     border:0;
 
-    color:#527084;
-
-    padding:9px 4px;
-
     border-radius:16px;
+
+    background:transparent;
+
+    color:#527084;
 
     font-size:10px;
 
     transition:.2s;
 }
 
-.nav-btn .nav-icon{
+.nav-icon{
 
     display:block;
 
-    font-size:18px;
-
     margin-bottom:4px;
+
+    font-size:18px;
 }
 
 .nav-btn.active{
@@ -1296,55 +1668,51 @@ button{
     color:#57d9ff;
 
     background:
-        linear-gradient(
-            145deg,
-            rgba(0,150,230,.15),
-            rgba(0,85,180,.08)
-        );
+        rgba(0,155,235,.10);
 }
 
 
-/* =========================================
+/* ============================================================
    MOBILE
-========================================= */
+============================================================ */
 
 @media(max-width:700px){
 
     .topbar{
 
-        padding:0 16px;
+        padding:
+            0 16px;
     }
 
     .page{
 
         padding:
-            18px
-            16px
+            15px
+            15px
             110px;
     }
 
-    .live-grid{
+    .live-section{
+
+        padding:14px;
+
+        border-radius:19px;
+    }
+
+    .sales-grid{
 
         grid-template-columns:
             repeat(2,1fr);
     }
 
-    .live-card{
+    .sales-card{
 
         padding:13px;
     }
 
-    .live-card-value{
+    .sales-value{
 
         font-size:20px;
-    }
-
-    .payment-grid{
-
-        grid-template-columns:
-            repeat(3,1fr);
-
-        gap:7px;
     }
 
     .payment-card{
@@ -1356,19 +1724,19 @@ button{
 
         align-items:flex-start;
 
-        gap:4px;
+        gap:5px;
     }
 
     .orb{
 
-        width:150px;
+        width:140px;
 
-        height:150px;
+        height:140px;
     }
 
     .chat-bubble{
 
-        max-width:88%;
+        max-width:90%;
     }
 
     .bottom-nav{
@@ -1376,17 +1744,7 @@ button{
         width:
             calc(100% - 16px);
 
-        bottom:8px;
-    }
-
-    .nav-btn{
-
-        font-size:9px;
-    }
-
-    .ask-box input{
-
-        font-size:13px;
+        bottom:7px;
     }
 
 }
@@ -1400,30 +1758,18 @@ button{
 
     .status{
 
-        font-size:9px;
-
         padding:
             6px 8px;
     }
 
-    .live-card-title{
+    .sales-label{
 
         font-size:8px;
     }
 
-    .live-card-value{
+    .sales-value{
 
         font-size:18px;
-    }
-
-    .payment-name{
-
-        font-size:8px;
-    }
-
-    .payment-value{
-
-        font-size:12px;
     }
 
 }
@@ -1438,9 +1784,9 @@ button{
 <div class="app">
 
 
-<!-- =====================================
+<!-- ==========================================================
      TOP BAR
-===================================== -->
+========================================================== -->
 
 <header class="topbar">
 
@@ -1466,8 +1812,8 @@ button{
 
 
     <div
-        class="status"
-        id="connectionStatus">
+        id="connectionStatus"
+        class="status">
 
         ● READY
 
@@ -1477,169 +1823,210 @@ button{
 
 
 
-<!-- =====================================
+<!-- ==========================================================
      HOME
-===================================== -->
+========================================================== -->
 
 <section
     id="homePage"
     class="page active">
 
 
-    <!-- =================================
-         LIVE SALES
-    ================================== -->
+    <!-- ======================================================
+         LIVE BUSINESS OVERVIEW
+    ======================================================= -->
 
-    <div class="live-header">
+    <div class="live-section">
 
-        <div class="live-title">
-            Live Business Overview
+
+        <div class="live-top">
+
+
+            <div class="live-heading">
+
+
+                <div class="live-heading-icon">
+                    ₹
+                </div>
+
+
+                <div class="live-heading-text">
+
+                    <strong>
+                        Live Business Overview
+                    </strong>
+
+                    <span>
+                        Today's restaurant performance
+                    </span>
+
+                </div>
+
+
+            </div>
+
+
+            <div class="live-status">
+
+                <span class="live-dot"></span>
+
+                LIVE
+
+            </div>
+
+
         </div>
 
-        <div class="live-indicator">
 
-            <span class="live-dot"></span>
 
-            LIVE
+        <div class="sales-grid">
+
+
+            <div class="sales-card">
+
+                <div class="sales-label">
+                    Today's Sales
+                </div>
+
+                <div
+                    id="liveTotalSales"
+                    class="sales-value primary">
+
+                    ₹0
+
+                </div>
+
+            </div>
+
+
+            <div class="sales-card">
+
+                <div class="sales-label">
+                    Total Orders
+                </div>
+
+                <div
+                    id="liveTotalOrders"
+                    class="sales-value">
+
+                    0
+
+                </div>
+
+            </div>
+
+
+            <div class="sales-card">
+
+                <div class="sales-label">
+                    Items Sold
+                </div>
+
+                <div
+                    id="liveTotalItems"
+                    class="sales-value">
+
+                    0
+
+                </div>
+
+            </div>
+
+
+            <div class="sales-card">
+
+                <div class="sales-label">
+                    Average Bill
+                </div>
+
+                <div
+                    id="liveAverageBill"
+                    class="sales-value">
+
+                    ₹0
+
+                </div>
+
+            </div>
+
 
         </div>
+
+
+
+        <div class="payment-grid">
+
+
+            <div class="payment-card">
+
+                <div class="payment-label">
+                    CASH
+                </div>
+
+                <div
+                    id="liveCash"
+                    class="payment-value">
+
+                    ₹0
+
+                </div>
+
+            </div>
+
+
+            <div class="payment-card">
+
+                <div class="payment-label">
+                    UPI
+                </div>
+
+                <div
+                    id="liveUPI"
+                    class="payment-value">
+
+                    ₹0
+
+                </div>
+
+            </div>
+
+
+            <div class="payment-card">
+
+                <div class="payment-label">
+                    CARD
+                </div>
+
+                <div
+                    id="liveCard"
+                    class="payment-value">
+
+                    ₹0
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+        <div
+            id="salesError"
+            class="sales-error">
+
+            Unable to load live sales data.
+
+        </div>
+
 
     </div>
 
 
-    <div class="live-grid">
 
-
-        <div class="live-card">
-
-            <div class="live-card-title">
-                Today's Sales
-            </div>
-
-            <div
-                class="live-card-value primary"
-                id="liveTotalSales">
-
-                ₹0
-
-            </div>
-
-        </div>
-
-
-        <div class="live-card">
-
-            <div class="live-card-title">
-                Orders
-            </div>
-
-            <div
-                class="live-card-value"
-                id="liveTotalOrders">
-
-                0
-
-            </div>
-
-        </div>
-
-
-        <div class="live-card">
-
-            <div class="live-card-title">
-                Items Sold
-            </div>
-
-            <div
-                class="live-card-value"
-                id="liveTotalItems">
-
-                0
-
-            </div>
-
-        </div>
-
-
-        <div class="live-card">
-
-            <div class="live-card-title">
-                Average Bill
-            </div>
-
-            <div
-                class="live-card-value"
-                id="liveAverageBill">
-
-                ₹0
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <div class="payment-grid">
-
-
-        <div class="payment-card">
-
-            <div class="payment-name">
-                CASH
-            </div>
-
-            <div
-                class="payment-value"
-                id="liveCash">
-
-                ₹0
-
-            </div>
-
-        </div>
-
-
-        <div class="payment-card">
-
-            <div class="payment-name">
-                UPI
-            </div>
-
-            <div
-                class="payment-value"
-                id="liveUPI">
-
-                ₹0
-
-            </div>
-
-        </div>
-
-
-        <div class="payment-card">
-
-            <div class="payment-name">
-                CARD
-            </div>
-
-            <div
-                class="payment-value"
-                id="liveCard">
-
-                ₹0
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-
-    <!-- =================================
-         HOME TITLE
-    ================================== -->
+    <!-- ======================================================
+         GREETING
+    ======================================================= -->
 
     <div class="home-title">
 
@@ -1660,15 +2047,15 @@ button{
 
 
 
-    <!-- =================================
+    <!-- ======================================================
          DARKY ORB
-    ================================== -->
+    ======================================================= -->
 
     <div class="orb-wrap">
 
         <div
-            class="orb"
-            id="homeOrb">
+            id="homeOrb"
+            class="orb">
 
             <div class="orb-icon">
                 ✦
@@ -1680,11 +2067,12 @@ button{
 
 
 
-    <!-- =================================
+    <!-- ======================================================
          CHAT
-    ================================== -->
+    ======================================================= -->
 
     <div class="chat-container">
+
 
         <div
             id="chatMessages"
@@ -1693,10 +2081,14 @@ button{
         </div>
 
 
+
         <div class="ask-box">
 
 
+            <!-- MICROPHONE -->
+
             <button
+                id="homeMicButton"
                 class="ask-button"
                 onclick="openVoice()">
 
@@ -1705,6 +2097,8 @@ button{
             </button>
 
 
+            <!-- TEXT -->
+
             <input
                 id="askInput"
                 type="text"
@@ -1712,6 +2106,8 @@ button{
                 autocomplete="off"
             >
 
+
+            <!-- SEND -->
 
             <button
                 class="ask-button ask-send"
@@ -1724,6 +2120,7 @@ button{
 
         </div>
 
+
     </div>
 
 
@@ -1731,9 +2128,9 @@ button{
 
 
 
-<!-- =====================================
+<!-- ==========================================================
      VOICE PAGE
-===================================== -->
+========================================================== -->
 
 <section
     id="voicePage"
@@ -1761,8 +2158,8 @@ button{
             class="voice-orb">
 
             <div
-                class="voice-mic"
-                id="voiceMicIcon">
+                id="voiceMicIcon"
+                class="voice-mic">
 
                 🎙
 
@@ -1814,9 +2211,9 @@ button{
 
 
 
-<!-- =====================================
-     STOCK PAGE
-===================================== -->
+<!-- ==========================================================
+     STOCK
+========================================================== -->
 
 <section
     id="stockPage"
@@ -1870,13 +2267,14 @@ button{
 
     </button>
 
+
 </section>
 
 
 
-<!-- =====================================
-     ORDERS PAGE
-===================================== -->
+<!-- ==========================================================
+     ORDERS
+========================================================== -->
 
 <section
     id="ordersPage"
@@ -1920,13 +2318,14 @@ button{
 
     </button>
 
+
 </section>
 
 
 
-<!-- =====================================
-     REPORTS PAGE
-===================================== -->
+<!-- ==========================================================
+     REPORTS
+========================================================== -->
 
 <section
     id="reportsPage"
@@ -1953,9 +2352,9 @@ button{
         </h3>
 
         <p>
-            Darky is connected to the same
-            sales data used by the Sales page.
-            The figures above refresh automatically.
+            The figures shown on the Home page
+            are connected to the same
+            chaat_orders sales data.
         </p>
 
     </div>
@@ -1970,13 +2369,24 @@ button{
 
     </button>
 
+
+    <button
+        class="quick-card"
+        onclick="askQuick('Give me today\\'s total sales, orders, items sold and average bill.')">
+
+        💰 &nbsp;
+        Today's sales report
+
+    </button>
+
+
 </section>
 
 
 
-<!-- =====================================
+<!-- ==========================================================
      BOTTOM NAV
-===================================== -->
+========================================================== -->
 
 <nav class="bottom-nav">
 
@@ -2060,21 +2470,18 @@ button{
 
 <script>
 
-
-/* =========================================
+/* ============================================================
    SUPABASE
-========================================= */
+============================================================ */
 
 const SUPABASE_URL =
-"https://ucqeyhcycwksiubmlilg.supabase.co";
-
+    "https://ucqeyhcycwksiubmlilg.supabase.co";
 
 const SUPABASE_KEY =
-"sb_publishable_YdIvl7IqdpT0UZOHBumEiw_ZThYEsgV";
-
+    "sb_publishable_YdIvl7IqdpT0UZOHBumEiw_ZThYEsgV";
 
 const SUPABASE_FUNCTION_URL =
-"https://ucqeyhcycwksiubmlilg.supabase.co/functions/v1/restaurant-ai";
+    "https://ucqeyhcycwksiubmlilg.supabase.co/functions/v1/restaurant-ai";
 
 
 const supabaseClient =
@@ -2084,73 +2491,90 @@ const supabaseClient =
     );
 
 
-
-/* =========================================
+/* ============================================================
    ELEMENTS
-========================================= */
+============================================================ */
 
 const askInput =
     document.getElementById(
         "askInput"
     );
 
-
 const connectionStatus =
     document.getElementById(
         "connectionStatus"
     );
-
 
 const chatMessages =
     document.getElementById(
         "chatMessages"
     );
 
+const homeOrb =
+    document.getElementById(
+        "homeOrb"
+    );
+
+const homeMicButton =
+    document.getElementById(
+        "homeMicButton"
+    );
 
 
-/* =========================================
+/* ============================================================
    PAGE NAVIGATION
-========================================= */
+============================================================ */
 
 function openPage(pageId){
 
     document
         .querySelectorAll(".page")
-        .forEach(page=>{
+        .forEach(
+            page =>
+                page.classList.remove(
+                    "active"
+                )
+        );
 
-            page.classList.remove(
-                "active"
-            );
 
-        });
+    const target =
+        document.getElementById(
+            pageId
+        );
 
 
-    document
-        .getElementById(pageId)
-        .classList.add("active");
+    if(target){
+
+        target.classList.add(
+            "active"
+        );
+
+    }
 
 
     document
         .querySelectorAll(".nav-btn")
-        .forEach(button=>{
+        .forEach(
+            button => {
 
-            button.classList.remove(
-                "active"
-            );
-
-
-            if(
-                button.dataset.page ===
-                pageId
-            ){
-
-                button.classList.add(
+                button.classList.remove(
                     "active"
                 );
 
-            }
 
-        });
+                if(
+                    button.dataset.page ===
+                    pageId
+                ){
+
+                    button.classList.add(
+                        "active"
+                    );
+
+                }
+
+            }
+        );
 
 
     window.scrollTo({
@@ -2161,10 +2585,9 @@ function openPage(pageId){
 }
 
 
-
-/* =========================================
+/* ============================================================
    CHAT MESSAGE
-========================================= */
+============================================================ */
 
 function addChatMessage(
     sender,
@@ -2202,22 +2625,25 @@ function addChatMessage(
         );
 
 
-    if(sender === "user"){
+    const name =
+        document.createElement(
+            "div"
+        );
 
-        bubble.innerHTML =
-            `<div class="chat-name user-name">
-                You
-            </div>`;
 
-    }
-    else{
+    name.className =
+        "chat-name " +
+        (
+            sender === "user"
+            ? "user-name"
+            : ""
+        );
 
-        bubble.innerHTML =
-            `<div class="chat-name">
-                Darky AI
-            </div>`;
 
-    }
+    name.textContent =
+        sender === "user"
+        ? "You"
+        : "Darky AI";
 
 
     const content =
@@ -2250,14 +2676,16 @@ function addChatMessage(
 
 
     bubble.appendChild(
-        content
+        name
     );
 
+    bubble.appendChild(
+        content
+    );
 
     row.appendChild(
         bubble
     );
-
 
     chatMessages.appendChild(
         row
@@ -2276,15 +2704,14 @@ function addChatMessage(
 }
 
 
-
-/* =========================================
+/* ============================================================
    CHAT SCROLL
-========================================= */
+============================================================ */
 
 function scrollChatToBottom(){
 
     setTimeout(
-        function(){
+        () => {
 
             window.scrollTo({
                 top:
@@ -2299,10 +2726,9 @@ function scrollChatToBottom(){
 }
 
 
-
-/* =========================================
+/* ============================================================
    HOME QUESTION
-========================================= */
+============================================================ */
 
 function sendHomeQuestion(){
 
@@ -2333,10 +2759,9 @@ function sendHomeQuestion(){
 }
 
 
-
-/* =========================================
+/* ============================================================
    ENTER KEY
-========================================= */
+============================================================ */
 
 askInput.addEventListener(
     "keydown",
@@ -2347,6 +2772,8 @@ askInput.addEventListener(
             "Enter"
         ){
 
+            event.preventDefault();
+
             sendHomeQuestion();
 
         }
@@ -2355,10 +2782,9 @@ askInput.addEventListener(
 );
 
 
-
-/* =========================================
-   QUICK ACTIONS
-========================================= */
+/* ============================================================
+   QUICK QUESTIONS
+============================================================ */
 
 function askQuick(message){
 
@@ -2380,10 +2806,9 @@ function askQuick(message){
 }
 
 
-
-/* =========================================
-   AI REQUEST
-========================================= */
+/* ============================================================
+   SEND MESSAGE TO DARKY
+============================================================ */
 
 async function sendMessageToAI(
     message
@@ -2474,7 +2899,6 @@ async function sendMessageToAI(
             answer
         );
 
-
     }
     catch(error){
 
@@ -2499,10 +2923,9 @@ async function sendMessageToAI(
 }
 
 
-
-/* =========================================
-   LIVE SALES
-========================================= */
+/* ============================================================
+   DATE
+============================================================ */
 
 function localDateString(
     date
@@ -2511,7 +2934,6 @@ function localDateString(
     const year =
         date.getFullYear();
 
-
     const month =
         String(
             date.getMonth()+1
@@ -2519,7 +2941,6 @@ function localDateString(
             2,
             "0"
         );
-
 
     const day =
         String(
@@ -2530,19 +2951,34 @@ function localDateString(
         );
 
 
-    return `${year}-${month}-${day}`;
+    return (
+        year +
+        "-" +
+        month +
+        "-" +
+        day
+    );
 
 }
 
 
-
-/* =========================================
-   LOAD LIVE SALES
-========================================= */
+/* ============================================================
+   LIVE SALES
+============================================================ */
 
 async function loadLiveSales(){
 
+    const errorBox =
+        document.getElementById(
+            "salesError"
+        );
+
+
     try{
+
+        errorBox.style.display =
+            "none";
+
 
         const today =
             localDateString(
@@ -2550,16 +2986,15 @@ async function loadLiveSales(){
             );
 
 
-        /*
-         * Same date logic as the
-         * Sales Tracking page.
-         */
-
-        const start =
+        const startDate =
             new Date(
                 today +
                 "T00:00:00"
-            ).toISOString();
+            );
+
+
+        const start =
+            startDate.toISOString();
 
 
         const endDate =
@@ -2578,67 +3013,83 @@ async function loadLiveSales(){
             endDate.toISOString();
 
 
-        const {
-            data,
-            error
-        } =
-        await supabaseClient
+        const result =
+            await supabaseClient
 
-            .from(
-                "chaat_orders"
-            )
+                .from(
+                    "chaat_orders"
+                )
 
-            .select("*")
+                .select("*")
 
-            .gte(
-                "created_at",
-                start
-            )
+                .gte(
+                    "created_at",
+                    start
+                )
 
-            .lt(
-                "created_at",
-                end
-            );
+                .lt(
+                    "created_at",
+                    end
+                );
+
+
+        const data =
+            result.data;
+
+        const error =
+            result.error;
 
 
         if(error){
 
             console.error(
-                "Live sales error:",
+                "Live sales Supabase error:",
                 error
             );
+
+
+            errorBox.textContent =
+                "Sales connection error: " +
+                error.message;
+
+
+            errorBox.style.display =
+                "block";
+
 
             return;
 
         }
 
 
-        const orders =
-            data || [];
-
-
         calculateLiveSales(
-            orders
+            data || []
         );
-
 
     }
     catch(error){
 
         console.error(
-            "Live sales connection error:",
+            "Live sales error:",
             error
         );
+
+
+        errorBox.textContent =
+            "Unable to load live sales data.";
+
+
+        errorBox.style.display =
+            "block";
 
     }
 
 }
 
 
-
-/* =========================================
+/* ============================================================
    CALCULATE LIVE SALES
-========================================= */
+============================================================ */
 
 function calculateLiveSales(
     orders
@@ -2656,12 +3107,11 @@ function calculateLiveSales(
 
 
     orders.forEach(
-        order=>{
+        order => {
 
             const total =
                 Number(
-                    order.total ||
-                    0
+                    order.total || 0
                 );
 
 
@@ -2669,9 +3119,17 @@ function calculateLiveSales(
                 total;
 
 
+            const payment =
+                String(
+                    order.payment_method ||
+                    ""
+                )
+                .trim()
+                .toLowerCase();
+
+
             if(
-                order.payment_method ===
-                "Cash"
+                payment === "cash"
             ){
 
                 cash += total;
@@ -2680,8 +3138,7 @@ function calculateLiveSales(
 
 
             if(
-                order.payment_method ===
-                "UPI"
+                payment === "upi"
             ){
 
                 upi += total;
@@ -2690,8 +3147,7 @@ function calculateLiveSales(
 
 
             if(
-                order.payment_method ===
-                "Card"
+                payment === "card"
             ){
 
                 card += total;
@@ -2706,12 +3162,11 @@ function calculateLiveSales(
             ){
 
                 order.items.forEach(
-                    item=>{
+                    item => {
 
                         totalItems +=
                             Number(
-                                item.qty ||
-                                0
+                                item.qty || 0
                             );
 
                     }
@@ -2724,9 +3179,8 @@ function calculateLiveSales(
 
 
     const averageBill =
-        orders.length
-        ? totalSales /
-          orders.length
+        orders.length > 0
+        ? totalSales / orders.length
         : 0;
 
 
@@ -2789,17 +3243,16 @@ function calculateLiveSales(
 }
 
 
-
-/* =========================================
+/* ============================================================
    MONEY
-========================================= */
+============================================================ */
 
 function formatMoney(
     number
 ){
 
     return Number(
-        number
+        number || 0
     )
     .toFixed(2)
     .replace(
@@ -2810,10 +3263,9 @@ function formatMoney(
 }
 
 
-
-/* =========================================
-   AUTO REFRESH LIVE SALES
-========================================= */
+/* ============================================================
+   LIVE SALES REFRESH
+============================================================ */
 
 loadLiveSales();
 
@@ -2824,24 +3276,9 @@ setInterval(
 );
 
 
-
-/* =========================================
+/* ============================================================
    VOICE
-========================================= */
-
-function openVoice(){
-
-    openPage(
-        "voicePage"
-    );
-
-}
-
-
-
-/* =========================================
-   SPEECH RECOGNITION
-========================================= */
+============================================================ */
 
 const SpeechRecognition =
     window.SpeechRecognition ||
@@ -2858,24 +3295,25 @@ const voiceOrb =
         "voiceOrb"
     );
 
-
 const voiceStatus =
     document.getElementById(
         "voiceStatus"
     );
-
 
 const voiceHint =
     document.getElementById(
         "voiceHint"
     );
 
-
 const voiceTranscript =
     document.getElementById(
         "voiceTranscript"
     );
 
+
+/* ============================================================
+   SPEECH RECOGNITION
+============================================================ */
 
 if(SpeechRecognition){
 
@@ -2895,15 +3333,34 @@ if(SpeechRecognition){
         false;
 
 
+    /* --------------------------------------------------------
+       START LISTENING
+    -------------------------------------------------------- */
+
     recognition.onstart =
         function(){
 
             listening = true;
 
 
-            voiceOrb.classList.add(
-                "listening"
+            homeOrb.classList.remove(
+                "home-thinking",
+                "home-speaking"
             );
+
+
+            homeOrb.classList.add(
+                "home-listening"
+            );
+
+
+            homeMicButton.classList.add(
+                "mic-active"
+            );
+
+
+            connectionStatus.textContent =
+                "● LISTENING";
 
 
             voiceStatus.textContent =
@@ -2920,6 +3377,10 @@ if(SpeechRecognition){
         };
 
 
+    /* --------------------------------------------------------
+       RESULT
+    -------------------------------------------------------- */
+
     recognition.onresult =
         async function(event){
 
@@ -2927,6 +3388,21 @@ if(SpeechRecognition){
                 event
                     .results[0][0]
                     .transcript;
+
+
+            homeOrb.classList.remove(
+                "home-listening"
+            );
+
+
+            homeOrb.classList.add(
+                "home-thinking"
+            );
+
+
+            homeMicButton.classList.remove(
+                "mic-active"
+            );
 
 
             voiceTranscript.textContent =
@@ -2941,9 +3417,8 @@ if(SpeechRecognition){
                 "Darky is processing your command";
 
 
-            voiceOrb.classList.remove(
-                "listening"
-            );
+            connectionStatus.textContent =
+                "● THINKING";
 
 
             await sendVoiceMessage(
@@ -2952,6 +3427,10 @@ if(SpeechRecognition){
 
         };
 
+
+    /* --------------------------------------------------------
+       ERROR
+    -------------------------------------------------------- */
 
     recognition.onerror =
         function(event){
@@ -2965,9 +3444,20 @@ if(SpeechRecognition){
             listening = false;
 
 
-            voiceOrb.classList.remove(
-                "listening"
+            homeOrb.classList.remove(
+                "home-listening",
+                "home-thinking",
+                "home-speaking"
             );
+
+
+            homeMicButton.classList.remove(
+                "mic-active"
+            );
+
+
+            connectionStatus.textContent =
+                "● READY";
 
 
             voiceStatus.textContent =
@@ -2980,13 +3470,18 @@ if(SpeechRecognition){
         };
 
 
+    /* --------------------------------------------------------
+       END
+    -------------------------------------------------------- */
+
     recognition.onend =
         function(){
 
             listening = false;
 
-            voiceOrb.classList.remove(
-                "listening"
+
+            homeMicButton.classList.remove(
+                "mic-active"
             );
 
         };
@@ -2994,10 +3489,52 @@ if(SpeechRecognition){
 }
 
 
+/* ============================================================
+   HOME MICROPHONE
+============================================================ */
 
-/* =========================================
-   START VOICE
-========================================= */
+function openVoice(){
+
+    if(!recognition){
+
+        connectionStatus.textContent =
+            "● VOICE NOT SUPPORTED";
+
+
+        return;
+
+    }
+
+
+    if(listening){
+
+        recognition.stop();
+
+        return;
+
+    }
+
+
+    try{
+
+        recognition.start();
+
+    }
+    catch(error){
+
+        console.error(
+            "Voice start error:",
+            error
+        );
+
+    }
+
+}
+
+
+/* ============================================================
+   VOICE PAGE MICROPHONE
+============================================================ */
 
 function startVoiceCommand(){
 
@@ -3041,10 +3578,9 @@ function startVoiceCommand(){
 }
 
 
-
-/* =========================================
-   VOICE → AI
-========================================= */
+/* ============================================================
+   VOICE → DARKY
+============================================================ */
 
 async function sendVoiceMessage(
     message
@@ -3112,6 +3648,21 @@ async function sendVoiceMessage(
             "I couldn't process that command.";
 
 
+        /* ----------------------------------------------------
+           CHANGE ORB FROM THINKING TO SPEAKING
+        ---------------------------------------------------- */
+
+        homeOrb.classList.remove(
+            "home-thinking",
+            "home-listening"
+        );
+
+
+        homeOrb.classList.add(
+            "home-speaking"
+        );
+
+
         voiceStatus.textContent =
             "Darky";
 
@@ -3127,25 +3678,13 @@ async function sendVoiceMessage(
             answer;
 
 
-        speakReply(
-            answer,
-            true
-        );
-
-
         connectionStatus.textContent =
             "● READY";
 
 
-        /*
-         * Also put the voice conversation
-         * into the Home chat history.
-         */
-
-        openPage(
-            "homePage"
-        );
-
+        /* ----------------------------------------------------
+           ADD TO CHAT
+        ---------------------------------------------------- */
 
         addChatMessage(
             "user",
@@ -3159,12 +3698,28 @@ async function sendVoiceMessage(
         );
 
 
+        /* ----------------------------------------------------
+           SPEAK
+        ---------------------------------------------------- */
+
+        speakReply(
+            answer,
+            true
+        );
+
     }
     catch(error){
 
         console.error(
             "Darky voice connection error:",
             error
+        );
+
+
+        homeOrb.classList.remove(
+            "home-listening",
+            "home-thinking",
+            "home-speaking"
         );
 
 
@@ -3184,10 +3739,9 @@ async function sendVoiceMessage(
 }
 
 
-
-/* =========================================
+/* ============================================================
    TEXT TO SPEECH
-========================================= */
+============================================================ */
 
 function speakReply(
     text,
@@ -3197,6 +3751,12 @@ function speakReply(
     if(
         !("speechSynthesis" in window)
     ){
+
+        homeOrb.classList.remove(
+            "home-speaking",
+            "home-thinking",
+            "home-listening"
+        );
 
         return;
 
@@ -3236,18 +3796,14 @@ function speakReply(
                         voice.name
                     )
         )
-
         ||
-
         voices.find(
             voice =>
                 /^en-IN/i.test(
                     voice.lang
                 )
         )
-
         ||
-
         voices.find(
             voice =>
                 /^en/i.test(
@@ -3265,6 +3821,17 @@ function speakReply(
 
 
     if(voiceMode){
+
+        homeOrb.classList.remove(
+            "home-thinking",
+            "home-listening"
+        );
+
+
+        homeOrb.classList.add(
+            "home-speaking"
+        );
+
 
         voiceOrb.classList.add(
             "speaking"
@@ -3285,6 +3852,13 @@ function speakReply(
             );
 
 
+            homeOrb.classList.remove(
+                "home-speaking",
+                "home-thinking",
+                "home-listening"
+            );
+
+
             if(voiceMode){
 
                 voiceStatus.textContent =
@@ -3299,6 +3873,23 @@ function speakReply(
         };
 
 
+    utterance.onerror =
+        function(){
+
+            homeOrb.classList.remove(
+                "home-speaking",
+                "home-thinking",
+                "home-listening"
+            );
+
+
+            voiceOrb.classList.remove(
+                "speaking"
+            );
+
+        };
+
+
     speechSynthesis.speak(
         utterance
     );
@@ -3306,10 +3897,9 @@ function speakReply(
 }
 
 
-
-/* =========================================
-   VOICES LOADED
-========================================= */
+/* ============================================================
+   SPEECH VOICES LOADED
+============================================================ */
 
 if(
     "speechSynthesis" in window
@@ -3325,10 +3915,9 @@ if(
 }
 
 
-
-/* =========================================
+/* ============================================================
    GREETING
-========================================= */
+============================================================ */
 
 const hour =
     new Date().getHours();
@@ -3360,16 +3949,15 @@ else{
 }
 
 
-
-/* =========================================
-   FIRST INTRODUCTION
-========================================= */
+/* ============================================================
+   DARKY INTRODUCTION
+============================================================ */
 
 const introduction =
-"Hi, I'm Darky AI. You can call me Darky. I'm the AI assistant of Chaatarra, created by Iqbal.";
+    "Hi, I'm Darky AI. You can call me Darky. I'm the AI assistant of Chaatarra, created by Iqbal.";
 
 
-let hasIntroduced =
+const hasIntroduced =
     localStorage.getItem(
         "darkyIntroduced"
     );
@@ -3396,13 +3984,28 @@ if(!hasIntroduced){
                 "true"
             );
 
-
         },
-        1200
+        1000
     );
 
 }
 
+
+/* ============================================================
+   READY
+============================================================ */
+
+console.log(
+    "Darky AI dashboard loaded."
+);
+
+console.log(
+    "Voice interaction enabled."
+);
+
+console.log(
+    "Live sales connected to chaat_orders."
+);
 
 </script>
 
