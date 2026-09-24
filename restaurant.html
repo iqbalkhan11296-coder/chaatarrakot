@@ -3,6 +3,13 @@
 <html lang="en">
 <head>
 
+   <button
+    id="logoutButton"
+    class="logout-button"
+    onclick="logoutDashboard()">
+    ⏻ LOGOUT
+</button>
+
 <meta charset="UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -2731,8 +2738,67 @@ button{
     }
 
 }
-```
+```css
+/* ============================================================
+   DARKY AI LOGOUT BUTTON
+============================================================ */
 
+.logout-button{
+
+    padding:10px 18px;
+
+    border:1px solid rgba(80,210,255,.35);
+
+    border-radius:10px;
+
+    background:
+        rgba(5,25,45,.75);
+
+    color:#bdefff;
+
+    font-size:11px;
+
+    font-weight:700;
+
+    letter-spacing:1.5px;
+
+    cursor:pointer;
+
+    transition:
+        .25s ease;
+
+    box-shadow:
+        0 0 12px rgba(0,170,255,.08);
+
+}
+
+
+.logout-button:hover{
+
+    color:#ffffff;
+
+    border-color:
+        rgba(80,220,255,.8);
+
+    background:
+        rgba(0,130,200,.22);
+
+    box-shadow:
+        0 0 20px
+        rgba(0,190,255,.3);
+
+    transform:
+        translateY(-1px);
+
+}
+
+
+.logout-button:active{
+
+    transform:
+        scale(.96);
+
+}
 
 </style>
 
