@@ -2895,84 +2895,33 @@ async function sendMessageToAI(
         scrollChatToBottom();
 
 
-        function speakReply(text, isDarky = true) {
-    if (!("speechSynthesis" in window)) return;
+        speakReply(
+            answer
+        );
 
-    speechSynthesis.cancel();
+    }
+    catch(error){
 
-    const voices = speechSynthesis.getVoices();
+        console.error(
+            "Darky connection error:",
+            error
+        );
 
-    // Prefer a deeper English voice when the browser provides one
-    const preferredVoice =
-        voices.find(v =>
-            /en-IN/i.test(v.lang) &&
-            /male|man|david|daniel|george|rishi|google/i.test(v.name)
-        ) ||
-        voices.find(v =>
-            /en-GB/i.test(v.lang) &&
-            /male|man|david|daniel|george/i.test(v.name)
-        ) ||
-        voices.find(v =>
-            /en-US/i.test(v.lang) &&
-            /male|man|david|daniel|george/i.test(v.name)
-        ) ||
-        voices.find(v => /en-IN/i.test(v.lang)) ||
-        voices.find(v => /en-GB|en-US/i.test(v.lang));
 
-    /*
-     * Cinematic Darky delivery
-     * -------------------------
-     * Lower pitch  = deeper voice
-     * Lower rate   = slower / more deliberate
-     */
-    const utterance = new SpeechSynthesisUtterance(text);
+        darkyMessage.content.textContent =
+            "I'm having trouble connecting right now. Please try again.";
 
-    if (preferredVoice) {
-        utterance.voice = preferredVoice;
-        utterance.lang = preferredVoice.lang;
-    } else {
-        utterance.lang = "en-IN";
+
+        connectionStatus.textContent =
+            "● CONNECTION ERROR";
+
+
+        scrollChatToBottom();
+
     }
 
-    utterance.rate = 0.78;
-    utterance.pitch = 0.48;
-    utterance.volume = 1;
-
-    utterance.onstart = () => {
-        if (isDarky) {
-            homeOrb.classList.remove(
-                "home-listening",
-                "home-thinking"
-            );
-
-            homeOrb.classList.add("home-speaking");
-
-            if (homeMic) {
-                homeMic.classList.add("mic-active");
-            }
-        }
-    };
-
-    utterance.onend = () => {
-        if (isDarky) {
-            homeOrb.classList.remove("home-speaking");
-
-            if (homeMic) {
-                homeMic.classList.remove("mic-active");
-            }
-        }
-    };
-
-    utterance.onerror = () => {
-        homeOrb.classList.remove("home-speaking");
-
-        if (homeMic) {
-            homeMic.classList.remove("mic-active");
-        }
-    };
-
-    speechSynthesis.speak(utterance);
 }
+
 
 /* ============================================================
    DATE
@@ -3551,9 +3500,11 @@ function openVoice(){
         connectionStatus.textContent =
             "● VOICE NOT SUPPORTED";
 
+
         return;
 
     }
+
 
     if(listening){
 
@@ -3563,85 +3514,23 @@ function openVoice(){
 
     }
 
-    // Darky speaks first
-    speechSynthesis.cancel();
 
-    const greeting =
-        new SpeechSynthesisUtterance(
-            "Hey boss, tell me what can I do?"
+    try{
+
+        recognition.start();
+
+    }
+    catch(error){
+
+        console.error(
+            "Voice start error:",
+            error
         );
 
-    greeting.lang = "en-IN";
-    greeting.rate = 0.92;
-    greeting.pitch = 1.08;
-
-    // Show speaking animation
-    homeOrb.classList.remove(
-        "home-listening",
-        "home-thinking"
-    );
-
-    homeOrb.classList.add(
-        "home-speaking"
-    );
-
-    homeMicButton.classList.add(
-        "mic-active"
-    );
-
-    connectionStatus.textContent =
-        "● SPEAKING";
-
-    greeting.onend = function(){
-
-        homeOrb.classList.remove(
-            "home-speaking"
-        );
-
-        homeOrb.classList.add(
-            "home-listening"
-        );
-
-        connectionStatus.textContent =
-            "● LISTENING";
-
-        // Start listening only after Darky finishes speaking
-        try{
-
-            recognition.start();
-
-        }
-        catch(error){
-
-            console.error(
-                "Voice start error:",
-                error
-            );
-
-        }
-
-    };
-
-    greeting.onerror = function(){
-
-        homeOrb.classList.remove(
-            "home-speaking"
-        );
-
-        homeMicButton.classList.remove(
-            "mic-active"
-        );
-
-        connectionStatus.textContent =
-            "● READY";
-
-    };
-
-    speechSynthesis.speak(
-        greeting
-    );
+    }
 
 }
+
 
 /* ============================================================
    VOICE PAGE MICROPHONE
