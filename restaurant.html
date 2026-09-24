@@ -900,7 +900,7 @@ button{
         rgba(0,130,255,.38),
 
         0 0 150px
-        rgba(0,90,255,.20),
+        rgba(0,90px,255,.20),
 
         inset 0 0 48px
         rgba(255,255,255,.28);
@@ -2713,11 +2713,18 @@ function scrollChatToBottom(){
     setTimeout(
         () => {
 
-            window.scrollTo({
-                top:
-                    document.body.scrollHeight,
-                behavior:"smooth"
-            });
+            const lastMessage =
+                chatMessages.lastElementChild;
+
+
+            if(lastMessage){
+
+                lastMessage.scrollIntoView({
+                    behavior:"smooth",
+                    block:"nearest"
+                });
+
+            }
 
         },
         50
@@ -3515,6 +3522,146 @@ function openVoice(){
     }
 
 
+    /*
+     * Cinematic Darky greeting before listening
+     */
+
+    const greeting =
+        "Hey boss... I'm listening. Tell me what you need.";
+
+
+    homeOrb.classList.remove(
+        "home-listening",
+        "home-thinking"
+    );
+
+
+    homeOrb.classList.add(
+        "home-speaking"
+    );
+
+
+    homeMicButton.classList.add(
+        "mic-active"
+    );
+
+
+    connectionStatus.textContent =
+        "● SPEAKING";
+
+
+    speakVoiceGreeting(
+        greeting
+    );
+
+}
+
+
+/* ============================================================
+   DARKY VOICE GREETING
+============================================================ */
+
+function speakVoiceGreeting(
+    text
+){
+
+    if(
+        !("speechSynthesis" in window)
+    ){
+
+        startListeningAfterGreeting();
+
+        return;
+
+    }
+
+
+    speechSynthesis.cancel();
+
+
+    const utterance =
+        new SpeechSynthesisUtterance(
+            text
+        );
+
+
+    configureDarkyVoice(
+        utterance
+    );
+
+
+    utterance.onstart =
+        function(){
+
+            homeOrb.classList.remove(
+                "home-listening",
+                "home-thinking"
+            );
+
+
+            homeOrb.classList.add(
+                "home-speaking"
+            );
+
+
+            homeMicButton.classList.add(
+                "mic-active"
+            );
+
+        };
+
+
+    utterance.onend =
+        function(){
+
+            startListeningAfterGreeting();
+
+        };
+
+
+    utterance.onerror =
+        function(){
+
+            startListeningAfterGreeting();
+
+        };
+
+
+    speechSynthesis.speak(
+        utterance
+    );
+
+}
+
+
+/* ============================================================
+   START LISTENING AFTER GREETING
+============================================================ */
+
+function startListeningAfterGreeting(){
+
+    if(!recognition){
+
+        return;
+
+    }
+
+
+    homeOrb.classList.remove(
+        "home-speaking",
+        "home-thinking"
+    );
+
+
+    homeOrb.classList.add(
+        "home-listening"
+    );
+
+
+    connectionStatus.textContent =
+        "● LISTENING";
+
+
     try{
 
         recognition.start();
@@ -3679,7 +3826,7 @@ async function sendVoiceMessage(
 
 
         connectionStatus.textContent =
-            "● READY";
+            "● SPEAKING";
 
 
         /* ----------------------------------------------------
@@ -3723,6 +3870,11 @@ async function sendVoiceMessage(
         );
 
 
+        homeMicButton.classList.remove(
+            "mic-active"
+        );
+
+
         voiceStatus.textContent =
             "Connection error";
 
@@ -3740,7 +3892,115 @@ async function sendVoiceMessage(
 
 
 /* ============================================================
-   TEXT TO SPEECH
+   CONFIGURE DARKY VOICE
+============================================================ */
+
+function configureDarkyVoice(
+    utterance
+){
+
+    /*
+     * Darky's voice personality
+     *
+     * Lower rate:
+     * slower and more deliberate.
+     *
+     * Lower pitch:
+     * deeper masculine tone.
+     */
+
+    utterance.lang =
+        "en-IN";
+
+
+    utterance.rate =
+        0.78;
+
+
+    utterance.pitch =
+        0.48;
+
+
+    utterance.volume =
+        1;
+
+
+    const voices =
+        speechSynthesis.getVoices();
+
+
+    /*
+     * Prefer masculine English voices.
+     */
+
+    const preferredVoice =
+        voices.find(
+            voice =>
+                /en-IN/i.test(
+                    voice.lang
+                )
+                &&
+                /male|man|david|daniel|george|rishi|microsoft.*male|google.*male/i.test(
+                    voice.name
+                )
+        )
+        ||
+        voices.find(
+            voice =>
+                /en-GB/i.test(
+                    voice.lang
+                )
+                &&
+                /male|man|david|daniel|george|microsoft.*male|google.*male/i.test(
+                    voice.name
+                )
+        )
+        ||
+        voices.find(
+            voice =>
+                /en-US/i.test(
+                    voice.lang
+                )
+                &&
+                /male|man|david|daniel|george|microsoft.*male|google.*male/i.test(
+                    voice.name
+                )
+        )
+        ||
+        voices.find(
+            voice =>
+                /en-IN/i.test(
+                    voice.lang
+                )
+        )
+        ||
+        voices.find(
+            voice =>
+                /^en/i.test(
+                    voice.lang
+                )
+        );
+
+
+    if(preferredVoice){
+
+        utterance.voice =
+            preferredVoice;
+
+
+        console.log(
+            "Darky voice:",
+            preferredVoice.name,
+            preferredVoice.lang
+        );
+
+    }
+
+}
+
+
+/* ============================================================
+   TEXT TO SPEECH — CINEMATIC DARKY
 ============================================================ */
 
 function speakReply(
@@ -3772,53 +4032,18 @@ function speakReply(
         );
 
 
-    utterance.lang =
-        "en-IN";
+    /*
+     * Apply Darky's deep cinematic voice.
+     */
+
+    configureDarkyVoice(
+        utterance
+    );
 
 
-    utterance.rate =
-        .92;
-
-
-    utterance.pitch =
-        1.08;
-
-
-    const voices =
-        speechSynthesis.getVoices();
-
-
-    const preferredVoice =
-        voices.find(
-            voice =>
-                /female|zira|samantha|aria|jenny|google uk english female/i
-                    .test(
-                        voice.name
-                    )
-        )
-        ||
-        voices.find(
-            voice =>
-                /^en-IN/i.test(
-                    voice.lang
-                )
-        )
-        ||
-        voices.find(
-            voice =>
-                /^en/i.test(
-                    voice.lang
-                )
-        );
-
-
-    if(preferredVoice){
-
-        utterance.voice =
-            preferredVoice;
-
-    }
-
+    /* --------------------------------------------------------
+       DARKY SPEAKING ANIMATION
+    -------------------------------------------------------- */
 
     if(voiceMode){
 
@@ -3833,6 +4058,11 @@ function speakReply(
         );
 
 
+        homeMicButton.classList.add(
+            "mic-active"
+        );
+
+
         voiceOrb.classList.add(
             "speaking"
         );
@@ -3841,8 +4071,66 @@ function speakReply(
         voiceStatus.textContent =
             "Darky is speaking";
 
+
+        voiceHint.textContent =
+            "Listen...";
+
+
+        connectionStatus.textContent =
+            "● SPEAKING";
+
     }
 
+
+    /* --------------------------------------------------------
+       SPEECH START
+    -------------------------------------------------------- */
+
+    utterance.onstart =
+        function(){
+
+            if(voiceMode){
+
+                homeOrb.classList.remove(
+                    "home-thinking",
+                    "home-listening"
+                );
+
+
+                homeOrb.classList.add(
+                    "home-speaking"
+                );
+
+
+                homeMicButton.classList.add(
+                    "mic-active"
+                );
+
+
+                voiceOrb.classList.add(
+                    "speaking"
+                );
+
+
+                voiceStatus.textContent =
+                    "Darky is speaking";
+
+
+                voiceHint.textContent =
+                    "Listen...";
+
+
+                connectionStatus.textContent =
+                    "● SPEAKING";
+
+            }
+
+        };
+
+
+    /* --------------------------------------------------------
+       SPEECH END
+    -------------------------------------------------------- */
 
     utterance.onend =
         function(){
@@ -3859,6 +4147,11 @@ function speakReply(
             );
 
 
+            homeMicButton.classList.remove(
+                "mic-active"
+            );
+
+
             if(voiceMode){
 
                 voiceStatus.textContent =
@@ -3868,13 +4161,27 @@ function speakReply(
                 voiceHint.textContent =
                     "Tap the microphone and speak";
 
+
+                connectionStatus.textContent =
+                    "● READY";
+
             }
 
         };
 
 
+    /* --------------------------------------------------------
+       SPEECH ERROR
+    -------------------------------------------------------- */
+
     utterance.onerror =
-        function(){
+        function(error){
+
+            console.error(
+                "Darky TTS error:",
+                error
+            );
+
 
             homeOrb.classList.remove(
                 "home-speaking",
@@ -3883,12 +4190,37 @@ function speakReply(
             );
 
 
+            homeMicButton.classList.remove(
+                "mic-active"
+            );
+
+
             voiceOrb.classList.remove(
                 "speaking"
             );
 
+
+            if(voiceMode){
+
+                voiceStatus.textContent =
+                    "Ready to listen";
+
+
+                voiceHint.textContent =
+                    "Tap the microphone and speak";
+
+
+                connectionStatus.textContent =
+                    "● READY";
+
+            }
+
         };
 
+
+    /* --------------------------------------------------------
+       SPEAK
+    -------------------------------------------------------- */
 
     speechSynthesis.speak(
         utterance
@@ -3908,7 +4240,20 @@ if(
     speechSynthesis.onvoiceschanged =
         function(){
 
-            speechSynthesis.getVoices();
+            const voices =
+                speechSynthesis.getVoices();
+
+
+            console.log(
+                "Available Darky voices:",
+                voices.map(
+                    voice =>
+                        voice.name +
+                        " (" +
+                        voice.lang +
+                        ")"
+                )
+            );
 
         };
 
@@ -3954,7 +4299,7 @@ else{
 ============================================================ */
 
 const introduction =
-    "Hi, I'm Darky AI. You can call me Darky. I'm the AI assistant of Chaatarra, created by Iqbal.";
+    "Hi, I'm Darky AI... You can call me Darky. I'm the AI assistant of Chaatarra, created by Iqbal.";
 
 
 const hasIntroduced =
@@ -4001,6 +4346,10 @@ console.log(
 
 console.log(
     "Voice interaction enabled."
+);
+
+console.log(
+    "Cinematic Darky voice enabled."
 );
 
 console.log(
