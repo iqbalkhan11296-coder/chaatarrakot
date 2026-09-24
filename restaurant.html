@@ -605,6 +605,247 @@ button{
 
 
 /* ============================================================
+   LOW ALERT INVENTORY
+============================================================ */
+
+.low-alert-section{
+
+    margin-top:10px;
+
+    padding:16px;
+
+    border-radius:17px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(48,38,19,.42),
+            rgba(15,25,37,.72)
+        );
+
+    border:
+        1px solid
+        rgba(255,205,90,.16);
+
+    box-shadow:
+        0 8px 25px
+        rgba(0,0,0,.15);
+}
+
+.low-alert-header{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    gap:10px;
+
+    margin-bottom:12px;
+}
+
+.low-alert-title{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:9px;
+}
+
+.low-alert-icon{
+
+    width:30px;
+
+    height:30px;
+
+    display:grid;
+
+    place-items:center;
+
+    border-radius:10px;
+
+    background:
+        rgba(255,190,60,.10);
+
+    border:
+        1px solid
+        rgba(255,205,80,.18);
+
+    color:#ffd46b;
+
+    font-size:14px;
+}
+
+.low-alert-title strong{
+
+    display:block;
+
+    color:#e9f8ff;
+
+    font-size:11px;
+
+    letter-spacing:1.3px;
+
+    text-transform:uppercase;
+}
+
+.low-alert-title span{
+
+    display:block;
+
+    margin-top:3px;
+
+    color:#71899a;
+
+    font-size:9px;
+}
+
+.low-alert-count{
+
+    min-width:30px;
+
+    height:30px;
+
+    padding:
+        0 9px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    border-radius:10px;
+
+    background:
+        rgba(255,190,50,.10);
+
+    border:
+        1px solid
+        rgba(255,205,80,.18);
+
+    color:#ffd66e;
+
+    font-size:12px;
+
+    font-weight:800;
+}
+
+.low-alert-items{
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(2,1fr);
+
+    gap:7px;
+
+    max-height:210px;
+
+    overflow-y:auto;
+
+    padding-right:2px;
+}
+
+.low-alert-item{
+
+    min-width:0;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    gap:8px;
+
+    padding:
+        9px 10px;
+
+    border-radius:10px;
+
+    background:
+        rgba(255,195,70,.055);
+
+    border:
+        1px solid
+        rgba(255,205,80,.10);
+}
+
+.low-alert-item-name{
+
+    min-width:0;
+
+    overflow:hidden;
+
+    text-overflow:ellipsis;
+
+    white-space:nowrap;
+
+    color:#d9edf4;
+
+    font-size:11px;
+
+    font-weight:600;
+}
+
+.low-alert-item-stock{
+
+    flex-shrink:0;
+
+    color:#ffd16a;
+
+    font-size:10px;
+
+    font-weight:800;
+
+    white-space:nowrap;
+}
+
+.low-alert-item.out{
+
+    background:
+        rgba(255,70,70,.07);
+
+    border-color:
+        rgba(255,100,100,.15);
+}
+
+.low-alert-item.out .low-alert-item-stock{
+
+    color:#ff8585;
+}
+
+.low-alert-empty{
+
+    grid-column:1 / -1;
+
+    padding:13px;
+
+    text-align:center;
+
+    color:#668294;
+
+    font-size:10px;
+}
+
+.low-alert-error{
+
+    grid-column:1 / -1;
+
+    padding:12px;
+
+    text-align:center;
+
+    color:#ff9a9a;
+
+    font-size:10px;
+}
+
+
+/* ============================================================
    HOME TITLE
 ============================================================ */
 
@@ -1779,6 +2020,12 @@ button{
         gap:5px;
     }
 
+    .low-alert-items{
+
+        grid-template-columns:
+            1fr;
+    }
+
     .orb{
 
         width:140px;
@@ -2070,6 +2317,64 @@ button{
             class="sales-error">
 
             Unable to load live sales data.
+
+        </div>
+
+
+
+        <!-- ==================================================
+             LOW ALERT ITEMS
+        =================================================== -->
+
+        <div class="low-alert-section">
+
+
+            <div class="low-alert-header">
+
+
+                <div class="low-alert-title">
+
+                    <div class="low-alert-icon">
+                        ⚠
+                    </div>
+
+                    <div>
+
+                        <strong>
+                            Low Alert Items
+                        </strong>
+
+                        <span>
+                            Items at or below their alert level
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="lowAlertCount"
+                    class="low-alert-count">
+
+                    0
+
+                </div>
+
+
+            </div>
+
+
+            <div
+                id="lowAlertItems"
+                class="low-alert-items">
+
+                <div class="low-alert-empty">
+                    Checking inventory...
+                </div>
+
+            </div>
+
 
         </div>
 
@@ -2577,6 +2882,16 @@ const homeMicButton =
 const liveStatus =
     document.getElementById(
         "liveStatus"
+    );
+
+const lowAlertItems =
+    document.getElementById(
+        "lowAlertItems"
+    );
+
+const lowAlertCount =
+    document.getElementById(
+        "lowAlertCount"
     );
 
 
@@ -3671,6 +3986,500 @@ subscribeToLiveSales();
 
 
 /* ============================================================
+   LOW ALERT INVENTORY — INITIAL LOAD
+============================================================ */
+
+/*
+ * LOW ALERT RULE:
+ *
+ * Every inventory item whose current stock is
+ * less than or equal to its configured alert level
+ * is displayed.
+ *
+ * Out-of-stock items are included.
+ */
+
+async function loadLowAlertInventory(){
+
+    if(!lowAlertItems){
+
+        return;
+
+    }
+
+
+    lowAlertItems.innerHTML = `
+        <div class="low-alert-empty">
+            Checking inventory...
+        </div>
+    `;
+
+
+    try{
+
+        const result =
+            await supabaseClient
+
+                .from(
+                    "inventory_items"
+                )
+
+                .select(
+                    "name, stock, alert, unit"
+                );
+
+
+        const data =
+            result.data;
+
+        const error =
+            result.error;
+
+
+        if(error){
+
+            console.error(
+                "Low alert inventory error:",
+                error
+            );
+
+
+            if(lowAlertCount){
+
+                lowAlertCount.textContent =
+                    "—";
+
+            }
+
+
+            lowAlertItems.innerHTML = `
+                <div class="low-alert-error">
+                    Unable to load inventory.
+                </div>
+            `;
+
+
+            return;
+
+        }
+
+
+        const items =
+            (data || [])
+                .filter(
+                    item =>
+                        Number(item.stock || 0) <=
+                        Number(item.alert || 0)
+                )
+                .sort(
+                    (a,b) =>
+                        Number(a.stock || 0) -
+                        Number(b.stock || 0)
+                );
+
+
+        if(lowAlertCount){
+
+            lowAlertCount.textContent =
+                items.length;
+
+        }
+
+
+        if(!items.length){
+
+            lowAlertItems.innerHTML = `
+                <div class="low-alert-empty">
+                    ✓ All inventory items are above their alert level
+                </div>
+            `;
+
+
+            return;
+
+        }
+
+
+        lowAlertItems.innerHTML =
+            items
+                .map(
+                    item => {
+
+                        const stock =
+                            Number(
+                                item.stock || 0
+                            );
+
+                        const alert =
+                            Number(
+                                item.alert || 0
+                            );
+
+                        const unit =
+                            String(
+                                item.unit || ""
+                            );
+
+                        const name =
+                            String(
+                                item.name || "Unnamed item"
+                            );
+
+
+                        const isOut =
+                            stock <= 0;
+
+
+                        return `
+
+                            <div
+                                class="low-alert-item ${isOut ? "out" : ""}"
+                            >
+
+                                <span
+                                    class="low-alert-item-name"
+                                    title="${escapeHtml(name)}"
+                                >
+
+                                    ${escapeHtml(name)}
+
+                                </span>
+
+
+                                <span
+                                    class="low-alert-item-stock"
+                                >
+
+                                    ${
+                                        isOut
+                                        ? "OUT OF STOCK"
+                                        : formatInventoryNumber(stock)
+                                          +
+                                          " / "
+                                          +
+                                          formatInventoryNumber(alert)
+                                          +
+                                          (
+                                              unit
+                                              ? " " +
+                                                escapeHtml(unit)
+                                              : ""
+                                          )
+                                    }
+
+                                </span>
+
+                            </div>
+
+                        `;
+
+                    }
+                )
+                .join("");
+
+
+    }
+    catch(error){
+
+        console.error(
+            "Low alert inventory exception:",
+            error
+        );
+
+
+        if(lowAlertCount){
+
+            lowAlertCount.textContent =
+                "—";
+
+        }
+
+
+        lowAlertItems.innerHTML = `
+            <div class="low-alert-error">
+                Unable to load inventory.
+            </div>
+        `;
+
+    }
+
+}
+
+
+/* ============================================================
+   INVENTORY NUMBER FORMAT
+============================================================ */
+
+function formatInventoryNumber(
+    value
+){
+
+    const number =
+        Number(
+            value || 0
+        );
+
+
+    if(
+        Number.isInteger(
+            number
+        )
+    ){
+
+        return String(
+            number
+        );
+
+    }
+
+
+    return number
+        .toFixed(2)
+        .replace(
+            /0+$/,
+            ""
+        )
+        .replace(
+            /\.$/,
+            ""
+        );
+
+}
+
+
+/* ============================================================
+   HTML ESCAPE
+============================================================ */
+
+function escapeHtml(
+    value
+){
+
+    return String(
+        value ?? ""
+    )
+    .replace(
+        /&/g,
+        "&amp;"
+    )
+    .replace(
+        /</g,
+        "&lt;"
+    )
+    .replace(
+        />/g,
+        "&gt;"
+    )
+    .replace(
+        /"/g,
+        "&quot;"
+    )
+    .replace(
+        /'/g,
+        "&#039;"
+    );
+
+}
+
+
+/* ============================================================
+   INVENTORY REALTIME
+============================================================ */
+
+let inventoryRealtimeChannel = null;
+
+let inventoryRefreshTimer = null;
+
+
+/*
+ * Inventory changes are re-read from the table instead of
+ * modifying the displayed list manually.
+ *
+ * This keeps the complete low-alert list synchronized even
+ * when an item is added, edited, deleted, stocked in or stocked out.
+ */
+
+function scheduleLowAlertRefresh(){
+
+    clearTimeout(
+        inventoryRefreshTimer
+    );
+
+
+    inventoryRefreshTimer =
+        setTimeout(
+            function(){
+
+                loadLowAlertInventory();
+
+            },
+            150
+        );
+
+}
+
+
+/* ============================================================
+   SUBSCRIBE TO INVENTORY ITEMS
+============================================================ */
+
+function subscribeToInventory(){
+
+    if(inventoryRealtimeChannel){
+
+        try{
+
+            supabaseClient.removeChannel(
+                inventoryRealtimeChannel
+            );
+
+        }
+        catch(error){
+
+            console.warn(
+                "Could not remove old inventory channel:",
+                error
+            );
+
+        }
+
+        inventoryRealtimeChannel =
+            null;
+
+    }
+
+
+    inventoryRealtimeChannel =
+        supabaseClient
+
+            .channel(
+                "darky-low-alert-inventory"
+            )
+
+            .on(
+                "postgres_changes",
+                {
+                    event:"INSERT",
+                    schema:"public",
+                    table:"inventory_items"
+                },
+                function(payload){
+
+                    console.log(
+                        "LOW ALERT INVENTORY INSERT:",
+                        payload
+                    );
+
+
+                    scheduleLowAlertRefresh();
+
+                }
+            )
+
+            .on(
+                "postgres_changes",
+                {
+                    event:"UPDATE",
+                    schema:"public",
+                    table:"inventory_items"
+                },
+                function(payload){
+
+                    console.log(
+                        "LOW ALERT INVENTORY UPDATE:",
+                        payload
+                    );
+
+
+                    scheduleLowAlertRefresh();
+
+                }
+            )
+
+            .on(
+                "postgres_changes",
+                {
+                    event:"DELETE",
+                    schema:"public",
+                    table:"inventory_items"
+                },
+                function(payload){
+
+                    console.log(
+                        "LOW ALERT INVENTORY DELETE:",
+                        payload
+                    );
+
+
+                    scheduleLowAlertRefresh();
+
+                }
+            )
+
+            .subscribe(
+                function(status){
+
+                    console.log(
+                        "Darky inventory realtime status:",
+                        status
+                    );
+
+
+                    if(
+                        status === "SUBSCRIBED"
+                    ){
+
+                        scheduleLowAlertRefresh();
+
+                    }
+
+
+                    if(
+                        status === "CHANNEL_ERROR"
+                    ){
+
+                        console.warn(
+                            "Darky inventory realtime channel error."
+                        );
+
+                    }
+
+
+                    if(
+                        status === "TIMED_OUT"
+                    ){
+
+                        console.warn(
+                            "Darky inventory realtime timed out."
+                        );
+
+                    }
+
+                }
+            );
+
+}
+
+
+/* ============================================================
+   START LOW ALERT INVENTORY
+============================================================ */
+
+/*
+ * First load the current inventory.
+ */
+
+loadLowAlertInventory();
+
+
+/*
+ * Then subscribe to inventory changes.
+ */
+
+subscribeToInventory();
+
+
+/* ============================================================
    VOICE
 ============================================================ */
 
@@ -4149,6 +4958,7 @@ async function sendVoiceMessage(
                         })
 
                 }
+
             );
 
 
@@ -4691,6 +5501,14 @@ console.log(
 
 console.log(
     "Supabase Realtime sales subscription enabled."
+);
+
+console.log(
+    "Low alert inventory initial load enabled."
+);
+
+console.log(
+    "Supabase Realtime inventory subscription enabled."
 );
 
 </script>
