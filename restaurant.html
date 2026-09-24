@@ -2738,7 +2738,6 @@ button{
     }
 
 }
-```css
 /* ============================================================
    DARKY AI LOGOUT BUTTON
 ============================================================ */
@@ -2797,6 +2796,72 @@ button{
 
     transform:
         scale(.96);
+
+}
+
+/* ============================================================
+   DARKY AI CHATBOX — ALWAYS ON TOP
+============================================================ */
+
+#chatBox,
+.chatbox,
+.chat-box,
+.ai-chat,
+.darky-chat,
+#darkyChat{
+
+    position:fixed !important;
+
+    z-index:99999 !important;
+
+}
+
+
+/* ============================================================
+   DASHBOARD CONTENT STAYS BELOW CHAT
+============================================================ */
+
+.app,
+.page,
+.page-content,
+#homePage,
+#stockPage,
+#voicePage,
+#ordersPage,
+#reportsPage{
+
+    z-index:1;
+
+}
+
+
+/* ============================================================
+   DO NOT ALLOW PAGE WINDOWS TO COVER CHAT
+============================================================ */
+
+.stock-window,
+.voice-window,
+.home-window,
+.inventory-window,
+.dashboard-window{
+
+    z-index:2 !important;
+
+}
+
+
+/* ============================================================
+   CHATBOX BUTTON / FLOATING BUTTON
+============================================================ */
+
+.chat-button,
+.chat-toggle,
+#chatButton,
+#chatToggle{
+
+    position:fixed !important;
+
+    z-index:100000 !important;
 
 }
 
@@ -3654,6 +3719,75 @@ function unlockDashboard(){
 
 }
 
+/* ============================================================
+   DARKY AI LOGOUT
+============================================================ */
+
+function logoutDashboard(){
+
+    /* Remove saved login */
+    sessionStorage.removeItem(
+        "darkyDashboardUnlocked"
+    );
+
+
+    /* Show password screen again */
+    const passwordLock =
+        document.getElementById(
+            "passwordLock"
+        );
+
+    const passwordInput =
+        document.getElementById(
+            "dashboardPassword"
+        );
+
+    const passwordError =
+        document.getElementById(
+            "passwordError"
+        );
+
+
+    if(passwordError){
+
+        passwordError.textContent = "";
+
+    }
+
+
+    if(passwordInput){
+
+        passwordInput.value = "";
+
+        passwordInput.disabled = false;
+
+    }
+
+
+    if(passwordLock){
+
+        passwordLock.style.display =
+            "flex";
+
+    }
+
+
+    /* Focus password field */
+
+    setTimeout(
+        function(){
+
+            if(passwordInput){
+
+                passwordInput.focus();
+
+            }
+
+        },
+        150
+    );
+
+}
 
 /* ============================================================
    CHECK DASHBOARD ACCESS
