@@ -2478,7 +2478,7 @@ const SUPABASE_URL =
     "https://ucqeyhcycwksiubmlilg.supabase.co";
 
 const SUPABASE_KEY =
-    "sb_publishable_YdIvl7IqdpT0UZOHBumEiw_ZThYEsgV";
+    "sb_publishable_YdIvl7Iqdp0TUZOHBumEiw_ZThYEsgV";
 
 const SUPABASE_FUNCTION_URL =
     "https://ucqeyhcycwksiubmlilg.supabase.co/functions/v1/restaurant-ai";
@@ -2706,6 +2706,8 @@ function addChatMessage(
 
 /* ============================================================
    CHAT SCROLL
+   IMPORTANT:
+   DOES NOT MOVE THE WHOLE PAGE
 ============================================================ */
 
 function scrollChatToBottom(){
@@ -2713,11 +2715,18 @@ function scrollChatToBottom(){
     setTimeout(
         () => {
 
-            window.scrollTo({
-                top:
-                    document.body.scrollHeight,
-                behavior:"smooth"
-            });
+            const lastMessage =
+                chatMessages.lastElementChild;
+
+
+            if(lastMessage){
+
+                lastMessage.scrollIntoView({
+                    behavior:"smooth",
+                    block:"nearest"
+                });
+
+            }
 
         },
         50
@@ -3289,6 +3298,8 @@ let recognition = null;
 
 let listening = false;
 
+let voiceGreetingPlaying = false;
+
 
 const voiceOrb =
     document.getElementById(
@@ -3444,6 +3455,9 @@ if(SpeechRecognition){
             listening = false;
 
 
+            voiceGreetingPlaying = false;
+
+
             homeOrb.classList.remove(
                 "home-listening",
                 "home-thinking",
@@ -3491,6 +3505,7 @@ if(SpeechRecognition){
 
 /* ============================================================
    HOME MICROPHONE
+   DARKY SPEAKS FIRST
 ============================================================ */
 
 function openVoice(){
@@ -3499,7 +3514,6 @@ function openVoice(){
 
         connectionStatus.textContent =
             "● VOICE NOT SUPPORTED";
-
 
         return;
 
@@ -3515,19 +3529,218 @@ function openVoice(){
     }
 
 
-    try{
+    /*
+       Stop any previous speech
+    */
 
-        recognition.start();
+    if(
+        "speechSynthesis" in window
+    ){
+
+        speechSynthesis.cancel();
 
     }
-    catch(error){
 
-        console.error(
-            "Voice start error:",
-            error
+
+    voiceGreetingPlaying = true;
+
+
+    /*
+       HOME ORB = SPEAKING
+    */
+
+    homeOrb.classList.remove(
+        "home-listening",
+        "home-thinking"
+    );
+
+
+    homeOrb.classList.add(
+        "home-speaking"
+    );
+
+
+    homeMicButton.classList.add(
+        "mic-active"
+    );
+
+
+    connectionStatus.textContent =
+        "● SPEAKING";
+
+
+    voiceStatus.textContent =
+        "Darky";
+
+
+    voiceHint.textContent =
+        "Getting ready to listen";
+
+
+    voiceTranscript.textContent =
+        "Hey boss, tell me what can I do?";
+
+
+    /*
+       DARKY GREETING
+    */
+
+    const greeting =
+        new SpeechSynthesisUtterance(
+            "Hey boss, tell me what can I do?"
         );
 
+
+    greeting.lang =
+        "en-IN";
+
+
+    greeting.rate =
+        0.92;
+
+
+    greeting.pitch =
+        1.08;
+
+
+    /*
+       Try to use an Indian English voice,
+       otherwise fall back to an English voice.
+    */
+
+    const voices =
+        speechSynthesis.getVoices();
+
+
+    const preferredVoice =
+        voices.find(
+            voice =>
+                /^en-IN/i.test(
+                    voice.lang
+                )
+        )
+        ||
+        voices.find(
+            voice =>
+                /^en/i.test(
+                    voice.lang
+                )
+        );
+
+
+    if(preferredVoice){
+
+        greeting.voice =
+            preferredVoice;
+
     }
+
+
+    /*
+       GREETING FINISHED
+       NOW START MICROPHONE
+    */
+
+    greeting.onend =
+        function(){
+
+            voiceGreetingPlaying =
+                false;
+
+
+            homeOrb.classList.remove(
+                "home-speaking",
+                "home-thinking"
+            );
+
+
+            homeOrb.classList.add(
+                "home-listening"
+            );
+
+
+            homeMicButton.classList.add(
+                "mic-active"
+            );
+
+
+            connectionStatus.textContent =
+                "● LISTENING";
+
+
+            voiceStatus.textContent =
+                "Listening...";
+
+
+            voiceHint.textContent =
+                "Speak naturally";
+
+
+            voiceTranscript.textContent =
+                "I'm listening...";
+
+
+            try{
+
+                recognition.start();
+
+            }
+            catch(error){
+
+                console.error(
+                    "Voice start error:",
+                    error
+                );
+
+
+                homeOrb.classList.remove(
+                    "home-listening"
+                );
+
+
+                homeMicButton.classList.remove(
+                    "mic-active"
+                );
+
+
+                connectionStatus.textContent =
+                    "● READY";
+
+            }
+
+        };
+
+
+    /*
+       IF GREETING SPEECH FAILS
+    */
+
+    greeting.onerror =
+        function(){
+
+            voiceGreetingPlaying =
+                false;
+
+
+            homeOrb.classList.remove(
+                "home-speaking"
+            );
+
+
+            homeMicButton.classList.remove(
+                "mic-active"
+            );
+
+
+            connectionStatus.textContent =
+                "● READY";
+
+        };
+
+
+    speechSynthesis.speak(
+        greeting
+    );
 
 }
 
@@ -3648,9 +3861,10 @@ async function sendVoiceMessage(
             "I couldn't process that command.";
 
 
-        /* ----------------------------------------------------
-           CHANGE ORB FROM THINKING TO SPEAKING
-        ---------------------------------------------------- */
+        /*
+           CHANGE ORB FROM THINKING
+           TO SPEAKING
+        */
 
         homeOrb.classList.remove(
             "home-thinking",
@@ -3679,12 +3893,12 @@ async function sendVoiceMessage(
 
 
         connectionStatus.textContent =
-            "● READY";
+            "● SPEAKING";
 
 
-        /* ----------------------------------------------------
+        /*
            ADD TO CHAT
-        ---------------------------------------------------- */
+        */
 
         addChatMessage(
             "user",
@@ -3698,9 +3912,9 @@ async function sendVoiceMessage(
         );
 
 
-        /* ----------------------------------------------------
-           SPEAK
-        ---------------------------------------------------- */
+        /*
+           SPEAK ANSWER
+        */
 
         speakReply(
             answer,
@@ -3720,6 +3934,11 @@ async function sendVoiceMessage(
             "home-listening",
             "home-thinking",
             "home-speaking"
+        );
+
+
+        homeMicButton.classList.remove(
+            "mic-active"
         );
 
 
@@ -3756,6 +3975,10 @@ function speakReply(
             "home-speaking",
             "home-thinking",
             "home-listening"
+        );
+
+        homeMicButton.classList.remove(
+            "mic-active"
         );
 
         return;
@@ -3833,6 +4056,11 @@ function speakReply(
         );
 
 
+        homeMicButton.classList.add(
+            "mic-active"
+        );
+
+
         voiceOrb.classList.add(
             "speaking"
         );
@@ -3840,6 +4068,14 @@ function speakReply(
 
         voiceStatus.textContent =
             "Darky is speaking";
+
+
+        voiceHint.textContent =
+            "Speaking...";
+
+
+        connectionStatus.textContent =
+            "● SPEAKING";
 
     }
 
@@ -3857,6 +4093,15 @@ function speakReply(
                 "home-thinking",
                 "home-listening"
             );
+
+
+            homeMicButton.classList.remove(
+                "mic-active"
+            );
+
+
+            connectionStatus.textContent =
+                "● READY";
 
 
             if(voiceMode){
@@ -3883,9 +4128,18 @@ function speakReply(
             );
 
 
+            homeMicButton.classList.remove(
+                "mic-active"
+            );
+
+
             voiceOrb.classList.remove(
                 "speaking"
             );
+
+
+            connectionStatus.textContent =
+                "● READY";
 
         };
 
@@ -4001,6 +4255,10 @@ console.log(
 
 console.log(
     "Voice interaction enabled."
+);
+
+console.log(
+    "Voice greeting enabled."
 );
 
 console.log(
