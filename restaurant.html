@@ -371,6 +371,9 @@ button{
     border:
         1px solid
         rgba(60,205,255,.18);
+
+    transition:
+        .25s ease;
 }
 
 .live-dot{
@@ -401,6 +404,53 @@ button{
             scale(.7);
     }
 
+}
+
+
+/* ============================================================
+   REALTIME DISCONNECTED STATE
+============================================================ */
+
+.live-status.offline{
+
+    color:#ff9a9a;
+
+    background:
+        rgba(255,70,70,.07);
+
+    border-color:
+        rgba(255,90,90,.20);
+}
+
+.live-status.offline .live-dot{
+
+    background:#ff7777;
+
+    box-shadow:
+        0 0 12px
+        rgba(255,80,80,.75);
+
+    animation:none;
+}
+
+.live-status.syncing{
+
+    color:#ffe38a;
+
+    background:
+        rgba(255,200,50,.06);
+
+    border-color:
+        rgba(255,210,70,.18);
+}
+
+.live-status.syncing .live-dot{
+
+    background:#ffd85c;
+
+    box-shadow:
+        0 0 12px
+        rgba(255,210,70,.75);
 }
 
 
@@ -549,6 +599,8 @@ button{
     color:#ff9a9a;
 
     font-size:10px;
+
+    line-height:1.5;
 }
 
 
@@ -900,7 +952,7 @@ button{
         rgba(0,130,255,.38),
 
         0 0 150px
-        rgba(0,90px,255,.20),
+        rgba(0,90,255,.20),
 
         inset 0 0 48px
         rgba(255,255,255,.28);
@@ -1866,7 +1918,9 @@ button{
             </div>
 
 
-            <div class="live-status">
+            <div
+                id="liveStatus"
+                class="live-status">
 
                 <span class="live-dot"></span>
 
@@ -2520,6 +2574,11 @@ const homeMicButton =
         "homeMicButton"
     );
 
+const liveStatus =
+    document.getElementById(
+        "liveStatus"
+    );
+
 
 /* ============================================================
    PAGE NAVIGATION
@@ -2970,7 +3029,7 @@ function localDateString(
 
 
 /* ============================================================
-   LIVE SALES
+   LIVE SALES — INITIAL DATA
 ============================================================ */
 
 async function loadLiveSales(){
@@ -2985,6 +3044,12 @@ async function loadLiveSales(){
 
         errorBox.style.display =
             "none";
+
+
+        setLiveStatus(
+            "syncing",
+            "SYNCING"
+        );
 
 
         const today =
@@ -3064,6 +3129,12 @@ async function loadLiveSales(){
                 "block";
 
 
+            setLiveStatus(
+                "offline",
+                "OFFLINE"
+            );
+
+
             return;
 
         }
@@ -3072,6 +3143,13 @@ async function loadLiveSales(){
         calculateLiveSales(
             data || []
         );
+
+
+        setLiveStatus(
+            "online",
+            "LIVE"
+        );
+
 
     }
     catch(error){
@@ -3089,7 +3167,64 @@ async function loadLiveSales(){
         errorBox.style.display =
             "block";
 
+
+        setLiveStatus(
+            "offline",
+            "OFFLINE"
+        );
+
     }
+
+}
+
+
+/* ============================================================
+   LIVE STATUS
+============================================================ */
+
+function setLiveStatus(
+    state,
+    label
+){
+
+    if(!liveStatus){
+
+        return;
+
+    }
+
+
+    liveStatus.classList.remove(
+        "offline",
+        "syncing"
+    );
+
+
+    if(state === "offline"){
+
+        liveStatus.classList.add(
+            "offline"
+        );
+
+    }
+
+
+    if(state === "syncing"){
+
+        liveStatus.classList.add(
+            "syncing"
+        );
+
+    }
+
+
+    liveStatus.innerHTML = `
+
+        <span class="live-dot"></span>
+
+        ${label}
+
+    `;
 
 }
 
@@ -3271,16 +3406,268 @@ function formatMoney(
 
 
 /* ============================================================
-   LIVE SALES REFRESH
+   TRUE LIVE SALES — SUPABASE REALTIME
 ============================================================ */
+
+let salesRealtimeChannel = null;
+
+let salesRefreshTimer = null;
+
+
+/*
+ * When Supabase tells us that chaat_orders changed,
+ * we reload today's complete sales data.
+ *
+ * This is intentional.
+ *
+ * We do NOT simply add/subtract the changed row because
+ * an existing order may also have been edited or deleted.
+ *
+ * Reloading today's rows guarantees that:
+ *
+ *   Sales
+ *   Orders
+ *   Items
+ *   Average Bill
+ *   Cash
+ *   UPI
+ *   Card
+ *
+ * all stay synchronized.
+ */
+
+function scheduleLiveSalesRefresh(){
+
+    clearTimeout(
+        salesRefreshTimer
+    );
+
+
+    salesRefreshTimer =
+        setTimeout(
+            function(){
+
+                loadLiveSales();
+
+            },
+            150
+        );
+
+}
+
+
+/* ============================================================
+   SUBSCRIBE TO CHAAT_ORDERS
+============================================================ */
+
+function subscribeToLiveSales(){
+
+    if(salesRealtimeChannel){
+
+        try{
+
+            supabaseClient.removeChannel(
+                salesRealtimeChannel
+            );
+
+        }
+        catch(error){
+
+            console.warn(
+                "Could not remove old sales channel:",
+                error
+            );
+
+        }
+
+        salesRealtimeChannel =
+            null;
+
+    }
+
+
+    setLiveStatus(
+        "syncing",
+        "CONNECTING"
+    );
+
+
+    salesRealtimeChannel =
+        supabaseClient
+
+            .channel(
+                "darky-live-sales"
+            )
+
+            .on(
+                "postgres_changes",
+                {
+                    event:"INSERT",
+                    schema:"public",
+                    table:"chaat_orders"
+                },
+                function(payload){
+
+                    console.log(
+                        "LIVE ORDER INSERT:",
+                        payload
+                    );
+
+
+                    scheduleLiveSalesRefresh();
+
+                }
+            )
+
+            .on(
+                "postgres_changes",
+                {
+                    event:"UPDATE",
+                    schema:"public",
+                    table:"chaat_orders"
+                },
+                function(payload){
+
+                    console.log(
+                        "LIVE ORDER UPDATE:",
+                        payload
+                    );
+
+
+                    scheduleLiveSalesRefresh();
+
+                }
+            )
+
+            .on(
+                "postgres_changes",
+                {
+                    event:"DELETE",
+                    schema:"public",
+                    table:"chaat_orders"
+                },
+                function(payload){
+
+                    console.log(
+                        "LIVE ORDER DELETE:",
+                        payload
+                    );
+
+
+                    scheduleLiveSalesRefresh();
+
+                }
+            )
+
+            .subscribe(
+                function(status){
+
+                    console.log(
+                        "Darky sales realtime status:",
+                        status
+                    );
+
+
+                    if(
+                        status === "SUBSCRIBED"
+                    ){
+
+                        setLiveStatus(
+                            "online",
+                            "LIVE"
+                        );
+
+
+                        /*
+                         * Refresh once immediately after
+                         * the realtime channel becomes active.
+                         */
+
+                        scheduleLiveSalesRefresh();
+
+                    }
+
+
+                    if(
+                        status === "CHANNEL_ERROR"
+                    ){
+
+                        setLiveStatus(
+                            "offline",
+                            "OFFLINE"
+                        );
+
+
+                        const errorBox =
+                            document.getElementById(
+                                "salesError"
+                            );
+
+
+                        errorBox.textContent =
+                            "Live sales realtime connection failed. Make sure chaat_orders is enabled for Supabase Realtime.";
+
+
+                        errorBox.style.display =
+                            "block";
+
+                    }
+
+
+                    if(
+                        status === "TIMED_OUT"
+                    ){
+
+                        setLiveStatus(
+                            "offline",
+                            "OFFLINE"
+                        );
+
+
+                        console.warn(
+                            "Darky sales realtime timed out."
+                        );
+
+                    }
+
+
+                    if(
+                        status === "CLOSED"
+                    ){
+
+                        setLiveStatus(
+                            "offline",
+                            "OFFLINE"
+                        );
+
+                    }
+
+                }
+            );
+
+}
+
+
+/* ============================================================
+   START LIVE SALES
+============================================================ */
+
+/*
+ * First load today's existing orders.
+ */
 
 loadLiveSales();
 
 
-setInterval(
-    loadLiveSales,
-    30000
-);
+/*
+ * Then subscribe to changes.
+ *
+ * There is intentionally NO 30-second setInterval anymore.
+ *
+ * New orders will update the dashboard through Realtime.
+ */
+
+subscribeToLiveSales();
 
 
 /* ============================================================
@@ -3521,10 +3908,6 @@ function openVoice(){
 
     }
 
-
-    /*
-     * Cinematic Darky greeting before listening
-     */
 
     const greeting =
         "Hey boss... I'm listening. Tell me what you need.";
@@ -3795,10 +4178,6 @@ async function sendVoiceMessage(
             "I couldn't process that command.";
 
 
-        /* ----------------------------------------------------
-           CHANGE ORB FROM THINKING TO SPEAKING
-        ---------------------------------------------------- */
-
         homeOrb.classList.remove(
             "home-thinking",
             "home-listening"
@@ -3829,10 +4208,6 @@ async function sendVoiceMessage(
             "● SPEAKING";
 
 
-        /* ----------------------------------------------------
-           ADD TO CHAT
-        ---------------------------------------------------- */
-
         addChatMessage(
             "user",
             message
@@ -3844,10 +4219,6 @@ async function sendVoiceMessage(
             answer
         );
 
-
-        /* ----------------------------------------------------
-           SPEAK
-        ---------------------------------------------------- */
 
         speakReply(
             answer,
@@ -3899,16 +4270,6 @@ function configureDarkyVoice(
     utterance
 ){
 
-    /*
-     * Darky's voice personality
-     *
-     * Lower rate:
-     * slower and more deliberate.
-     *
-     * Lower pitch:
-     * deeper masculine tone.
-     */
-
     utterance.lang =
         "en-IN";
 
@@ -3928,10 +4289,6 @@ function configureDarkyVoice(
     const voices =
         speechSynthesis.getVoices();
 
-
-    /*
-     * Prefer masculine English voices.
-     */
 
     const preferredVoice =
         voices.find(
@@ -4032,18 +4389,10 @@ function speakReply(
         );
 
 
-    /*
-     * Apply Darky's deep cinematic voice.
-     */
-
     configureDarkyVoice(
         utterance
     );
 
-
-    /* --------------------------------------------------------
-       DARKY SPEAKING ANIMATION
-    -------------------------------------------------------- */
 
     if(voiceMode){
 
@@ -4081,10 +4430,6 @@ function speakReply(
 
     }
 
-
-    /* --------------------------------------------------------
-       SPEECH START
-    -------------------------------------------------------- */
 
     utterance.onstart =
         function(){
@@ -4128,10 +4473,6 @@ function speakReply(
         };
 
 
-    /* --------------------------------------------------------
-       SPEECH END
-    -------------------------------------------------------- */
-
     utterance.onend =
         function(){
 
@@ -4169,10 +4510,6 @@ function speakReply(
 
         };
 
-
-    /* --------------------------------------------------------
-       SPEECH ERROR
-    -------------------------------------------------------- */
 
     utterance.onerror =
         function(error){
@@ -4217,10 +4554,6 @@ function speakReply(
 
         };
 
-
-    /* --------------------------------------------------------
-       SPEAK
-    -------------------------------------------------------- */
 
     speechSynthesis.speak(
         utterance
@@ -4353,7 +4686,11 @@ console.log(
 );
 
 console.log(
-    "Live sales connected to chaat_orders."
+    "Live sales initial load enabled."
+);
+
+console.log(
+    "Supabase Realtime sales subscription enabled."
 );
 
 </script>
