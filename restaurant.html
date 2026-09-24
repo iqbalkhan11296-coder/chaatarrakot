@@ -2895,33 +2895,84 @@ async function sendMessageToAI(
         scrollChatToBottom();
 
 
-        speakReply(
-            answer
-        );
+        function speakReply(text, isDarky = true) {
+    if (!("speechSynthesis" in window)) return;
 
+    speechSynthesis.cancel();
+
+    const voices = speechSynthesis.getVoices();
+
+    // Prefer a deeper English voice when the browser provides one
+    const preferredVoice =
+        voices.find(v =>
+            /en-IN/i.test(v.lang) &&
+            /male|man|david|daniel|george|rishi|google/i.test(v.name)
+        ) ||
+        voices.find(v =>
+            /en-GB/i.test(v.lang) &&
+            /male|man|david|daniel|george/i.test(v.name)
+        ) ||
+        voices.find(v =>
+            /en-US/i.test(v.lang) &&
+            /male|man|david|daniel|george/i.test(v.name)
+        ) ||
+        voices.find(v => /en-IN/i.test(v.lang)) ||
+        voices.find(v => /en-GB|en-US/i.test(v.lang));
+
+    /*
+     * Cinematic Darky delivery
+     * -------------------------
+     * Lower pitch  = deeper voice
+     * Lower rate   = slower / more deliberate
+     */
+    const utterance = new SpeechSynthesisUtterance(text);
+
+    if (preferredVoice) {
+        utterance.voice = preferredVoice;
+        utterance.lang = preferredVoice.lang;
+    } else {
+        utterance.lang = "en-IN";
     }
-    catch(error){
 
-        console.error(
-            "Darky connection error:",
-            error
-        );
+    utterance.rate = 0.78;
+    utterance.pitch = 0.48;
+    utterance.volume = 1;
 
+    utterance.onstart = () => {
+        if (isDarky) {
+            homeOrb.classList.remove(
+                "home-listening",
+                "home-thinking"
+            );
 
-        darkyMessage.content.textContent =
-            "I'm having trouble connecting right now. Please try again.";
+            homeOrb.classList.add("home-speaking");
 
+            if (homeMic) {
+                homeMic.classList.add("mic-active");
+            }
+        }
+    };
 
-        connectionStatus.textContent =
-            "● CONNECTION ERROR";
+    utterance.onend = () => {
+        if (isDarky) {
+            homeOrb.classList.remove("home-speaking");
 
+            if (homeMic) {
+                homeMic.classList.remove("mic-active");
+            }
+        }
+    };
 
-        scrollChatToBottom();
+    utterance.onerror = () => {
+        homeOrb.classList.remove("home-speaking");
 
-    }
+        if (homeMic) {
+            homeMic.classList.remove("mic-active");
+        }
+    };
 
+    speechSynthesis.speak(utterance);
 }
-
 
 /* ============================================================
    DATE
