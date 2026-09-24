@@ -1,801 +1,1051 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
 <meta charset="UTF-8">
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Darky AI — Chaatarra</title>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
 
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+/* ============================================================
+   RESET
+============================================================ */
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
 }
 
-body {
-    font-family: Inter, Arial, sans-serif;
-    background:
-        radial-gradient(circle at 50% -10%, rgba(0, 153, 255, .16), transparent 38%),
-        radial-gradient(circle at 10% 50%, rgba(0, 80, 255, .08), transparent 35%),
-        radial-gradient(circle at 90% 80%, rgba(0, 220, 255, .07), transparent 35%),
-        #030811;
-    color: #edf8ff;
-    min-height: 100vh;
+html{
+    scroll-behavior:smooth;
 }
 
-button,
-input {
-    font: inherit;
-}
+body{
 
-button {
-    cursor: pointer;
-}
-
-.app {
-    max-width: 1100px;
-    margin: auto;
-    min-height: 100vh;
+    font-family:
+        Inter,
+        Arial,
+        sans-serif;
 
     background:
         radial-gradient(
-            circle at 50% 5%,
-            rgba(0, 153, 255, .12),
-            transparent 32%
+            circle at 50% -10%,
+            rgba(0,153,255,.20),
+            transparent 38%
         ),
+
+        radial-gradient(
+            circle at 0% 50%,
+            rgba(0,80,255,.10),
+            transparent 35%
+        ),
+
+        #020711;
+
+    color:#edfaff;
+
+    min-height:100vh;
+}
+
+button,
+input{
+    font:inherit;
+}
+
+button{
+    cursor:pointer;
+}
+
+.app{
+
+    width:100%;
+
+    max-width:1200px;
+
+    min-height:100vh;
+
+    margin:auto;
+
+    background:
         linear-gradient(
             180deg,
-            rgba(3, 12, 25, .98),
-            rgba(2, 8, 18, .98)
+            rgba(3,12,25,.98),
+            rgba(1,7,16,.99)
         );
 
-    position: relative;
+    position:relative;
+
+    overflow:hidden;
 }
 
 
-/* =========================================
+/* ============================================================
    TOP BAR
-========================================= */
+============================================================ */
 
-.topbar {
+.topbar{
 
-    height: 76px;
+    height:76px;
 
-    padding: 0 24px;
+    padding:
+        0 24px;
 
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    position:sticky;
+
+    top:0;
+
+    z-index:100;
+
+    background:
+        rgba(3,14,27,.90);
 
     border-bottom:
         1px solid
-        rgba(70, 190, 255, .14);
-
-    background:
-        rgba(5, 18, 35, .62);
+        rgba(65,190,255,.15);
 
     backdrop-filter:
-        blur(22px);
+        blur(25px);
 
     -webkit-backdrop-filter:
-        blur(22px);
-
-    box-shadow:
-        0 8px 30px
-        rgba(0, 70, 150, .08);
-
-    position: relative;
-    z-index: 10;
+        blur(25px);
 }
 
-.brand {
+.brand{
 
-    display: flex;
-    align-items: center;
+    display:flex;
 
-    gap: 12px;
+    align-items:center;
+
+    gap:12px;
 }
 
-.logo {
+.logo{
 
-    width: 42px;
-    height: 42px;
+    width:43px;
 
-    border-radius: 14px;
+    height:43px;
 
-    display: grid;
-    place-items: center;
+    display:grid;
+
+    place-items:center;
+
+    border-radius:14px;
 
     background:
         linear-gradient(
             145deg,
-            #8ee7ff,
-            #0879d9 48%,
-            #06418f
+            #9beaff,
+            #1188d8 52%,
+            #063c80
         );
 
-    color: #02101e;
+    color:#02101d;
 
-    font-weight: 900;
-    font-size: 20px;
+    font-size:20px;
+
+    font-weight:900;
 
     box-shadow:
-        0 0 22px
-        rgba(0, 174, 255, .35),
-
-        inset 0 1px 1px
-        rgba(255,255,255,.55);
+        0 0 25px
+        rgba(0,180,255,.38);
 }
 
-.brand-text strong {
+.brand-text strong{
 
-    display: block;
+    display:block;
 
-    letter-spacing: 2px;
+    font-size:16px;
 
-    font-size: 16px;
+    letter-spacing:2px;
 
-    color: #eaf9ff;
-
-    text-shadow:
-        0 0 14px
-        rgba(50, 190, 255, .25);
+    color:#effcff;
 }
 
-.brand-text span {
+.brand-text span{
 
-    font-size: 10px;
+    display:block;
 
-    color: #6e91aa;
+    margin-top:2px;
 
-    letter-spacing: 1px;
+    font-size:9px;
+
+    letter-spacing:1.4px;
+
+    color:#66869b;
 }
 
-.status {
+.status{
 
-    font-size: 10px;
+    padding:
+        7px 11px;
 
-    color: #55d7ff;
+    border-radius:20px;
+
+    font-size:9px;
+
+    letter-spacing:1px;
+
+    color:#57ddff;
+
+    background:
+        rgba(0,150,220,.08);
 
     border:
         1px solid
-        rgba(40, 190, 255, .30);
-
-    padding: 7px 11px;
-
-    border-radius: 20px;
-
-    background:
-        rgba(0, 130, 210, .08);
-
-    box-shadow:
-        0 0 15px
-        rgba(0, 160, 255, .08),
-
-        inset 0 0 12px
-        rgba(0, 150, 255, .04);
+        rgba(50,200,255,.25);
 }
 
 
-/* =========================================
-   MAIN PAGE
-========================================= */
+/* ============================================================
+   PAGE
+============================================================ */
 
-.page {
+.page{
 
     padding:
-        28px
+        20px
         24px
-        115px;
+        120px;
 
     min-height:
         calc(100vh - 76px);
 }
 
+.page:not(.active){
 
-/* =========================================
-   HOME HEADER
-========================================= */
-
-.home-title {
-
-    margin-top: 20px;
+    display:none;
 }
 
-.home-title small {
 
-    color: #6f8da4;
+/* ============================================================
+   LIVE BUSINESS HEADER
+============================================================ */
 
-    font-size: 13px;
+.live-section{
+
+    width:100%;
+
+    margin-bottom:30px;
+
+    padding:18px;
+
+    border-radius:22px;
+
+    border:
+        1px solid
+        rgba(60,205,255,.22);
+
+    background:
+
+        radial-gradient(
+            circle at 15% 0%,
+            rgba(0,175,255,.14),
+            transparent 35%
+        ),
+
+        linear-gradient(
+            145deg,
+            rgba(10,45,70,.75),
+            rgba(3,17,32,.88)
+        );
+
+    box-shadow:
+
+        0 15px 50px
+        rgba(0,0,0,.28),
+
+        0 0 40px
+        rgba(0,150,255,.05);
+
+    backdrop-filter:
+        blur(22px);
+
+    -webkit-backdrop-filter:
+        blur(22px);
 }
 
-.home-title h1 {
+.live-top{
 
-    margin-top: 8px;
+    display:flex;
 
-    font-size:
-        clamp(30px,5vw,48px);
+    align-items:center;
 
-    font-weight: 500;
+    justify-content:space-between;
 
-    letter-spacing: -1px;
-
-    color: #eefaff;
+    margin-bottom:15px;
 }
 
-.home-title h1 span {
+.live-heading{
 
-    color: #49cfff;
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+}
+
+.live-heading-icon{
+
+    width:34px;
+
+    height:34px;
+
+    display:grid;
+
+    place-items:center;
+
+    border-radius:11px;
+
+    background:
+        rgba(40,195,255,.10);
+
+    border:
+        1px solid
+        rgba(50,200,255,.20);
+
+    color:#59dbff;
+
+    font-size:16px;
+}
+
+.live-heading-text strong{
+
+    display:block;
+
+    font-size:13px;
+
+    letter-spacing:1.5px;
+
+    color:#dff8ff;
+
+    text-transform:uppercase;
+}
+
+.live-heading-text span{
+
+    display:block;
+
+    margin-top:3px;
+
+    color:#64859a;
+
+    font-size:9px;
+
+    letter-spacing:.5px;
+}
+
+.live-status{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:6px;
+
+    color:#55dcff;
+
+    font-size:9px;
+
+    letter-spacing:1.2px;
+
+    padding:
+        7px 10px;
+
+    border-radius:20px;
+
+    background:
+        rgba(0,180,240,.07);
+
+    border:
+        1px solid
+        rgba(60,205,255,.18);
+}
+
+.live-dot{
+
+    width:7px;
+
+    height:7px;
+
+    border-radius:50%;
+
+    background:#4ce0ff;
+
+    box-shadow:
+        0 0 12px
+        rgba(60,220,255,.95);
+
+    animation:
+        livePulse 1.5s infinite;
+}
+
+@keyframes livePulse{
+
+    50%{
+        opacity:.35;
+        transform:scale(.7);
+    }
+
+}
+
+
+/* ============================================================
+   SALES CARDS
+============================================================ */
+
+.sales-grid{
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(4,1fr);
+
+    gap:10px;
+}
+
+.sales-card{
+
+    min-width:0;
+
+    padding:16px;
+
+    border-radius:17px;
+
+    background:
+        rgba(4,26,44,.72);
+
+    border:
+        1px solid
+        rgba(50,190,255,.13);
+
+    transition:.2s;
+}
+
+.sales-card:hover{
+
+    transform:
+        translateY(-2px);
+
+    border-color:
+        rgba(50,205,255,.28);
+}
+
+.sales-label{
+
+    color:#64869b;
+
+    font-size:9px;
+
+    letter-spacing:1.2px;
+
+    text-transform:uppercase;
+
+    white-space:nowrap;
+}
+
+.sales-value{
+
+    margin-top:8px;
+
+    color:#ecfbff;
+
+    font-size:24px;
+
+    font-weight:600;
+
+    white-space:nowrap;
+
+    overflow:hidden;
+
+    text-overflow:ellipsis;
+}
+
+.sales-value.primary{
+
+    color:#59dcff;
 
     text-shadow:
-        0 0 22px
-        rgba(0, 190, 255, .30);
+        0 0 18px
+        rgba(40,200,255,.25);
 }
 
 
-/* =========================================
+/* ============================================================
+   PAYMENT CARDS
+============================================================ */
+
+.payment-grid{
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(3,1fr);
+
+    gap:10px;
+
+    margin-top:10px;
+}
+
+.payment-card{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    padding:
+        12px 15px;
+
+    border-radius:14px;
+
+    background:
+        rgba(2,20,35,.60);
+
+    border:
+        1px solid
+        rgba(50,175,255,.10);
+}
+
+.payment-label{
+
+    color:#5e7f93;
+
+    font-size:9px;
+
+    letter-spacing:1.3px;
+}
+
+.payment-value{
+
+    color:#bceeff;
+
+    font-size:14px;
+
+    font-weight:600;
+}
+
+.sales-error{
+
+    display:none;
+
+    margin-top:10px;
+
+    color:#ff9a9a;
+
+    font-size:10px;
+
+}
+
+
+/* ============================================================
+   HOME TITLE
+============================================================ */
+
+.home-title{
+
+    margin-top:5px;
+
+    text-align:center;
+}
+
+.home-title small{
+
+    color:#6e8ba0;
+
+    font-size:13px;
+}
+
+.home-title h1{
+
+    margin-top:7px;
+
+    font-size:
+        clamp(
+            30px,
+            5vw,
+            46px
+        );
+
+    font-weight:500;
+
+    letter-spacing:-1px;
+}
+
+.home-title h1 span{
+
+    color:#51d7ff;
+
+    text-shadow:
+        0 0 25px
+        rgba(0,190,255,.28);
+}
+
+
+/* ============================================================
    DARKY ORB
-========================================= */
+============================================================ */
 
-.orb-wrap {
+.orb-wrap{
 
-    display: flex;
+    display:flex;
 
-    justify-content: center;
+    justify-content:center;
 
     margin:
-        45px 0 30px;
+        32px 0 28px;
 }
 
-.orb {
+.orb{
 
-    width: 190px;
-    height: 190px;
+    width:155px;
 
-    border-radius: 50%;
+    height:155px;
+
+    border-radius:50%;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    position:relative;
 
     background:
 
         radial-gradient(
             circle at 35% 25%,
-            #dffaff,
-            #54d9ff 25%,
-            #087fcf 48%,
-            #063a78 68%,
-            #020d1b 90%
+            #e6fbff,
+            #55dcff 25%,
+            #0785d5 48%,
+            #06376e 68%,
+            #020b17 90%
         );
 
     box-shadow:
 
         0 0 35px
-        rgba(0, 174, 255, .35),
+        rgba(0,180,255,.35),
 
-        0 0 85px
-        rgba(0, 95, 255, .18),
+        0 0 90px
+        rgba(0,90,255,.16),
 
         inset 0 0 35px
-        rgba(255,255,255,.20),
-
-        inset -20px -25px 45px
-        rgba(0, 20, 70, .55);
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    position: relative;
-
-    transition: .3s;
+        rgba(255,255,255,.18);
 }
 
-.orb::before {
+.orb::before{
 
-    content: "";
+    content:"";
 
-    position: absolute;
+    position:absolute;
 
-    inset: -15px;
+    inset:-13px;
 
     border:
         1px solid
-        rgba(48, 198, 255, .38);
+        rgba(50,205,255,.30);
 
-    border-radius: 50%;
-
-    box-shadow:
-        0 0 25px
-        rgba(0, 174, 255, .12);
+    border-radius:50%;
 }
 
-.orb::after {
+.orb::after{
 
-    content: "";
+    content:"";
 
-    position: absolute;
+    position:absolute;
 
-    inset: -30px;
+    inset:-26px;
 
     border:
         1px solid
-        rgba(48, 160, 255, .14);
+        rgba(50,165,255,.10);
 
-    border-radius: 50%;
+    border-radius:50%;
 }
 
-.orb-icon {
+.orb-icon{
 
-    font-size: 46px;
+    font-size:40px;
 
-    color: #e9fbff;
+    color:#f0fdff;
 
     text-shadow:
-        0 0 15px
-        #ffffff,
+
+        0 0 15px #fff,
 
         0 0 35px
-        rgba(0, 210, 255, .9);
+        rgba(0,215,255,.95);
 }
 
 
-/* =========================================
-   ASK DARKY AREA
-========================================= */
+/* ============================================================
+   CHAT
+============================================================ */
 
-.ask-area {
+.chat-container{
 
-    width: min(760px,100%);
+    width:
+        min(820px,100%);
 
     margin:
-        0 auto 35px;
+        0 auto;
 }
 
-.ask-label {
+.chat-messages{
 
-    text-align: center;
+    display:flex;
 
-    color: #63859e;
+    flex-direction:column;
 
-    font-size: 12px;
+    gap:13px;
 
-    margin-bottom: 10px;
+    margin-bottom:15px;
 }
 
-.ask-box {
+.chat-row{
 
-    display: flex;
+    display:flex;
 
-    align-items: center;
-
-    gap: 8px;
-
-    padding: 8px 9px;
-
-    background:
-        rgba(7, 28, 50, .58);
-
-    border:
-        1px solid
-        rgba(50, 190, 255, .18);
-
-    border-radius: 20px;
-
-    box-shadow:
-
-        0 12px 45px
-        rgba(0,0,0,.30),
-
-        0 0 25px
-        rgba(0, 110, 255, .05),
-
-        inset 0 1px 0
-        rgba(255,255,255,.05);
-
-    backdrop-filter:
-        blur(20px);
-
-    -webkit-backdrop-filter:
-        blur(20px);
-
-    transition: .25s;
+    width:100%;
 }
 
-.ask-box:focus-within {
+.chat-row.user{
 
-    border-color:
-        rgba(40, 195, 255, .50);
-
-    box-shadow:
-
-        0 0 35px
-        rgba(0, 155, 255, .12),
-
-        inset 0 0 20px
-        rgba(0, 150, 255, .04);
+    justify-content:flex-end;
 }
 
-.ask-box input {
+.chat-row.darky{
 
-    flex: 1;
-
-    min-width: 0;
-
-    background: transparent;
-
-    border: none;
-
-    outline: none;
-
-    color: #eaf9ff;
-
-    padding: 12px 8px;
-
-    font-size: 14px;
+    justify-content:flex-start;
 }
 
-.ask-box input::placeholder {
+.chat-bubble{
 
-    color: #527188;
+    max-width:
+        min(82%,680px);
+
+    padding:
+        12px 15px;
+
+    border-radius:18px;
+
+    font-size:14px;
+
+    line-height:1.6;
+
+    white-space:pre-wrap;
+
+    word-break:break-word;
 }
 
-.ask-button {
-
-    width: 44px;
-    height: 44px;
-
-    flex-shrink: 0;
-
-    border-radius: 14px;
-
-    border:
-        1px solid
-        rgba(50, 180, 255, .14);
-
-    background:
-        rgba(12, 39, 64, .65);
-
-    color: #5fd8ff;
-
-    font-size: 19px;
-
-    transition: .2s;
-
-    box-shadow:
-        inset 0 1px 0
-        rgba(255,255,255,.04);
-}
-
-.ask-button:hover {
-
-    background:
-        rgba(20, 68, 105, .75);
-
-    border-color:
-        rgba(50, 200, 255, .30);
-
-    box-shadow:
-        0 0 18px
-        rgba(0, 170, 255, .12);
-}
-
-.ask-send {
+.user-bubble{
 
     background:
         linear-gradient(
             145deg,
-            #72e3ff,
-            #168edb 55%,
+            #0e86d5,
             #07529b
         );
 
-    color: #02101b;
-
-    border: none;
-
-    box-shadow:
-        0 0 18px
-        rgba(0, 174, 255, .25),
-
-        inset 0 1px 1px
-        rgba(255,255,255,.45);
-}
-
-
-/* =========================================
-   RESPONSE PANEL
-========================================= */
-
-.response-panel {
-
-    width: min(760px,100%);
-
-    margin: 0 auto 35px;
-
-    display: none;
-
-    background:
-        linear-gradient(
-            135deg,
-            rgba(18, 63, 94, .40),
-            rgba(4, 22, 42, .62)
-        );
-
     border:
         1px solid
-        rgba(45, 190, 255, .17);
+        rgba(90,220,255,.25);
 
-    border-radius: 20px;
+    border-bottom-right-radius:6px;
 
-    overflow: hidden;
-
-    box-shadow:
-        0 15px 50px
-        rgba(0,0,0,.25),
-
-        0 0 30px
-        rgba(0, 125, 255, .05);
-
-    backdrop-filter:
-        blur(20px);
-
-    -webkit-backdrop-filter:
-        blur(20px);
-}
-
-.response-panel.visible {
-
-    display: block;
-
-    animation:
-        responseIn .3s ease;
-}
-
-@keyframes responseIn {
-
-    from {
-        opacity: 0;
-        transform: translateY(8px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.response-header {
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 9px;
-
-    padding: 13px 16px;
-
-    border-bottom:
-        1px solid
-        rgba(60, 190, 255, .10);
-
-    color: #54d6ff;
-
-    font-size: 11px;
-
-    letter-spacing: 1px;
-
-    text-transform: uppercase;
-}
-
-.response-dot {
-
-    width: 7px;
-    height: 7px;
-
-    border-radius: 50%;
-
-    background: #4bdcff;
+    color:#f3fcff;
 
     box-shadow:
-        0 0 10px
-        rgba(50, 215, 255, .8);
+        0 8px 24px
+        rgba(0,90,190,.18);
 }
 
-.response-body {
-
-    padding: 18px;
-
-    color: #c7e2ee;
-
-    font-size: 14px;
-
-    line-height: 1.65;
-
-    white-space: pre-wrap;
-}
-
-
-/* =========================================
-   QUICK ACTIONS
-========================================= */
-
-.section-title {
-
-    margin:
-        20px 0 15px;
-
-    font-size: 11px;
-
-    color: #5d7e95;
-
-    text-transform: uppercase;
-
-    letter-spacing: 2px;
-}
-
-.quick-grid {
-
-    display: grid;
-
-    grid-template-columns:
-        repeat(4,1fr);
-
-    gap: 12px;
-
-    max-width: 900px;
-
-    margin: auto;
-}
-
-.quick-card {
+.darky-bubble{
 
     background:
         linear-gradient(
             145deg,
-            rgba(18, 55, 82, .42),
-            rgba(4, 22, 40, .55)
+            rgba(18,65,96,.55),
+            rgba(3,21,39,.78)
         );
 
     border:
         1px solid
-        rgba(50, 180, 255, .14);
+        rgba(50,190,255,.15);
 
-    border-radius: 18px;
+    border-bottom-left-radius:6px;
 
-    padding: 20px 14px;
+    color:#cce8f1;
 
-    color: #e7f7ff;
-
-    transition: .2s;
-
-    text-align: left;
+    box-shadow:
+        0 8px 28px
+        rgba(0,0,0,.20);
 
     backdrop-filter:
-        blur(16px);
+        blur(18px);
+}
+
+.chat-name{
+
+    margin-bottom:5px;
+
+    color:#5bdcff;
+
+    font-size:9px;
+
+    letter-spacing:1.2px;
+
+    text-transform:uppercase;
+}
+
+.user-name{
+
+    text-align:right;
+
+    color:#c5f3ff;
+}
+
+
+/* ============================================================
+   ASK BOX
+============================================================ */
+
+.ask-box{
+
+    position:sticky;
+
+    bottom:92px;
+
+    z-index:20;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:8px;
+
+    padding:8px;
+
+    border-radius:21px;
+
+    background:
+        rgba(5,25,44,.90);
+
+    border:
+        1px solid
+        rgba(50,195,255,.20);
+
+    box-shadow:
+        0 15px 45px
+        rgba(0,0,0,.35);
+
+    backdrop-filter:
+        blur(24px);
 
     -webkit-backdrop-filter:
-        blur(16px);
-
-    box-shadow:
-        0 10px 30px
-        rgba(0,0,0,.18),
-
-        inset 0 1px 0
-        rgba(255,255,255,.035);
+        blur(24px);
 }
 
-.quick-card:hover {
+.ask-box:focus-within{
 
     border-color:
-        rgba(45, 200, 255, .40);
-
-    transform:
-        translateY(-2px);
+        rgba(50,205,255,.45);
 
     box-shadow:
-        0 12px 35px
-        rgba(0, 110, 255, .12),
+        0 0 35px
+        rgba(0,160,255,.12);
+}
 
+.ask-box input{
+
+    flex:1;
+
+    min-width:0;
+
+    padding:
+        12px 8px;
+
+    background:transparent;
+
+    border:none;
+
+    outline:none;
+
+    color:#eafaff;
+
+    font-size:14px;
+}
+
+.ask-box input::placeholder{
+
+    color:#537188;
+}
+
+.ask-button{
+
+    width:44px;
+
+    height:44px;
+
+    flex-shrink:0;
+
+    border-radius:14px;
+
+    border:
+        1px solid
+        rgba(50,190,255,.16);
+
+    background:
+        rgba(10,45,70,.75);
+
+    color:#5edcff;
+
+    font-size:18px;
+
+    transition:.2s;
+}
+
+.ask-button:hover{
+
+    transform:translateY(-1px);
+
+    border-color:
+        rgba(50,210,255,.35);
+}
+
+.ask-send{
+
+    color:#03111e;
+
+    background:
+        linear-gradient(
+            145deg,
+            #79e7ff,
+            #168fda 55%,
+            #07539d
+        );
+
+    border:none;
+
+    box-shadow:
         0 0 20px
-        rgba(0, 180, 255, .06);
-}
-
-.quick-card .icon {
-
-    font-size: 23px;
-
-    margin-bottom: 12px;
-
-    color: #4fd6ff;
-
-    text-shadow:
-        0 0 14px
-        rgba(0, 190, 255, .45);
-}
-
-.quick-card strong {
-
-    display: block;
-
-    font-size: 13px;
-
-    color: #e6f7ff;
-}
-
-.quick-card span {
-
-    color: #638297;
-
-    font-size: 11px;
+        rgba(0,180,255,.25);
 }
 
 
-/* =========================================
+/* ============================================================
+   TYPING
+============================================================ */
+
+.typing{
+
+    display:inline-flex;
+
+    align-items:center;
+
+    gap:4px;
+}
+
+.typing span{
+
+    width:5px;
+
+    height:5px;
+
+    border-radius:50%;
+
+    background:#54dbff;
+
+    animation:
+        typing 1s infinite;
+}
+
+.typing span:nth-child(2){
+    animation-delay:.15s;
+}
+
+.typing span:nth-child(3){
+    animation-delay:.3s;
+}
+
+@keyframes typing{
+
+    50%{
+        opacity:.2;
+        transform:translateY(-3px);
+    }
+}
+
+
+/* ============================================================
    VOICE PAGE
-========================================= */
+============================================================ */
 
-.voice-page {
+.voice-page{
 
-    display: none;
-
-    text-align: center;
+    text-align:center;
 }
 
-.voice-page.active {
+.voice-center{
 
-    display: block;
+    max-width:700px;
+
+    margin:auto;
 }
 
-.voice-center {
+.page-heading{
 
-    max-width: 650px;
+    text-align:left;
 
-    margin: auto;
-
-    padding-top: 10px;
+    margin-bottom:10px;
 }
 
-.page-heading {
+.page-heading h2{
 
-    text-align: left;
+    font-size:27px;
 
-    margin-bottom: 10px;
+    font-weight:500;
+
+    color:#eafaff;
 }
 
-.page-heading h2 {
+.page-heading p{
 
-    font-size: 27px;
+    margin-top:5px;
 
-    font-weight: 500;
+    color:#638298;
 
-    color: #e9f9ff;
+    font-size:12px;
 }
 
-.page-heading p {
+.voice-orb{
 
-    color: #638298;
+    width:225px;
 
-    font-size: 12px;
-
-    margin-top: 5px;
-}
-
-.voice-orb {
-
-    width: 230px;
-    height: 230px;
-
-    border-radius: 50%;
+    height:225px;
 
     margin:
         55px auto 35px;
 
-    display: grid;
+    border-radius:50%;
 
-    place-items: center;
+    display:grid;
+
+    place-items:center;
 
     background:
 
@@ -808,498 +1058,408 @@ button {
             #020b17
         );
 
+    border:
+        1px solid
+        rgba(60,205,255,.35);
+
     box-shadow:
 
         0 0 55px
-        rgba(0, 174, 255, .30),
+        rgba(0,174,255,.30),
 
         0 0 110px
-        rgba(0, 85, 255, .14),
-
-        inset 0 0 40px
-        rgba(255,255,255,.18);
-
-    border:
-        1px solid
-        rgba(60, 205, 255, .35);
-
-    transition: .3s;
+        rgba(0,85,255,.14);
 }
 
-.voice-orb.listening {
+.voice-orb.listening{
 
     animation:
         pulse 1.1s infinite;
 
-    box-shadow:
-
-        0 0 0 15px
-        rgba(0, 180, 255, .07),
-
-        0 0 0 30px
-        rgba(0, 120, 255, .04),
-
-        0 0 80px
-        rgba(0, 190, 255, .38);
 }
 
-.voice-orb.speaking {
+.voice-orb.speaking{
 
     animation:
         speakPulse .55s infinite
         alternate;
 }
 
-@keyframes pulse {
+@keyframes pulse{
 
-    50% {
-        transform: scale(1.07);
+    50%{
+        transform:scale(1.07);
     }
 }
 
-@keyframes speakPulse {
+@keyframes speakPulse{
 
-    to {
-        transform: scale(1.04);
+    to{
+        transform:scale(1.04);
     }
 }
 
-.voice-mic {
+.voice-mic{
 
-    font-size: 55px;
-
-    text-shadow:
-        0 0 18px
-        rgba(255,255,255,.75),
-
-        0 0 30px
-        rgba(0, 210, 255, .7);
-}
-
-.voice-status {
-
-    font-size: 22px;
-
-    font-weight: 500;
-
-    color: #e8f9ff;
+    font-size:55px;
 
     text-shadow:
-        0 0 15px
-        rgba(0, 180, 255, .20);
+        0 0 18px #fff,
+        0 0 30px rgba(0,210,255,.7);
 }
 
-.voice-hint {
+.voice-status{
 
-    color: #648399;
+    font-size:22px;
 
-    font-size: 13px;
-
-    margin-top: 8px;
+    color:#e8f9ff;
 }
 
-.voice-transcript {
+.voice-hint{
 
-    min-height: 80px;
+    margin-top:8px;
+
+    color:#648399;
+
+    font-size:13px;
+}
+
+.voice-transcript{
+
+    max-width:600px;
+
+    min-height:80px;
 
     margin:
         30px auto;
 
-    padding: 18px;
+    padding:18px;
 
-    max-width: 600px;
+    border-radius:18px;
 
     border:
         1px solid
-        rgba(50, 180, 255, .13);
+        rgba(50,180,255,.13);
 
     background:
-        rgba(7, 29, 49, .48);
+        rgba(7,29,49,.48);
 
-    border-radius: 18px;
+    color:#9ebdcd;
 
-    color: #9ebdcd;
+    font-size:14px;
 
-    font-size: 14px;
+    line-height:1.5;
 
-    line-height: 1.5;
-
-    white-space: pre-wrap;
-
-    backdrop-filter:
-        blur(18px);
-
-    -webkit-backdrop-filter:
-        blur(18px);
-
-    box-shadow:
-        inset 0 1px 0
-        rgba(255,255,255,.03);
+    white-space:pre-wrap;
 }
 
-.voice-button {
+.voice-button{
 
-    width: 72px;
-    height: 72px;
+    width:72px;
 
-    border-radius: 50%;
+    height:72px;
+
+    border-radius:50%;
 
     border:
         1px solid
-        rgba(50, 195, 255, .35);
+        rgba(50,195,255,.35);
 
     background:
         linear-gradient(
             145deg,
-            rgba(20, 69, 101, .80),
-            rgba(4, 28, 52, .90)
+            rgba(20,69,101,.80),
+            rgba(4,28,52,.90)
         );
 
-    color: #61dfff;
+    color:#61dfff;
 
-    font-size: 28px;
-
-    transition: .2s;
-
-    box-shadow:
-        0 0 25px
-        rgba(0, 150, 255, .12),
-
-        inset 0 1px 0
-        rgba(255,255,255,.08);
-}
-
-.voice-button:hover {
-
-    transform: scale(1.05);
-
-    background:
-        linear-gradient(
-            145deg,
-            rgba(27, 86, 125, .90),
-            rgba(5, 37, 68, .95)
-        );
-
-    box-shadow:
-        0 0 30px
-        rgba(0, 185, 255, .22);
+    font-size:28px;
 }
 
 
-/* =========================================
-   OTHER PAGES
-========================================= */
+/* ============================================================
+   SECONDARY PAGES
+============================================================ */
 
-.secondary-page {
+.data-card{
 
-    display: none;
-}
+    max-width:800px;
 
-.secondary-page.active {
+    margin-top:20px;
 
-    display: block;
-}
+    padding:22px;
 
-.data-card {
-
-    background:
-        linear-gradient(
-            145deg,
-            rgba(17, 56, 82, .42),
-            rgba(4, 22, 41, .58)
-        );
+    border-radius:20px;
 
     border:
         1px solid
-        rgba(50, 180, 255, .14);
+        rgba(50,180,255,.14);
 
-    border-radius: 20px;
-
-    padding: 22px;
-
-    margin-top: 20px;
-
-    max-width: 800px;
-
-    backdrop-filter:
-        blur(18px);
-
-    -webkit-backdrop-filter:
-        blur(18px);
-
-    box-shadow:
-        0 12px 35px
-        rgba(0,0,0,.18),
-
-        inset 0 1px 0
-        rgba(255,255,255,.035);
+    background:
+        linear-gradient(
+            145deg,
+            rgba(17,56,82,.42),
+            rgba(4,22,41,.58)
+        );
 }
 
-.data-card h3 {
+.data-card h3{
 
-    font-size: 15px;
+    margin-bottom:8px;
 
-    margin-bottom: 8px;
+    font-size:15px;
 
-    color: #dff6ff;
+    color:#dff6ff;
 }
 
-.data-card p {
+.data-card p{
 
-    color: #7190a4;
+    color:#7190a4;
 
-    line-height: 1.6;
+    line-height:1.6;
 
-    font-size: 13px;
+    font-size:13px;
 }
 
+.quick-card{
 
-/* =========================================
-   TYPING
-========================================= */
+    width:100%;
 
-.typing {
+    max-width:800px;
 
-    display: inline-flex;
+    margin-top:12px;
 
-    gap: 4px;
+    padding:19px;
+
+    text-align:left;
+
+    color:#e7f7ff;
+
+    border-radius:18px;
+
+    border:
+        1px solid
+        rgba(50,180,255,.14);
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(18,55,82,.42),
+            rgba(4,22,40,.55)
+        );
 }
 
-.typing span {
+.quick-card:hover{
 
-    width: 5px;
-    height: 5px;
-
-    background: #52d8ff;
-
-    border-radius: 50%;
-
-    animation:
-        typing 1s infinite;
-
-    box-shadow:
-        0 0 8px
-        rgba(50, 210, 255, .7);
-}
-
-.typing span:nth-child(2) {
-
-    animation-delay: .15s;
-}
-
-.typing span:nth-child(3) {
-
-    animation-delay: .3s;
-}
-
-@keyframes typing {
-
-    50% {
-
-        opacity: .2;
-
-        transform:
-            translateY(-3px);
-    }
+    border-color:
+        rgba(45,200,255,.40);
 }
 
 
-/* =========================================
+/* ============================================================
    BOTTOM NAV
-========================================= */
+============================================================ */
 
-.bottom-nav {
+.bottom-nav{
 
-    position: fixed;
+    position:fixed;
 
-    left: 50%;
-    bottom: 15px;
+    left:50%;
+
+    bottom:14px;
 
     transform:
         translateX(-50%);
 
     width:
-        min(700px,calc(100% - 24px));
+        min(720px,calc(100% - 24px));
 
-    background:
-        rgba(4, 20, 37, .78);
-
-    backdrop-filter:
-        blur(24px);
-
-    -webkit-backdrop-filter:
-        blur(24px);
-
-    border:
-        1px solid
-        rgba(50, 190, 255, .17);
-
-    border-radius: 23px;
-
-    padding: 8px;
-
-    display: grid;
+    display:grid;
 
     grid-template-columns:
         repeat(5,1fr);
 
-    z-index: 100;
+    gap:4px;
 
-    box-shadow:
+    padding:8px;
 
-        0 15px 45px
-        rgba(0,0,0,.35),
+    z-index:200;
 
-        0 0 30px
-        rgba(0, 100, 255, .08),
-
-        inset 0 1px 0
-        rgba(255,255,255,.05);
-}
-
-.nav-btn {
-
-    background: transparent;
-
-    border: 0;
-
-    color: #527084;
-
-    padding: 9px 4px;
-
-    border-radius: 16px;
-
-    font-size: 10px;
-
-    transition: .2s;
-}
-
-.nav-btn .nav-icon {
-
-    display: block;
-
-    font-size: 18px;
-
-    margin-bottom: 4px;
-}
-
-.nav-btn.active {
-
-    color: #57d9ff;
+    border-radius:23px;
 
     background:
-        linear-gradient(
-            145deg,
-            rgba(0, 150, 230, .15),
-            rgba(0, 85, 180, .08)
-        );
+        rgba(4,20,37,.90);
+
+    border:
+        1px solid
+        rgba(50,190,255,.17);
+
+    backdrop-filter:
+        blur(25px);
+
+    -webkit-backdrop-filter:
+        blur(25px);
 
     box-shadow:
-        inset 0 0 18px
-        rgba(0, 170, 255, .06),
+        0 15px 45px
+        rgba(0,0,0,.40);
+}
 
-        0 0 14px
-        rgba(0, 160, 255, .05);
+.nav-btn{
+
+    padding:
+        9px 4px;
+
+    border:0;
+
+    border-radius:16px;
+
+    background:transparent;
+
+    color:#527084;
+
+    font-size:10px;
+
+    transition:.2s;
+}
+
+.nav-icon{
+
+    display:block;
+
+    margin-bottom:4px;
+
+    font-size:18px;
+}
+
+.nav-btn.active{
+
+    color:#57d9ff;
+
+    background:
+        rgba(0,155,235,.10);
 }
 
 
-/* =========================================
+/* ============================================================
    MOBILE
-========================================= */
+============================================================ */
 
-@media(max-width:700px) {
+@media(max-width:700px){
 
-    .topbar {
-
-        padding: 0 16px;
+    .topbar{
+        padding:0 16px;
     }
 
-    .page {
+    .page{
 
         padding:
-            22px
-            16px
+            15px
+            15px
             110px;
     }
 
-    .orb {
+    .live-section{
 
-        width: 155px;
-        height: 155px;
+        padding:14px;
+
+        border-radius:19px;
     }
 
-    .orb-wrap {
-
-        margin-top: 38px;
-    }
-
-    .quick-grid {
+    .sales-grid{
 
         grid-template-columns:
             repeat(2,1fr);
     }
 
-    .quick-card {
+    .sales-card{
 
-        padding: 17px 13px;
+        padding:13px;
     }
 
-    .voice-orb {
+    .sales-value{
 
-        width: 190px;
-        height: 190px;
-
-        margin-top: 45px;
+        font-size:20px;
     }
 
-    .bottom-nav {
+    .payment-card{
+
+        padding:
+            10px 8px;
+
+        flex-direction:column;
+
+        align-items:flex-start;
+
+        gap:5px;
+    }
+
+    .orb{
+
+        width:140px;
+
+        height:140px;
+    }
+
+    .chat-bubble{
+
+        max-width:90%;
+    }
+
+    .bottom-nav{
 
         width:
             calc(100% - 16px);
 
-        bottom: 8px;
-    }
-
-    .nav-btn {
-
-        font-size: 9px;
-    }
-
-    .ask-box input {
-
-        font-size: 13px;
+        bottom:7px;
     }
 
 }
 
+@media(max-width:400px){
 
-/* =========================================
-   SMALL MOBILE
-========================================= */
-
-@media(max-width:400px) {
-
-    .brand-text span {
-
-        display: none;
+    .brand-text span{
+        display:none;
     }
 
-    .status {
-
-        font-size: 9px;
-
+    .status{
         padding:
             6px 8px;
     }
 
-    .quick-card span {
+    .sales-label{
+        font-size:8px;
+    }
 
-        display: none;
+    .sales-value{
+        font-size:18px;
     }
 
 }
 
+
+/* ============================================================
+   LOADING STATE
+============================================================ */
+
+.loading-value{
+
+    opacity:.55;
+}
+
+
+/* ============================================================
+   NO DATA
+============================================================ */
+
+.no-sales{
+
+    opacity:.65;
+}
+
 </style>
+
 </head>
 
 
@@ -1308,16 +1468,16 @@ button {
 <div class="app">
 
 
-<!-- =====================================
+<!-- ==========================================================
      TOP BAR
-===================================== -->
+========================================================== -->
 
 <header class="topbar">
 
     <div class="brand">
 
         <div class="logo">
-            R
+            D
         </div>
 
         <div class="brand-text">
@@ -1336,8 +1496,8 @@ button {
 
 
     <div
-        class="status"
-        id="connectionStatus">
+        id="connectionStatus"
+        class="status">
 
         ● READY
 
@@ -1347,14 +1507,214 @@ button {
 
 
 
-<!-- =====================================
+<!-- ==========================================================
      HOME
-===================================== -->
+========================================================== -->
 
 <section
     id="homePage"
-    class="page active">
+    class="page">
 
+
+    <!-- ======================================================
+         LIVE SALES
+    ======================================================= -->
+
+    <div class="live-section">
+
+
+        <div class="live-top">
+
+
+            <div class="live-heading">
+
+
+                <div class="live-heading-icon">
+                    ₹
+                </div>
+
+
+                <div class="live-heading-text">
+
+                    <strong>
+                        Live Business Overview
+                    </strong>
+
+                    <span>
+                        Today's restaurant performance
+                    </span>
+
+                </div>
+
+
+            </div>
+
+
+            <div class="live-status">
+
+                <span class="live-dot"></span>
+
+                LIVE
+
+            </div>
+
+
+        </div>
+
+
+
+        <!-- MAIN SALES -->
+
+        <div class="sales-grid">
+
+
+            <div class="sales-card">
+
+                <div class="sales-label">
+                    Today's Sales
+                </div>
+
+                <div
+                    id="liveTotalSales"
+                    class="sales-value primary">
+
+                    ₹0
+
+                </div>
+
+            </div>
+
+
+            <div class="sales-card">
+
+                <div class="sales-label">
+                    Total Orders
+                </div>
+
+                <div
+                    id="liveTotalOrders"
+                    class="sales-value">
+
+                    0
+
+                </div>
+
+            </div>
+
+
+            <div class="sales-card">
+
+                <div class="sales-label">
+                    Items Sold
+                </div>
+
+                <div
+                    id="liveTotalItems"
+                    class="sales-value">
+
+                    0
+
+                </div>
+
+            </div>
+
+
+            <div class="sales-card">
+
+                <div class="sales-label">
+                    Average Bill
+                </div>
+
+                <div
+                    id="liveAverageBill"
+                    class="sales-value">
+
+                    ₹0
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+
+        <!-- PAYMENT BREAKDOWN -->
+
+        <div class="payment-grid">
+
+
+            <div class="payment-card">
+
+                <div class="payment-label">
+                    CASH
+                </div>
+
+                <div
+                    id="liveCash"
+                    class="payment-value">
+
+                    ₹0
+
+                </div>
+
+            </div>
+
+
+            <div class="payment-card">
+
+                <div class="payment-label">
+                    UPI
+                </div>
+
+                <div
+                    id="liveUPI"
+                    class="payment-value">
+
+                    ₹0
+
+                </div>
+
+            </div>
+
+
+            <div class="payment-card">
+
+                <div class="payment-label">
+                    CARD
+                </div>
+
+                <div
+                    id="liveCard"
+                    class="payment-value">
+
+                    ₹0
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+        <div
+            id="salesError"
+            class="sales-error">
+
+            Unable to load live sales data.
+
+        </div>
+
+
+    </div>
+
+
+
+    <!-- ======================================================
+         DARKY GREETING
+    ======================================================= -->
 
     <div class="home-title">
 
@@ -1363,23 +1723,27 @@ button {
         </small>
 
         <h1>
+
             Hello,
             <span>
                 Iqbal
             </span>
+
         </h1>
 
     </div>
 
 
 
-    <!-- DARKY -->
+    <!-- ======================================================
+         DARKY ORB
+    ======================================================= -->
 
     <div class="orb-wrap">
 
         <div
-            class="orb"
-            id="homeOrb">
+            id="homeOrb"
+            class="orb">
 
             <div class="orb-icon">
                 ✦
@@ -1391,18 +1755,23 @@ button {
 
 
 
-    <!-- ASK DARKY -->
+    <!-- ======================================================
+         CHAT
+    ======================================================= -->
 
-    <div class="ask-area">
+    <div class="chat-container">
 
-        <div class="ask-label">
 
-            Ask Darky anything
+        <div
+            id="chatMessages"
+            class="chat-messages">
 
         </div>
 
 
+
         <div class="ask-box">
+
 
             <button
                 class="ask-button"
@@ -1429,134 +1798,20 @@ button {
 
             </button>
 
-        </div>
-
-    </div>
-
-
-
-    <!-- RESPONSE -->
-
-    <div
-        id="responsePanel"
-        class="response-panel">
-
-        <div class="response-header">
-
-            <span class="response-dot"></span>
-
-            Darky AI
 
         </div>
 
 
-        <div
-            id="responseBody"
-            class="response-body">
-
-        </div>
-
     </div>
 
-
-
-    <!-- QUICK ACTIONS -->
-
-    <div class="section-title">
-
-        Quick actions
-
-    </div>
-
-
-    <div class="quick-grid">
-
-
-        <button
-            class="quick-card"
-            onclick="askQuick('What are today\\'s sales?')">
-
-            <div class="icon">
-                ₹
-            </div>
-
-            <strong>
-                Today's Sales
-            </strong>
-
-            <span>
-                Revenue today
-            </span>
-
-        </button>
-
-
-        <button
-            class="quick-card"
-            onclick="askQuick('Show me the latest orders.')">
-
-            <div class="icon">
-                🧾
-            </div>
-
-            <strong>
-                Orders
-            </strong>
-
-            <span>
-                Recent orders
-            </span>
-
-        </button>
-
-
-        <button
-            class="quick-card"
-            onclick="askQuick('Give me the current inventory overview.')">
-
-            <div class="icon">
-                📦
-            </div>
-
-            <strong>
-                Inventory
-            </strong>
-
-            <span>
-                Current stock
-            </span>
-
-        </button>
-
-
-        <button
-            class="quick-card"
-            onclick="askQuick('Show me the recent inventory history.')">
-
-            <div class="icon">
-                ↕
-            </div>
-
-            <strong>
-                Stock History
-            </strong>
-
-            <span>
-                Stock movements
-            </span>
-
-        </button>
-
-
-    </div>
 
 </section>
 
 
 
-<!-- =====================================
-     VOICE PAGE
-===================================== -->
+<!-- ==========================================================
+     VOICE
+========================================================== -->
 
 <section
     id="voicePage"
@@ -1584,8 +1839,8 @@ button {
             class="voice-orb">
 
             <div
-                class="voice-mic"
-                id="voiceMicIcon">
+                id="voiceMicIcon"
+                class="voice-mic">
 
                 🎙
 
@@ -1637,9 +1892,9 @@ button {
 
 
 
-<!-- =====================================
-     STOCK PAGE
-===================================== -->
+<!-- ==========================================================
+     STOCK
+========================================================== -->
 
 <section
     id="stockPage"
@@ -1676,7 +1931,6 @@ button {
 
     <button
         class="quick-card"
-        style="margin-top:15px;width:100%;"
         onclick="askQuick('Give me the current inventory overview.')">
 
         📦 &nbsp;
@@ -1687,7 +1941,6 @@ button {
 
     <button
         class="quick-card"
-        style="margin-top:10px;width:100%;"
         onclick="askQuick('Show me the recent inventory history.')">
 
         ↕ &nbsp;
@@ -1695,13 +1948,14 @@ button {
 
     </button>
 
+
 </section>
 
 
 
-<!-- =====================================
-     ORDERS PAGE
-===================================== -->
+<!-- ==========================================================
+     ORDERS
+========================================================== -->
 
 <section
     id="ordersPage"
@@ -1738,7 +1992,6 @@ button {
 
     <button
         class="quick-card"
-        style="margin-top:15px;width:100%;"
         onclick="askQuick('Show me the latest orders.')">
 
         🧾 &nbsp;
@@ -1746,13 +1999,14 @@ button {
 
     </button>
 
+
 </section>
 
 
 
-<!-- =====================================
-     REPORTS PAGE
-===================================== -->
+<!-- ==========================================================
+     REPORTS
+========================================================== -->
 
 <section
     id="reportsPage"
@@ -1775,13 +2029,13 @@ button {
     <div class="data-card">
 
         <h3>
-            Ask Darky
+            Today's Live Report
         </h3>
 
         <p>
-            Ask questions about sales,
-            orders, inventory, expenses
-            and restaurant activity.
+            The figures shown on the Home page
+            are connected to the same
+            <b>chaat_orders</b> sales data.
         </p>
 
     </div>
@@ -1789,7 +2043,6 @@ button {
 
     <button
         class="quick-card"
-        style="margin-top:15px;width:100%;"
         onclick="askQuick('Give me a summary of today\\'s restaurant activity.')">
 
         📊 &nbsp;
@@ -1797,13 +2050,24 @@ button {
 
     </button>
 
+
+    <button
+        class="quick-card"
+        onclick="askQuick('Give me today\\'s total sales, orders, items sold and average bill.')">
+
+        💰 &nbsp;
+        Today's sales report
+
+    </button>
+
+
 </section>
 
 
 
-<!-- =====================================
+<!-- ==========================================================
      BOTTOM NAV
-===================================== -->
+========================================================== -->
 
 <nav class="bottom-nav">
 
@@ -1887,118 +2151,308 @@ button {
 
 <script>
 
-
-/* =========================================
+/* ============================================================
    SUPABASE
-========================================= */
+============================================================ */
 
-const SUPABASE_FUNCTION_URL =
-"https://ucqeyhcycwksiubmlilg.supabase.co/functions/v1/restaurant-ai";
-
+const SUPABASE_URL =
+    "https://ucqeyhcycwksiubmlilg.supabase.co";
 
 const SUPABASE_KEY =
-"sb_publishable_YdIvl7IqdpT0UZOHBumEiw_ZThYEsgV";
+    "sb_publishable_YdIvl7IqdpT0UZOHBumEiw_ZThYEsgV";
+
+const SUPABASE_FUNCTION_URL =
+    "https://ucqeyhcycwksiubmlilg.supabase.co/functions/v1/restaurant-ai";
 
 
+const supabaseClient =
+    supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+    );
 
-/* =========================================
+
+/* ============================================================
    ELEMENTS
-========================================= */
+============================================================ */
 
 const askInput =
-document.getElementById("askInput");
-
-const responsePanel =
-document.getElementById("responsePanel");
-
-const responseBody =
-document.getElementById("responseBody");
+    document.getElementById(
+        "askInput"
+    );
 
 const connectionStatus =
-document.getElementById("connectionStatus");
+    document.getElementById(
+        "connectionStatus"
+    );
+
+const chatMessages =
+    document.getElementById(
+        "chatMessages"
+    );
 
 
-
-/* =========================================
+/* ============================================================
    PAGE NAVIGATION
-========================================= */
+============================================================ */
 
-function openPage(pageId) {
+function openPage(pageId){
 
     document
         .querySelectorAll(".page")
-        .forEach(page => {
+        .forEach(
+            page =>
+                page.classList.remove(
+                    "active"
+                )
+        );
 
-            page.classList.remove("active");
 
-        });
+    const target =
+        document.getElementById(
+            pageId
+        );
 
 
-    document
-        .getElementById(pageId)
-        .classList.add("active");
+    if(target){
+
+        target.classList.add(
+            "active"
+        );
+
+    }
 
 
     document
         .querySelectorAll(".nav-btn")
-        .forEach(button => {
+        .forEach(
+            button => {
 
-            button.classList.remove("active");
+                button.classList.remove(
+                    "active"
+                );
 
 
-            if (
-                button.dataset.page === pageId
-            ) {
+                if(
+                    button.dataset.page ===
+                    pageId
+                ){
 
-                button.classList.add("active");
+                    button.classList.add(
+                        "active"
+                    );
+
+                }
 
             }
-
-        });
+        );
 
 
     window.scrollTo({
-        top: 0,
-        behavior: "smooth"
+        top:0,
+        behavior:"smooth"
     });
 
 }
 
 
+/* ============================================================
+   CHAT MESSAGE
+============================================================ */
 
-/* =========================================
-   HOME QUESTION
-========================================= */
+function addChatMessage(
+    sender,
+    message,
+    typing = false
+){
 
-function sendHomeQuestion() {
+    const row =
+        document.createElement(
+            "div"
+        );
+
+
+    row.className =
+        "chat-row " +
+        (
+            sender === "user"
+            ? "user"
+            : "darky"
+        );
+
+
+    const bubble =
+        document.createElement(
+            "div"
+        );
+
+
+    bubble.className =
+        "chat-bubble " +
+        (
+            sender === "user"
+            ? "user-bubble"
+            : "darky-bubble"
+        );
+
+
+    const name =
+        document.createElement(
+            "div"
+        );
+
+
+    name.className =
+        "chat-name " +
+        (
+            sender === "user"
+            ? "user-name"
+            : ""
+        );
+
+
+    name.textContent =
+        sender === "user"
+        ? "You"
+        : "Darky AI";
+
+
+    const content =
+        document.createElement(
+            "div"
+        );
+
+
+    if(typing){
+
+        content.innerHTML = `
+
+            <div class="typing">
+
+                <span></span>
+                <span></span>
+                <span></span>
+
+            </div>
+
+        `;
+
+    }
+    else{
+
+        content.textContent =
+            message;
+
+    }
+
+
+    bubble.appendChild(
+        name
+    );
+
+    bubble.appendChild(
+        content
+    );
+
+    row.appendChild(
+        bubble
+    );
+
+    chatMessages.appendChild(
+        row
+    );
+
+
+    scrollChatToBottom();
+
+
+    return {
+        row,
+        bubble,
+        content
+    };
+
+}
+
+
+/* ============================================================
+   CHAT SCROLL
+============================================================ */
+
+function scrollChatToBottom(){
+
+    setTimeout(
+        () => {
+
+            const container =
+                document.querySelector(
+                    ".chat-container"
+                );
+
+
+            if(container){
+
+                container.scrollIntoView({
+                    behavior:"smooth",
+                    block:"end"
+                });
+
+            }
+
+        },
+        50
+    );
+
+}
+
+
+/* ============================================================
+   HOME MESSAGE
+============================================================ */
+
+function sendHomeQuestion(){
 
     const message =
         askInput.value.trim();
 
 
-    if (!message) {
+    if(!message){
+
         return;
+
     }
 
 
     askInput.value = "";
 
 
-    sendMessageToAI(message);
+    addChatMessage(
+        "user",
+        message
+    );
+
+
+    sendMessageToAI(
+        message
+    );
 
 }
 
 
-
-/* =========================================
+/* ============================================================
    ENTER KEY
-========================================= */
+============================================================ */
 
 askInput.addEventListener(
     "keydown",
-    function(event) {
+    function(event){
 
-        if (event.key === "Enter") {
+        if(
+            event.key ===
+            "Enter"
+        ){
+
+            event.preventDefault();
 
             sendHomeQuestion();
 
@@ -2008,57 +2462,60 @@ askInput.addEventListener(
 );
 
 
+/* ============================================================
+   QUICK QUESTIONS
+============================================================ */
 
-/* =========================================
-   QUICK ACTIONS
-========================================= */
+function askQuick(message){
 
-function askQuick(message) {
+    openPage(
+        "homePage"
+    );
 
-    sendMessageToAI(message);
+
+    addChatMessage(
+        "user",
+        message
+    );
+
+
+    sendMessageToAI(
+        message
+    );
 
 }
 
 
+/* ============================================================
+   SEND TO DARKY
+============================================================ */
 
-/* =========================================
-   AI REQUEST
-========================================= */
+async function sendMessageToAI(
+    message
+){
 
-async function sendMessageToAI(message) {
-
-    responsePanel.classList.add(
-        "visible"
-    );
-
-
-    responseBody.innerHTML = `
-
-        <div class="typing">
-
-            <span></span>
-            <span></span>
-            <span></span>
-
-        </div>
-
-    `;
+    const darkyMessage =
+        addChatMessage(
+            "darky",
+            "",
+            true
+        );
 
 
     connectionStatus.textContent =
         "● THINKING";
 
 
-    try {
+    try{
 
         const response =
             await fetch(
                 SUPABASE_FUNCTION_URL,
                 {
 
-                    method: "POST",
+                    method:"POST",
 
-                    headers: {
+                    headers:{
 
                         "Content-Type":
                             "application/json",
@@ -2069,11 +2526,13 @@ async function sendMessageToAI(message) {
 
                     },
 
-                    body: JSON.stringify({
+                    body:
+                        JSON.stringify({
 
-                        message: message
+                            message:
+                                message
 
-                    })
+                        })
 
                 }
             );
@@ -2089,7 +2548,7 @@ async function sendMessageToAI(message) {
         );
 
 
-        if (!response.ok) {
+        if(!response.ok){
 
             throw new Error(
                 data.error ||
@@ -2099,31 +2558,13 @@ async function sendMessageToAI(message) {
         }
 
 
-        /*
-         * Connection-test function returns:
-         *
-         * {
-         *   success: true,
-         *   reply: "Hi Iqbal, I'm Darky."
-         * }
-         *
-         * Future AI version may return:
-         *
-         * {
-         *   success: true,
-         *   answer: "..."
-         * }
-         *
-         * Support both formats.
-         */
-
         const answer =
             data.reply ||
             data.answer ||
             "I couldn't get a response right now.";
 
 
-        responseBody.textContent =
+        darkyMessage.content.textContent =
             answer;
 
 
@@ -2131,13 +2572,15 @@ async function sendMessageToAI(message) {
             "● READY";
 
 
+        scrollChatToBottom();
+
+
         speakReply(
             answer
         );
 
-
     }
-    catch(error) {
+    catch(error){
 
         console.error(
             "Darky connection error:",
@@ -2145,34 +2588,400 @@ async function sendMessageToAI(message) {
         );
 
 
-        responseBody.textContent =
+        darkyMessage.content.textContent =
             "I'm having trouble connecting right now. Please try again.";
 
 
         connectionStatus.textContent =
             "● CONNECTION ERROR";
 
+
+        scrollChatToBottom();
+
     }
 
 }
 
 
+/* ============================================================
+   DATE
+============================================================ */
 
-/* =========================================
-   VOICE
-========================================= */
+function localDateString(
+    date
+){
 
-function openVoice() {
+    const year =
+        date.getFullYear();
 
-    openPage("voicePage");
+    const month =
+        String(
+            date.getMonth()+1
+        ).padStart(
+            2,
+            "0"
+        );
+
+    const day =
+        String(
+            date.getDate()
+        ).padStart(
+            2,
+            "0"
+        );
+
+
+    return (
+        year +
+        "-" +
+        month +
+        "-" +
+        day
+    );
 
 }
 
 
+/* ============================================================
+   LIVE SALES
+============================================================ */
 
-/* =========================================
-   SPEECH RECOGNITION
-========================================= */
+async function loadLiveSales(){
+
+    const errorBox =
+        document.getElementById(
+            "salesError"
+        );
+
+
+    try{
+
+        errorBox.style.display =
+            "none";
+
+
+        const today =
+            localDateString(
+                new Date()
+            );
+
+
+        const startDate =
+            new Date(
+                today +
+                "T00:00:00"
+            );
+
+
+        const start =
+            startDate.toISOString();
+
+
+        const endDate =
+            new Date(
+                today +
+                "T00:00:00"
+            );
+
+
+        endDate.setDate(
+            endDate.getDate()+1
+        );
+
+
+        const end =
+            endDate.toISOString();
+
+
+        console.log(
+            "Darky live sales:",
+            today,
+            start,
+            end
+        );
+
+
+        const result =
+            await supabaseClient
+
+                .from(
+                    "chaat_orders"
+                )
+
+                .select("*")
+
+                .gte(
+                    "created_at",
+                    start
+                )
+
+                .lt(
+                    "created_at",
+                    end
+                );
+
+
+        const data =
+            result.data;
+
+        const error =
+            result.error;
+
+
+        if(error){
+
+            console.error(
+                "Live sales Supabase error:",
+                error
+            );
+
+
+            errorBox.textContent =
+                "Sales connection error: " +
+                error.message;
+
+
+            errorBox.style.display =
+                "block";
+
+
+            return;
+
+        }
+
+
+        console.log(
+            "Darky live orders:",
+            data
+        );
+
+
+        calculateLiveSales(
+            data || []
+        );
+
+    }
+    catch(error){
+
+        console.error(
+            "Live sales error:",
+            error
+        );
+
+
+        errorBox.textContent =
+            "Unable to load live sales data.";
+
+
+        errorBox.style.display =
+            "block";
+
+    }
+
+}
+
+
+/* ============================================================
+   CALCULATE SALES
+============================================================ */
+
+function calculateLiveSales(
+    orders
+){
+
+    let totalSales = 0;
+
+    let totalItems = 0;
+
+    let cash = 0;
+
+    let upi = 0;
+
+    let card = 0;
+
+
+    orders.forEach(
+        order => {
+
+            const total =
+                Number(
+                    order.total || 0
+                );
+
+
+            totalSales +=
+                total;
+
+
+            const payment =
+                String(
+                    order.payment_method ||
+                    ""
+                )
+                .trim()
+                .toLowerCase();
+
+
+            if(
+                payment === "cash"
+            ){
+
+                cash += total;
+
+            }
+
+
+            if(
+                payment === "upi"
+            ){
+
+                upi += total;
+
+            }
+
+
+            if(
+                payment === "card"
+            ){
+
+                card += total;
+
+            }
+
+
+            if(
+                Array.isArray(
+                    order.items
+                )
+            ){
+
+                order.items.forEach(
+                    item => {
+
+                        totalItems +=
+                            Number(
+                                item.qty || 0
+                            );
+
+                    }
+                );
+
+            }
+
+        }
+    );
+
+
+    const averageBill =
+        orders.length > 0
+        ? totalSales / orders.length
+        : 0;
+
+
+    document.getElementById(
+        "liveTotalSales"
+    ).textContent =
+        "₹" +
+        formatMoney(
+            totalSales
+        );
+
+
+    document.getElementById(
+        "liveTotalOrders"
+    ).textContent =
+        orders.length;
+
+
+    document.getElementById(
+        "liveTotalItems"
+    ).textContent =
+        totalItems;
+
+
+    document.getElementById(
+        "liveAverageBill"
+    ).textContent =
+        "₹" +
+        formatMoney(
+            averageBill
+        );
+
+
+    document.getElementById(
+        "liveCash"
+    ).textContent =
+        "₹" +
+        formatMoney(
+            cash
+        );
+
+
+    document.getElementById(
+        "liveUPI"
+    ).textContent =
+        "₹" +
+        formatMoney(
+            upi
+        );
+
+
+    document.getElementById(
+        "liveCard"
+    ).textContent =
+        "₹" +
+        formatMoney(
+            card
+        );
+
+}
+
+
+/* ============================================================
+   MONEY
+============================================================ */
+
+function formatMoney(
+    number
+){
+
+    return Number(
+        number || 0
+    )
+    .toFixed(2)
+    .replace(
+        /\.00$/,
+        ""
+    );
+
+}
+
+
+/* ============================================================
+   START LIVE SALES
+============================================================ */
+
+loadLiveSales();
+
+
+setInterval(
+    loadLiveSales,
+    30000
+);
+
+
+/* ============================================================
+   VOICE
+============================================================ */
+
+function openVoice(){
+
+    openPage(
+        "voicePage"
+    );
+
+}
+
 
 const SpeechRecognition =
     window.SpeechRecognition ||
@@ -2189,18 +2998,15 @@ const voiceOrb =
         "voiceOrb"
     );
 
-
 const voiceStatus =
     document.getElementById(
         "voiceStatus"
     );
 
-
 const voiceHint =
     document.getElementById(
         "voiceHint"
     );
-
 
 const voiceTranscript =
     document.getElementById(
@@ -2208,9 +3014,7 @@ const voiceTranscript =
     );
 
 
-
-if (SpeechRecognition) {
-
+if(SpeechRecognition){
 
     recognition =
         new SpeechRecognition();
@@ -2228,10 +3032,8 @@ if (SpeechRecognition) {
         false;
 
 
-
     recognition.onstart =
-        function() {
-
+        function(){
 
             listening = true;
 
@@ -2255,10 +3057,8 @@ if (SpeechRecognition) {
         };
 
 
-
     recognition.onresult =
-        async function(event) {
-
+        async function(event){
 
             const transcript =
                 event
@@ -2290,10 +3090,8 @@ if (SpeechRecognition) {
         };
 
 
-
     recognition.onerror =
-        function(event) {
-
+        function(event){
 
             console.error(
                 "Speech recognition:",
@@ -2319,9 +3117,8 @@ if (SpeechRecognition) {
         };
 
 
-
     recognition.onend =
-        function() {
+        function(){
 
             listening = false;
 
@@ -2334,16 +3131,13 @@ if (SpeechRecognition) {
 }
 
 
-
-/* =========================================
+/* ============================================================
    START VOICE
-========================================= */
+============================================================ */
 
-function startVoiceCommand() {
+function startVoiceCommand(){
 
-
-    if (!recognition) {
-
+    if(!recognition){
 
         voiceStatus.textContent =
             "Voice not supported";
@@ -2358,7 +3152,7 @@ function startVoiceCommand() {
     }
 
 
-    if (listening) {
+    if(listening){
 
         recognition.stop();
 
@@ -2367,45 +3161,44 @@ function startVoiceCommand() {
     }
 
 
-    try {
+    try{
 
         recognition.start();
 
     }
-    catch(error) {
+    catch(error){
 
-        console.error(error);
+        console.error(
+            error
+        );
 
     }
 
 }
 
 
-
-/* =========================================
-   VOICE → AI
-========================================= */
+/* ============================================================
+   VOICE → DARKY
+============================================================ */
 
 async function sendVoiceMessage(
     message
-) {
-
+){
 
     connectionStatus.textContent =
         "● THINKING";
 
 
-    try {
-
+    try{
 
         const response =
             await fetch(
                 SUPABASE_FUNCTION_URL,
                 {
 
-                    method: "POST",
+                    method:"POST",
 
-                    headers: {
+                    headers:{
 
                         "Content-Type":
                             "application/json",
@@ -2416,11 +3209,13 @@ async function sendVoiceMessage(
 
                     },
 
-                    body: JSON.stringify({
+                    body:
+                        JSON.stringify({
 
-                        message: message
+                            message:
+                                message
 
-                    })
+                        })
 
                 }
             );
@@ -2430,13 +3225,7 @@ async function sendVoiceMessage(
             await response.json();
 
 
-        console.log(
-            "Darky voice response:",
-            data
-        );
-
-
-        if (!response.ok) {
+        if(!response.ok){
 
             throw new Error(
                 data.error ||
@@ -2445,13 +3234,6 @@ async function sendVoiceMessage(
 
         }
 
-
-        /*
-         * Support both response formats:
-         *
-         * data.reply
-         * data.answer
-         */
 
         const answer =
             data.reply ||
@@ -2484,12 +3266,27 @@ async function sendVoiceMessage(
             "● READY";
 
 
-    }
-    catch(error) {
+        openPage(
+            "homePage"
+        );
 
+
+        addChatMessage(
+            "user",
+            message
+        );
+
+
+        addChatMessage(
+            "darky",
+            answer
+        );
+
+    }
+    catch(error){
 
         console.error(
-            "Darky voice connection error:",
+            "Darky voice error:",
             error
         );
 
@@ -2510,20 +3307,18 @@ async function sendVoiceMessage(
 }
 
 
-
-/* =========================================
+/* ============================================================
    TEXT TO SPEECH
-========================================= */
+============================================================ */
 
 function speakReply(
     text,
     voiceMode = false
-) {
+){
 
-
-    if (
+    if(
         !("speechSynthesis" in window)
-    ) {
+    ){
 
         return;
 
@@ -2544,7 +3339,7 @@ function speakReply(
 
 
     utterance.rate =
-        0.92;
+        .92;
 
 
     utterance.pitch =
@@ -2559,23 +3354,27 @@ function speakReply(
         voices.find(
             voice =>
                 /female|zira|samantha|aria|jenny|google uk english female/i
-                    .test(voice.name)
+                    .test(
+                        voice.name
+                    )
         )
         ||
         voices.find(
             voice =>
-                /^en-IN/i
-                    .test(voice.lang)
+                /^en-IN/i.test(
+                    voice.lang
+                )
         )
         ||
         voices.find(
             voice =>
-                /^en/i
-                    .test(voice.lang)
+                /^en/i.test(
+                    voice.lang
+                )
         );
 
 
-    if (preferredVoice) {
+    if(preferredVoice){
 
         utterance.voice =
             preferredVoice;
@@ -2583,7 +3382,7 @@ function speakReply(
     }
 
 
-    if (voiceMode) {
+    if(voiceMode){
 
         voiceOrb.classList.add(
             "speaking"
@@ -2597,16 +3396,14 @@ function speakReply(
 
 
     utterance.onend =
-        function() {
-
+        function(){
 
             voiceOrb.classList.remove(
                 "speaking"
             );
 
 
-            if (voiceMode) {
-
+            if(voiceMode){
 
                 voiceStatus.textContent =
                     "Ready to listen";
@@ -2627,17 +3424,16 @@ function speakReply(
 }
 
 
+/* ============================================================
+   VOICES
+============================================================ */
 
-/* =========================================
-   VOICES LOADED
-========================================= */
-
-if (
+if(
     "speechSynthesis" in window
-) {
+){
 
     speechSynthesis.onvoiceschanged =
-        function() {
+        function(){
 
             speechSynthesis.getVoices();
 
@@ -2646,16 +3442,15 @@ if (
 }
 
 
-
-/* =========================================
+/* ============================================================
    GREETING
-========================================= */
+============================================================ */
 
 const hour =
-new Date().getHours();
+    new Date().getHours();
 
 
-if (hour < 12) {
+if(hour < 12){
 
     document.getElementById(
         "greeting"
@@ -2663,7 +3458,7 @@ if (hour < 12) {
         "Good morning.";
 
 }
-else if (hour < 17) {
+else if(hour < 17){
 
     document.getElementById(
         "greeting"
@@ -2671,7 +3466,7 @@ else if (hour < 17) {
         "Good afternoon.";
 
 }
-else {
+else{
 
     document.getElementById(
         "greeting"
@@ -2681,35 +3476,29 @@ else {
 }
 
 
-
-/* =========================================
-   FIRST INTRODUCTION
-========================================= */
+/* ============================================================
+   DARKY INTRO
+============================================================ */
 
 const introduction =
-"Hi, I'm Darky AI. You can call me Darky. I'm the AI assistant of Chaatarra, created by Iqbal.";
+    "Hi, I'm Darky AI. You can call me Darky. I'm the AI assistant of Chaatarra, created by Iqbal.";
 
 
-let hasIntroduced =
+const hasIntroduced =
     localStorage.getItem(
         "darkyIntroduced"
     );
 
 
-if (!hasIntroduced) {
-
+if(!hasIntroduced){
 
     setTimeout(
-        function() {
+        function(){
 
-
-            responsePanel.classList.add(
-                "visible"
+            addChatMessage(
+                "darky",
+                introduction
             );
-
-
-            responseBody.textContent =
-                introduction;
 
 
             speakReply(
@@ -2722,16 +3511,26 @@ if (!hasIntroduced) {
                 "true"
             );
 
-
         },
-        1200
+        1000
     );
 
 }
 
 
+/* ============================================================
+   INITIAL SALES LOAD
+============================================================ */
+
+console.log(
+    "Darky AI dashboard loaded."
+);
+
+console.log(
+    "Live sales connected to chaat_orders."
+);
+
 </script>
 
 </body>
 </html>
-```
