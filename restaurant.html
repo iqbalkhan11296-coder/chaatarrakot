@@ -2277,6 +2277,462 @@ button{
     }
 
 }
+   ```css
+/* ============================================================
+   DARKY AI UNLOCK ANIMATION
+============================================================ */
+
+#darkyUnlockAnimation{
+
+    position:fixed;
+    inset:0;
+    z-index:100000;
+
+    display:none;
+    align-items:center;
+    justify-content:center;
+
+    background:
+        radial-gradient(
+            circle at center,
+            rgba(0,180,255,.20),
+            rgba(2,7,17,.96) 55%,
+            #020711 100%
+        );
+
+    opacity:0;
+
+    pointer-events:none;
+
+}
+
+
+/* ACTIVE */
+
+#darkyUnlockAnimation.active{
+
+    display:flex;
+
+    animation:
+        darkyUnlockScreen
+        2.2s
+        ease-in-out
+        forwards;
+
+}
+
+
+/* ============================================================
+   MAIN ORB
+============================================================ */
+
+.unlock-orb{
+
+    position:relative;
+
+    width:110px;
+    height:110px;
+
+    border-radius:50%;
+
+    background:
+        radial-gradient(
+            circle,
+            #d9faff 0%,
+            #5edcff 18%,
+            #087fc9 48%,
+            #031c36 72%,
+            transparent 73%
+        );
+
+    box-shadow:
+
+        0 0 25px rgba(0,200,255,.8),
+
+        0 0 60px rgba(0,160,255,.6),
+
+        0 0 120px rgba(0,120,255,.4);
+
+    animation:
+        unlockOrb
+        2s
+        cubic-bezier(.2,.8,.2,1)
+        forwards;
+
+}
+
+
+/* ============================================================
+   ORB RINGS
+============================================================ */
+
+.unlock-orb::before,
+.unlock-orb::after{
+
+    content:"";
+
+    position:absolute;
+
+    inset:-25px;
+
+    border-radius:50%;
+
+    border:
+        1px solid
+        rgba(90,220,255,.55);
+
+    box-shadow:
+        0 0 25px
+        rgba(0,180,255,.25);
+
+}
+
+
+.unlock-orb::before{
+
+    animation:
+        unlockRing
+        1.5s
+        ease-out
+        infinite;
+
+}
+
+
+.unlock-orb::after{
+
+    inset:-45px;
+
+    border-color:
+        rgba(80,190,255,.25);
+
+    animation:
+        unlockRing
+        2s
+        ease-out
+        infinite
+        .2s;
+
+}
+
+
+/* ============================================================
+   CENTER LETTER
+============================================================ */
+
+.unlock-letter{
+
+    position:absolute;
+
+    inset:0;
+
+    display:grid;
+
+    place-items:center;
+
+    color:#eaffff;
+
+    font-size:38px;
+
+    font-weight:900;
+
+    letter-spacing:-2px;
+
+    text-shadow:
+        0 0 20px
+        rgba(120,240,255,.9);
+
+    animation:
+        unlockLetter
+        1.5s
+        ease-in-out
+        forwards;
+
+}
+
+
+/* ============================================================
+   PARTICLE RINGS
+============================================================ */
+
+.unlock-particle{
+
+    position:absolute;
+
+    width:5px;
+    height:5px;
+
+    border-radius:50%;
+
+    background:#8eeeff;
+
+    box-shadow:
+        0 0 12px
+        rgba(80,220,255,.9);
+
+}
+
+
+.unlock-particle.p1{
+    animation:particle1 1.7s ease-out forwards;
+}
+
+.unlock-particle.p2{
+    animation:particle2 1.9s ease-out forwards;
+}
+
+.unlock-particle.p3{
+    animation:particle3 1.5s ease-out forwards;
+}
+
+.unlock-particle.p4{
+    animation:particle4 2s ease-out forwards;
+}
+
+.unlock-particle.p5{
+    animation:particle5 1.8s ease-out forwards;
+}
+
+.unlock-particle.p6{
+    animation:particle6 1.6s ease-out forwards;
+}
+
+
+/* ============================================================
+   DARKY TEXT
+============================================================ */
+
+.unlock-text{
+
+    position:absolute;
+
+    margin-top:230px;
+
+    color:#bdefff;
+
+    font-size:12px;
+
+    font-weight:600;
+
+    letter-spacing:5px;
+
+    text-transform:uppercase;
+
+    text-shadow:
+        0 0 15px
+        rgba(80,220,255,.7);
+
+    animation:
+        unlockText
+        1.8s
+        ease-in-out
+        forwards;
+
+}
+
+
+/* ============================================================
+   ANIMATIONS
+============================================================ */
+
+@keyframes darkyUnlockScreen{
+
+    0%{
+        opacity:0;
+    }
+
+    15%{
+        opacity:1;
+    }
+
+    70%{
+        opacity:1;
+    }
+
+    100%{
+        opacity:0;
+    }
+
+}
+
+
+@keyframes unlockOrb{
+
+    0%{
+
+        transform:
+            scale(.15)
+            rotate(0deg);
+
+        opacity:0;
+
+    }
+
+    20%{
+
+        transform:
+            scale(.65)
+            rotate(45deg);
+
+        opacity:1;
+
+    }
+
+    55%{
+
+        transform:
+            scale(1.15)
+            rotate(180deg);
+
+    }
+
+    100%{
+
+        transform:
+            scale(9)
+            rotate(360deg);
+
+        opacity:0;
+
+    }
+
+}
+
+
+@keyframes unlockRing{
+
+    0%{
+
+        transform:scale(.3);
+
+        opacity:0;
+
+    }
+
+    25%{
+
+        opacity:1;
+
+    }
+
+    100%{
+
+        transform:scale(3);
+
+        opacity:0;
+
+    }
+
+}
+
+
+@keyframes unlockLetter{
+
+    0%{
+        opacity:0;
+        transform:scale(.5);
+    }
+
+    35%{
+        opacity:1;
+        transform:scale(1);
+    }
+
+    70%{
+        opacity:1;
+    }
+
+    100%{
+        opacity:0;
+        transform:scale(1.5);
+    }
+
+}
+
+
+@keyframes unlockText{
+
+    0%{
+        opacity:0;
+        transform:translateY(15px);
+    }
+
+    30%{
+        opacity:1;
+        transform:translateY(0);
+    }
+
+    75%{
+        opacity:1;
+    }
+
+    100%{
+        opacity:0;
+        transform:translateY(-10px);
+    }
+
+}
+
+
+/* ============================================================
+   PARTICLES
+============================================================ */
+
+@keyframes particle1{
+
+    to{
+        transform:translate(-180px,-130px) scale(0);
+        opacity:0;
+    }
+
+}
+
+@keyframes particle2{
+
+    to{
+        transform:translate(190px,-100px) scale(0);
+        opacity:0;
+    }
+
+}
+
+@keyframes particle3{
+
+    to{
+        transform:translate(-150px,150px) scale(0);
+        opacity:0;
+    }
+
+}
+
+@keyframes particle4{
+
+    to{
+        transform:translate(170px,140px) scale(0);
+        opacity:0;
+    }
+
+}
+
+@keyframes particle5{
+
+    to{
+        transform:translate(-250px,20px) scale(0);
+        opacity:0;
+    }
+
+}
+
+@keyframes particle6{
+
+    to{
+        transform:translate(250px,30px) scale(0);
+        opacity:0;
+    }
+
+}
+```
+
 
 </style>
 
