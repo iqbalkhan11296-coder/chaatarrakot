@@ -605,245 +605,272 @@ button{
 
 
 /* ============================================================
-   LOW ALERT INVENTORY
+   LOW ALERT INVENTORY — USES THE SAME SCHEMA AS INVENTORY PAGE
 ============================================================ */
 
-.low-alert-section{
+let inventoryItems = [];
+let inventoryRealtimeChannel = null;
+let inventoryRefreshTimer = null;
 
-    margin-top:10px;
+function inventoryNumber(value) {
+    const n = Number(value || 0);
 
-    padding:16px;
+    return Number.isInteger(n)
+        ? String(n)
+        : n.toFixed(2)
+            .replace(/0+$/, "")
+            .replace(/\.$/, "");
+}
 
-    border-radius:17px;
+async function loadLowAlertInventory() {
 
-    background:
-        linear-gradient(
-            145deg,
-            rgba(48,38,19,.42),
-            rgba(15,25,37,.72)
+    const list = document.getElementById("lowAlertItemsList");
+    const count = document.getElementById("statLowAlert");
+
+    if (list) {
+        list.innerHTML =
+            `<span class="low-alert-loading">Syncing inventory...</span>`;
+    }
+
+    try {
+
+        const { data, error } =
+            await supabaseClient
+                .from("inventory_items")
+                .select("id, name, unit, current_stock, alert_level")
+                .order("name", { ascending: true });
+
+        if (error) {
+            throw error;
+        }
+
+        /*
+         * EXACT SAME DATABASE FIELDS USED BY YOUR
+         * WORKING INVENTORY MANAGEMENT PAGE:
+         *
+         * current_stock
+         * alert_level
+         */
+
+        inventoryItems = (data || [])
+            .map(item => ({
+                id: item.id,
+                name: item.name || "Unnamed item",
+                unit: item.unit || "",
+                stock: Number(item.current_stock || 0),
+                alert: Number(item.alert_level || 0)
+            }))
+            .filter(item =>
+                item.stock <= item.alert
+            )
+            .sort((a, b) =>
+                a.stock - b.stock
+            );
+
+        if (count) {
+            count.textContent = inventoryItems.length;
+        }
+
+        renderLowAlertInventory();
+
+    } catch (error) {
+
+        console.error(
+            "Darky Low Alert inventory error:",
+            error
         );
 
-    border:
-        1px solid
-        rgba(255,205,90,.16);
+        if (count) {
+            count.textContent = "—";
+        }
 
-    box-shadow:
-        0 8px 25px
-        rgba(0,0,0,.15);
+        if (list) {
+            list.innerHTML = `
+                <span class="low-alert-empty">
+                    Unable to load inventory.
+                </span>
+            `;
+        }
+    }
 }
 
-.low-alert-header{
 
-    display:flex;
+function renderLowAlertInventory() {
 
-    align-items:center;
+    const list =
+        document.getElementById(
+            "lowAlertItemsList"
+        );
 
-    justify-content:space-between;
+    if (!list) {
+        return;
+    }
 
-    gap:10px;
+    if (!inventoryItems.length) {
 
-    margin-bottom:12px;
+        list.innerHTML = `
+            <span class="low-alert-empty">
+                ✓ All inventory items are above their alert level
+            </span>
+        `;
+
+        return;
+    }
+
+    list.innerHTML =
+        inventoryItems
+            .map(item => {
+
+                const isOut =
+                    Number(item.stock) <= 0;
+
+                return `
+                    <div class="low-alert-item ${isOut ? "out" : ""}">
+
+                        <span
+                            class="low-alert-item-name"
+                            title="${escapeHtml(item.name)}">
+                            ${escapeHtml(item.name)}
+                        </span>
+
+                        <span class="low-alert-item-stock">
+
+                            ${
+                                isOut
+                                    ? "OUT"
+                                    : `${inventoryNumber(item.stock)} / ${inventoryNumber(item.alert)}${item.unit ? " " + escapeHtml(item.unit) : ""}`
+                            }
+
+                        </span>
+
+                    </div>
+                `;
+
+            })
+            .join("");
 }
 
-.low-alert-title{
 
-    display:flex;
+/* ============================================================
+   REALTIME INVENTORY UPDATES
+============================================================ */
 
-    align-items:center;
+function scheduleInventoryRefresh() {
 
-    gap:9px;
+    clearTimeout(
+        inventoryRefreshTimer
+    );
+
+    inventoryRefreshTimer =
+        setTimeout(
+            function() {
+                loadLowAlertInventory();
+            },
+            200
+        );
 }
 
-.low-alert-icon{
 
-    width:30px;
+function subscribeToInventory() {
 
-    height:30px;
+    if (inventoryRealtimeChannel) {
 
-    display:grid;
+        try {
 
-    place-items:center;
+            supabaseClient.removeChannel(
+                inventoryRealtimeChannel
+            );
 
-    border-radius:10px;
+        } catch (error) {
 
-    background:
-        rgba(255,190,60,.10);
+            console.warn(
+                "Could not remove old inventory channel:",
+                error
+            );
+        }
 
-    border:
-        1px solid
-        rgba(255,205,80,.18);
+        inventoryRealtimeChannel = null;
+    }
 
-    color:#ffd46b;
+    inventoryRealtimeChannel =
+        supabaseClient
+            .channel(
+                "darky-low-alert-inventory"
+            )
 
-    font-size:14px;
+            .on(
+                "postgres_changes",
+                {
+                    event: "INSERT",
+                    schema: "public",
+                    table: "inventory_items"
+                },
+                function(payload) {
+
+                    console.log(
+                        "Inventory INSERT:",
+                        payload
+                    );
+
+                    scheduleInventoryRefresh();
+                }
+            )
+
+            .on(
+                "postgres_changes",
+                {
+                    event: "UPDATE",
+                    schema: "public",
+                    table: "inventory_items"
+                },
+                function(payload) {
+
+                    console.log(
+                        "Inventory UPDATE:",
+                        payload
+                    );
+
+                    scheduleInventoryRefresh();
+                }
+            )
+
+            .on(
+                "postgres_changes",
+                {
+                    event: "DELETE",
+                    schema: "public",
+                    table: "inventory_items"
+                },
+                function(payload) {
+
+                    console.log(
+                        "Inventory DELETE:",
+                        payload
+                    );
+
+                    scheduleInventoryRefresh();
+                }
+            )
+
+            .subscribe(
+                function(status) {
+
+                    console.log(
+                        "Darky inventory realtime:",
+                        status
+                    );
+
+                }
+            );
 }
 
-.low-alert-title strong{
 
-    display:block;
+/* ============================================================
+   START LOW ALERT INVENTORY
+============================================================ */
 
-    color:#e9f8ff;
-
-    font-size:11px;
-
-    letter-spacing:1.3px;
-
-    text-transform:uppercase;
-}
-
-.low-alert-title span{
-
-    display:block;
-
-    margin-top:3px;
-
-    color:#71899a;
-
-    font-size:9px;
-}
-
-.low-alert-count{
-
-    min-width:30px;
-
-    height:30px;
-
-    padding:
-        0 9px;
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    border-radius:10px;
-
-    background:
-        rgba(255,190,50,.10);
-
-    border:
-        1px solid
-        rgba(255,205,80,.18);
-
-    color:#ffd66e;
-
-    font-size:12px;
-
-    font-weight:800;
-}
-
-.low-alert-items{
-
-    display:grid;
-
-    grid-template-columns:
-        repeat(2,1fr);
-
-    gap:7px;
-
-    max-height:210px;
-
-    overflow-y:auto;
-
-    padding-right:2px;
-}
-
-.low-alert-item{
-
-    min-width:0;
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:space-between;
-
-    gap:8px;
-
-    padding:
-        9px 10px;
-
-    border-radius:10px;
-
-    background:
-        rgba(255,195,70,.055);
-
-    border:
-        1px solid
-        rgba(255,205,80,.10);
-}
-
-.low-alert-item-name{
-
-    min-width:0;
-
-    overflow:hidden;
-
-    text-overflow:ellipsis;
-
-    white-space:nowrap;
-
-    color:#d9edf4;
-
-    font-size:11px;
-
-    font-weight:600;
-}
-
-.low-alert-item-stock{
-
-    flex-shrink:0;
-
-    color:#ffd16a;
-
-    font-size:10px;
-
-    font-weight:800;
-
-    white-space:nowrap;
-}
-
-.low-alert-item.out{
-
-    background:
-        rgba(255,70,70,.07);
-
-    border-color:
-        rgba(255,100,100,.15);
-}
-
-.low-alert-item.out .low-alert-item-stock{
-
-    color:#ff8585;
-}
-
-.low-alert-empty{
-
-    grid-column:1 / -1;
-
-    padding:13px;
-
-    text-align:center;
-
-    color:#668294;
-
-    font-size:10px;
-}
-
-.low-alert-error{
-
-    grid-column:1 / -1;
-
-    padding:12px;
-
-    text-align:center;
-
-    color:#ff9a9a;
-
-    font-size:10px;
-}
-
+loadLowAlertInventory();
+subscribeToInventory();
 
 /* ============================================================
    HOME TITLE
