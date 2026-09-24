@@ -1,0 +1,2472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Reemy AI — Chaatarra</title>
+
+<style>
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Inter, Arial, sans-serif;
+    background: #080808;
+    color: #f4f0e8;
+    min-height: 100vh;
+}
+
+button,
+input {
+    font: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+.app {
+    max-width: 1100px;
+    margin: auto;
+    min-height: 100vh;
+
+    background:
+        radial-gradient(
+            circle at 50% 5%,
+            rgba(190,155,75,.13),
+            transparent 32%
+        ),
+        #080808;
+}
+
+
+/* =========================================
+   TOP BAR
+========================================= */
+
+.topbar {
+
+    height: 76px;
+
+    padding: 0 24px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    border-bottom:
+        1px solid rgba(255,255,255,.07);
+}
+
+.brand {
+
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+}
+
+.logo {
+
+    width: 42px;
+    height: 42px;
+
+    border-radius: 14px;
+
+    display: grid;
+    place-items: center;
+
+    background:
+        linear-gradient(
+            145deg,
+            #d8bd78,
+            #8e6d2e
+        );
+
+    color: #111;
+
+    font-weight: 900;
+    font-size: 20px;
+}
+
+.brand-text strong {
+
+    display: block;
+
+    letter-spacing: 2px;
+
+    font-size: 16px;
+}
+
+.brand-text span {
+
+    font-size: 10px;
+
+    color: #9e9a91;
+
+    letter-spacing: 1px;
+}
+
+.status {
+
+    font-size: 10px;
+
+    color: #c8ad6d;
+
+    border:
+        1px solid rgba(200,173,109,.25);
+
+    padding: 7px 11px;
+
+    border-radius: 20px;
+}
+
+
+/* =========================================
+   MAIN PAGE
+========================================= */
+
+.page {
+
+    padding:
+        28px
+        24px
+        115px;
+
+    min-height:
+        calc(100vh - 76px);
+}
+
+
+/* =========================================
+   HOME HEADER
+========================================= */
+
+.home-title {
+
+    margin-top: 20px;
+}
+
+.home-title small {
+
+    color: #99948a;
+
+    font-size: 13px;
+}
+
+.home-title h1 {
+
+    margin-top: 8px;
+
+    font-size:
+        clamp(30px,5vw,48px);
+
+    font-weight: 500;
+
+    letter-spacing: -1px;
+}
+
+.home-title h1 span {
+
+    color: #cdb16b;
+}
+
+
+/* =========================================
+   REEMY ORB
+========================================= */
+
+.orb-wrap {
+
+    display: flex;
+
+    justify-content: center;
+
+    margin:
+        45px 0 30px;
+}
+
+.orb {
+
+    width: 190px;
+    height: 190px;
+
+    border-radius: 50%;
+
+    background:
+
+        radial-gradient(
+            circle at 35% 30%,
+            #f8e7b5,
+            #b9944e 38%,
+            #4e3a1b 65%,
+            #17130c
+        );
+
+    box-shadow:
+
+        0 0 45px
+        rgba(205,177,107,.16),
+
+        inset 0 0 35px
+        rgba(255,255,255,.12);
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    position: relative;
+
+    transition: .3s;
+}
+
+.orb::before {
+
+    content: "";
+
+    position: absolute;
+
+    inset: -15px;
+
+    border:
+        1px solid
+        rgba(219,190,113,.25);
+
+    border-radius: 50%;
+}
+
+.orb::after {
+
+    content: "";
+
+    position: absolute;
+
+    inset: -30px;
+
+    border:
+        1px solid
+        rgba(219,190,113,.10);
+
+    border-radius: 50%;
+}
+
+.orb-icon {
+
+    font-size: 46px;
+}
+
+
+/* =========================================
+   ASK REEMY AREA
+========================================= */
+
+.ask-area {
+
+    width: min(760px,100%);
+
+    margin:
+        0 auto 35px;
+}
+
+.ask-label {
+
+    text-align: center;
+
+    color: #817c74;
+
+    font-size: 12px;
+
+    margin-bottom: 10px;
+}
+
+.ask-box {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    padding: 8px 9px;
+
+    background: #111;
+
+    border:
+        1px solid
+        rgba(255,255,255,.10);
+
+    border-radius: 20px;
+
+    box-shadow:
+        0 10px 40px
+        rgba(0,0,0,.25);
+
+    transition: .25s;
+}
+
+.ask-box:focus-within {
+
+    border-color:
+        rgba(205,177,107,.45);
+
+    box-shadow:
+        0 0 30px
+        rgba(205,177,107,.07);
+}
+
+.ask-box input {
+
+    flex: 1;
+
+    min-width: 0;
+
+    background: transparent;
+
+    border: none;
+
+    outline: none;
+
+    color: #f5f0e6;
+
+    padding: 12px 8px;
+
+    font-size: 14px;
+}
+
+.ask-box input::placeholder {
+
+    color: #66615a;
+}
+
+.ask-button {
+
+    width: 44px;
+    height: 44px;
+
+    flex-shrink: 0;
+
+    border-radius: 14px;
+
+    border:
+        1px solid
+        rgba(255,255,255,.08);
+
+    background: #191919;
+
+    color: #d7bd7b;
+
+    font-size: 19px;
+
+    transition: .2s;
+}
+
+.ask-button:hover {
+
+    background: #222;
+}
+
+.ask-send {
+
+    background:
+        linear-gradient(
+            145deg,
+            #d5bb78,
+            #96763e
+        );
+
+    color: #111;
+
+    border: none;
+}
+
+
+/* =========================================
+   RESPONSE PANEL
+========================================= */
+
+.response-panel {
+
+    width: min(760px,100%);
+
+    margin: 0 auto 35px;
+
+    display: none;
+
+    background:
+        rgba(255,255,255,.035);
+
+    border:
+        1px solid
+        rgba(255,255,255,.07);
+
+    border-radius: 20px;
+
+    overflow: hidden;
+}
+
+.response-panel.visible {
+
+    display: block;
+
+    animation:
+        responseIn .3s ease;
+}
+
+@keyframes responseIn {
+
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.response-header {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 9px;
+
+    padding: 13px 16px;
+
+    border-bottom:
+        1px solid
+        rgba(255,255,255,.06);
+
+    color: #cdb16b;
+
+    font-size: 11px;
+
+    letter-spacing: 1px;
+
+    text-transform: uppercase;
+}
+
+.response-dot {
+
+    width: 7px;
+    height: 7px;
+
+    border-radius: 50%;
+
+    background: #cdb16b;
+
+    box-shadow:
+        0 0 10px
+        rgba(205,177,107,.5);
+}
+
+.response-body {
+
+    padding: 18px;
+
+    color: #d5d0c7;
+
+    font-size: 14px;
+
+    line-height: 1.65;
+
+    white-space: pre-wrap;
+}
+
+
+/* =========================================
+   QUICK ACTIONS
+========================================= */
+
+.section-title {
+
+    margin:
+        20px 0 15px;
+
+    font-size: 11px;
+
+    color: #88837a;
+
+    text-transform: uppercase;
+
+    letter-spacing: 2px;
+}
+
+.quick-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(4,1fr);
+
+    gap: 12px;
+
+    max-width: 900px;
+
+    margin: auto;
+}
+
+.quick-card {
+
+    background:
+        rgba(255,255,255,.035);
+
+    border:
+        1px solid
+        rgba(255,255,255,.07);
+
+    border-radius: 18px;
+
+    padding: 20px 14px;
+
+    color: #eee9df;
+
+    transition: .2s;
+
+    text-align: left;
+}
+
+.quick-card:hover {
+
+    border-color:
+        rgba(205,177,107,.4);
+
+    transform:
+        translateY(-2px);
+}
+
+.quick-card .icon {
+
+    font-size: 23px;
+
+    margin-bottom: 12px;
+}
+
+.quick-card strong {
+
+    display: block;
+
+    font-size: 13px;
+}
+
+.quick-card span {
+
+    color: #817d75;
+
+    font-size: 11px;
+}
+
+
+/* =========================================
+   VOICE PAGE
+========================================= */
+
+.voice-page {
+
+    display: none;
+
+    text-align: center;
+}
+
+.voice-page.active {
+
+    display: block !important;
+}
+
+.voice-center {
+
+    max-width: 650px;
+
+    margin: auto;
+
+    padding-top: 10px;
+}
+
+.page-heading {
+
+    text-align: left;
+
+    margin-bottom: 10px;
+}
+
+.page-heading h2 {
+
+    font-size: 27px;
+
+    font-weight: 500;
+}
+
+.page-heading p {
+
+    color: #858078;
+
+    font-size: 12px;
+
+    margin-top: 5px;
+}
+
+.voice-orb {
+
+    width: 230px;
+    height: 230px;
+
+    border-radius: 50%;
+
+    margin:
+        55px auto 35px;
+
+    display: grid;
+
+    place-items: center;
+
+    background:
+
+        radial-gradient(
+            circle at 35% 28%,
+            #fff0bd,
+            #c4a35d 35%,
+            #61491e 62%,
+            #16130d
+        );
+
+    box-shadow:
+        0 0 70px
+        rgba(205,177,107,.18);
+
+    border:
+        1px solid
+        rgba(220,190,110,.3);
+
+    transition: .3s;
+}
+
+.voice-orb.listening {
+
+    animation:
+        pulse 1.1s infinite;
+
+    box-shadow:
+
+        0 0 0 15px
+        rgba(205,177,107,.06),
+
+        0 0 0 30px
+        rgba(205,177,107,.03),
+
+        0 0 80px
+        rgba(205,177,107,.3);
+}
+
+.voice-orb.speaking {
+
+    animation:
+        speakPulse .55s infinite
+        alternate;
+}
+
+@keyframes pulse {
+
+    50% {
+        transform: scale(1.07);
+    }
+}
+
+@keyframes speakPulse {
+
+    to {
+        transform: scale(1.04);
+    }
+}
+
+.voice-mic {
+
+    font-size: 55px;
+}
+
+.voice-status {
+
+    font-size: 22px;
+
+    font-weight: 500;
+}
+
+.voice-hint {
+
+    color: #817c74;
+
+    font-size: 13px;
+
+    margin-top: 8px;
+}
+
+.voice-transcript {
+
+    min-height: 80px;
+
+    margin:
+        30px auto;
+
+    padding: 18px;
+
+    max-width: 600px;
+
+    border:
+        1px solid
+        rgba(255,255,255,.07);
+
+    background:
+        rgba(255,255,255,.025);
+
+    border-radius: 18px;
+
+    color: #aaa59c;
+
+    font-size: 14px;
+
+    line-height: 1.5;
+
+    white-space: pre-wrap;
+}
+
+.voice-button {
+
+    width: 72px;
+    height: 72px;
+
+    border-radius: 50%;
+
+    border:
+        1px solid
+        rgba(210,180,105,.35);
+
+    background: #151515;
+
+    color: #d7bd7b;
+
+    font-size: 28px;
+
+    transition: .2s;
+}
+
+.voice-button:hover {
+
+    transform: scale(1.05);
+
+    background: #1d1d1d;
+}
+
+
+/* =========================================
+   OTHER PAGES
+========================================= */
+
+.secondary-page {
+
+    display: none;
+}
+
+.secondary-page.active {
+
+    display: block;
+}
+
+.data-card {
+
+    background:
+        rgba(255,255,255,.035);
+
+    border:
+        1px solid
+        rgba(255,255,255,.07);
+
+    border-radius: 20px;
+
+    padding: 22px;
+
+    margin-top: 20px;
+
+    max-width: 800px;
+}
+
+.data-card h3 {
+
+    font-size: 15px;
+
+    margin-bottom: 8px;
+}
+
+.data-card p {
+
+    color: #99948b;
+
+    line-height: 1.6;
+
+    font-size: 13px;
+}
+
+
+/* =========================================
+   TYPING
+========================================= */
+
+.typing {
+
+    display: inline-flex;
+
+    gap: 4px;
+}
+
+.typing span {
+
+    width: 5px;
+    height: 5px;
+
+    background: #bca365;
+
+    border-radius: 50%;
+
+    animation:
+        typing 1s infinite;
+}
+
+.typing span:nth-child(2) {
+
+    animation-delay: .15s;
+}
+
+.typing span:nth-child(3) {
+
+    animation-delay: .3s;
+}
+
+@keyframes typing {
+
+    50% {
+
+        opacity: .2;
+
+        transform:
+            translateY(-3px);
+    }
+}
+
+
+/* =========================================
+   BOTTOM NAV
+========================================= */
+
+.bottom-nav {
+
+    position: fixed;
+
+    left: 50%;
+    bottom: 15px;
+
+    transform:
+        translateX(-50%);
+
+    width:
+        min(700px,calc(100% - 24px));
+
+    background:
+        rgba(20,20,20,.95);
+
+    backdrop-filter:
+        blur(18px);
+
+    border:
+        1px solid
+        rgba(255,255,255,.08);
+
+    border-radius: 23px;
+
+    padding: 8px;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(5,1fr);
+
+    z-index: 100;
+}
+
+.nav-btn {
+
+    background: transparent;
+
+    border: 0;
+
+    color: #69655e;
+
+    padding: 9px 4px;
+
+    border-radius: 16px;
+
+    font-size: 10px;
+
+    transition: .2s;
+}
+
+.nav-btn .nav-icon {
+
+    display: block;
+
+    font-size: 18px;
+
+    margin-bottom: 4px;
+}
+
+.nav-btn.active {
+
+    color: #d2b66f;
+
+    background:
+        rgba(205,177,107,.08);
+}
+
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media(max-width:700px) {
+
+    .topbar {
+
+        padding: 0 16px;
+    }
+
+    .page {
+
+        padding:
+            22px
+            16px
+            110px;
+    }
+
+    .orb {
+
+        width: 155px;
+        height: 155px;
+    }
+
+    .orb-wrap {
+
+        margin-top: 38px;
+    }
+
+    .quick-grid {
+
+        grid-template-columns:
+            repeat(2,1fr);
+    }
+
+    .quick-card {
+
+        padding: 17px 13px;
+    }
+
+    .voice-orb {
+
+        width: 190px;
+        height: 190px;
+
+        margin-top: 45px;
+    }
+
+    .bottom-nav {
+
+        width:
+            calc(100% - 16px);
+
+        bottom: 8px;
+    }
+
+    .nav-btn {
+
+        font-size: 9px;
+    }
+
+    .ask-box input {
+
+        font-size: 13px;
+    }
+
+}
+
+
+/* =========================================
+   SMALL MOBILE
+========================================= */
+
+@media(max-width:400px) {
+
+    .brand-text span {
+
+        display: none;
+    }
+
+    .status {
+
+        font-size: 9px;
+
+        padding:
+            6px 8px;
+    }
+
+    .quick-card span {
+
+        display: none;
+    }
+
+}
+
+</style>
+</head>
+
+
+<body>
+
+<div class="app">
+
+
+<!-- =====================================
+     TOP BAR
+===================================== -->
+
+<header class="topbar">
+
+    <div class="brand">
+
+        <div class="logo">
+            R
+        </div>
+
+        <div class="brand-text">
+
+            <strong>
+                REEMY AI
+            </strong>
+
+            <span>
+                CHAATARRA ASSISTANT
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <div
+        class="status"
+        id="connectionStatus">
+
+        ● READY
+
+    </div>
+
+</header>
+
+
+
+<!-- =====================================
+     HOME
+===================================== -->
+
+<section
+    id="homePage"
+    class="page active">
+
+
+    <div class="home-title">
+
+        <small id="greeting">
+            Good evening.
+        </small>
+
+        <h1>
+            Hello,
+            <span>
+                Iqbal
+            </span>
+        </h1>
+
+    </div>
+
+
+
+    <!-- REEMY -->
+
+    <div class="orb-wrap">
+
+        <div
+            class="orb"
+            id="homeOrb">
+
+            <div class="orb-icon">
+                ✦
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- ASK REEMY -->
+
+    <div class="ask-area">
+
+        <div class="ask-label">
+
+            Ask Reemy anything
+
+        </div>
+
+
+        <div class="ask-box">
+
+            <button
+                class="ask-button"
+                onclick="openVoice()">
+
+                🎙
+
+            </button>
+
+
+            <input
+                id="askInput"
+                type="text"
+                placeholder="Ask Reemy anything..."
+                autocomplete="off"
+            >
+
+
+            <button
+                class="ask-button ask-send"
+                onclick="sendHomeQuestion()">
+
+                ➤
+
+            </button>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- RESPONSE -->
+
+    <div
+        id="responsePanel"
+        class="response-panel">
+
+        <div class="response-header">
+
+            <span class="response-dot"></span>
+
+            Reemy AI
+
+        </div>
+
+
+        <div
+            id="responseBody"
+            class="response-body">
+
+        </div>
+
+    </div>
+
+
+
+    <!-- QUICK ACTIONS -->
+
+    <div class="section-title">
+
+        Quick actions
+
+    </div>
+
+
+    <div class="quick-grid">
+
+
+        <button
+            class="quick-card"
+            onclick="askQuick('What are today\\'s sales?')">
+
+            <div class="icon">
+                ₹
+            </div>
+
+            <strong>
+                Today's Sales
+            </strong>
+
+            <span>
+                Revenue today
+            </span>
+
+        </button>
+
+
+        <button
+            class="quick-card"
+            onclick="askQuick('Show me the latest orders.')">
+
+            <div class="icon">
+                🧾
+            </div>
+
+            <strong>
+                Orders
+            </strong>
+
+            <span>
+                Recent orders
+            </span>
+
+        </button>
+
+
+        <button
+            class="quick-card"
+            onclick="askQuick('Give me the current inventory overview.')">
+
+            <div class="icon">
+                📦
+            </div>
+
+            <strong>
+                Inventory
+            </strong>
+
+            <span>
+                Current stock
+            </span>
+
+        </button>
+
+
+        <button
+            class="quick-card"
+            onclick="askQuick('Show me the recent inventory history.')">
+
+            <div class="icon">
+                ↕
+            </div>
+
+            <strong>
+                Stock History
+            </strong>
+
+            <span>
+                Stock movements
+            </span>
+
+        </button>
+
+
+    </div>
+
+</section>
+
+
+
+<!-- =====================================
+     VOICE PAGE
+===================================== -->
+
+<section
+    id="voicePage"
+    class="page voice-page">
+
+
+    <div class="voice-center">
+
+
+        <div class="page-heading">
+
+            <h2>
+                Voice Command
+            </h2>
+
+            <p>
+                Speak naturally to Reemy
+            </p>
+
+        </div>
+
+
+        <div
+            id="voiceOrb"
+            class="voice-orb">
+
+            <div
+                class="voice-mic"
+                id="voiceMicIcon">
+
+                🎙
+
+            </div>
+
+        </div>
+
+
+        <div
+            id="voiceStatus"
+            class="voice-status">
+
+            Ready to listen
+
+        </div>
+
+
+        <div
+            id="voiceHint"
+            class="voice-hint">
+
+            Tap the microphone and speak
+
+        </div>
+
+
+        <div
+            id="voiceTranscript"
+            class="voice-transcript">
+
+            Your voice command will appear here.
+
+        </div>
+
+
+        <button
+            id="voiceButton"
+            class="voice-button"
+            onclick="startVoiceCommand()">
+
+            🎙
+
+        </button>
+
+
+    </div>
+
+</section>
+
+
+
+<!-- =====================================
+     STOCK PAGE
+===================================== -->
+
+<section
+    id="stockPage"
+    class="page secondary-page">
+
+
+    <div class="page-heading">
+
+        <h2>
+            Stock
+        </h2>
+
+        <p>
+            Inventory information
+        </p>
+
+    </div>
+
+
+    <div class="data-card">
+
+        <h3>
+            Inventory Assistant
+        </h3>
+
+        <p>
+            Ask Reemy about current stock,
+            low-stock items, vendors,
+            purchase prices or stock movements.
+        </p>
+
+    </div>
+
+
+    <button
+        class="quick-card"
+        style="margin-top:15px;width:100%;"
+        onclick="askQuick('Give me the current inventory overview.')">
+
+        📦 &nbsp;
+        Check current inventory
+
+    </button>
+
+
+    <button
+        class="quick-card"
+        style="margin-top:10px;width:100%;"
+        onclick="askQuick('Show me the recent inventory history.')">
+
+        ↕ &nbsp;
+        Check stock history
+
+    </button>
+
+</section>
+
+
+
+<!-- =====================================
+     ORDERS PAGE
+===================================== -->
+
+<section
+    id="ordersPage"
+    class="page secondary-page">
+
+
+    <div class="page-heading">
+
+        <h2>
+            Orders
+        </h2>
+
+        <p>
+            Restaurant order information
+        </p>
+
+    </div>
+
+
+    <div class="data-card">
+
+        <h3>
+            Order Assistant
+        </h3>
+
+        <p>
+            Ask Reemy about recent orders,
+            order totals, customer names,
+            tables or order details.
+        </p>
+
+    </div>
+
+
+    <button
+        class="quick-card"
+        style="margin-top:15px;width:100%;"
+        onclick="askQuick('Show me the latest orders.')">
+
+        🧾 &nbsp;
+        Show latest orders
+
+    </button>
+
+</section>
+
+
+
+<!-- =====================================
+     REPORTS PAGE
+===================================== -->
+
+<section
+    id="reportsPage"
+    class="page secondary-page">
+
+
+    <div class="page-heading">
+
+        <h2>
+            Reports
+        </h2>
+
+        <p>
+            Business information through Reemy
+        </p>
+
+    </div>
+
+
+    <div class="data-card">
+
+        <h3>
+            Ask Reemy
+        </h3>
+
+        <p>
+            Ask questions about sales,
+            orders, inventory, expenses
+            and restaurant activity.
+        </p>
+
+    </div>
+
+
+    <button
+        class="quick-card"
+        style="margin-top:15px;width:100%;"
+        onclick="askQuick('Give me a summary of today\\'s restaurant activity.')">
+
+        📊 &nbsp;
+        Today's summary
+
+    </button>
+
+</section>
+
+
+
+<!-- =====================================
+     BOTTOM NAV
+===================================== -->
+
+<nav class="bottom-nav">
+
+
+    <button
+        class="nav-btn active"
+        data-page="homePage"
+        onclick="openPage('homePage')">
+
+        <span class="nav-icon">
+            ⌂
+        </span>
+
+        Home
+
+    </button>
+
+
+    <button
+        class="nav-btn"
+        data-page="voicePage"
+        onclick="openPage('voicePage')">
+
+        <span class="nav-icon">
+            🎙
+        </span>
+
+        Voice
+
+    </button>
+
+
+    <button
+        class="nav-btn"
+        data-page="stockPage"
+        onclick="openPage('stockPage')">
+
+        <span class="nav-icon">
+            📦
+        </span>
+
+        Stock
+
+    </button>
+
+
+    <button
+        class="nav-btn"
+        data-page="ordersPage"
+        onclick="openPage('ordersPage')">
+
+        <span class="nav-icon">
+            🧾
+        </span>
+
+        Orders
+
+    </button>
+
+
+    <button
+        class="nav-btn"
+        data-page="reportsPage"
+        onclick="openPage('reportsPage')">
+
+        <span class="nav-icon">
+            ▥
+        </span>
+
+        Reports
+
+    </button>
+
+
+</nav>
+
+
+</div>
+
+
+
+<script>
+
+
+/* =========================================
+   SUPABASE
+========================================= */
+
+const SUPABASE_FUNCTION_URL =
+"https://ucqeyhcycwksiubmlilg.supabase.co/functions/v1/restaurant-ai";
+
+
+const SUPABASE_KEY =
+"sb_publishable_YdIvl7IqdpT0UZOHBumEiw_ZThYEsgV";
+
+
+
+/* =========================================
+   ELEMENTS
+========================================= */
+
+const askInput =
+document.getElementById("askInput");
+
+const responsePanel =
+document.getElementById("responsePanel");
+
+const responseBody =
+document.getElementById("responseBody");
+
+const connectionStatus =
+document.getElementById("connectionStatus");
+
+
+
+/* =========================================
+   PAGE NAVIGATION
+========================================= */
+
+function openPage(pageId) {
+
+    document
+        .querySelectorAll(".page")
+        .forEach(page => {
+
+            page.classList.remove("active");
+
+        });
+
+
+    document
+        .getElementById(pageId)
+        .classList.add("active");
+
+
+    document
+        .querySelectorAll(".nav-btn")
+        .forEach(button => {
+
+            button.classList.remove("active");
+
+
+            if (
+                button.dataset.page === pageId
+            ) {
+
+                button.classList.add("active");
+
+            }
+
+        });
+
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+
+}
+
+
+
+/* =========================================
+   HOME QUESTION
+========================================= */
+
+function sendHomeQuestion() {
+
+    const message =
+        askInput.value.trim();
+
+
+    if (!message) {
+        return;
+    }
+
+
+    askInput.value = "";
+
+
+    sendMessageToAI(message);
+
+}
+
+
+
+/* =========================================
+   ENTER KEY
+========================================= */
+
+askInput.addEventListener(
+    "keydown",
+    function(event) {
+
+        if (event.key === "Enter") {
+
+            sendHomeQuestion();
+
+        }
+
+    }
+);
+
+
+
+/* =========================================
+   QUICK ACTIONS
+========================================= */
+
+function askQuick(message) {
+
+    sendMessageToAI(message);
+
+}
+
+
+
+/* =========================================
+   AI REQUEST
+========================================= */
+
+async function sendMessageToAI(message) {
+
+    responsePanel.classList.add(
+        "visible"
+    );
+
+
+    responseBody.innerHTML = `
+
+        <div class="typing">
+
+            <span></span>
+            <span></span>
+            <span></span>
+
+        </div>
+
+    `;
+
+
+    connectionStatus.textContent =
+        "● THINKING";
+
+
+    try {
+
+        const response =
+            await fetch(
+                SUPABASE_FUNCTION_URL,
+                {
+
+                    method: "POST",
+
+                    headers: {
+
+                        "Content-Type":
+                            "application/json",
+
+                        "Authorization":
+                            "Bearer " +
+                            SUPABASE_KEY
+
+                    },
+
+                    body: JSON.stringify({
+
+                        message: message
+
+                    })
+
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        console.log(
+            "Reemy response:",
+            data
+        );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.error ||
+                "Request failed"
+            );
+
+        }
+
+
+        /*
+         * Connection-test function returns:
+         *
+         * {
+         *   success: true,
+         *   reply: "Hi Iqbal, I'm Reemy."
+         * }
+         *
+         * Future AI version may return:
+         *
+         * {
+         *   success: true,
+         *   answer: "..."
+         * }
+         *
+         * Support both formats.
+         */
+
+        const answer =
+            data.reply ||
+            data.answer ||
+            "I couldn't get a response right now.";
+
+
+        responseBody.textContent =
+            answer;
+
+
+        connectionStatus.textContent =
+            "● READY";
+
+
+        speakReply(
+            answer
+        );
+
+
+    }
+    catch(error) {
+
+        console.error(
+            "Reemy connection error:",
+            error
+        );
+
+
+        responseBody.textContent =
+            "I'm having trouble connecting right now. Please try again.";
+
+
+        connectionStatus.textContent =
+            "● CONNECTION ERROR";
+
+    }
+
+}
+
+
+
+/* =========================================
+   VOICE
+========================================= */
+
+function openVoice() {
+
+    openPage("voicePage");
+
+    /* Start listening immediately from the Speak button. */
+    if (typeof startVoiceCommand === "function") {
+        startVoiceCommand();
+    }
+
+}
+
+
+
+/* =========================================
+   SPEECH RECOGNITION
+========================================= */
+
+const SpeechRecognition =
+    window.SpeechRecognition ||
+    window.webkitSpeechRecognition;
+
+
+let recognition = null;
+
+let listening = false;
+
+
+const voiceOrb =
+    document.getElementById(
+        "voiceOrb"
+    );
+
+
+const voiceStatus =
+    document.getElementById(
+        "voiceStatus"
+    );
+
+
+const voiceHint =
+    document.getElementById(
+        "voiceHint"
+    );
+
+
+const voiceTranscript =
+    document.getElementById(
+        "voiceTranscript"
+    );
+
+
+
+if (SpeechRecognition) {
+
+
+    recognition =
+        new SpeechRecognition();
+
+
+    recognition.lang =
+        "en-IN";
+
+
+    recognition.continuous =
+        false;
+
+
+    recognition.interimResults =
+        false;
+
+
+
+    recognition.onstart =
+        function() {
+
+
+            listening = true;
+
+
+            voiceOrb.classList.add(
+                "listening"
+            );
+
+
+            voiceStatus.textContent =
+                "Listening...";
+
+
+            voiceHint.textContent =
+                "Speak naturally";
+
+
+            voiceTranscript.textContent =
+                "Listening for your command...";
+
+        };
+
+
+
+    recognition.onresult =
+        async function(event) {
+
+
+            const transcript =
+                event
+                    .results[0][0]
+                    .transcript;
+
+
+            voiceTranscript.textContent =
+                transcript;
+
+
+            voiceStatus.textContent =
+                "Thinking...";
+
+
+            voiceHint.textContent =
+                "Reemy is processing your command";
+
+
+            voiceOrb.classList.remove(
+                "listening"
+            );
+
+
+            await sendVoiceMessage(
+                transcript
+            );
+
+        };
+
+
+
+    recognition.onerror =
+        function(event) {
+
+
+            console.error(
+                "Speech recognition:",
+                event.error
+            );
+
+
+            listening = false;
+
+
+            voiceOrb.classList.remove(
+                "listening"
+            );
+
+
+            voiceStatus.textContent =
+                "Voice error";
+
+
+            voiceHint.textContent =
+                "Please try again";
+
+        };
+
+
+
+    recognition.onend =
+        function() {
+
+            listening = false;
+
+            voiceOrb.classList.remove(
+                "listening"
+            );
+
+        };
+
+}
+
+
+
+/* =========================================
+   START VOICE
+========================================= */
+
+function startVoiceCommand() {
+
+
+    if (!recognition) {
+
+
+        voiceStatus.textContent =
+            "Voice not supported";
+
+
+        voiceHint.textContent =
+            "Please use Chrome or Edge";
+
+
+        return;
+
+    }
+
+
+    if (listening) {
+
+        recognition.stop();
+
+        return;
+
+    }
+
+
+    try {
+
+        recognition.start();
+
+    }
+    catch(error) {
+
+        console.error(error);
+
+    }
+
+}
+
+
+
+/* =========================================
+   VOICE → AI
+========================================= */
+
+async function sendVoiceMessage(
+    message
+) {
+
+
+    connectionStatus.textContent =
+        "● THINKING";
+
+
+    try {
+
+
+        const response =
+            await fetch(
+                SUPABASE_FUNCTION_URL,
+                {
+
+                    method: "POST",
+
+                    headers: {
+
+                        "Content-Type":
+                            "application/json",
+
+                        "Authorization":
+                            "Bearer " +
+                            SUPABASE_KEY
+
+                    },
+
+                    body: JSON.stringify({
+
+                        message: message
+
+                    })
+
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        console.log(
+            "Reemy voice response:",
+            data
+        );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.error ||
+                "Voice request failed"
+            );
+
+        }
+
+
+        /*
+         * Support both response formats:
+         *
+         * data.reply
+         * data.answer
+         */
+
+        const answer =
+            data.reply ||
+            data.answer ||
+            "I couldn't process that command.";
+
+
+        voiceStatus.textContent =
+            "Reemy";
+
+
+        voiceHint.textContent =
+            "Speaking...";
+
+
+        voiceTranscript.textContent =
+            "You: " +
+            message +
+            "\n\nReemy: " +
+            answer;
+
+
+        speakReply(
+            answer,
+            true
+        );
+
+
+        connectionStatus.textContent =
+            "● READY";
+
+
+    }
+    catch(error) {
+
+
+        console.error(
+            "Reemy voice connection error:",
+            error
+        );
+
+
+        voiceStatus.textContent =
+            "Connection error";
+
+
+        voiceHint.textContent =
+            "Please try again";
+
+
+        connectionStatus.textContent =
+            "● CONNECTION ERROR";
+
+    }
+
+}
+
+
+
+/* =========================================
+   TEXT TO SPEECH
+========================================= */
+
+function speakReply(
+    text,
+    voiceMode = false
+) {
+
+
+    if (
+        !("speechSynthesis" in window)
+    ) {
+
+        return;
+
+    }
+
+
+    speechSynthesis.cancel();
+
+
+    const utterance =
+        new SpeechSynthesisUtterance(
+            text
+        );
+
+
+    utterance.lang =
+        "en-IN";
+
+
+    utterance.rate =
+        0.92;
+
+
+    utterance.pitch =
+        1.08;
+
+
+    const voices =
+        speechSynthesis.getVoices();
+
+
+    const preferredVoice =
+        voices.find(
+            voice =>
+                /female|zira|samantha|aria|jenny|google uk english female/i
+                    .test(voice.name)
+        )
+        ||
+        voices.find(
+            voice =>
+                /^en-IN/i
+                    .test(voice.lang)
+        )
+        ||
+        voices.find(
+            voice =>
+                /^en/i
+                    .test(voice.lang)
+        );
+
+
+    if (preferredVoice) {
+
+        utterance.voice =
+            preferredVoice;
+
+    }
+
+
+    if (voiceMode) {
+
+        voiceOrb.classList.add(
+            "speaking"
+        );
+
+
+        voiceStatus.textContent =
+            "Reemy is speaking";
+
+    }
+
+
+    utterance.onend =
+        function() {
+
+
+            voiceOrb.classList.remove(
+                "speaking"
+            );
+
+
+            if (voiceMode) {
+
+
+                voiceStatus.textContent =
+                    "Ready to listen";
+
+
+                voiceHint.textContent =
+                    "Tap the microphone and speak";
+
+            }
+
+        };
+
+
+    speechSynthesis.speak(
+        utterance
+    );
+
+}
+
+
+
+/* =========================================
+   VOICES LOADED
+========================================= */
+
+if (
+    "speechSynthesis" in window
+) {
+
+    speechSynthesis.onvoiceschanged =
+        function() {
+
+            speechSynthesis.getVoices();
+
+        };
+
+}
+
+
+
+/* =========================================
+   GREETING
+========================================= */
+
+const hour =
+new Date().getHours();
+
+
+if (hour < 12) {
+
+    document.getElementById(
+        "greeting"
+    ).textContent =
+        "Good morning.";
+
+}
+else if (hour < 17) {
+
+    document.getElementById(
+        "greeting"
+    ).textContent =
+        "Good afternoon.";
+
+}
+else {
+
+    document.getElementById(
+        "greeting"
+    ).textContent =
+        "Good evening.";
+
+}
+
+
+
+/* =========================================
+   FIRST INTRODUCTION
+========================================= */
+
+const introduction =
+"Hi, I'm Reemy AI. You can call me Reemy. I'm the AI assistant of Chaatarra, created by Iqbal.";
+
+
+let hasIntroduced =
+    localStorage.getItem(
+        "reemyIntroduced"
+    );
+
+
+if (!hasIntroduced) {
+
+
+    setTimeout(
+        function() {
+
+
+            responsePanel.classList.add(
+                "visible"
+            );
+
+
+            responseBody.textContent =
+                introduction;
+
+
+            speakReply(
+                introduction
+            );
+
+
+            localStorage.setItem(
+                "reemyIntroduced",
+                "true"
+            );
+
+
+        },
+        1200
+    );
+
+}
+
+
+</script>
+
+</body>
+</html>
