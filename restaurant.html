@@ -1,22 +1,20 @@
 <!DOCTYPE html>
-
 <html lang="en">
-<head>
 
-   <button
-    id="logoutButton"
-    class="logout-button"
-    onclick="logoutDashboard()">
-    ⏻ LOGOUT
-</button>
+<head>
 
 <meta charset="UTF-8">
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
 
 <title>Darky AI — Chaatarra</title>
 
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 
 <style>
 
@@ -36,65 +34,1881 @@ html{
 
 body{
 
+    min-height:100vh;
+
     font-family:
         Inter,
-        Arial,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
         sans-serif;
+
+    color:#e8faff;
 
     background:
         radial-gradient(
             circle at 50% -10%,
-            rgba(0,153,255,.20),
-            transparent 38%
-        ),
-
-        radial-gradient(
-            circle at 0% 50%,
-            rgba(0,80,255,.10),
+            rgba(0,180,255,.18),
             transparent 35%
         ),
-
+        radial-gradient(
+            circle at 90% 30%,
+            rgba(0,100,255,.08),
+            transparent 30%
+        ),
         #020711;
 
-    color:#edfaff;
-
-    min-height:100vh;
-}
-
-button,
-input{
-    font:inherit;
-}
-
-button{
-    cursor:pointer;
-}
-
-.app{
-
-    width:100%;
-
-    max-width:1200px;
-
-    min-height:100vh;
-
-    margin:auto;
-
-    background:
-        linear-gradient(
-            180deg,
-            rgba(3,12,25,.98),
-            rgba(1,7,16,.99)
-        );
-
-    position:relative;
-
-    overflow:hidden;
+    overflow-x:hidden;
 }
 
 
 /* ============================================================
-   DARKY AI PASSWORD LOCK
+   APP
+============================================================ */
+
+.app{
+
+    position:relative;
+
+    width:min(
+        1200px,
+        100%
+    );
+
+    min-height:100vh;
+
+    margin:0 auto;
+
+    padding-bottom:100px;
+}
+
+
+/* ============================================================
+   TOP BAR
+============================================================ */
+
+.topbar{
+
+    position:sticky;
+
+    top:0;
+
+    z-index:500;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    gap:15px;
+
+    padding:16px 20px;
+
+    background:
+        rgba(2,9,20,.86);
+
+    backdrop-filter:
+        blur(18px);
+
+    -webkit-backdrop-filter:
+        blur(18px);
+
+    border-bottom:
+        1px solid
+        rgba(80,210,255,.10);
+}
+
+
+.brand{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+    min-width:0;
+}
+
+
+.brand-logo{
+
+    width:42px;
+    height:42px;
+
+    flex:none;
+
+    display:grid;
+
+    place-items:center;
+
+    border-radius:13px;
+
+    color:#eaffff;
+
+    font-size:20px;
+
+    font-weight:900;
+
+    background:
+        radial-gradient(
+            circle at 35% 30%,
+            #dffcff,
+            #29bfff 35%,
+            #07548d 70%,
+            #021222
+        );
+
+    box-shadow:
+        0 0 18px
+        rgba(0,190,255,.45),
+        inset 0 0 15px
+        rgba(255,255,255,.12);
+}
+
+
+.brand-text{
+
+    display:flex;
+
+    flex-direction:column;
+
+    min-width:0;
+}
+
+
+.brand-text strong{
+
+    color:#ffffff;
+
+    font-size:16px;
+
+    letter-spacing:1px;
+}
+
+
+.brand-text span{
+
+    color:#6daabd;
+
+    font-size:9px;
+
+    letter-spacing:1.8px;
+
+    text-transform:uppercase;
+}
+
+
+.status{
+
+    margin-top:3px;
+
+    color:#61e7ff;
+
+    font-size:9px;
+
+    letter-spacing:1.3px;
+
+    white-space:nowrap;
+}
+
+
+/* ============================================================
+   LOGOUT
+============================================================ */
+
+.logout-button{
+
+    flex:none;
+
+    padding:10px 16px;
+
+    border:
+        1px solid
+        rgba(80,210,255,.35);
+
+    border-radius:10px;
+
+    background:
+        rgba(5,25,45,.75);
+
+    color:#bdefff;
+
+    font-size:10px;
+
+    font-weight:700;
+
+    letter-spacing:1.5px;
+
+    cursor:pointer;
+
+    transition:
+        .25s ease;
+
+    box-shadow:
+        0 0 12px
+        rgba(0,170,255,.08);
+}
+
+.logout-button:hover{
+
+    color:#ffffff;
+
+    border-color:
+        rgba(80,220,255,.8);
+
+    background:
+        rgba(0,130,200,.22);
+
+    box-shadow:
+        0 0 20px
+        rgba(0,190,255,.3);
+
+    transform:
+        translateY(-1px);
+}
+
+.logout-button:active{
+
+    transform:
+        scale(.96);
+}
+
+
+/* ============================================================
+   PAGES
+============================================================ */
+
+.page{
+
+    display:none;
+
+    min-height:
+        calc(
+            100vh - 80px
+        );
+
+    padding:
+        25px 20px 120px;
+}
+
+.page.active{
+
+    display:block;
+
+}
+
+
+/* ============================================================
+   HOME
+============================================================ */
+
+.home-title{
+
+    text-align:center;
+
+    margin:
+        22px auto 10px;
+}
+
+
+.home-title small{
+
+    display:block;
+
+    margin-bottom:7px;
+
+    color:#5f9eb2;
+
+    font-size:11px;
+
+    letter-spacing:2px;
+
+    text-transform:uppercase;
+}
+
+
+.home-title h1{
+
+    color:#ffffff;
+
+    font-size:
+        clamp(
+            26px,
+            5vw,
+            38px
+        );
+
+    font-weight:800;
+
+    letter-spacing:-1px;
+}
+
+
+.home-title h1 span{
+
+    color:#62ddff;
+
+    text-shadow:
+        0 0 22px
+        rgba(70,220,255,.35);
+}
+
+
+/* ============================================================
+   LIVE SECTION
+============================================================ */
+
+.live-section{
+
+    width:min(
+        900px,
+        100%
+    );
+
+    margin:0 auto 25px;
+
+    padding:18px;
+
+    border:
+        1px solid
+        rgba(80,210,255,.12);
+
+    border-radius:18px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(8,25,43,.72),
+            rgba(3,12,25,.68)
+        );
+
+    box-shadow:
+        0 20px 60px
+        rgba(0,0,0,.20);
+
+    backdrop-filter:
+        blur(15px);
+}
+
+
+.live-header{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    gap:12px;
+
+    margin-bottom:17px;
+}
+
+
+.live-heading{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+}
+
+
+.live-heading-icon{
+
+    width:42px;
+    height:42px;
+
+    display:grid;
+
+    place-items:center;
+
+    border-radius:12px;
+
+    color:#8beaff;
+
+    background:
+        rgba(0,180,255,.10);
+
+    border:
+        1px solid
+        rgba(80,220,255,.16);
+}
+
+
+.live-heading-text{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:3px;
+}
+
+
+.live-heading-text strong{
+
+    color:#eaffff;
+
+    font-size:14px;
+}
+
+
+.live-heading-text span{
+
+    color:#668e9e;
+
+    font-size:9px;
+
+    letter-spacing:1px;
+}
+
+
+.live-status{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:7px;
+
+    padding:7px 10px;
+
+    border-radius:20px;
+
+    color:#72eaff;
+
+    background:
+        rgba(0,200,255,.07);
+
+    border:
+        1px solid
+        rgba(80,220,255,.13);
+
+    font-size:9px;
+
+    font-weight:800;
+
+    letter-spacing:1px;
+}
+
+
+.live-dot{
+
+    width:6px;
+    height:6px;
+
+    border-radius:50%;
+
+    background:#59e6ff;
+
+    box-shadow:
+        0 0 10px
+        rgba(80,230,255,.9);
+
+    animation:
+        livePulse 1.5s infinite;
+}
+
+
+.live-status.offline{
+
+    color:#ff8c8c;
+}
+
+
+.live-status.offline .live-dot{
+
+    background:#ff6464;
+
+    box-shadow:
+        0 0 10px
+        rgba(255,70,70,.8);
+}
+
+
+.live-status.syncing{
+
+    color:#ffe28a;
+}
+
+
+.live-status.syncing .live-dot{
+
+    background:#ffd45c;
+
+    box-shadow:
+        0 0 10px
+        rgba(255,210,80,.8);
+}
+
+
+@keyframes livePulse{
+
+    0%,100%{
+        opacity:.5;
+        transform:scale(.85);
+    }
+
+    50%{
+        opacity:1;
+        transform:scale(1.15);
+    }
+
+}
+
+
+/* ============================================================
+   SALES GRID
+============================================================ */
+
+.sales-grid{
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(
+            4,
+            minmax(0,1fr)
+        );
+
+    gap:10px;
+}
+
+
+.sales-card{
+
+    padding:15px;
+
+    border:
+        1px solid
+        rgba(80,210,255,.09);
+
+    border-radius:13px;
+
+    background:
+        rgba(2,14,28,.58);
+}
+
+
+.sales-label{
+
+    color:#648c9c;
+
+    font-size:9px;
+
+    font-weight:700;
+
+    letter-spacing:1.2px;
+
+    text-transform:uppercase;
+}
+
+
+.sales-value{
+
+    margin-top:7px;
+
+    color:#dffaff;
+
+    font-size:22px;
+
+    font-weight:800;
+}
+
+
+.sales-value.primary{
+
+    color:#6ce4ff;
+
+    text-shadow:
+        0 0 18px
+        rgba(70,220,255,.25);
+}
+
+
+/* ============================================================
+   PAYMENT
+============================================================ */
+
+.payment-grid{
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(
+            3,
+            minmax(0,1fr)
+        );
+
+    gap:10px;
+
+    margin-top:10px;
+}
+
+
+.payment-card{
+
+    padding:13px 15px;
+
+    border:
+        1px solid
+        rgba(80,210,255,.07);
+
+    border-radius:12px;
+
+    background:
+        rgba(2,12,24,.42);
+}
+
+
+.payment-label{
+
+    color:#587e8e;
+
+    font-size:8px;
+
+    font-weight:800;
+
+    letter-spacing:1.5px;
+}
+
+
+.payment-value{
+
+    margin-top:5px;
+
+    color:#b9efff;
+
+    font-size:16px;
+
+    font-weight:750;
+}
+
+
+.sales-error{
+
+    display:none;
+
+    margin-top:10px;
+
+    padding:9px 12px;
+
+    border-radius:8px;
+
+    color:#ffaaaa;
+
+    background:
+        rgba(255,70,70,.07);
+
+    border:
+        1px solid
+        rgba(255,90,90,.15);
+
+    font-size:10px;
+}
+
+
+/* ============================================================
+   LOW ALERT
+============================================================ */
+
+.low-alert-section{
+
+    margin-top:14px;
+
+    padding:16px;
+
+    border:
+        1px solid
+        rgba(255,190,70,.10);
+
+    border-radius:15px;
+
+    background:
+        rgba(20,18,8,.35);
+}
+
+
+.low-alert-header{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    margin-bottom:12px;
+}
+
+
+.low-alert-title{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+}
+
+
+.low-alert-icon{
+
+    width:34px;
+    height:34px;
+
+    display:grid;
+
+    place-items:center;
+
+    border-radius:10px;
+
+    color:#ffd66d;
+
+    background:
+        rgba(255,190,50,.08);
+}
+
+
+.low-alert-title strong{
+
+    display:block;
+
+    color:#eaffff;
+
+    font-size:12px;
+}
+
+
+.low-alert-title span{
+
+    display:block;
+
+    margin-top:3px;
+
+    color:#718f99;
+
+    font-size:8px;
+}
+
+
+.low-alert-count{
+
+    min-width:30px;
+    height:30px;
+
+    display:grid;
+
+    place-items:center;
+
+    padding:0 8px;
+
+    border-radius:10px;
+
+    color:#ffd76c;
+
+    background:
+        rgba(255,190,50,.09);
+
+    border:
+        1px solid
+        rgba(255,190,50,.14);
+
+    font-size:11px;
+
+    font-weight:800;
+}
+
+
+.low-alert-items{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:6px;
+}
+
+
+.low-alert-item{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    gap:10px;
+
+    padding:10px 11px;
+
+    border-radius:9px;
+
+    background:
+        rgba(255,190,50,.035);
+
+    border:
+        1px solid
+        rgba(255,190,50,.06);
+}
+
+
+.low-alert-item.out{
+
+    border-color:
+        rgba(255,80,80,.16);
+
+    background:
+        rgba(255,50,50,.045);
+}
+
+
+.low-alert-item-name{
+
+    overflow:hidden;
+
+    text-overflow:ellipsis;
+
+    white-space:nowrap;
+
+    color:#d7edf3;
+
+    font-size:10px;
+}
+
+
+.low-alert-item-stock{
+
+    flex:none;
+
+    color:#ffc967;
+
+    font-size:9px;
+
+    font-weight:700;
+
+    letter-spacing:.5px;
+}
+
+
+.low-alert-item.out
+.low-alert-item-stock{
+
+    color:#ff7777;
+}
+
+
+.low-alert-loading,
+.low-alert-empty,
+.low-alert-error{
+
+    padding:13px;
+
+    color:#668b98;
+
+    font-size:9px;
+
+    text-align:center;
+}
+
+
+.low-alert-empty{
+
+    color:#70dba8;
+}
+
+
+.low-alert-error{
+
+    color:#ff9b9b;
+
+    text-align:left;
+}
+
+
+/* ============================================================
+   DARKY ORB
+============================================================ */
+
+.orb-wrap{
+
+    position:relative;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    margin:
+        5px auto 22px;
+
+    height:170px;
+}
+
+
+.orb{
+
+    position:relative;
+
+    width:120px;
+    height:120px;
+
+    display:grid;
+
+    place-items:center;
+
+    border-radius:50%;
+
+    background:
+        radial-gradient(
+            circle at 35% 28%,
+            #e8fdff 0%,
+            #7deaff 10%,
+            #16a9e4 28%,
+            #07548e 54%,
+            #02192e 74%,
+            #010914 100%
+        );
+
+    box-shadow:
+        0 0 22px
+        rgba(40,210,255,.55),
+        0 0 55px
+        rgba(0,150,255,.30),
+        inset 0 0 25px
+        rgba(255,255,255,.13);
+
+    animation:
+        orbFloat 4s ease-in-out infinite;
+}
+
+
+.orb::before{
+
+    content:"";
+
+    position:absolute;
+
+    inset:-13px;
+
+    border-radius:50%;
+
+    border:
+        1px solid
+        rgba(70,220,255,.22);
+
+    box-shadow:
+        0 0 22px
+        rgba(40,210,255,.16);
+
+    animation:
+        orbRing 3s linear infinite;
+}
+
+
+.orb::after{
+
+    content:"";
+
+    position:absolute;
+
+    inset:-27px;
+
+    border-radius:50%;
+
+    border:
+        1px solid
+        rgba(70,190,255,.10);
+
+    animation:
+        orbRing 5s linear infinite reverse;
+}
+
+
+.orb-icon{
+
+    position:relative;
+
+    z-index:2;
+
+    color:#eaffff;
+
+    font-size:31px;
+
+    text-shadow:
+        0 0 20px
+        rgba(160,245,255,.9);
+}
+
+
+.home-listening{
+
+    animation:
+        orbListening
+        1.2s
+        ease-in-out
+        infinite;
+}
+
+
+.home-thinking{
+
+    animation:
+        orbThinking
+        .8s
+        linear
+        infinite;
+}
+
+
+.home-speaking{
+
+    animation:
+        orbSpeaking
+        .65s
+        ease-in-out
+        infinite;
+}
+
+
+@keyframes orbFloat{
+
+    0%,100%{
+        transform:translateY(0);
+    }
+
+    50%{
+        transform:translateY(-7px);
+    }
+
+}
+
+
+@keyframes orbRing{
+
+    from{
+        transform:rotate(0deg) scale(.96);
+    }
+
+    to{
+        transform:rotate(360deg) scale(1.04);
+    }
+
+}
+
+
+@keyframes orbListening{
+
+    0%,100%{
+        transform:scale(1);
+    }
+
+    50%{
+        transform:scale(1.08);
+    }
+
+}
+
+
+@keyframes orbThinking{
+
+    to{
+        transform:rotate(360deg);
+    }
+
+}
+
+
+@keyframes orbSpeaking{
+
+    0%,100%{
+        transform:scale(1);
+    }
+
+    50%{
+        transform:scale(1.12);
+    }
+
+}
+
+
+/* ============================================================
+   CHAT
+============================================================ */
+
+.chat-container{
+
+    width:min(
+        820px,
+        100%
+    );
+
+    margin:0 auto;
+
+    position:relative;
+
+    z-index:5;
+}
+
+
+.chat-messages{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:13px;
+
+    margin-bottom:15px;
+
+    max-height:
+        min(
+            42vh,
+            430px
+        );
+
+    overflow-y:auto;
+
+    padding:
+        4px 3px 8px;
+
+    scrollbar-width:thin;
+
+    scrollbar-color:
+        rgba(70,200,255,.25)
+        transparent;
+}
+
+
+.chat-row{
+
+    display:flex;
+
+    width:100%;
+}
+
+
+.chat-row.user{
+
+    justify-content:flex-end;
+}
+
+
+.chat-row.darky{
+
+    justify-content:flex-start;
+}
+
+
+.chat-bubble{
+
+    max-width:min(
+        82%,
+        650px
+    );
+
+    padding:
+        11px 14px;
+
+    border-radius:14px;
+
+    line-height:1.5;
+
+    font-size:11px;
+
+    white-space:pre-wrap;
+
+    overflow-wrap:anywhere;
+}
+
+
+.darky-bubble{
+
+    color:#cceef7;
+
+    background:
+        rgba(5,30,48,.74);
+
+    border:
+        1px solid
+        rgba(60,205,255,.12);
+
+    box-shadow:
+        0 5px 25px
+        rgba(0,0,0,.14);
+}
+
+
+.user-bubble{
+
+    color:#e9fbff;
+
+    background:
+        rgba(0,105,160,.30);
+
+    border:
+        1px solid
+        rgba(70,205,255,.20);
+}
+
+
+.chat-name{
+
+    margin-bottom:4px;
+
+    color:#5fdcff;
+
+    font-size:8px;
+
+    font-weight:800;
+
+    letter-spacing:1px;
+
+    text-transform:uppercase;
+}
+
+
+.user-name{
+
+    color:#8fb9c8;
+}
+
+
+.ask-box{
+
+    position:relative;
+
+    z-index:10;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:8px;
+
+    width:100%;
+
+    padding:8px;
+
+    border:
+        1px solid
+        rgba(80,210,255,.17);
+
+    border-radius:15px;
+
+    background:
+        rgba(3,17,31,.90);
+
+    box-shadow:
+        0 15px 40px
+        rgba(0,0,0,.28);
+
+    backdrop-filter:
+        blur(15px);
+
+    -webkit-backdrop-filter:
+        blur(15px);
+}
+
+
+.ask-box input{
+
+    flex:1;
+
+    min-width:0;
+
+    height:42px;
+
+    border:0;
+
+    outline:0;
+
+    color:#eaffff;
+
+    background:transparent;
+
+    font-size:12px;
+}
+
+
+.ask-box input::placeholder{
+
+    color:#557c89;
+}
+
+
+.ask-button{
+
+    width:42px;
+    height:42px;
+
+    flex:none;
+
+    display:grid;
+
+    place-items:center;
+
+    border:
+        1px solid
+        rgba(80,210,255,.14);
+
+    border-radius:11px;
+
+    color:#8deaff;
+
+    background:
+        rgba(0,100,150,.12);
+
+    cursor:pointer;
+
+    transition:.2s ease;
+
+    font-size:17px;
+}
+
+
+.ask-button:hover{
+
+    color:#ffffff;
+
+    background:
+        rgba(0,160,220,.22);
+
+    border-color:
+        rgba(80,220,255,.40);
+
+    box-shadow:
+        0 0 15px
+        rgba(0,190,255,.18);
+}
+
+
+.ask-button:active{
+
+    transform:scale(.94);
+}
+
+
+.mic-active{
+
+    color:#ffffff !important;
+
+    background:
+        rgba(0,180,230,.28) !important;
+
+    border-color:
+        rgba(90,230,255,.65) !important;
+
+    box-shadow:
+        0 0 22px
+        rgba(50,220,255,.45) !important;
+
+    animation:
+        micPulse
+        1s
+        infinite;
+}
+
+
+@keyframes micPulse{
+
+    0%,100%{
+        box-shadow:
+            0 0 12px
+            rgba(50,220,255,.25);
+    }
+
+    50%{
+        box-shadow:
+            0 0 25px
+            rgba(50,220,255,.65);
+    }
+
+}
+
+
+/* ============================================================
+   TYPING
+============================================================ */
+
+.typing{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:4px;
+
+    height:18px;
+}
+
+
+.typing span{
+
+    width:5px;
+    height:5px;
+
+    border-radius:50%;
+
+    background:#6cddf7;
+
+    animation:
+        typingDot
+        1.1s
+        infinite;
+}
+
+
+.typing span:nth-child(2){
+
+    animation-delay:.15s;
+}
+
+
+.typing span:nth-child(3){
+
+    animation-delay:.3s;
+}
+
+
+@keyframes typingDot{
+
+    0%,100%{
+        opacity:.25;
+        transform:translateY(0);
+    }
+
+    50%{
+        opacity:1;
+        transform:translateY(-3px);
+    }
+
+}
+
+
+/* ============================================================
+   SECONDARY PAGES
+============================================================ */
+
+.secondary-page{
+
+    width:min(
+        850px,
+        100%
+    );
+
+    margin:0 auto;
+}
+
+
+.page-heading{
+
+    margin-bottom:22px;
+
+    text-align:center;
+}
+
+
+.page-heading h2{
+
+    color:#eaffff;
+
+    font-size:27px;
+
+    letter-spacing:-.5px;
+}
+
+
+.page-heading p{
+
+    margin-top:5px;
+
+    color:#648b98;
+
+    font-size:10px;
+
+    letter-spacing:.8px;
+}
+
+
+.data-card{
+
+    margin-bottom:12px;
+
+    padding:18px;
+
+    border:
+        1px solid
+        rgba(80,210,255,.10);
+
+    border-radius:15px;
+
+    background:
+        rgba(5,23,39,.62);
+}
+
+
+.data-card h3{
+
+    margin-bottom:8px;
+
+    color:#bcefff;
+
+    font-size:13px;
+}
+
+
+.data-card p{
+
+    color:#718f9c;
+
+    font-size:10px;
+
+    line-height:1.7;
+}
+
+
+.quick-card{
+
+    width:100%;
+
+    margin-bottom:9px;
+
+    padding:15px;
+
+    border:
+        1px solid
+        rgba(80,210,255,.10);
+
+    border-radius:12px;
+
+    color:#bdefff;
+
+    background:
+        rgba(5,24,40,.65);
+
+    text-align:left;
+
+    cursor:pointer;
+
+    font-size:11px;
+
+    transition:.2s ease;
+}
+
+
+.quick-card:hover{
+
+    border-color:
+        rgba(80,220,255,.35);
+
+    background:
+        rgba(0,120,175,.15);
+
+    transform:
+        translateY(-1px);
+}
+
+
+/* ============================================================
+   VOICE PAGE
+============================================================ */
+
+.voice-page{
+
+    display:none;
+
+    align-items:center;
+
+    justify-content:center;
+}
+
+
+.voice-page.active{
+
+    display:flex;
+}
+
+
+.voice-center{
+
+    width:min(
+        700px,
+        100%
+    );
+
+    text-align:center;
+
+    margin:auto;
+}
+
+
+.voice-orb{
+
+    width:145px;
+    height:145px;
+
+    margin:25px auto;
+
+    display:grid;
+
+    place-items:center;
+
+    border-radius:50%;
+
+    background:
+        radial-gradient(
+            circle,
+            #9ef1ff 0%,
+            #168fc6 32%,
+            #053e6a 60%,
+            #011322 100%
+        );
+
+    box-shadow:
+        0 0 30px
+        rgba(50,210,255,.40),
+        0 0 80px
+        rgba(0,130,255,.20);
+
+    transition:.3s ease;
+}
+
+
+.voice-orb.speaking{
+
+    animation:
+        voiceSpeaking
+        .7s
+        ease-in-out
+        infinite;
+}
+
+
+@keyframes voiceSpeaking{
+
+    0%,100%{
+        transform:scale(1);
+    }
+
+    50%{
+        transform:scale(1.10);
+    }
+
+}
+
+
+.voice-mic{
+
+    font-size:42px;
+}
+
+
+.voice-status{
+
+    color:#9deaff;
+
+    font-size:13px;
+
+    font-weight:700;
+}
+
+
+.voice-hint{
+
+    margin-top:6px;
+
+    color:#608b9a;
+
+    font-size:9px;
+}
+
+
+.voice-transcript{
+
+    min-height:70px;
+
+    margin:22px auto;
+
+    padding:15px;
+
+    border:
+        1px solid
+        rgba(80,210,255,.10);
+
+    border-radius:13px;
+
+    color:#9ec0cb;
+
+    background:
+        rgba(3,18,32,.58);
+
+    font-size:11px;
+
+    line-height:1.6;
+
+    white-space:pre-wrap;
+}
+
+
+.voice-button{
+
+    width:58px;
+    height:58px;
+
+    border:
+        1px solid
+        rgba(80,220,255,.25);
+
+    border-radius:50%;
+
+    color:#dffaff;
+
+    background:
+        rgba(0,120,180,.18);
+
+    cursor:pointer;
+
+    font-size:21px;
+
+    box-shadow:
+        0 0 20px
+        rgba(0,180,255,.12);
+
+    transition:.2s ease;
+}
+
+
+.voice-button:hover{
+
+    transform:scale(1.05);
+
+    box-shadow:
+        0 0 30px
+        rgba(0,200,255,.30);
+}
+
+
+/* ============================================================
+   BOTTOM NAV
+============================================================ */
+
+.bottom-nav{
+
+    position:fixed;
+
+    left:50%;
+
+    bottom:14px;
+
+    transform:
+        translateX(-50%);
+
+    z-index:800;
+
+    width:min(
+        720px,
+        calc(100% - 24px)
+    );
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(
+            5,
+            1fr
+        );
+
+    gap:5px;
+
+    padding:7px;
+
+    border:
+        1px solid
+        rgba(80,210,255,.14);
+
+    border-radius:17px;
+
+    background:
+        rgba(3,15,28,.91);
+
+    box-shadow:
+        0 15px 50px
+        rgba(0,0,0,.45);
+
+    backdrop-filter:
+        blur(20px);
+
+    -webkit-backdrop-filter:
+        blur(20px);
+}
+
+
+.nav-btn{
+
+    min-width:0;
+
+    padding:9px 5px;
+
+    border:0;
+
+    border-radius:11px;
+
+    color:#557987;
+
+    background:transparent;
+
+    cursor:pointer;
+
+    font-size:8px;
+
+    font-weight:700;
+
+    letter-spacing:.5px;
+
+    transition:.2s ease;
+}
+
+
+.nav-icon{
+
+    display:block;
+
+    margin-bottom:3px;
+
+    font-size:15px;
+}
+
+
+.nav-btn:hover{
+
+    color:#a8eafa;
+
+    background:
+        rgba(60,190,240,.07);
+}
+
+
+.nav-btn.active{
+
+    color:#76e5ff;
+
+    background:
+        rgba(30,170,220,.12);
+
+    box-shadow:
+        inset 0 0 15px
+        rgba(50,200,255,.05);
+}
+
+
+/* ============================================================
+   PASSWORD LOCK
 ============================================================ */
 
 #passwordLock{
@@ -115,2195 +1929,231 @@ button{
 
     background:
         radial-gradient(
-            circle at 50% 25%,
-            rgba(0,153,255,.18),
-            transparent 38%
-        ),
-        #020711;
+            circle at center,
+            rgba(0,150,230,.12),
+            rgba(2,7,17,.98) 55%,
+            #01050c 100%
+        );
 
-    backdrop-filter:blur(20px);
+    backdrop-filter:
+        blur(12px);
 
-    -webkit-backdrop-filter:blur(20px);
+    -webkit-backdrop-filter:
+        blur(12px);
 }
+
 
 .password-box{
 
-    width:min(380px,100%);
+    width:min(
+        380px,
+        100%
+    );
 
-    padding:30px;
-
-    border-radius:24px;
+    padding:34px 28px;
 
     text-align:center;
+
+    border:
+        1px solid
+        rgba(80,210,255,.18);
+
+    border-radius:22px;
 
     background:
         linear-gradient(
             145deg,
-            rgba(10,45,70,.88),
-            rgba(3,17,32,.96)
+            rgba(7,28,47,.88),
+            rgba(2,12,24,.92)
         );
 
-    border:
-        1px solid
-        rgba(60,205,255,.25);
-
     box-shadow:
-        0 25px 80px
-        rgba(0,0,0,.55),
+        0 30px 100px
+        rgba(0,0,0,.65),
         0 0 50px
-        rgba(0,150,255,.08);
+        rgba(0,160,255,.08);
 }
+
 
 .password-logo{
 
-    width:64px;
+    width:65px;
+    height:65px;
 
-    height:64px;
-
-    margin:0 auto 18px;
+    margin:0 auto 17px;
 
     display:grid;
 
     place-items:center;
 
-    border-radius:20px;
+    border-radius:19px;
 
-    background:
-        linear-gradient(
-            145deg,
-            #9beaff,
-            #1188d8 52%,
-            #063c80
-        );
+    color:#eaffff;
 
-    color:#02101d;
-
-    font-size:28px;
+    font-size:30px;
 
     font-weight:900;
 
+    background:
+        radial-gradient(
+            circle at 35% 25%,
+            #e9ffff,
+            #41d2ff 28%,
+            #0873ad 58%,
+            #02172b
+        );
+
     box-shadow:
         0 0 30px
-        rgba(0,180,255,.35);
+        rgba(30,210,255,.45);
 }
+
 
 .password-box h2{
 
-    color:#effcff;
+    color:#eaffff;
 
     font-size:20px;
 
-    font-weight:500;
-
-    letter-spacing:1px;
+    letter-spacing:3px;
 }
+
 
 .password-box p{
 
-    margin-top:7px;
+    margin:
+        8px 0 22px;
 
-    margin-bottom:22px;
+    color:#688e9b;
 
-    color:#66869b;
+    font-size:10px;
 
-    font-size:11px;
+    line-height:1.5;
 }
+
 
 .password-input{
 
     width:100%;
 
-    padding:14px 15px;
+    height:48px;
 
-    border-radius:14px;
+    padding:0 15px;
 
-    outline:none;
+    outline:0;
 
     border:
         1px solid
-        rgba(50,190,255,.18);
+        rgba(80,210,255,.14);
+
+    border-radius:11px;
+
+    color:#eaffff;
 
     background:
-        rgba(2,20,35,.75);
-
-    color:#eafaff;
+        rgba(0,10,20,.65);
 
     text-align:center;
 
-    font-size:15px;
+    font-size:14px;
 
-    letter-spacing:2px;
+    letter-spacing:3px;
+
+    transition:.2s ease;
 }
+
 
 .password-input:focus{
 
     border-color:
-        rgba(50,205,255,.45);
+        rgba(80,220,255,.55);
 
     box-shadow:
-        0 0 25px
-        rgba(0,160,255,.10);
+        0 0 20px
+        rgba(0,180,255,.12);
 }
+
 
 .password-button{
 
     width:100%;
 
-    margin-top:10px;
-
-    padding:13px;
-
-    border:0;
-
-    border-radius:14px;
-
-    background:
-        linear-gradient(
-            145deg,
-            #79e7ff,
-            #168fda 55%,
-            #07539d
-        );
-
-    color:#03111e;
-
-    font-size:12px;
-
-    font-weight:700;
-
-    letter-spacing:1px;
-
-    box-shadow:
-        0 0 20px
-        rgba(0,180,255,.20);
-}
-
-.password-button:hover{
-
-    filter:brightness(1.08);
-}
-
-.password-error{
-
-    min-height:18px;
+    height:46px;
 
     margin-top:10px;
 
-    color:#ff9999;
-
-    font-size:10px;
-}
-
-
-/* ============================================================
-   TOP BAR
-============================================================ */
-
-.topbar{
-
-    height:76px;
-
-    padding:
-        0 24px;
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:space-between;
-
-    position:sticky;
-
-    top:0;
-
-    z-index:100;
-
-    background:
-        rgba(3,14,27,.90);
-
-    border-bottom:
-        1px solid
-        rgba(65,190,255,.15);
-
-    backdrop-filter:
-        blur(25px);
-
-    -webkit-backdrop-filter:
-        blur(25px);
-}
-
-.brand{
-
-    display:flex;
-
-    align-items:center;
-
-    gap:12px;
-}
-
-.logo{
-
-    width:43px;
-
-    height:43px;
-
-    display:grid;
-
-    place-items:center;
-
-    border-radius:14px;
-
-    background:
-        linear-gradient(
-            145deg,
-            #9beaff,
-            #1188d8 52%,
-            #063c80
-        );
-
-    color:#02101d;
-
-    font-size:20px;
-
-    font-weight:900;
-
-    box-shadow:
-        0 0 25px
-        rgba(0,180,255,.38);
-}
-
-.brand-text strong{
-
-    display:block;
-
-    font-size:16px;
-
-    letter-spacing:2px;
-
-    color:#effcff;
-}
-
-.brand-text span{
-
-    display:block;
-
-    margin-top:2px;
-
-    font-size:9px;
-
-    letter-spacing:1.4px;
-
-    color:#66869b;
-}
-
-.status{
-
-    padding:
-        7px 11px;
-
-    border-radius:20px;
-
-    font-size:9px;
-
-    letter-spacing:1px;
-
-    color:#57ddff;
-
-    background:
-        rgba(0,150,220,.08);
-
     border:
         1px solid
-        rgba(50,200,255,.25);
-}
-
-
-/* ============================================================
-   PAGE
-============================================================ */
-
-.page{
-
-    padding:
-        20px
-        24px
-        120px;
-
-    min-height:
-        calc(100vh - 76px);
-}
-
-.page:not(.active){
-
-    display:none;
-}
-
-
-/* ============================================================
-   LIVE BUSINESS OVERVIEW
-============================================================ */
-
-.live-section{
-
-    width:100%;
-
-    margin-bottom:30px;
-
-    padding:18px;
-
-    border-radius:22px;
-
-    border:
-        1px solid
-        rgba(60,205,255,.22);
-
-    background:
-
-        radial-gradient(
-            circle at 15% 0%,
-            rgba(0,175,255,.14),
-            transparent 35%
-        ),
-
-        linear-gradient(
-            145deg,
-            rgba(10,45,70,.75),
-            rgba(3,17,32,.88)
-        );
-
-    box-shadow:
-
-        0 15px 50px
-        rgba(0,0,0,.28),
-
-        0 0 40px
-        rgba(0,150,255,.05);
-
-    backdrop-filter:
-        blur(22px);
-
-    -webkit-backdrop-filter:
-        blur(22px);
-}
-
-.live-top{
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:space-between;
-
-    margin-bottom:15px;
-}
-
-.live-heading{
-
-    display:flex;
-
-    align-items:center;
-
-    gap:10px;
-}
-
-.live-heading-icon{
-
-    width:34px;
-
-    height:34px;
-
-    display:grid;
-
-    place-items:center;
+        rgba(80,220,255,.25);
 
     border-radius:11px;
 
+    color:#eaffff;
+
     background:
-        rgba(40,195,255,.10);
+        rgba(0,135,190,.20);
 
-    border:
-        1px solid
-        rgba(50,200,255,.20);
+    cursor:pointer;
 
-    color:#59dbff;
+    font-size:10px;
 
-    font-size:16px;
-}
-
-.live-heading-text strong{
-
-    display:block;
-
-    font-size:13px;
+    font-weight:800;
 
     letter-spacing:1.5px;
 
-    color:#dff8ff;
-
-    text-transform:uppercase;
+    transition:.2s ease;
 }
 
-.live-heading-text span{
 
-    display:block;
-
-    margin-top:3px;
-
-    color:#64859a;
-
-    font-size:9px;
-
-    letter-spacing:.5px;
-}
-
-.live-status{
-
-    display:flex;
-
-    align-items:center;
-
-    gap:6px;
-
-    color:#55dcff;
-
-    font-size:9px;
-
-    letter-spacing:1.2px;
-
-    padding:
-        7px 10px;
-
-    border-radius:20px;
+.password-button:hover{
 
     background:
-        rgba(0,180,240,.07);
+        rgba(0,160,220,.30);
 
-    border:
-        1px solid
-        rgba(60,205,255,.18);
-
-    transition:
-        .25s ease;
-}
-
-.live-dot{
-
-    width:7px;
-
-    height:7px;
-
-    border-radius:50%;
-
-    background:#4ce0ff;
+    border-color:
+        rgba(80,230,255,.55);
 
     box-shadow:
-        0 0 12px
-        rgba(60,220,255,.95);
-
-    animation:
-        livePulse 1.5s infinite;
-}
-
-@keyframes livePulse{
-
-    50%{
-
-        opacity:.35;
-
-        transform:
-            scale(.7);
-    }
-
-}
-
-
-/* ============================================================
-   REALTIME DISCONNECTED STATE
-============================================================ */
-
-.live-status.offline{
-
-    color:#ff9a9a;
-
-    background:
-        rgba(255,70,70,.07);
-
-    border-color:
-        rgba(255,90,90,.20);
-}
-
-.live-status.offline .live-dot{
-
-    background:#ff7777;
-
-    box-shadow:
-        0 0 12px
-        rgba(255,80,80,.75);
-
-    animation:none;
-}
-
-.live-status.syncing{
-
-    color:#ffe38a;
-
-    background:
-        rgba(255,200,50,.06);
-
-    border-color:
-        rgba(255,210,70,.18);
-}
-
-.live-status.syncing .live-dot{
-
-    background:#ffd85c;
-
-    box-shadow:
-        0 0 12px
-        rgba(255,210,70,.75);
-}
-
-
-/* ============================================================
-   SALES CARDS
-============================================================ */
-
-.sales-grid{
-
-    display:grid;
-
-    grid-template-columns:
-        repeat(4,1fr);
-
-    gap:10px;
-}
-
-.sales-card{
-
-    min-width:0;
-
-    padding:16px;
-
-    border-radius:17px;
-
-    background:
-        rgba(4,26,44,.72);
-
-    border:
-        1px solid
-        rgba(50,190,255,.13);
-
-    transition:.2s;
-}
-
-.sales-card:hover{
-
-    transform:
-        translateY(-2px);
-
-    border-color:
-        rgba(50,205,255,.28);
-}
-
-.sales-label{
-
-    color:#64869b;
-
-    font-size:9px;
-
-    letter-spacing:1.2px;
-
-    text-transform:uppercase;
-
-    white-space:nowrap;
-}
-
-.sales-value{
-
-    margin-top:8px;
-
-    color:#ecfbff;
-
-    font-size:24px;
-
-    font-weight:600;
-
-    white-space:nowrap;
-
-    overflow:hidden;
-
-    text-overflow:ellipsis;
-}
-
-.sales-value.primary{
-
-    color:#59dcff;
-
-    text-shadow:
-        0 0 18px
-        rgba(40,200,255,.25);
-}
-
-
-/* ============================================================
-   PAYMENT CARDS
-============================================================ */
-
-.payment-grid{
-
-    display:grid;
-
-    grid-template-columns:
-        repeat(3,1fr);
-
-    gap:10px;
-
-    margin-top:10px;
-}
-
-.payment-card{
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:space-between;
-
-    padding:
-        12px 15px;
-
-    border-radius:14px;
-
-    background:
-        rgba(2,20,35,.60);
-
-    border:
-        1px solid
-        rgba(50,175,255,.10);
-}
-
-.payment-label{
-
-    color:#5e7f93;
-
-    font-size:9px;
-
-    letter-spacing:1.3px;
-}
-
-.payment-value{
-
-    color:#bceeff;
-
-    font-size:14px;
-
-    font-weight:600;
-}
-
-.sales-error{
-
-    display:none;
-
-    margin-top:10px;
-
-    color:#ff9a9a;
-
-    font-size:10px;
-
-    line-height:1.5;
-}
-
-
-/* ============================================================
-   LOW ALERT ITEMS
-============================================================ */
-
-.low-alert-section{
-
-    margin-top:10px;
-
-    padding:15px;
-
-    border-radius:17px;
-
-    background:
-        rgba(4,26,44,.72);
-
-    border:
-        1px solid
-        rgba(255,190,70,.16);
-}
-
-.low-alert-header{
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:space-between;
-
-    gap:12px;
-
-    margin-bottom:10px;
-}
-
-.low-alert-title{
-
-    display:flex;
-
-    align-items:center;
-
-    gap:9px;
-
-    min-width:0;
-}
-
-.low-alert-title > div:last-child{
-
-    min-width:0;
-}
-
-.low-alert-icon{
-
-    width:32px;
-
-    height:32px;
-
-    display:grid;
-
-    place-items:center;
-
-    flex-shrink:0;
-
-    border-radius:10px;
-
-    background:
-        rgba(255,180,50,.08);
-
-    border:
-        1px solid
-        rgba(255,195,70,.18);
-
-    color:#ffd36b;
-
-    font-size:15px;
-}
-
-.low-alert-title strong{
-
-    display:block;
-
-    color:#dff8ff;
-
-    font-size:11px;
-
-    letter-spacing:1.2px;
-
-    text-transform:uppercase;
-}
-
-.low-alert-title span{
-
-    display:block;
-
-    margin-top:3px;
-
-    color:#64869b;
-
-    font-size:9px;
-}
-
-.low-alert-count{
-
-    flex-shrink:0;
-
-    min-width:30px;
-
-    height:30px;
-
-    padding:
-        0 9px;
-
-    display:grid;
-
-    place-items:center;
-
-    border-radius:10px;
-
-    background:
-        rgba(255,180,50,.09);
-
-    border:
-        1px solid
-        rgba(255,195,70,.18);
-
-    color:#ffd36b;
-
-    font-size:13px;
-
-    font-weight:700;
-}
-
-.low-alert-items{
-
-    display:grid;
-
-    gap:7px;
-
-    max-height:190px;
-
-    overflow-y:auto;
-}
-
-.low-alert-item{
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:space-between;
-
-    gap:10px;
-
-    min-width:0;
-
-    padding:
-        9px 11px;
-
-    border-radius:11px;
-
-    background:
-        rgba(255,190,70,.045);
-
-    border:
-        1px solid
-        rgba(255,195,70,.10);
-}
-
-.low-alert-item-name{
-
-    min-width:0;
-
-    overflow:hidden;
-
-    text-overflow:ellipsis;
-
-    white-space:nowrap;
-
-    color:#cfeaf3;
-
-    font-size:11px;
-
-    font-weight:600;
-}
-
-.low-alert-item-stock{
-
-    flex-shrink:0;
-
-    color:#ffd36b;
-
-    font-size:10px;
-
-    font-weight:700;
-}
-
-.low-alert-item.out{
-
-    background:
-        rgba(255,70,70,.055);
-
-    border-color:
-        rgba(255,90,90,.12);
-}
-
-.low-alert-item.out .low-alert-item-stock{
-
-    color:#ff9999;
-}
-
-.low-alert-empty{
-
-    color:#6c8798;
-
-    font-size:16px;
-
-    padding:5px 0;
-}
-
-.low-alert-loading{
-
-    color:#ffe38a;
-
-    font-size:11px;
-
-    padding:5px 0;
-}
-
-.low-alert-error{
-
-    color:#ff9999;
-
-    font-size:10px;
-
-    line-height:1.6;
-
-    padding:5px 0;
-}
-
-
-/* ============================================================
-   HOME TITLE
-============================================================ */
-
-.home-title{
-
-    margin-top:5px;
-
-    text-align:center;
-}
-
-.home-title small{
-
-    color:#6e8ba0;
-
-    font-size:13px;
-}
-
-.home-title h1{
-
-    margin-top:7px;
-
-    font-size:
-        clamp(
-            30px,
-            5vw,
-            46px
-        );
-
-    font-weight:500;
-
-    letter-spacing:-1px;
-}
-
-.home-title h1 span{
-
-    color:#51d7ff;
-
-    text-shadow:
         0 0 25px
-        rgba(0,190,255,.28);
+        rgba(0,190,255,.18);
 }
 
 
-/* ============================================================
-   DARKY ORB
-============================================================ */
+.password-error{
 
-.orb-wrap{
+    min-height:17px;
 
-    display:flex;
+    margin-top:10px;
 
-    justify-content:center;
-
-    margin:
-        38px 0 34px;
-}
-
-.orb{
-
-    width:155px;
-
-    height:155px;
-
-    border-radius:50%;
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    position:relative;
-
-    background:
-
-        radial-gradient(
-            circle at 35% 25%,
-            #e6fbff,
-            #55dcff 25%,
-            #0785d5 48%,
-            #06376e 68%,
-            #020b17 90%
-        );
-
-    box-shadow:
-
-        0 0 35px
-        rgba(0,180,255,.35),
-
-        0 0 90px
-        rgba(0,90,255,.16),
-
-        inset 0 0 35px
-        rgba(255,255,255,.18);
-
-    transition:
-        transform .25s ease,
-        box-shadow .25s ease;
-}
-
-.orb::before{
-
-    content:"";
-
-    position:absolute;
-
-    inset:-13px;
-
-    border:
-        1px solid
-        rgba(50,205,255,.30);
-
-    border-radius:50%;
-}
-
-.orb::after{
-
-    content:"";
-
-    position:absolute;
-
-    inset:-26px;
-
-    border:
-        1px solid
-        rgba(50,165,255,.10);
-
-    border-radius:50%;
-}
-
-.orb-icon{
-
-    font-size:40px;
-
-    color:#f0fdff;
-
-    text-shadow:
-
-        0 0 15px #fff,
-
-        0 0 35px
-        rgba(0,215,255,.95);
-
-    position:relative;
-
-    z-index:2;
-}
-
-
-/* ============================================================
-   DARKY LISTENING ANIMATION
-============================================================ */
-
-.home-listening{
-
-    animation:
-        darkyListen 1.1s
-        infinite
-        ease-in-out;
-
-    box-shadow:
-
-        0 0 40px
-        rgba(0,200,255,.60),
-
-        0 0 80px
-        rgba(0,130,255,.35),
-
-        0 0 130px
-        rgba(0,90,255,.18),
-
-        inset 0 0 45px
-        rgba(255,255,255,.25);
-}
-
-.home-listening::before{
-
-    animation:
-        voiceRing 1.25s
-        infinite
-        ease-out;
-
-    border-color:
-        rgba(65,225,255,.80);
-}
-
-.home-listening::after{
-
-    animation:
-        voiceRingOuter 1.8s
-        infinite
-        ease-out;
-
-    border-color:
-        rgba(40,180,255,.40);
-}
-
-@keyframes darkyListen{
-
-    0%,
-    100%{
-
-        transform:
-            scale(1);
-
-    }
-
-    50%{
-
-        transform:
-            scale(1.09);
-
-    }
-
-}
-
-@keyframes voiceRing{
-
-    0%{
-
-        transform:
-            scale(.92);
-
-        opacity:.9;
-
-    }
-
-    70%{
-
-        transform:
-            scale(1.30);
-
-        opacity:.15;
-
-    }
-
-    100%{
-
-        transform:
-            scale(1.40);
-
-        opacity:0;
-
-    }
-
-}
-
-@keyframes voiceRingOuter{
-
-    0%{
-
-        transform:
-            scale(.90);
-
-        opacity:.65;
-
-    }
-
-    70%{
-
-        transform:
-            scale(1.28);
-
-        opacity:.08;
-
-    }
-
-    100%{
-
-        transform:
-            scale(1.42);
-
-        opacity:0;
-
-    }
-
-}
-
-
-/* ============================================================
-   DARKY THINKING
-============================================================ */
-
-.home-thinking{
-
-    animation:
-        darkyThinking .65s
-        infinite
-        alternate
-        ease-in-out;
-
-    box-shadow:
-
-        0 0 40px
-        rgba(0,180,255,.45),
-
-        0 0 85px
-        rgba(0,100,255,.25),
-
-        inset 0 0 40px
-        rgba(255,255,255,.20);
-}
-
-@keyframes darkyThinking{
-
-    from{
-
-        transform:
-            scale(.97);
-
-        filter:
-            brightness(.95);
-    }
-
-    to{
-
-        transform:
-            scale(1.07);
-
-        filter:
-            brightness(1.28);
-    }
-
-}
-
-
-/* ============================================================
-   DARKY SPEAKING
-============================================================ */
-
-.home-speaking{
-
-    animation:
-        darkySpeaking .42s
-        infinite
-        alternate
-        ease-in-out;
-
-    box-shadow:
-
-        0 0 50px
-        rgba(0,215,255,.70),
-
-        0 0 100px
-        rgba(0,130,255,.38),
-
-        0 0 150px
-        rgba(0,90,255,.20),
-
-        inset 0 0 48px
-        rgba(255,255,255,.28);
-}
-
-.home-speaking::before{
-
-    animation:
-        speakingRing .8s
-        infinite
-        ease-in-out;
-
-    border-color:
-        rgba(80,225,255,.55);
-}
-
-@keyframes darkySpeaking{
-
-    from{
-
-        transform:
-            scale(1);
-
-    }
-
-    to{
-
-        transform:
-            scale(1.08);
-
-    }
-
-}
-
-@keyframes speakingRing{
-
-    0%,
-    100%{
-
-        transform:
-            scale(1);
-
-        opacity:.5;
-
-    }
-
-    50%{
-
-        transform:
-            scale(1.16);
-
-        opacity:.95;
-
-    }
-
-}
-
-
-/* ============================================================
-   CHAT
-============================================================ */
-
-.chat-container{
-
-    width:
-        min(820px,100%);
-
-    margin:
-        0 auto;
-}
-
-.chat-messages{
-
-    display:flex;
-
-    flex-direction:column;
-
-    gap:13px;
-
-    margin-bottom:15px;
-}
-
-.chat-row{
-
-    display:flex;
-
-    width:100%;
-}
-
-.chat-row.user{
-
-    justify-content:flex-end;
-}
-
-.chat-row.darky{
-
-    justify-content:flex-start;
-}
-
-.chat-bubble{
-
-    max-width:
-        min(82%,680px);
-
-    padding:
-        12px 15px;
-
-    border-radius:18px;
-
-    font-size:14px;
-
-    line-height:1.6;
-
-    white-space:pre-wrap;
-
-    word-break:break-word;
-}
-
-.user-bubble{
-
-    background:
-        linear-gradient(
-            145deg,
-            #0e86d5,
-            #07529b
-        );
-
-    border:
-        1px solid
-        rgba(90,220,255,.25);
-
-    border-bottom-right-radius:6px;
-
-    color:#f3fcff;
-
-    box-shadow:
-        0 8px 24px
-        rgba(0,90,190,.18);
-}
-
-.darky-bubble{
-
-    background:
-        linear-gradient(
-            145deg,
-            rgba(18,65,96,.55),
-            rgba(3,21,39,.78)
-        );
-
-    border:
-        1px solid
-        rgba(50,190,255,.15);
-
-    border-bottom-left-radius:6px;
-
-    color:#cce8f1;
-
-    box-shadow:
-        0 8px 28px
-        rgba(0,0,0,.20);
-
-    backdrop-filter:
-        blur(18px);
-}
-
-.chat-name{
-
-    margin-bottom:5px;
-
-    color:#5bdcff;
+    color:#ff7777;
 
     font-size:9px;
-
-    letter-spacing:1.2px;
-
-    text-transform:uppercase;
-}
-
-.user-name{
-
-    text-align:right;
-
-    color:#c5f3ff;
 }
 
 
 /* ============================================================
-   ASK BOX
-============================================================ */
-
-.ask-box{
-
-    position:sticky;
-
-    bottom:92px;
-
-    z-index:20;
-
-    display:flex;
-
-    align-items:center;
-
-    gap:8px;
-
-    padding:8px;
-
-    border-radius:21px;
-
-    background:
-        rgba(5,25,44,.90);
-
-    border:
-        1px solid
-        rgba(50,195,255,.20);
-
-    box-shadow:
-        0 15px 45px
-        rgba(0,0,0,.35);
-
-    backdrop-filter:
-        blur(24px);
-
-    -webkit-backdrop-filter:
-        blur(24px);
-}
-
-.ask-box:focus-within{
-
-    border-color:
-        rgba(50,205,255,.45);
-
-    box-shadow:
-        0 0 35px
-        rgba(0,160,255,.12);
-}
-
-.ask-box input{
-
-    flex:1;
-
-    min-width:0;
-
-    padding:
-        12px 8px;
-
-    background:transparent;
-
-    border:none;
-
-    outline:none;
-
-    color:#eafaff;
-
-    font-size:14px;
-}
-
-.ask-box input::placeholder{
-
-    color:#537188;
-}
-
-.ask-button{
-
-    width:44px;
-
-    height:44px;
-
-    flex-shrink:0;
-
-    border-radius:14px;
-
-    border:
-        1px solid
-        rgba(50,190,255,.16);
-
-    background:
-        rgba(10,45,70,.75);
-
-    color:#5edcff;
-
-    font-size:18px;
-
-    transition:
-        transform .2s,
-        background .2s,
-        box-shadow .2s;
-}
-
-.ask-button:hover{
-
-    transform:
-        translateY(-1px);
-
-    border-color:
-        rgba(50,210,255,.35);
-}
-
-
-/* ============================================================
-   ACTIVE MICROPHONE
-============================================================ */
-
-.mic-active{
-
-    animation:
-        micPulse 1s
-        infinite;
-
-    background:
-        linear-gradient(
-            145deg,
-            #75e6ff,
-            #087ec8
-        ) !important;
-
-    color:#02101b !important;
-
-    border-color:
-        rgba(100,230,255,.70) !important;
-
-    box-shadow:
-
-        0 0 20px
-        rgba(0,195,255,.55),
-
-        0 0 40px
-        rgba(0,130,255,.25);
-}
-
-@keyframes micPulse{
-
-    0%,
-    100%{
-
-        transform:
-            scale(1);
-
-    }
-
-    50%{
-
-        transform:
-            scale(1.10);
-
-    }
-
-}
-
-.ask-send{
-
-    color:#03111e;
-
-    background:
-        linear-gradient(
-            145deg,
-            #79e7ff,
-            #168fda 55%,
-            #07539d
-        );
-
-    border:none;
-
-    box-shadow:
-        0 0 20px
-        rgba(0,180,255,.25);
-}
-
-
-/* ============================================================
-   TYPING
-============================================================ */
-
-.typing{
-
-    display:inline-flex;
-
-    align-items:center;
-
-    gap:4px;
-}
-
-.typing span{
-
-    width:5px;
-
-    height:5px;
-
-    border-radius:50%;
-
-    background:#54dbff;
-
-    animation:
-        typing 1s infinite;
-}
-
-.typing span:nth-child(2){
-    animation-delay:.15s;
-}
-
-.typing span:nth-child(3){
-    animation-delay:.3s;
-}
-
-@keyframes typing{
-
-    50%{
-
-        opacity:.2;
-
-        transform:
-            translateY(-3px);
-    }
-
-}
-
-
-/* ============================================================
-   VOICE PAGE
-============================================================ */
-
-.voice-page{
-
-    text-align:center;
-}
-
-.voice-center{
-
-    max-width:700px;
-
-    margin:auto;
-}
-
-.page-heading{
-
-    text-align:left;
-
-    margin-bottom:10px;
-}
-
-.page-heading h2{
-
-    font-size:27px;
-
-    font-weight:500;
-
-    color:#eafaff;
-}
-
-.page-heading p{
-
-    margin-top:5px;
-
-    color:#638298;
-
-    font-size:12px;
-}
-
-.voice-orb{
-
-    width:225px;
-
-    height:225px;
-
-    margin:
-        55px auto 35px;
-
-    border-radius:50%;
-
-    display:grid;
-
-    place-items:center;
-
-    background:
-
-        radial-gradient(
-            circle at 35% 28%,
-            #e8fbff,
-            #58d9ff 30%,
-            #0784d6 50%,
-            #06386e 70%,
-            #020b17
-        );
-
-    border:
-        1px solid
-        rgba(60,205,255,.35);
-
-    box-shadow:
-
-        0 0 55px
-        rgba(0,174,255,.30),
-
-        0 0 110px
-        rgba(0,85,255,.14);
-}
-
-.voice-orb.listening{
-
-    animation:
-        pulse 1.1s infinite;
-}
-
-.voice-orb.speaking{
-
-    animation:
-        speakPulse .55s infinite
-        alternate;
-}
-
-@keyframes pulse{
-
-    50%{
-        transform:
-            scale(1.07);
-    }
-
-}
-
-@keyframes speakPulse{
-
-    to{
-
-        transform:
-            scale(1.04);
-    }
-
-}
-
-.voice-mic{
-
-    font-size:55px;
-
-    text-shadow:
-        0 0 18px #fff,
-        0 0 30px rgba(0,210,255,.7);
-}
-
-.voice-status{
-
-    font-size:22px;
-
-    color:#e8f9ff;
-}
-
-.voice-hint{
-
-    margin-top:8px;
-
-    color:#648399;
-
-    font-size:13px;
-}
-
-.voice-transcript{
-
-    max-width:600px;
-
-    min-height:80px;
-
-    margin:
-        30px auto;
-
-    padding:18px;
-
-    border-radius:18px;
-
-    border:
-        1px solid
-        rgba(50,180,255,.13);
-
-    background:
-        rgba(7,29,49,.48);
-
-    color:#9ebdcd;
-
-    font-size:14px;
-
-    line-height:1.5;
-
-    white-space:pre-wrap;
-}
-
-.voice-button{
-
-    width:72px;
-
-    height:72px;
-
-    border-radius:50%;
-
-    border:
-        1px solid
-        rgba(50,195,255,.35);
-
-    background:
-        linear-gradient(
-            145deg,
-            rgba(20,69,101,.80),
-            rgba(4,28,52,.90)
-        );
-
-    color:#61dfff;
-
-    font-size:28px;
-}
-
-
-/* ============================================================
-   SECONDARY PAGES
-============================================================ */
-
-.data-card{
-
-    max-width:800px;
-
-    margin-top:20px;
-
-    padding:22px;
-
-    border-radius:20px;
-
-    border:
-        1px solid
-        rgba(50,180,255,.14);
-
-    background:
-        linear-gradient(
-            145deg,
-            rgba(17,56,82,.42),
-            rgba(4,22,41,.58)
-        );
-}
-
-.data-card h3{
-
-    margin-bottom:8px;
-
-    font-size:15px;
-
-    color:#dff6ff;
-}
-
-.data-card p{
-
-    color:#7190a4;
-
-    line-height:1.6;
-
-    font-size:13px;
-}
-
-.quick-card{
-
-    width:100%;
-
-    max-width:800px;
-
-    margin-top:12px;
-
-    padding:19px;
-
-    text-align:left;
-
-    color:#e7f7ff;
-
-    border-radius:18px;
-
-    border:
-        1px solid
-        rgba(50,180,255,.14);
-
-    background:
-        linear-gradient(
-            145deg,
-            rgba(18,55,82,.42),
-            rgba(4,22,40,.55)
-        );
-}
-
-.quick-card:hover{
-
-    border-color:
-        rgba(45,200,255,.40);
-}
-
-
-/* ============================================================
-   BOTTOM NAV
-============================================================ */
-
-.bottom-nav{
-
-    position:fixed;
-
-    left:50%;
-
-    bottom:14px;
-
-    transform:
-        translateX(-50%);
-
-    width:
-        min(720px,calc(100% - 24px));
-
-    display:grid;
-
-    grid-template-columns:
-        repeat(5,1fr);
-
-    gap:4px;
-
-    padding:8px;
-
-    z-index:200;
-
-    border-radius:23px;
-
-    background:
-        rgba(4,20,37,.90);
-
-    border:
-        1px solid
-        rgba(50,190,255,.17);
-
-    backdrop-filter:
-        blur(25px);
-
-    -webkit-backdrop-filter:
-        blur(25px);
-
-    box-shadow:
-        0 15px 45px
-        rgba(0,0,0,.40);
-}
-
-.nav-btn{
-
-    padding:
-        9px 4px;
-
-    border:0;
-
-    border-radius:16px;
-
-    background:transparent;
-
-    color:#527084;
-
-    font-size:10px;
-
-    transition:.2s;
-}
-
-.nav-icon{
-
-    display:block;
-
-    margin-bottom:4px;
-
-    font-size:18px;
-}
-
-.nav-btn.active{
-
-    color:#57d9ff;
-
-    background:
-        rgba(0,155,235,.10);
-}
-
-
-/* ============================================================
-   MOBILE
-============================================================ */
-
-@media(max-width:700px){
-
-    .topbar{
-
-        padding:
-            0 16px;
-    }
-
-    .page{
-
-        padding:
-            15px
-            15px
-            110px;
-    }
-
-    .live-section{
-
-        padding:14px;
-
-        border-radius:19px;
-    }
-
-    .sales-grid{
-
-        grid-template-columns:
-            repeat(2,1fr);
-    }
-
-    .sales-card{
-
-        padding:13px;
-    }
-
-    .sales-value{
-
-        font-size:20px;
-    }
-
-    .payment-card{
-
-        padding:
-            10px 8px;
-
-        flex-direction:column;
-
-        align-items:flex-start;
-
-        gap:5px;
-    }
-
-    .low-alert-section{
-
-        padding:13px;
-    }
-
-    .low-alert-items{
-
-        grid-template-columns:
-            1fr;
-    }
-
-    .orb{
-
-        width:140px;
-
-        height:140px;
-    }
-
-    .chat-bubble{
-
-        max-width:90%;
-    }
-
-    .bottom-nav{
-
-        width:
-            calc(100% - 16px);
-
-        bottom:7px;
-    }
-
-}
-
-@media(max-width:400px){
-
-    .brand-text span{
-
-        display:none;
-    }
-
-    .status{
-
-        padding:
-            6px 8px;
-    }
-
-    .sales-label{
-
-        font-size:8px;
-    }
-
-    .sales-value{
-
-        font-size:18px;
-    }
-
-}
-   ```css
-/* ============================================================
-   DARKY AI UNLOCK ANIMATION
+   DARKY UNLOCK ANIMATION
 ============================================================ */
 
 #darkyUnlockAnimation{
 
     position:fixed;
+
     inset:0;
+
     z-index:100000;
 
     display:none;
+
     align-items:center;
+
     justify-content:center;
 
     background:
         radial-gradient(
             circle at center,
-            rgba(0,180,255,.20),
-            rgba(2,7,17,.96) 55%,
+            rgba(0,190,255,.22),
+            rgba(2,7,17,.97) 52%,
             #020711 100%
         );
 
@@ -2311,10 +2161,9 @@ button{
 
     pointer-events:none;
 
+    overflow:hidden;
 }
 
-
-/* ACTIVE */
 
 #darkyUnlockAnimation.active{
 
@@ -2322,56 +2171,46 @@ button{
 
     animation:
         darkyUnlockScreen
-        2.2s
+        2.4s
         ease-in-out
         forwards;
-
 }
 
-
-/* ============================================================
-   MAIN ORB
-============================================================ */
 
 .unlock-orb{
 
     position:relative;
 
-    width:110px;
-    height:110px;
+    width:105px;
+    height:105px;
 
     border-radius:50%;
 
     background:
         radial-gradient(
             circle,
-            #d9faff 0%,
-            #5edcff 18%,
-            #087fc9 48%,
-            #031c36 72%,
+            #e9ffff 0%,
+            #68e1ff 17%,
+            #087fc9 46%,
+            #031c36 70%,
             transparent 73%
         );
 
     box-shadow:
-
-        0 0 25px rgba(0,200,255,.8),
-
-        0 0 60px rgba(0,160,255,.6),
-
-        0 0 120px rgba(0,120,255,.4);
+        0 0 25px
+        rgba(0,210,255,.9),
+        0 0 65px
+        rgba(0,160,255,.65),
+        0 0 130px
+        rgba(0,120,255,.4);
 
     animation:
         unlockOrb
-        2s
+        2.1s
         cubic-bezier(.2,.8,.2,1)
         forwards;
-
 }
 
-
-/* ============================================================
-   ORB RINGS
-============================================================ */
 
 .unlock-orb::before,
 .unlock-orb::after{
@@ -2386,12 +2225,11 @@ button{
 
     border:
         1px solid
-        rgba(90,220,255,.55);
+        rgba(90,220,255,.60);
 
     box-shadow:
         0 0 25px
         rgba(0,180,255,.25);
-
 }
 
 
@@ -2402,7 +2240,6 @@ button{
         1.5s
         ease-out
         infinite;
-
 }
 
 
@@ -2419,13 +2256,8 @@ button{
         ease-out
         infinite
         .2s;
-
 }
 
-
-/* ============================================================
-   CENTER LETTER
-============================================================ */
 
 .unlock-letter{
 
@@ -2451,16 +2283,11 @@ button{
 
     animation:
         unlockLetter
-        1.5s
+        1.7s
         ease-in-out
         forwards;
-
 }
 
-
-/* ============================================================
-   PARTICLE RINGS
-============================================================ */
 
 .unlock-particle{
 
@@ -2476,44 +2303,63 @@ button{
     box-shadow:
         0 0 12px
         rgba(80,220,255,.9);
-
 }
 
 
 .unlock-particle.p1{
-    animation:particle1 1.7s ease-out forwards;
+    animation:
+        particle1
+        1.7s
+        ease-out
+        forwards;
 }
 
 .unlock-particle.p2{
-    animation:particle2 1.9s ease-out forwards;
+    animation:
+        particle2
+        1.9s
+        ease-out
+        forwards;
 }
 
 .unlock-particle.p3{
-    animation:particle3 1.5s ease-out forwards;
+    animation:
+        particle3
+        1.5s
+        ease-out
+        forwards;
 }
 
 .unlock-particle.p4{
-    animation:particle4 2s ease-out forwards;
+    animation:
+        particle4
+        2s
+        ease-out
+        forwards;
 }
 
 .unlock-particle.p5{
-    animation:particle5 1.8s ease-out forwards;
+    animation:
+        particle5
+        1.8s
+        ease-out
+        forwards;
 }
 
 .unlock-particle.p6{
-    animation:particle6 1.6s ease-out forwards;
+    animation:
+        particle6
+        1.6s
+        ease-out
+        forwards;
 }
 
-
-/* ============================================================
-   DARKY TEXT
-============================================================ */
 
 .unlock-text{
 
     position:absolute;
 
-    margin-top:230px;
+    margin-top:220px;
 
     color:#bdefff;
 
@@ -2531,16 +2377,11 @@ button{
 
     animation:
         unlockText
-        1.8s
+        1.9s
         ease-in-out
         forwards;
-
 }
 
-
-/* ============================================================
-   ANIMATIONS
-============================================================ */
 
 @keyframes darkyUnlockScreen{
 
@@ -2548,88 +2389,69 @@ button{
         opacity:0;
     }
 
-    15%{
+    12%{
         opacity:1;
     }
 
-    70%{
+    72%{
         opacity:1;
     }
 
     100%{
         opacity:0;
     }
-
 }
 
 
 @keyframes unlockOrb{
 
     0%{
-
         transform:
             scale(.15)
             rotate(0deg);
 
         opacity:0;
-
     }
 
-    20%{
-
+    18%{
         transform:
             scale(.65)
             rotate(45deg);
 
         opacity:1;
-
     }
 
-    55%{
-
+    52%{
         transform:
             scale(1.15)
             rotate(180deg);
-
     }
 
     100%{
-
         transform:
             scale(9)
             rotate(360deg);
 
         opacity:0;
-
     }
-
 }
 
 
 @keyframes unlockRing{
 
     0%{
-
         transform:scale(.3);
-
         opacity:0;
-
     }
 
     25%{
-
         opacity:1;
-
     }
 
     100%{
-
         transform:scale(3);
-
         opacity:0;
-
     }
-
 }
 
 
@@ -2640,7 +2462,7 @@ button{
         transform:scale(.5);
     }
 
-    35%{
+    30%{
         opacity:1;
         transform:scale(1);
     }
@@ -2653,7 +2475,6 @@ button{
         opacity:0;
         transform:scale(1.5);
     }
-
 }
 
 
@@ -2677,191 +2498,248 @@ button{
         opacity:0;
         transform:translateY(-10px);
     }
-
 }
 
-
-/* ============================================================
-   PARTICLES
-============================================================ */
 
 @keyframes particle1{
 
     to{
-        transform:translate(-180px,-130px) scale(0);
+        transform:
+            translate(-180px,-130px)
+            scale(0);
+
         opacity:0;
     }
-
 }
+
 
 @keyframes particle2{
 
     to{
-        transform:translate(190px,-100px) scale(0);
+        transform:
+            translate(190px,-100px)
+            scale(0);
+
         opacity:0;
     }
-
 }
+
 
 @keyframes particle3{
 
     to{
-        transform:translate(-150px,150px) scale(0);
+        transform:
+            translate(-150px,150px)
+            scale(0);
+
         opacity:0;
     }
-
 }
+
 
 @keyframes particle4{
 
     to{
-        transform:translate(170px,140px) scale(0);
+        transform:
+            translate(170px,140px)
+            scale(0);
+
         opacity:0;
     }
-
 }
+
 
 @keyframes particle5{
 
     to{
-        transform:translate(-250px,20px) scale(0);
+        transform:
+            translate(-250px,20px)
+            scale(0);
+
         opacity:0;
     }
-
 }
+
 
 @keyframes particle6{
 
     to{
-        transform:translate(250px,30px) scale(0);
+        transform:
+            translate(250px,30px)
+            scale(0);
+
         opacity:0;
+    }
+}
+
+
+/* ============================================================
+   MOBILE
+============================================================ */
+
+@media(max-width:700px){
+
+    .topbar{
+
+        padding:
+            13px 14px;
+    }
+
+
+    .brand-logo{
+
+        width:37px;
+        height:37px;
+
+        border-radius:11px;
+    }
+
+
+    .brand-text strong{
+
+        font-size:14px;
+    }
+
+
+    .brand-text span{
+
+        display:none;
+    }
+
+
+    .logout-button{
+
+        padding:
+            9px 11px;
+
+        font-size:8px;
+    }
+
+
+    .page{
+
+        padding:
+            18px 12px 115px;
+    }
+
+
+    .sales-grid{
+
+        grid-template-columns:
+            repeat(2,1fr);
+    }
+
+
+    .payment-grid{
+
+        grid-template-columns:
+            repeat(3,1fr);
+    }
+
+
+    .sales-value{
+
+        font-size:18px;
+    }
+
+
+    .live-section{
+
+        padding:13px;
+    }
+
+
+    .live-heading-text span{
+
+        display:none;
+    }
+
+
+    .chat-bubble{
+
+        max-width:88%;
+    }
+
+
+    .orb-wrap{
+
+        height:145px;
+    }
+
+
+    .orb{
+
+        width:105px;
+        height:105px;
+    }
+
+
+    .bottom-nav{
+
+        bottom:9px;
+
+        width:
+            calc(100% - 14px);
     }
 
 }
-/* ============================================================
-   DARKY AI LOGOUT BUTTON
-============================================================ */
-
-.logout-button{
-
-    padding:10px 18px;
-
-    border:1px solid rgba(80,210,255,.35);
-
-    border-radius:10px;
-
-    background:
-        rgba(5,25,45,.75);
-
-    color:#bdefff;
-
-    font-size:11px;
-
-    font-weight:700;
-
-    letter-spacing:1.5px;
-
-    cursor:pointer;
-
-    transition:
-        .25s ease;
-
-    box-shadow:
-        0 0 12px rgba(0,170,255,.08);
-
-}
 
 
-.logout-button:hover{
+@media(max-width:430px){
 
-    color:#ffffff;
+    .payment-card{
 
-    border-color:
-        rgba(80,220,255,.8);
-
-    background:
-        rgba(0,130,200,.22);
-
-    box-shadow:
-        0 0 20px
-        rgba(0,190,255,.3);
-
-    transform:
-        translateY(-1px);
-
-}
+        padding:
+            11px 8px;
+    }
 
 
-.logout-button:active{
+    .payment-value{
 
-    transform:
-        scale(.96);
+        font-size:13px;
+    }
 
-}
 
-/* ============================================================
-   DARKY AI CHATBOX — ALWAYS ON TOP
-============================================================ */
+    .payment-label{
 
-#chatBox,
-.chatbox,
-.chat-box,
-.ai-chat,
-.darky-chat,
-#darkyChat{
+        font-size:7px;
+    }
 
-    position:fixed !important;
 
-    z-index:99999 !important;
+    .low-alert-item{
+
+        padding:
+            9px;
+    }
+
+
+    .low-alert-item-stock{
+
+        font-size:8px;
+    }
 
 }
 
 
 /* ============================================================
-   DASHBOARD CONTENT STAYS BELOW CHAT
+   REDUCED MOTION
 ============================================================ */
 
-.app,
-.page,
-.page-content,
-#homePage,
-#stockPage,
-#voicePage,
-#ordersPage,
-#reportsPage{
+@media(prefers-reduced-motion:reduce){
 
-    z-index:1;
+    *,
+    *::before,
+    *::after{
 
-}
+        animation-duration:
+            .01ms !important;
 
+        animation-iteration-count:
+            1 !important;
 
-/* ============================================================
-   DO NOT ALLOW PAGE WINDOWS TO COVER CHAT
-============================================================ */
-
-.stock-window,
-.voice-window,
-.home-window,
-.inventory-window,
-.dashboard-window{
-
-    z-index:2 !important;
-
-}
-
-
-/* ============================================================
-   CHATBOX BUTTON / FLOATING BUTTON
-============================================================ */
-
-.chat-button,
-.chat-toggle,
-#chatButton,
-#chatToggle{
-
-    position:fixed !important;
-
-    z-index:100000 !important;
+        scroll-behavior:
+            auto !important;
+    }
 
 }
 
@@ -2869,7 +2747,9 @@ button{
 
 </head>
 
+
 <body>
+
 
 <!-- ==========================================================
      DARKY AI PASSWORD LOCK
@@ -2877,50 +2757,82 @@ button{
 
 <div id="passwordLock">
 
-```
-<div class="password-box">
+    <div class="password-box">
 
-    <div class="password-logo">
-        D
+        <div class="password-logo">
+            D
+        </div>
+
+        <h2>
+            DARKY AI
+        </h2>
+
+        <p>
+            Enter your password to access the dashboard
+        </p>
+
+        <input
+            id="dashboardPassword"
+            class="password-input"
+            type="password"
+            placeholder="PASSWORD"
+            autocomplete="off"
+        >
+
+        <button
+            id="passwordButton"
+            class="password-button"
+            onclick="unlockDashboard()"
+        >
+            UNLOCK DASHBOARD
+        </button>
+
+        <div
+            id="passwordError"
+            class="password-error">
+        </div>
+
     </div>
 
-    <h2>
+</div>
+
+
+<!-- ==========================================================
+     UNLOCK ANIMATION
+========================================================== -->
+
+<div id="darkyUnlockAnimation">
+
+    <div class="unlock-orb">
+
+        <div class="unlock-letter">
+            D
+        </div>
+
+    </div>
+
+
+    <div class="unlock-particle p1"></div>
+    <div class="unlock-particle p2"></div>
+    <div class="unlock-particle p3"></div>
+    <div class="unlock-particle p4"></div>
+    <div class="unlock-particle p5"></div>
+    <div class="unlock-particle p6"></div>
+
+
+    <div class="unlock-text">
         DARKY AI
-    </h2>
-
-    <p>
-        Enter your password to access the dashboard
-    </p>
-
-    <input
-        id="dashboardPassword"
-        class="password-input"
-        type="password"
-        placeholder="PASSWORD"
-        autocomplete="off"
-    >
-
-    <button
-        id="passwordButton"
-        class="password-button"
-        onclick="unlockDashboard()">
-
-        UNLOCK DASHBOARD
-
-    </button>
-
-    <div
-        id="passwordError"
-        class="password-error">
-
     </div>
 
 </div>
-```
 
-</div>
+
+<!-- ==========================================================
+     APP
+========================================================== -->
 
 <div class="app">
+
 
 <!-- ==========================================================
      TOP BAR
@@ -2928,70 +2840,72 @@ button{
 
 <header class="topbar">
 
-```
-<div class="brand">
+    <div class="brand">
 
-    <div class="logo">
-        D
+        <div class="brand-logo">
+            D
+        </div>
+
+        <div class="brand-text">
+
+            <strong>
+                DARKY AI
+            </strong>
+
+            <span>
+                Chaatarra Restaurant Assistant
+            </span>
+
+            <div
+                id="connectionStatus"
+                class="status">
+                ● READY
+            </div>
+
+        </div>
+
     </div>
 
-    <div class="brand-text">
 
-        <strong>
-            DARKY AI
-        </strong>
-
-        <span>
-            RARKS AI ASSISTANT
-        </span>
-
-    </div>
-
-</div>
-
-
-<div
-    id="connectionStatus"
-    class="status">
-
-    ● READY
-
-</div>
-```
+    <button
+        id="logoutButton"
+        class="logout-button"
+        onclick="logoutDashboard()"
+    >
+        ⏻ LOGOUT
+    </button>
 
 </header>
 
+
 <!-- ==========================================================
-     HOME
+     HOME PAGE
 ========================================================== -->
 
 <section
     id="homePage"
-    class="page active">
+    class="page active"
+>
 
-```
-<!-- ======================================================
-     LIVE BUSINESS OVERVIEW
-======================================================= -->
+
+<!-- ==========================================================
+     LIVE BUSINESS
+========================================================== -->
 
 <div class="live-section">
 
-
-    <div class="live-top">
-
+    <div class="live-header">
 
         <div class="live-heading">
 
-
             <div class="live-heading-icon">
-                ₹
+                ◉
             </div>
-
 
             <div class="live-heading-text">
 
                 <strong>
-                  Admin's Dashboard
+                    Admin's Dashboard
                 </strong>
 
                 <span>
@@ -2999,7 +2913,6 @@ button{
                 </span>
 
             </div>
-
 
         </div>
 
@@ -3014,9 +2927,7 @@ button{
 
         </div>
 
-
     </div>
-
 
 
     <div class="sales-grid">
@@ -3031,9 +2942,7 @@ button{
             <div
                 id="liveTotalSales"
                 class="sales-value primary">
-
                 ₹0
-
             </div>
 
         </div>
@@ -3048,9 +2957,7 @@ button{
             <div
                 id="liveTotalOrders"
                 class="sales-value">
-
                 0
-
             </div>
 
         </div>
@@ -3065,9 +2972,7 @@ button{
             <div
                 id="liveTotalItems"
                 class="sales-value">
-
                 0
-
             </div>
 
         </div>
@@ -3082,16 +2987,13 @@ button{
             <div
                 id="liveAverageBill"
                 class="sales-value">
-
                 ₹0
-
             </div>
 
         </div>
 
 
     </div>
-
 
 
     <div class="payment-grid">
@@ -3106,9 +3008,7 @@ button{
             <div
                 id="liveCash"
                 class="payment-value">
-
                 ₹0
-
             </div>
 
         </div>
@@ -3123,9 +3023,7 @@ button{
             <div
                 id="liveUPI"
                 class="payment-value">
-
                 ₹0
-
             </div>
 
         </div>
@@ -3140,9 +3038,7 @@ button{
             <div
                 id="liveCard"
                 class="payment-value">
-
                 ₹0
-
             </div>
 
         </div>
@@ -3154,22 +3050,15 @@ button{
     <div
         id="salesError"
         class="sales-error">
-
         Unable to load live sales data.
-
     </div>
 
 
-
-    <!-- ==================================================
-         LOW ALERT ITEMS
-    =================================================== -->
+    <!-- LOW ALERT -->
 
     <div class="low-alert-section">
 
-
         <div class="low-alert-header">
-
 
             <div class="low-alert-title">
 
@@ -3195,11 +3084,8 @@ button{
             <div
                 id="lowAlertCount"
                 class="low-alert-count">
-
                 0
-
             </div>
-
 
         </div>
 
@@ -3214,17 +3100,12 @@ button{
 
         </div>
 
-
     </div>
-
 
 </div>
 
 
-
-<!-- ======================================================
-     GREETING
-======================================================= -->
+<!-- GREETING -->
 
 <div class="home-title">
 
@@ -3244,10 +3125,7 @@ button{
 </div>
 
 
-
-<!-- ======================================================
-     DARKY ORB
-======================================================= -->
+<!-- DARKY ORB -->
 
 <div class="orb-wrap">
 
@@ -3264,32 +3142,24 @@ button{
 </div>
 
 
-
-<!-- ======================================================
-     CHAT
-======================================================= -->
+<!-- CHAT -->
 
 <div class="chat-container">
-
 
     <div
         id="chatMessages"
         class="chat-messages">
-
     </div>
-
 
 
     <div class="ask-box">
 
-
         <button
             id="homeMicButton"
             class="ask-button"
-            onclick="openVoice()">
-
+            onclick="openVoice()"
+        >
             🎙
-
         </button>
 
 
@@ -3303,20 +3173,18 @@ button{
 
         <button
             class="ask-button ask-send"
-            onclick="sendHomeQuestion()">
-
+            onclick="sendHomeQuestion()"
+        >
             ➤
-
         </button>
-
 
     </div>
 
-
 </div>
-```
+
 
 </section>
+
 
 <!-- ==========================================================
      VOICE PAGE
@@ -3324,81 +3192,70 @@ button{
 
 <section
     id="voicePage"
-    class="page voice-page">
+    class="page voice-page"
+>
 
-```
-<div class="voice-center">
+    <div class="voice-center">
 
+        <div class="page-heading">
 
-    <div class="page-heading">
+            <h2>
+                Voice Command
+            </h2>
 
-        <h2>
-            Voice Command
-        </h2>
-
-        <p>
-            Speak naturally to Darky
-        </p>
-
-    </div>
-
-
-    <div
-        id="voiceOrb"
-        class="voice-orb">
-
-        <div
-            id="voiceMicIcon"
-            class="voice-mic">
-
-            🎙
+            <p>
+                Speak naturally to Darky
+            </p>
 
         </div>
 
+
+        <div
+            id="voiceOrb"
+            class="voice-orb">
+
+            <div
+                id="voiceMicIcon"
+                class="voice-mic">
+                🎙
+            </div>
+
+        </div>
+
+
+        <div
+            id="voiceStatus"
+            class="voice-status">
+            Ready to listen
+        </div>
+
+
+        <div
+            id="voiceHint"
+            class="voice-hint">
+            Tap the microphone and speak
+        </div>
+
+
+        <div
+            id="voiceTranscript"
+            class="voice-transcript">
+            Your voice command will appear here.
+        </div>
+
+
+        <button
+            id="voiceButton"
+            class="voice-button"
+            onclick="startVoiceCommand()"
+        >
+            🎙
+        </button>
+
     </div>
-
-
-    <div
-        id="voiceStatus"
-        class="voice-status">
-
-        Ready to listen
-
-    </div>
-
-
-    <div
-        id="voiceHint"
-        class="voice-hint">
-
-        Tap the microphone and speak
-
-    </div>
-
-
-    <div
-        id="voiceTranscript"
-        class="voice-transcript">
-
-        Your voice command will appear here.
-
-    </div>
-
-
-    <button
-        id="voiceButton"
-        class="voice-button"
-        onclick="startVoiceCommand()">
-
-        🎙
-
-    </button>
-
-
-</div>
-```
 
 </section>
+
 
 <!-- ==========================================================
      STOCK
@@ -3406,58 +3263,56 @@ button{
 
 <section
     id="stockPage"
-    class="page secondary-page">
+    class="page secondary-page"
+>
 
-```
-<div class="page-heading">
+    <div class="page-heading">
 
-    <h2>
-        Stock
-    </h2>
+        <h2>
+            Stock
+        </h2>
 
-    <p>
-        Inventory information
-    </p>
+        <p>
+            Inventory information
+        </p>
 
-</div>
-
-
-<div class="data-card">
-
-    <h3>
-        Inventory Assistant
-    </h3>
-
-    <p>
-        Ask Darky about current stock,
-        low-stock items, vendors,
-        purchase prices or stock movements.
-    </p>
-
-</div>
+    </div>
 
 
-<button
-    class="quick-card"
-    onclick="askQuick('Give me the current inventory overview.')">
+    <div class="data-card">
 
-    📦 &nbsp;
-    Check current inventory
+        <h3>
+            Inventory Assistant
+        </h3>
 
-</button>
+        <p>
+            Ask Darky about current stock,
+            low-stock items, vendors,
+            purchase prices or stock movements.
+        </p>
+
+    </div>
 
 
-<button
-    class="quick-card"
-    onclick="askQuick('Show me the recent inventory history.')">
+    <button
+        class="quick-card"
+        onclick="askQuick('Give me the current inventory overview.')"
+    >
+        📦 &nbsp;
+        Check current inventory
+    </button>
 
-    ↕ &nbsp;
-    Check stock history
 
-</button>
-```
+    <button
+        class="quick-card"
+        onclick="askQuick('Show me the recent inventory history.')"
+    >
+        ↕ &nbsp;
+        Check stock history
+    </button>
 
 </section>
+
 
 <!-- ==========================================================
      ORDERS
@@ -3465,48 +3320,47 @@ button{
 
 <section
     id="ordersPage"
-    class="page secondary-page">
+    class="page secondary-page"
+>
 
-```
-<div class="page-heading">
+    <div class="page-heading">
 
-    <h2>
-        Orders
-    </h2>
+        <h2>
+            Orders
+        </h2>
 
-    <p>
-        Restaurant order information
-    </p>
+        <p>
+            Restaurant order information
+        </p>
 
-</div>
-
-
-<div class="data-card">
-
-    <h3>
-        Order Assistant
-    </h3>
-
-    <p>
-        Ask Darky about recent orders,
-        order totals, customer names,
-        tables or order details.
-    </p>
-
-</div>
+    </div>
 
 
-<button
-    class="quick-card"
-    onclick="askQuick('Show me the latest orders.')">
+    <div class="data-card">
 
-    🧾 &nbsp;
-    Show latest orders
+        <h3>
+            Order Assistant
+        </h3>
 
-</button>
-```
+        <p>
+            Ask Darky about recent orders,
+            order totals, customer names,
+            tables or order details.
+        </p>
+
+    </div>
+
+
+    <button
+        class="quick-card"
+        onclick="askQuick('Show me the latest orders.')"
+    >
+        🧾 &nbsp;
+        Show latest orders
+    </button>
 
 </section>
+
 
 <!-- ==========================================================
      REPORTS
@@ -3514,58 +3368,56 @@ button{
 
 <section
     id="reportsPage"
-    class="page secondary-page">
+    class="page secondary-page"
+>
 
-```
-<div class="page-heading">
+    <div class="page-heading">
 
-    <h2>
-        Reports
-    </h2>
+        <h2>
+            Reports
+        </h2>
 
-    <p>
-        Business information through Darky
-    </p>
+        <p>
+            Business information through Darky
+        </p>
 
-</div>
-
-
-<div class="data-card">
-
-    <h3>
-        Today's Live Report
-    </h3>
-
-    <p>
-        The figures shown on the Home page
-        are connected to the same
-        chaat_orders sales data.
-    </p>
-
-</div>
+    </div>
 
 
-<button
-    class="quick-card"
-    onclick="askQuick('Give me a summary of today\'s restaurant activity.')">
+    <div class="data-card">
 
-    📊 &nbsp;
-    Today's summary
+        <h3>
+            Today's Live Report
+        </h3>
 
-</button>
+        <p>
+            The figures shown on the Home page
+            are connected to the same
+            chaat_orders sales data.
+        </p>
+
+    </div>
 
 
-<button
-    class="quick-card"
-    onclick="askQuick('Give me today\'s total sales, orders, items sold and average bill.')">
+    <button
+        class="quick-card"
+        onclick="askQuick('Give me a summary of today\'s restaurant activity.')"
+    >
+        📊 &nbsp;
+        Today's summary
+    </button>
 
-    💰 &nbsp;
-    Today's sales report
 
-</button>
-```
+    <button
+        class="quick-card"
+        onclick="askQuick('Give me today\'s total sales, orders, items sold and average bill.')"
+    >
+        💰 &nbsp;
+        Today's sales report
+    </button>
 
 </section>
+
 
 <!-- ==========================================================
      BOTTOM NAV
@@ -3573,92 +3425,91 @@ button{
 
 <nav class="bottom-nav">
 
-```
-<button
-    class="nav-btn active"
-    data-page="homePage"
-    onclick="openPage('homePage')">
+    <button
+        class="nav-btn active"
+        data-page="homePage"
+        onclick="openPage('homePage')"
+    >
 
-    <span class="nav-icon">
-        ⌂
-    </span>
+        <span class="nav-icon">
+            ⌂
+        </span>
 
-    Home
+        Home
 
-</button>
-
-
-<button
-    class="nav-btn"
-    data-page="voicePage"
-    onclick="openPage('voicePage')">
-
-    <span class="nav-icon">
-        🎙
-    </span>
-
-    Voice
-
-</button>
+    </button>
 
 
-<button
-    class="nav-btn"
-    data-page="stockPage"
-    onclick="openPage('stockPage')">
+    <button
+        class="nav-btn"
+        data-page="voicePage"
+        onclick="openPage('voicePage')"
+    >
 
-    <span class="nav-icon">
-        📦
-    </span>
+        <span class="nav-icon">
+            🎙
+        </span>
 
-    Stock
+        Voice
 
-</button>
-
-
-<button
-    class="nav-btn"
-    data-page="ordersPage"
-    onclick="openPage('ordersPage')">
-
-    <span class="nav-icon">
-        🧾
-    </span>
-
-    Orders
-
-</button>
+    </button>
 
 
-<button
-    class="nav-btn"
-    data-page="reportsPage"
-    onclick="openPage('reportsPage')">
+    <button
+        class="nav-btn"
+        data-page="stockPage"
+        onclick="openPage('stockPage')"
+    >
 
-    <span class="nav-icon">
-        ▥
-    </span>
+        <span class="nav-icon">
+            📦
+        </span>
 
-    Reports
+        Stock
 
-</button>
-```
+    </button>
+
+
+    <button
+        class="nav-btn"
+        data-page="ordersPage"
+        onclick="openPage('ordersPage')"
+    >
+
+        <span class="nav-icon">
+            🧾
+        </span>
+
+        Orders
+
+    </button>
+
+
+    <button
+        class="nav-btn"
+        data-page="reportsPage"
+        onclick="openPage('reportsPage')"
+    >
+
+        <span class="nav-icon">
+            ▥
+        </span>
+
+        Reports
+
+    </button>
 
 </nav>
 
+
 </div>
+
 
 <script>
 
 /* ============================================================
    DARKY AI PASSWORD PROTECTION
 ============================================================ */
-
-/*
- * ============================================================
- * CHANGE YOUR PASSWORD HERE
- * ============================================================
- */
 
 const DARKY_PASSWORD = "1129";
 
@@ -3684,8 +3535,13 @@ function unlockDashboard(){
             "passwordLock"
         );
 
+    const unlockAnimation =
+        document.getElementById(
+            "darkyUnlockAnimation"
+        );
+
     const enteredPassword =
-        passwordInput.value;
+        passwordInput.value.trim();
 
 
     if(
@@ -3698,12 +3554,83 @@ function unlockDashboard(){
             "true"
         );
 
-        passwordLock.style.display =
-            "none";
-
-        passwordInput.value = "";
 
         errorBox.textContent = "";
+
+        passwordInput.blur();
+
+
+        /* ------------------------------------------
+           START DARKY UNLOCK ANIMATION
+        ------------------------------------------ */
+
+        unlockAnimation.classList.remove(
+            "active"
+        );
+
+        /*
+         * Force browser reflow so the animation
+         * restarts every time.
+         */
+
+        void unlockAnimation.offsetWidth;
+
+
+        unlockAnimation.classList.add(
+            "active"
+        );
+
+
+        /* ------------------------------------------
+           FADE PASSWORD SCREEN
+        ------------------------------------------ */
+
+        passwordLock.style.transition =
+            "opacity .45s ease";
+
+        passwordLock.style.opacity =
+            "0";
+
+
+        setTimeout(
+            function(){
+
+                passwordLock.style.display =
+                    "none";
+
+                passwordLock.style.opacity =
+                    "1";
+
+                passwordInput.value = "";
+
+            },
+            450
+        );
+
+
+        /* ------------------------------------------
+           DIRECT TO HOME PAGE
+        ------------------------------------------ */
+
+        openPage(
+            "homePage"
+        );
+
+
+        /* ------------------------------------------
+           END ANIMATION
+        ------------------------------------------ */
+
+        setTimeout(
+            function(){
+
+                unlockAnimation.classList.remove(
+                    "active"
+                );
+
+            },
+            2400
+        );
 
     }
     else{
@@ -3719,19 +3646,18 @@ function unlockDashboard(){
 
 }
 
+
 /* ============================================================
    DARKY AI LOGOUT
 ============================================================ */
 
 function logoutDashboard(){
 
-    /* Remove saved login */
     sessionStorage.removeItem(
         "darkyDashboardUnlocked"
     );
 
 
-    /* Show password screen again */
     const passwordLock =
         document.getElementById(
             "passwordLock"
@@ -3746,6 +3672,20 @@ function logoutDashboard(){
         document.getElementById(
             "passwordError"
         );
+
+    const unlockAnimation =
+        document.getElementById(
+            "darkyUnlockAnimation"
+        );
+
+
+    if(unlockAnimation){
+
+        unlockAnimation.classList.remove(
+            "active"
+        );
+
+    }
 
 
     if(passwordError){
@@ -3769,10 +3709,16 @@ function logoutDashboard(){
         passwordLock.style.display =
             "flex";
 
+        passwordLock.style.opacity =
+            "1";
+
     }
 
 
-    /* Focus password field */
+    openPage(
+        "homePage"
+    );
+
 
     setTimeout(
         function(){
@@ -3788,6 +3734,7 @@ function logoutDashboard(){
     );
 
 }
+
 
 /* ============================================================
    CHECK DASHBOARD ACCESS
@@ -4380,7 +4327,7 @@ function localDateString(
 
 
 /* ============================================================
-   LIVE SALES — INITIAL DATA
+   LIVE SALES
 ============================================================ */
 
 async function loadLiveSales(){
@@ -4757,7 +4704,7 @@ function formatMoney(
 
 
 /* ============================================================
-   TRUE LIVE SALES — SUPABASE REALTIME
+   SALES REALTIME
 ============================================================ */
 
 let salesRealtimeChannel = null;
@@ -4784,10 +4731,6 @@ function scheduleLiveSalesRefresh(){
 
 }
 
-
-/* ============================================================
-   SUBSCRIBE TO CHAAT_ORDERS
-============================================================ */
 
 function subscribeToLiveSales(){
 
@@ -4842,7 +4785,6 @@ function subscribeToLiveSales(){
                         payload
                     );
 
-
                     scheduleLiveSalesRefresh();
 
                 }
@@ -4862,7 +4804,6 @@ function subscribeToLiveSales(){
                         payload
                     );
 
-
                     scheduleLiveSalesRefresh();
 
                 }
@@ -4881,7 +4822,6 @@ function subscribeToLiveSales(){
                         "LIVE ORDER DELETE:",
                         payload
                     );
-
 
                     scheduleLiveSalesRefresh();
 
@@ -4905,7 +4845,6 @@ function subscribeToLiveSales(){
                             "online",
                             "LIVE"
                         );
-
 
                         scheduleLiveSalesRefresh();
 
@@ -4947,11 +4886,6 @@ function subscribeToLiveSales(){
                             "OFFLINE"
                         );
 
-
-                        console.warn(
-                            "Darky sales realtime timed out."
-                        );
-
                     }
 
 
@@ -4972,10 +4906,6 @@ function subscribeToLiveSales(){
 }
 
 
-/* ============================================================
-   START LIVE SALES
-============================================================ */
-
 loadLiveSales();
 
 subscribeToLiveSales();
@@ -4983,41 +4913,12 @@ subscribeToLiveSales();
 
 /* ============================================================
    LOW ALERT INVENTORY
-   CORRECT DATABASE SCHEMA
 ============================================================ */
 
 let inventoryRealtimeChannel = null;
 
 let inventoryRefreshTimer = null;
 
-
-/*
- * IMPORTANT:
- *
- * The actual inventory_items table uses:
- *
- *     name
- *     unit
- *     current_stock
- *     alert_level
- *
- * NOT:
- *
- *     stock
- *     alert
- *
- *
- * LOW ALERT RULE:
- *
- * current_stock <= alert_level
- *
- * This includes items with zero stock.
- */
-
-
-/* ============================================================
-   INVENTORY NUMBER FORMAT
-============================================================ */
 
 function formatInventoryNumber(
     value
@@ -5056,10 +4957,6 @@ function formatInventoryNumber(
 }
 
 
-/* ============================================================
-   HTML ESCAPE
-============================================================ */
-
 function escapeHtml(
     value
 ){
@@ -5091,17 +4988,9 @@ function escapeHtml(
 }
 
 
-/* ============================================================
-   LOAD LOW ALERT INVENTORY
-============================================================ */
-
 async function loadLowAlertInventory(){
 
     if(!lowAlertItems){
-
-        console.error(
-            "Darky: lowAlertItems element not found."
-        );
 
         return;
 
@@ -5109,18 +4998,15 @@ async function loadLowAlertInventory(){
 
 
     lowAlertItems.innerHTML = `
+
         <div class="low-alert-loading">
             Syncing inventory...
         </div>
+
     `;
 
 
     try{
-
-        console.log(
-            "DARKY INVENTORY: querying inventory_items..."
-        );
-
 
         const result =
             await supabaseClient
@@ -5139,12 +5025,6 @@ async function loadLowAlertInventory(){
                         ascending:true
                     }
                 );
-
-
-        console.log(
-            "DARKY INVENTORY RESULT:",
-            result
-        );
 
 
         const data =
@@ -5185,24 +5065,6 @@ async function loadLowAlertInventory(){
                         "Unknown Supabase error"
                     )}
 
-                    ${
-                        error.code
-                        ?
-                        "<br>Code: " +
-                        escapeHtml(error.code)
-                        :
-                        ""
-                    }
-
-                    ${
-                        error.details
-                        ?
-                        "<br>" +
-                        escapeHtml(error.details)
-                        :
-                        ""
-                    }
-
                 </div>
 
             `;
@@ -5211,12 +5073,6 @@ async function loadLowAlertInventory(){
             return;
 
         }
-
-
-        console.log(
-            "DARKY INVENTORY ROWS:",
-            data
-        );
 
 
         const items =
@@ -5257,12 +5113,6 @@ async function loadLowAlertInventory(){
                         a.stock -
                         b.stock
                 );
-
-
-        console.log(
-            "DARKY LOW ALERT ITEMS:",
-            items
-        );
 
 
         if(lowAlertCount){
@@ -5331,9 +5181,7 @@ async function loadLowAlertInventory(){
                                     class="low-alert-item-name"
                                     title="${name}"
                                 >
-
                                     ${name}
-
                                 </span>
 
 
@@ -5415,10 +5263,6 @@ async function loadLowAlertInventory(){
 }
 
 
-/* ============================================================
-   INVENTORY REFRESH
-============================================================ */
-
 function scheduleLowAlertRefresh(){
 
     clearTimeout(
@@ -5438,10 +5282,6 @@ function scheduleLowAlertRefresh(){
 
 }
 
-
-/* ============================================================
-   INVENTORY REALTIME
-============================================================ */
 
 function subscribeToInventory(){
 
@@ -5490,7 +5330,6 @@ function subscribeToInventory(){
                         payload
                     );
 
-
                     scheduleLowAlertRefresh();
 
                 }
@@ -5509,7 +5348,6 @@ function subscribeToInventory(){
                         "DARKY INVENTORY UPDATE:",
                         payload
                     );
-
 
                     scheduleLowAlertRefresh();
 
@@ -5530,7 +5368,6 @@ function subscribeToInventory(){
                         payload
                     );
 
-
                     scheduleLowAlertRefresh();
 
                 }
@@ -5549,34 +5386,7 @@ function subscribeToInventory(){
                         status === "SUBSCRIBED"
                     ){
 
-                        console.log(
-                            "DARKY: Inventory realtime connected."
-                        );
-
-
                         loadLowAlertInventory();
-
-                    }
-
-
-                    if(
-                        status === "CHANNEL_ERROR"
-                    ){
-
-                        console.warn(
-                            "DARKY: Inventory realtime channel error."
-                        );
-
-                    }
-
-
-                    if(
-                        status === "TIMED_OUT"
-                    ){
-
-                        console.warn(
-                            "DARKY: Inventory realtime timed out."
-                        );
 
                     }
 
@@ -5585,10 +5395,6 @@ function subscribeToInventory(){
 
 }
 
-
-/* ============================================================
-   START LOW ALERT INVENTORY
-============================================================ */
 
 loadLowAlertInventory();
 
@@ -5629,10 +5435,6 @@ const voiceTranscript =
         "voiceTranscript"
     );
 
-
-/* ============================================================
-   SPEECH RECOGNITION
-============================================================ */
 
 if(SpeechRecognition){
 
@@ -5803,7 +5605,6 @@ function openVoice(){
         connectionStatus.textContent =
             "● VOICE NOT SUPPORTED";
 
-
         return;
 
     }
@@ -5972,7 +5773,7 @@ function startListeningAfterGreeting(){
 
 
 /* ============================================================
-   VOICE PAGE MICROPHONE
+   VOICE PAGE
 ============================================================ */
 
 function startVoiceCommand(){
@@ -6058,7 +5859,6 @@ async function sendVoiceMessage(
                         })
 
                 }
-
             );
 
 
@@ -6267,7 +6067,7 @@ function configureDarkyVoice(
 
 
 /* ============================================================
-   TEXT TO SPEECH — CINEMATIC DARKY
+   TEXT TO SPEECH
 ============================================================ */
 
 function speakReply(
@@ -6556,6 +6356,22 @@ if(!hasIntroduced){
     setTimeout(
         function(){
 
+            /*
+             * Only introduce Darky after the
+             * dashboard has been unlocked.
+             */
+
+            if(
+                sessionStorage.getItem(
+                    "darkyDashboardUnlocked"
+                ) !== "true"
+            ){
+
+                return;
+
+            }
+
+
             addChatMessage(
                 "darky",
                 introduction
@@ -6573,7 +6389,7 @@ if(!hasIntroduced){
             );
 
         },
-        1000
+        1200
     );
 
 }
@@ -6613,6 +6429,14 @@ console.log(
 
 console.log(
     "Darky AI password protection enabled."
+);
+
+console.log(
+    "Darky AI unlock animation enabled."
+);
+
+console.log(
+    "Darky AI logout enabled."
 );
 
 </script>
