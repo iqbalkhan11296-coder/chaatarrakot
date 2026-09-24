@@ -1,10 +1,11 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Reemy AI — Chaatarra</title>
+<title>Darky AI — Chaatarra</title>
 
 <style>
 
@@ -16,8 +17,12 @@
 
 body {
     font-family: Inter, Arial, sans-serif;
-    background: #080808;
-    color: #f4f0e8;
+    background:
+        radial-gradient(circle at 50% -10%, rgba(0, 153, 255, .16), transparent 38%),
+        radial-gradient(circle at 10% 50%, rgba(0, 80, 255, .08), transparent 35%),
+        radial-gradient(circle at 90% 80%, rgba(0, 220, 255, .07), transparent 35%),
+        #030811;
+    color: #edf8ff;
     min-height: 100vh;
 }
 
@@ -38,10 +43,16 @@ button {
     background:
         radial-gradient(
             circle at 50% 5%,
-            rgba(190,155,75,.13),
+            rgba(0, 153, 255, .12),
             transparent 32%
         ),
-        #080808;
+        linear-gradient(
+            180deg,
+            rgba(3, 12, 25, .98),
+            rgba(2, 8, 18, .98)
+        );
+
+    position: relative;
 }
 
 
@@ -60,7 +71,24 @@ button {
     justify-content: space-between;
 
     border-bottom:
-        1px solid rgba(255,255,255,.07);
+        1px solid
+        rgba(70, 190, 255, .14);
+
+    background:
+        rgba(5, 18, 35, .62);
+
+    backdrop-filter:
+        blur(22px);
+
+    -webkit-backdrop-filter:
+        blur(22px);
+
+    box-shadow:
+        0 8px 30px
+        rgba(0, 70, 150, .08);
+
+    position: relative;
+    z-index: 10;
 }
 
 .brand {
@@ -84,14 +112,22 @@ button {
     background:
         linear-gradient(
             145deg,
-            #d8bd78,
-            #8e6d2e
+            #8ee7ff,
+            #0879d9 48%,
+            #06418f
         );
 
-    color: #111;
+    color: #02101e;
 
     font-weight: 900;
     font-size: 20px;
+
+    box-shadow:
+        0 0 22px
+        rgba(0, 174, 255, .35),
+
+        inset 0 1px 1px
+        rgba(255,255,255,.55);
 }
 
 .brand-text strong {
@@ -101,13 +137,19 @@ button {
     letter-spacing: 2px;
 
     font-size: 16px;
+
+    color: #eaf9ff;
+
+    text-shadow:
+        0 0 14px
+        rgba(50, 190, 255, .25);
 }
 
 .brand-text span {
 
     font-size: 10px;
 
-    color: #9e9a91;
+    color: #6e91aa;
 
     letter-spacing: 1px;
 }
@@ -116,14 +158,25 @@ button {
 
     font-size: 10px;
 
-    color: #c8ad6d;
+    color: #55d7ff;
 
     border:
-        1px solid rgba(200,173,109,.25);
+        1px solid
+        rgba(40, 190, 255, .30);
 
     padding: 7px 11px;
 
     border-radius: 20px;
+
+    background:
+        rgba(0, 130, 210, .08);
+
+    box-shadow:
+        0 0 15px
+        rgba(0, 160, 255, .08),
+
+        inset 0 0 12px
+        rgba(0, 150, 255, .04);
 }
 
 
@@ -154,7 +207,7 @@ button {
 
 .home-title small {
 
-    color: #99948a;
+    color: #6f8da4;
 
     font-size: 13px;
 }
@@ -169,16 +222,22 @@ button {
     font-weight: 500;
 
     letter-spacing: -1px;
+
+    color: #eefaff;
 }
 
 .home-title h1 span {
 
-    color: #cdb16b;
+    color: #49cfff;
+
+    text-shadow:
+        0 0 22px
+        rgba(0, 190, 255, .30);
 }
 
 
 /* =========================================
-   REEMY ORB
+   DARKY ORB
 ========================================= */
 
 .orb-wrap {
@@ -201,20 +260,27 @@ button {
     background:
 
         radial-gradient(
-            circle at 35% 30%,
-            #f8e7b5,
-            #b9944e 38%,
-            #4e3a1b 65%,
-            #17130c
+            circle at 35% 25%,
+            #dffaff,
+            #54d9ff 25%,
+            #087fcf 48%,
+            #063a78 68%,
+            #020d1b 90%
         );
 
     box-shadow:
 
-        0 0 45px
-        rgba(205,177,107,.16),
+        0 0 35px
+        rgba(0, 174, 255, .35),
+
+        0 0 85px
+        rgba(0, 95, 255, .18),
 
         inset 0 0 35px
-        rgba(255,255,255,.12);
+        rgba(255,255,255,.20),
+
+        inset -20px -25px 45px
+        rgba(0, 20, 70, .55);
 
     display: flex;
 
@@ -237,9 +303,13 @@ button {
 
     border:
         1px solid
-        rgba(219,190,113,.25);
+        rgba(48, 198, 255, .38);
 
     border-radius: 50%;
+
+    box-shadow:
+        0 0 25px
+        rgba(0, 174, 255, .12);
 }
 
 .orb::after {
@@ -252,7 +322,7 @@ button {
 
     border:
         1px solid
-        rgba(219,190,113,.10);
+        rgba(48, 160, 255, .14);
 
     border-radius: 50%;
 }
@@ -260,11 +330,20 @@ button {
 .orb-icon {
 
     font-size: 46px;
+
+    color: #e9fbff;
+
+    text-shadow:
+        0 0 15px
+        #ffffff,
+
+        0 0 35px
+        rgba(0, 210, 255, .9);
 }
 
 
 /* =========================================
-   ASK REEMY AREA
+   ASK DARKY AREA
 ========================================= */
 
 .ask-area {
@@ -279,7 +358,7 @@ button {
 
     text-align: center;
 
-    color: #817c74;
+    color: #63859e;
 
     font-size: 12px;
 
@@ -296,17 +375,31 @@ button {
 
     padding: 8px 9px;
 
-    background: #111;
+    background:
+        rgba(7, 28, 50, .58);
 
     border:
         1px solid
-        rgba(255,255,255,.10);
+        rgba(50, 190, 255, .18);
 
     border-radius: 20px;
 
     box-shadow:
-        0 10px 40px
-        rgba(0,0,0,.25);
+
+        0 12px 45px
+        rgba(0,0,0,.30),
+
+        0 0 25px
+        rgba(0, 110, 255, .05),
+
+        inset 0 1px 0
+        rgba(255,255,255,.05);
+
+    backdrop-filter:
+        blur(20px);
+
+    -webkit-backdrop-filter:
+        blur(20px);
 
     transition: .25s;
 }
@@ -314,11 +407,15 @@ button {
 .ask-box:focus-within {
 
     border-color:
-        rgba(205,177,107,.45);
+        rgba(40, 195, 255, .50);
 
     box-shadow:
-        0 0 30px
-        rgba(205,177,107,.07);
+
+        0 0 35px
+        rgba(0, 155, 255, .12),
+
+        inset 0 0 20px
+        rgba(0, 150, 255, .04);
 }
 
 .ask-box input {
@@ -333,7 +430,7 @@ button {
 
     outline: none;
 
-    color: #f5f0e6;
+    color: #eaf9ff;
 
     padding: 12px 8px;
 
@@ -342,7 +439,7 @@ button {
 
 .ask-box input::placeholder {
 
-    color: #66615a;
+    color: #527188;
 }
 
 .ask-button {
@@ -356,20 +453,33 @@ button {
 
     border:
         1px solid
-        rgba(255,255,255,.08);
+        rgba(50, 180, 255, .14);
 
-    background: #191919;
+    background:
+        rgba(12, 39, 64, .65);
 
-    color: #d7bd7b;
+    color: #5fd8ff;
 
     font-size: 19px;
 
     transition: .2s;
+
+    box-shadow:
+        inset 0 1px 0
+        rgba(255,255,255,.04);
 }
 
 .ask-button:hover {
 
-    background: #222;
+    background:
+        rgba(20, 68, 105, .75);
+
+    border-color:
+        rgba(50, 200, 255, .30);
+
+    box-shadow:
+        0 0 18px
+        rgba(0, 170, 255, .12);
 }
 
 .ask-send {
@@ -377,13 +487,21 @@ button {
     background:
         linear-gradient(
             145deg,
-            #d5bb78,
-            #96763e
+            #72e3ff,
+            #168edb 55%,
+            #07529b
         );
 
-    color: #111;
+    color: #02101b;
 
     border: none;
+
+    box-shadow:
+        0 0 18px
+        rgba(0, 174, 255, .25),
+
+        inset 0 1px 1px
+        rgba(255,255,255,.45);
 }
 
 
@@ -400,15 +518,32 @@ button {
     display: none;
 
     background:
-        rgba(255,255,255,.035);
+        linear-gradient(
+            135deg,
+            rgba(18, 63, 94, .40),
+            rgba(4, 22, 42, .62)
+        );
 
     border:
         1px solid
-        rgba(255,255,255,.07);
+        rgba(45, 190, 255, .17);
 
     border-radius: 20px;
 
     overflow: hidden;
+
+    box-shadow:
+        0 15px 50px
+        rgba(0,0,0,.25),
+
+        0 0 30px
+        rgba(0, 125, 255, .05);
+
+    backdrop-filter:
+        blur(20px);
+
+    -webkit-backdrop-filter:
+        blur(20px);
 }
 
 .response-panel.visible {
@@ -444,9 +579,9 @@ button {
 
     border-bottom:
         1px solid
-        rgba(255,255,255,.06);
+        rgba(60, 190, 255, .10);
 
-    color: #cdb16b;
+    color: #54d6ff;
 
     font-size: 11px;
 
@@ -462,18 +597,18 @@ button {
 
     border-radius: 50%;
 
-    background: #cdb16b;
+    background: #4bdcff;
 
     box-shadow:
         0 0 10px
-        rgba(205,177,107,.5);
+        rgba(50, 215, 255, .8);
 }
 
 .response-body {
 
     padding: 18px;
 
-    color: #d5d0c7;
+    color: #c7e2ee;
 
     font-size: 14px;
 
@@ -494,7 +629,7 @@ button {
 
     font-size: 11px;
 
-    color: #88837a;
+    color: #5d7e95;
 
     text-transform: uppercase;
 
@@ -518,30 +653,54 @@ button {
 .quick-card {
 
     background:
-        rgba(255,255,255,.035);
+        linear-gradient(
+            145deg,
+            rgba(18, 55, 82, .42),
+            rgba(4, 22, 40, .55)
+        );
 
     border:
         1px solid
-        rgba(255,255,255,.07);
+        rgba(50, 180, 255, .14);
 
     border-radius: 18px;
 
     padding: 20px 14px;
 
-    color: #eee9df;
+    color: #e7f7ff;
 
     transition: .2s;
 
     text-align: left;
+
+    backdrop-filter:
+        blur(16px);
+
+    -webkit-backdrop-filter:
+        blur(16px);
+
+    box-shadow:
+        0 10px 30px
+        rgba(0,0,0,.18),
+
+        inset 0 1px 0
+        rgba(255,255,255,.035);
 }
 
 .quick-card:hover {
 
     border-color:
-        rgba(205,177,107,.4);
+        rgba(45, 200, 255, .40);
 
     transform:
         translateY(-2px);
+
+    box-shadow:
+        0 12px 35px
+        rgba(0, 110, 255, .12),
+
+        0 0 20px
+        rgba(0, 180, 255, .06);
 }
 
 .quick-card .icon {
@@ -549,6 +708,12 @@ button {
     font-size: 23px;
 
     margin-bottom: 12px;
+
+    color: #4fd6ff;
+
+    text-shadow:
+        0 0 14px
+        rgba(0, 190, 255, .45);
 }
 
 .quick-card strong {
@@ -556,11 +721,13 @@ button {
     display: block;
 
     font-size: 13px;
+
+    color: #e6f7ff;
 }
 
 .quick-card span {
 
-    color: #817d75;
+    color: #638297;
 
     font-size: 11px;
 }
@@ -603,11 +770,13 @@ button {
     font-size: 27px;
 
     font-weight: 500;
+
+    color: #e9f9ff;
 }
 
 .page-heading p {
 
-    color: #858078;
+    color: #638298;
 
     font-size: 12px;
 
@@ -632,19 +801,27 @@ button {
 
         radial-gradient(
             circle at 35% 28%,
-            #fff0bd,
-            #c4a35d 35%,
-            #61491e 62%,
-            #16130d
+            #e8fbff,
+            #58d9ff 30%,
+            #0784d6 50%,
+            #06386e 70%,
+            #020b17
         );
 
     box-shadow:
-        0 0 70px
-        rgba(205,177,107,.18);
+
+        0 0 55px
+        rgba(0, 174, 255, .30),
+
+        0 0 110px
+        rgba(0, 85, 255, .14),
+
+        inset 0 0 40px
+        rgba(255,255,255,.18);
 
     border:
         1px solid
-        rgba(220,190,110,.3);
+        rgba(60, 205, 255, .35);
 
     transition: .3s;
 }
@@ -657,13 +834,13 @@ button {
     box-shadow:
 
         0 0 0 15px
-        rgba(205,177,107,.06),
+        rgba(0, 180, 255, .07),
 
         0 0 0 30px
-        rgba(205,177,107,.03),
+        rgba(0, 120, 255, .04),
 
         0 0 80px
-        rgba(205,177,107,.3);
+        rgba(0, 190, 255, .38);
 }
 
 .voice-orb.speaking {
@@ -690,6 +867,13 @@ button {
 .voice-mic {
 
     font-size: 55px;
+
+    text-shadow:
+        0 0 18px
+        rgba(255,255,255,.75),
+
+        0 0 30px
+        rgba(0, 210, 255, .7);
 }
 
 .voice-status {
@@ -697,11 +881,17 @@ button {
     font-size: 22px;
 
     font-weight: 500;
+
+    color: #e8f9ff;
+
+    text-shadow:
+        0 0 15px
+        rgba(0, 180, 255, .20);
 }
 
 .voice-hint {
 
-    color: #817c74;
+    color: #648399;
 
     font-size: 13px;
 
@@ -721,20 +911,30 @@ button {
 
     border:
         1px solid
-        rgba(255,255,255,.07);
+        rgba(50, 180, 255, .13);
 
     background:
-        rgba(255,255,255,.025);
+        rgba(7, 29, 49, .48);
 
     border-radius: 18px;
 
-    color: #aaa59c;
+    color: #9ebdcd;
 
     font-size: 14px;
 
     line-height: 1.5;
 
     white-space: pre-wrap;
+
+    backdrop-filter:
+        blur(18px);
+
+    -webkit-backdrop-filter:
+        blur(18px);
+
+    box-shadow:
+        inset 0 1px 0
+        rgba(255,255,255,.03);
 }
 
 .voice-button {
@@ -746,22 +946,43 @@ button {
 
     border:
         1px solid
-        rgba(210,180,105,.35);
+        rgba(50, 195, 255, .35);
 
-    background: #151515;
+    background:
+        linear-gradient(
+            145deg,
+            rgba(20, 69, 101, .80),
+            rgba(4, 28, 52, .90)
+        );
 
-    color: #d7bd7b;
+    color: #61dfff;
 
     font-size: 28px;
 
     transition: .2s;
+
+    box-shadow:
+        0 0 25px
+        rgba(0, 150, 255, .12),
+
+        inset 0 1px 0
+        rgba(255,255,255,.08);
 }
 
 .voice-button:hover {
 
     transform: scale(1.05);
 
-    background: #1d1d1d;
+    background:
+        linear-gradient(
+            145deg,
+            rgba(27, 86, 125, .90),
+            rgba(5, 37, 68, .95)
+        );
+
+    box-shadow:
+        0 0 30px
+        rgba(0, 185, 255, .22);
 }
 
 
@@ -782,11 +1003,15 @@ button {
 .data-card {
 
     background:
-        rgba(255,255,255,.035);
+        linear-gradient(
+            145deg,
+            rgba(17, 56, 82, .42),
+            rgba(4, 22, 41, .58)
+        );
 
     border:
         1px solid
-        rgba(255,255,255,.07);
+        rgba(50, 180, 255, .14);
 
     border-radius: 20px;
 
@@ -795,6 +1020,19 @@ button {
     margin-top: 20px;
 
     max-width: 800px;
+
+    backdrop-filter:
+        blur(18px);
+
+    -webkit-backdrop-filter:
+        blur(18px);
+
+    box-shadow:
+        0 12px 35px
+        rgba(0,0,0,.18),
+
+        inset 0 1px 0
+        rgba(255,255,255,.035);
 }
 
 .data-card h3 {
@@ -802,11 +1040,13 @@ button {
     font-size: 15px;
 
     margin-bottom: 8px;
+
+    color: #dff6ff;
 }
 
 .data-card p {
 
-    color: #99948b;
+    color: #7190a4;
 
     line-height: 1.6;
 
@@ -830,12 +1070,16 @@ button {
     width: 5px;
     height: 5px;
 
-    background: #bca365;
+    background: #52d8ff;
 
     border-radius: 50%;
 
     animation:
         typing 1s infinite;
+
+    box-shadow:
+        0 0 8px
+        rgba(50, 210, 255, .7);
 }
 
 .typing span:nth-child(2) {
@@ -878,14 +1122,17 @@ button {
         min(700px,calc(100% - 24px));
 
     background:
-        rgba(20,20,20,.95);
+        rgba(4, 20, 37, .78);
 
     backdrop-filter:
-        blur(18px);
+        blur(24px);
+
+    -webkit-backdrop-filter:
+        blur(24px);
 
     border:
         1px solid
-        rgba(255,255,255,.08);
+        rgba(50, 190, 255, .17);
 
     border-radius: 23px;
 
@@ -897,6 +1144,17 @@ button {
         repeat(5,1fr);
 
     z-index: 100;
+
+    box-shadow:
+
+        0 15px 45px
+        rgba(0,0,0,.35),
+
+        0 0 30px
+        rgba(0, 100, 255, .08),
+
+        inset 0 1px 0
+        rgba(255,255,255,.05);
 }
 
 .nav-btn {
@@ -905,7 +1163,7 @@ button {
 
     border: 0;
 
-    color: #69655e;
+    color: #527084;
 
     padding: 9px 4px;
 
@@ -927,10 +1185,21 @@ button {
 
 .nav-btn.active {
 
-    color: #d2b66f;
+    color: #57d9ff;
 
     background:
-        rgba(205,177,107,.08);
+        linear-gradient(
+            145deg,
+            rgba(0, 150, 230, .15),
+            rgba(0, 85, 180, .08)
+        );
+
+    box-shadow:
+        inset 0 0 18px
+        rgba(0, 170, 255, .06),
+
+        0 0 14px
+        rgba(0, 160, 255, .05);
 }
 
 
@@ -1054,7 +1323,7 @@ button {
         <div class="brand-text">
 
             <strong>
-                REEMY AI
+                DARKY AI
             </strong>
 
             <span>
@@ -1104,7 +1373,7 @@ button {
 
 
 
-    <!-- REEMY -->
+    <!-- DARKY -->
 
     <div class="orb-wrap">
 
@@ -1122,13 +1391,13 @@ button {
 
 
 
-    <!-- ASK REEMY -->
+    <!-- ASK DARKY -->
 
     <div class="ask-area">
 
         <div class="ask-label">
 
-            Ask Reemy anything
+            Ask Darky anything
 
         </div>
 
@@ -1147,7 +1416,7 @@ button {
             <input
                 id="askInput"
                 type="text"
-                placeholder="Ask Reemy anything..."
+                placeholder="Ask Darky anything..."
                 autocomplete="off"
             >
 
@@ -1176,7 +1445,7 @@ button {
 
             <span class="response-dot"></span>
 
-            Reemy AI
+            Darky AI
 
         </div>
 
@@ -1304,7 +1573,7 @@ button {
             </h2>
 
             <p>
-                Speak naturally to Reemy
+                Speak naturally to Darky
             </p>
 
         </div>
@@ -1397,7 +1666,7 @@ button {
         </h3>
 
         <p>
-            Ask Reemy about current stock,
+            Ask Darky about current stock,
             low-stock items, vendors,
             purchase prices or stock movements.
         </p>
@@ -1459,7 +1728,7 @@ button {
         </h3>
 
         <p>
-            Ask Reemy about recent orders,
+            Ask Darky about recent orders,
             order totals, customer names,
             tables or order details.
         </p>
@@ -1497,7 +1766,7 @@ button {
         </h2>
 
         <p>
-            Business information through Reemy
+            Business information through Darky
         </p>
 
     </div>
@@ -1506,7 +1775,7 @@ button {
     <div class="data-card">
 
         <h3>
-            Ask Reemy
+            Ask Darky
         </h3>
 
         <p>
@@ -1815,7 +2084,7 @@ async function sendMessageToAI(message) {
 
 
         console.log(
-            "Reemy response:",
+            "Darky response:",
             data
         );
 
@@ -1835,7 +2104,7 @@ async function sendMessageToAI(message) {
          *
          * {
          *   success: true,
-         *   reply: "Hi Iqbal, I'm Reemy."
+         *   reply: "Hi Iqbal, I'm Darky."
          * }
          *
          * Future AI version may return:
@@ -1871,7 +2140,7 @@ async function sendMessageToAI(message) {
     catch(error) {
 
         console.error(
-            "Reemy connection error:",
+            "Darky connection error:",
             error
         );
 
@@ -2006,7 +2275,7 @@ if (SpeechRecognition) {
 
 
             voiceHint.textContent =
-                "Reemy is processing your command";
+                "Darky is processing your command";
 
 
             voiceOrb.classList.remove(
@@ -2162,7 +2431,7 @@ async function sendVoiceMessage(
 
 
         console.log(
-            "Reemy voice response:",
+            "Darky voice response:",
             data
         );
 
@@ -2191,7 +2460,7 @@ async function sendVoiceMessage(
 
 
         voiceStatus.textContent =
-            "Reemy";
+            "Darky";
 
 
         voiceHint.textContent =
@@ -2201,7 +2470,7 @@ async function sendVoiceMessage(
         voiceTranscript.textContent =
             "You: " +
             message +
-            "\n\nReemy: " +
+            "\n\nDarky: " +
             answer;
 
 
@@ -2220,7 +2489,7 @@ async function sendVoiceMessage(
 
 
         console.error(
-            "Reemy voice connection error:",
+            "Darky voice connection error:",
             error
         );
 
@@ -2322,7 +2591,7 @@ function speakReply(
 
 
         voiceStatus.textContent =
-            "Reemy is speaking";
+            "Darky is speaking";
 
     }
 
@@ -2418,12 +2687,12 @@ else {
 ========================================= */
 
 const introduction =
-"Hi, I'm Reemy AI. You can call me Reemy. I'm the AI assistant of Chaatarra, created by Iqbal.";
+"Hi, I'm Darky AI. You can call me Darky. I'm the AI assistant of Chaatarra, created by Iqbal.";
 
 
 let hasIntroduced =
     localStorage.getItem(
-        "reemyIntroduced"
+        "darkyIntroduced"
     );
 
 
@@ -2449,7 +2718,7 @@ if (!hasIntroduced) {
 
 
             localStorage.setItem(
-                "reemyIntroduced",
+                "darkyIntroduced",
                 "true"
             );
 
@@ -2465,3 +2734,4 @@ if (!hasIntroduced) {
 
 </body>
 </html>
+```
