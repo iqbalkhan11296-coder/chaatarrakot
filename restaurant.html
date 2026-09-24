@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
 
@@ -82,6 +83,208 @@ button{
     position:relative;
 
     overflow:hidden;
+}
+
+
+/* ============================================================
+   DARKY AI PASSWORD LOCK
+============================================================ */
+
+#passwordLock{
+
+    position:fixed;
+
+    inset:0;
+
+    z-index:99999;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    padding:20px;
+
+    background:
+        radial-gradient(
+            circle at 50% 25%,
+            rgba(0,153,255,.18),
+            transparent 38%
+        ),
+        #020711;
+
+    backdrop-filter:blur(20px);
+
+    -webkit-backdrop-filter:blur(20px);
+}
+
+.password-box{
+
+    width:min(380px,100%);
+
+    padding:30px;
+
+    border-radius:24px;
+
+    text-align:center;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(10,45,70,.88),
+            rgba(3,17,32,.96)
+        );
+
+    border:
+        1px solid
+        rgba(60,205,255,.25);
+
+    box-shadow:
+        0 25px 80px
+        rgba(0,0,0,.55),
+        0 0 50px
+        rgba(0,150,255,.08);
+}
+
+.password-logo{
+
+    width:64px;
+
+    height:64px;
+
+    margin:0 auto 18px;
+
+    display:grid;
+
+    place-items:center;
+
+    border-radius:20px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #9beaff,
+            #1188d8 52%,
+            #063c80
+        );
+
+    color:#02101d;
+
+    font-size:28px;
+
+    font-weight:900;
+
+    box-shadow:
+        0 0 30px
+        rgba(0,180,255,.35);
+}
+
+.password-box h2{
+
+    color:#effcff;
+
+    font-size:20px;
+
+    font-weight:500;
+
+    letter-spacing:1px;
+}
+
+.password-box p{
+
+    margin-top:7px;
+
+    margin-bottom:22px;
+
+    color:#66869b;
+
+    font-size:11px;
+}
+
+.password-input{
+
+    width:100%;
+
+    padding:14px 15px;
+
+    border-radius:14px;
+
+    outline:none;
+
+    border:
+        1px solid
+        rgba(50,190,255,.18);
+
+    background:
+        rgba(2,20,35,.75);
+
+    color:#eafaff;
+
+    text-align:center;
+
+    font-size:15px;
+
+    letter-spacing:2px;
+}
+
+.password-input:focus{
+
+    border-color:
+        rgba(50,205,255,.45);
+
+    box-shadow:
+        0 0 25px
+        rgba(0,160,255,.10);
+}
+
+.password-button{
+
+    width:100%;
+
+    margin-top:10px;
+
+    padding:13px;
+
+    border:0;
+
+    border-radius:14px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #79e7ff,
+            #168fda 55%,
+            #07539d
+        );
+
+    color:#03111e;
+
+    font-size:12px;
+
+    font-weight:700;
+
+    letter-spacing:1px;
+
+    box-shadow:
+        0 0 20px
+        rgba(0,180,255,.20);
+}
+
+.password-button:hover{
+
+    filter:brightness(1.08);
+}
+
+.password-error{
+
+    min-height:18px;
+
+    margin-top:10px;
+
+    color:#ff9999;
+
+    font-size:10px;
 }
 
 
@@ -2079,11 +2282,58 @@ button{
 
 </head>
 
-
 <body>
 
-<div class="app">
+<!-- ==========================================================
+     DARKY AI PASSWORD LOCK
+========================================================== -->
 
+<div id="passwordLock">
+
+```
+<div class="password-box">
+
+    <div class="password-logo">
+        D
+    </div>
+
+    <h2>
+        DARKY AI
+    </h2>
+
+    <p>
+        Enter your password to access the dashboard
+    </p>
+
+    <input
+        id="dashboardPassword"
+        class="password-input"
+        type="password"
+        placeholder="PASSWORD"
+        autocomplete="off"
+    >
+
+    <button
+        id="passwordButton"
+        class="password-button"
+        onclick="unlockDashboard()">
+
+        UNLOCK DASHBOARD
+
+    </button>
+
+    <div
+        id="passwordError"
+        class="password-error">
+
+    </div>
+
+</div>
+```
+
+</div>
+
+<div class="app">
 
 <!-- ==========================================================
      TOP BAR
@@ -2091,38 +2341,38 @@ button{
 
 <header class="topbar">
 
-    <div class="brand">
+```
+<div class="brand">
 
-        <div class="logo">
-            D
-        </div>
+    <div class="logo">
+        D
+    </div>
 
-        <div class="brand-text">
+    <div class="brand-text">
 
-            <strong>
-                DARKY AI
-            </strong>
+        <strong>
+            DARKY AI
+        </strong>
 
-            <span>
-                RARKS AI ASSISTANT
-            </span>
-
-        </div>
+        <span>
+            RARKS AI ASSISTANT
+        </span>
 
     </div>
 
+</div>
 
-    <div
-        id="connectionStatus"
-        class="status">
 
-        ● READY
+<div
+    id="connectionStatus"
+    class="status">
 
-    </div>
+    ● READY
+
+</div>
+```
 
 </header>
-
-
 
 <!-- ==========================================================
      HOME
@@ -2132,181 +2382,234 @@ button{
     id="homePage"
     class="page active">
 
+```
+<!-- ======================================================
+     LIVE BUSINESS OVERVIEW
+======================================================= -->
 
-    <!-- ======================================================
-         LIVE BUSINESS OVERVIEW
-    ======================================================= -->
-
-    <div class="live-section">
-
-
-        <div class="live-top">
+<div class="live-section">
 
 
-            <div class="live-heading">
+    <div class="live-top">
 
 
-                <div class="live-heading-icon">
-                    ₹
+        <div class="live-heading">
+
+
+            <div class="live-heading-icon">
+                ₹
+            </div>
+
+
+            <div class="live-heading-text">
+
+                <strong>
+                  Admin's Dashboard
+                </strong>
+
+                <span>
+                    Powered By Rarks Darky AI
+                </span>
+
+            </div>
+
+
+        </div>
+
+
+        <div
+            id="liveStatus"
+            class="live-status">
+
+            <span class="live-dot"></span>
+
+            LIVE
+
+        </div>
+
+
+    </div>
+
+
+
+    <div class="sales-grid">
+
+
+        <div class="sales-card">
+
+            <div class="sales-label">
+                Today's Sales
+            </div>
+
+            <div
+                id="liveTotalSales"
+                class="sales-value primary">
+
+                ₹0
+
+            </div>
+
+        </div>
+
+
+        <div class="sales-card">
+
+            <div class="sales-label">
+                Total Orders
+            </div>
+
+            <div
+                id="liveTotalOrders"
+                class="sales-value">
+
+                0
+
+            </div>
+
+        </div>
+
+
+        <div class="sales-card">
+
+            <div class="sales-label">
+                Items Sold
+            </div>
+
+            <div
+                id="liveTotalItems"
+                class="sales-value">
+
+                0
+
+            </div>
+
+        </div>
+
+
+        <div class="sales-card">
+
+            <div class="sales-label">
+                Average Bill
+            </div>
+
+            <div
+                id="liveAverageBill"
+                class="sales-value">
+
+                ₹0
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+
+    <div class="payment-grid">
+
+
+        <div class="payment-card">
+
+            <div class="payment-label">
+                CASH
+            </div>
+
+            <div
+                id="liveCash"
+                class="payment-value">
+
+                ₹0
+
+            </div>
+
+        </div>
+
+
+        <div class="payment-card">
+
+            <div class="payment-label">
+                UPI
+            </div>
+
+            <div
+                id="liveUPI"
+                class="payment-value">
+
+                ₹0
+
+            </div>
+
+        </div>
+
+
+        <div class="payment-card">
+
+            <div class="payment-label">
+                CARD
+            </div>
+
+            <div
+                id="liveCard"
+                class="payment-value">
+
+                ₹0
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+    <div
+        id="salesError"
+        class="sales-error">
+
+        Unable to load live sales data.
+
+    </div>
+
+
+
+    <!-- ==================================================
+         LOW ALERT ITEMS
+    =================================================== -->
+
+    <div class="low-alert-section">
+
+
+        <div class="low-alert-header">
+
+
+            <div class="low-alert-title">
+
+                <div class="low-alert-icon">
+                    ⚠
                 </div>
 
-
-                <div class="live-heading-text">
+                <div>
 
                     <strong>
-                      Admin's Dashboard
+                        Low Alert Items
                     </strong>
 
                     <span>
-                        Powered By Rarks Darky AI
+                        Items at or below their alert level
                     </span>
 
                 </div>
 
-
             </div>
 
 
             <div
-                id="liveStatus"
-                class="live-status">
+                id="lowAlertCount"
+                class="low-alert-count">
 
-                <span class="live-dot"></span>
-
-                LIVE
-
-            </div>
-
-
-        </div>
-
-
-
-        <div class="sales-grid">
-
-
-            <div class="sales-card">
-
-                <div class="sales-label">
-                    Today's Sales
-                </div>
-
-                <div
-                    id="liveTotalSales"
-                    class="sales-value primary">
-
-                    ₹0
-
-                </div>
-
-            </div>
-
-
-            <div class="sales-card">
-
-                <div class="sales-label">
-                    Total Orders
-                </div>
-
-                <div
-                    id="liveTotalOrders"
-                    class="sales-value">
-
-                    0
-
-                </div>
-
-            </div>
-
-
-            <div class="sales-card">
-
-                <div class="sales-label">
-                    Items Sold
-                </div>
-
-                <div
-                    id="liveTotalItems"
-                    class="sales-value">
-
-                    0
-
-                </div>
-
-            </div>
-
-
-            <div class="sales-card">
-
-                <div class="sales-label">
-                    Average Bill
-                </div>
-
-                <div
-                    id="liveAverageBill"
-                    class="sales-value">
-
-                    ₹0
-
-                </div>
-
-            </div>
-
-
-        </div>
-
-
-
-        <div class="payment-grid">
-
-
-            <div class="payment-card">
-
-                <div class="payment-label">
-                    CASH
-                </div>
-
-                <div
-                    id="liveCash"
-                    class="payment-value">
-
-                    ₹0
-
-                </div>
-
-            </div>
-
-
-            <div class="payment-card">
-
-                <div class="payment-label">
-                    UPI
-                </div>
-
-                <div
-                    id="liveUPI"
-                    class="payment-value">
-
-                    ₹0
-
-                </div>
-
-            </div>
-
-
-            <div class="payment-card">
-
-                <div class="payment-label">
-                    CARD
-                </div>
-
-                <div
-                    id="liveCard"
-                    class="payment-value">
-
-                    ₹0
-
-                </div>
+                0
 
             </div>
 
@@ -2315,173 +2618,118 @@ button{
 
 
         <div
-            id="salesError"
-            class="sales-error">
+            id="lowAlertItems"
+            class="low-alert-items">
 
-            Unable to load live sales data.
-
-        </div>
-
-
-
-        <!-- ==================================================
-             LOW ALERT ITEMS
-        =================================================== -->
-
-        <div class="low-alert-section">
-
-
-            <div class="low-alert-header">
-
-
-                <div class="low-alert-title">
-
-                    <div class="low-alert-icon">
-                        ⚠
-                    </div>
-
-                    <div>
-
-                        <strong>
-                            Low Alert Items
-                        </strong>
-
-                        <span>
-                            Items at or below their alert level
-                        </span>
-
-                    </div>
-
-                </div>
-
-
-                <div
-                    id="lowAlertCount"
-                    class="low-alert-count">
-
-                    0
-
-                </div>
-
-
-            </div>
-
-
-            <div
-                id="lowAlertItems"
-                class="low-alert-items">
-
-                <div class="low-alert-loading">
-                    Checking inventory...
-                </div>
-
-            </div>
-
-
-        </div>
-
-
-    </div>
-
-
-
-    <!-- ======================================================
-         GREETING
-    ======================================================= -->
-
-    <div class="home-title">
-
-        <small id="greeting">
-            Good evening.
-        </small>
-
-        <h1>
-
-            Hello,
-            <span>
-                Iqbal
-            </span>
-
-        </h1>
-
-    </div>
-
-
-
-    <!-- ======================================================
-         DARKY ORB
-    ======================================================= -->
-
-    <div class="orb-wrap">
-
-        <div
-            id="homeOrb"
-            class="orb">
-
-            <div class="orb-icon">
-                ✦
+            <div class="low-alert-loading">
+                Checking inventory...
             </div>
 
         </div>
 
+
+    </div>
+
+
+</div>
+
+
+
+<!-- ======================================================
+     GREETING
+======================================================= -->
+
+<div class="home-title">
+
+    <small id="greeting">
+        Good evening.
+    </small>
+
+    <h1>
+
+        Hello,
+        <span>
+            Iqbal
+        </span>
+
+    </h1>
+
+</div>
+
+
+
+<!-- ======================================================
+     DARKY ORB
+======================================================= -->
+
+<div class="orb-wrap">
+
+    <div
+        id="homeOrb"
+        class="orb">
+
+        <div class="orb-icon">
+            ✦
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- ======================================================
+     CHAT
+======================================================= -->
+
+<div class="chat-container">
+
+
+    <div
+        id="chatMessages"
+        class="chat-messages">
+
     </div>
 
 
 
-    <!-- ======================================================
-         CHAT
-    ======================================================= -->
-
-    <div class="chat-container">
+    <div class="ask-box">
 
 
-        <div
-            id="chatMessages"
-            class="chat-messages">
+        <button
+            id="homeMicButton"
+            class="ask-button"
+            onclick="openVoice()">
 
-        </div>
+            🎙
 
-
-
-        <div class="ask-box">
-
-
-            <button
-                id="homeMicButton"
-                class="ask-button"
-                onclick="openVoice()">
-
-                🎙
-
-            </button>
+        </button>
 
 
-            <input
-                id="askInput"
-                type="text"
-                placeholder="Ask Darky anything..."
-                autocomplete="off"
-            >
+        <input
+            id="askInput"
+            type="text"
+            placeholder="Ask Darky anything..."
+            autocomplete="off"
+        >
 
 
-            <button
-                class="ask-button ask-send"
-                onclick="sendHomeQuestion()">
+        <button
+            class="ask-button ask-send"
+            onclick="sendHomeQuestion()">
 
-                ➤
+            ➤
 
-            </button>
-
-
-        </div>
+        </button>
 
 
     </div>
 
+
+</div>
+```
 
 </section>
-
-
 
 <!-- ==========================================================
      VOICE PAGE
@@ -2491,80 +2739,79 @@ button{
     id="voicePage"
     class="page voice-page">
 
-
-    <div class="voice-center">
-
-
-        <div class="page-heading">
-
-            <h2>
-                Voice Command
-            </h2>
-
-            <p>
-                Speak naturally to Darky
-            </p>
-
-        </div>
+```
+<div class="voice-center">
 
 
-        <div
-            id="voiceOrb"
-            class="voice-orb">
+    <div class="page-heading">
 
-            <div
-                id="voiceMicIcon"
-                class="voice-mic">
+        <h2>
+            Voice Command
+        </h2>
 
-                🎙
-
-            </div>
-
-        </div>
-
-
-        <div
-            id="voiceStatus"
-            class="voice-status">
-
-            Ready to listen
-
-        </div>
-
-
-        <div
-            id="voiceHint"
-            class="voice-hint">
-
-            Tap the microphone and speak
-
-        </div>
-
-
-        <div
-            id="voiceTranscript"
-            class="voice-transcript">
-
-            Your voice command will appear here.
-
-        </div>
-
-
-        <button
-            id="voiceButton"
-            class="voice-button"
-            onclick="startVoiceCommand()">
-
-            🎙
-
-        </button>
-
+        <p>
+            Speak naturally to Darky
+        </p>
 
     </div>
 
+
+    <div
+        id="voiceOrb"
+        class="voice-orb">
+
+        <div
+            id="voiceMicIcon"
+            class="voice-mic">
+
+            🎙
+
+        </div>
+
+    </div>
+
+
+    <div
+        id="voiceStatus"
+        class="voice-status">
+
+        Ready to listen
+
+    </div>
+
+
+    <div
+        id="voiceHint"
+        class="voice-hint">
+
+        Tap the microphone and speak
+
+    </div>
+
+
+    <div
+        id="voiceTranscript"
+        class="voice-transcript">
+
+        Your voice command will appear here.
+
+    </div>
+
+
+    <button
+        id="voiceButton"
+        class="voice-button"
+        onclick="startVoiceCommand()">
+
+        🎙
+
+    </button>
+
+
+</div>
+```
+
 </section>
-
-
 
 <!-- ==========================================================
      STOCK
@@ -2574,58 +2821,56 @@ button{
     id="stockPage"
     class="page secondary-page">
 
+```
+<div class="page-heading">
 
-    <div class="page-heading">
+    <h2>
+        Stock
+    </h2>
 
-        <h2>
-            Stock
-        </h2>
+    <p>
+        Inventory information
+    </p>
 
-        <p>
-            Inventory information
-        </p>
-
-    </div>
-
-
-    <div class="data-card">
-
-        <h3>
-            Inventory Assistant
-        </h3>
-
-        <p>
-            Ask Darky about current stock,
-            low-stock items, vendors,
-            purchase prices or stock movements.
-        </p>
-
-    </div>
+</div>
 
 
-    <button
-        class="quick-card"
-        onclick="askQuick('Give me the current inventory overview.')">
+<div class="data-card">
 
-        📦 &nbsp;
-        Check current inventory
+    <h3>
+        Inventory Assistant
+    </h3>
 
-    </button>
+    <p>
+        Ask Darky about current stock,
+        low-stock items, vendors,
+        purchase prices or stock movements.
+    </p>
+
+</div>
 
 
-    <button
-        class="quick-card"
-        onclick="askQuick('Show me the recent inventory history.')">
+<button
+    class="quick-card"
+    onclick="askQuick('Give me the current inventory overview.')">
 
-        ↕ &nbsp;
-        Check stock history
+    📦 &nbsp;
+    Check current inventory
 
-    </button>
+</button>
 
+
+<button
+    class="quick-card"
+    onclick="askQuick('Show me the recent inventory history.')">
+
+    ↕ &nbsp;
+    Check stock history
+
+</button>
+```
 
 </section>
-
-
 
 <!-- ==========================================================
      ORDERS
@@ -2635,48 +2880,46 @@ button{
     id="ordersPage"
     class="page secondary-page">
 
+```
+<div class="page-heading">
 
-    <div class="page-heading">
+    <h2>
+        Orders
+    </h2>
 
-        <h2>
-            Orders
-        </h2>
+    <p>
+        Restaurant order information
+    </p>
 
-        <p>
-            Restaurant order information
-        </p>
-
-    </div>
-
-
-    <div class="data-card">
-
-        <h3>
-            Order Assistant
-        </h3>
-
-        <p>
-            Ask Darky about recent orders,
-            order totals, customer names,
-            tables or order details.
-        </p>
-
-    </div>
+</div>
 
 
-    <button
-        class="quick-card"
-        onclick="askQuick('Show me the latest orders.')">
+<div class="data-card">
 
-        🧾 &nbsp;
-        Show latest orders
+    <h3>
+        Order Assistant
+    </h3>
 
-    </button>
+    <p>
+        Ask Darky about recent orders,
+        order totals, customer names,
+        tables or order details.
+    </p>
 
+</div>
+
+
+<button
+    class="quick-card"
+    onclick="askQuick('Show me the latest orders.')">
+
+    🧾 &nbsp;
+    Show latest orders
+
+</button>
+```
 
 </section>
-
-
 
 <!-- ==========================================================
      REPORTS
@@ -2686,58 +2929,56 @@ button{
     id="reportsPage"
     class="page secondary-page">
 
+```
+<div class="page-heading">
 
-    <div class="page-heading">
+    <h2>
+        Reports
+    </h2>
 
-        <h2>
-            Reports
-        </h2>
+    <p>
+        Business information through Darky
+    </p>
 
-        <p>
-            Business information through Darky
-        </p>
-
-    </div>
-
-
-    <div class="data-card">
-
-        <h3>
-            Today's Live Report
-        </h3>
-
-        <p>
-            The figures shown on the Home page
-            are connected to the same
-            chaat_orders sales data.
-        </p>
-
-    </div>
+</div>
 
 
-    <button
-        class="quick-card"
-        onclick="askQuick('Give me a summary of today\\'s restaurant activity.')">
+<div class="data-card">
 
-        📊 &nbsp;
-        Today's summary
+    <h3>
+        Today's Live Report
+    </h3>
 
-    </button>
+    <p>
+        The figures shown on the Home page
+        are connected to the same
+        chaat_orders sales data.
+    </p>
+
+</div>
 
 
-    <button
-        class="quick-card"
-        onclick="askQuick('Give me today\\'s total sales, orders, items sold and average bill.')">
+<button
+    class="quick-card"
+    onclick="askQuick('Give me a summary of today\'s restaurant activity.')">
 
-        💰 &nbsp;
-        Today's sales report
+    📊 &nbsp;
+    Today's summary
 
-    </button>
+</button>
 
+
+<button
+    class="quick-card"
+    onclick="askQuick('Give me today\'s total sales, orders, items sold and average bill.')">
+
+    💰 &nbsp;
+    Today's sales report
+
+</button>
+```
 
 </section>
-
-
 
 <!-- ==========================================================
      BOTTOM NAV
@@ -2745,85 +2986,228 @@ button{
 
 <nav class="bottom-nav">
 
+```
+<button
+    class="nav-btn active"
+    data-page="homePage"
+    onclick="openPage('homePage')">
 
-    <button
-        class="nav-btn active"
-        data-page="homePage"
-        onclick="openPage('homePage')">
+    <span class="nav-icon">
+        ⌂
+    </span>
 
-        <span class="nav-icon">
-            ⌂
-        </span>
+    Home
 
-        Home
-
-    </button>
-
-
-    <button
-        class="nav-btn"
-        data-page="voicePage"
-        onclick="openPage('voicePage')">
-
-        <span class="nav-icon">
-            🎙
-        </span>
-
-        Voice
-
-    </button>
+</button>
 
 
-    <button
-        class="nav-btn"
-        data-page="stockPage"
-        onclick="openPage('stockPage')">
+<button
+    class="nav-btn"
+    data-page="voicePage"
+    onclick="openPage('voicePage')">
 
-        <span class="nav-icon">
-            📦
-        </span>
+    <span class="nav-icon">
+        🎙
+    </span>
 
-        Stock
+    Voice
 
-    </button>
-
-
-    <button
-        class="nav-btn"
-        data-page="ordersPage"
-        onclick="openPage('ordersPage')">
-
-        <span class="nav-icon">
-            🧾
-        </span>
-
-        Orders
-
-    </button>
+</button>
 
 
-    <button
-        class="nav-btn"
-        data-page="reportsPage"
-        onclick="openPage('reportsPage')">
+<button
+    class="nav-btn"
+    data-page="stockPage"
+    onclick="openPage('stockPage')">
 
-        <span class="nav-icon">
-            ▥
-        </span>
+    <span class="nav-icon">
+        📦
+    </span>
 
-        Reports
+    Stock
 
-    </button>
+</button>
 
+
+<button
+    class="nav-btn"
+    data-page="ordersPage"
+    onclick="openPage('ordersPage')">
+
+    <span class="nav-icon">
+        🧾
+    </span>
+
+    Orders
+
+</button>
+
+
+<button
+    class="nav-btn"
+    data-page="reportsPage"
+    onclick="openPage('reportsPage')">
+
+    <span class="nav-icon">
+        ▥
+    </span>
+
+    Reports
+
+</button>
+```
 
 </nav>
 
-
 </div>
 
-
-
 <script>
+
+/* ============================================================
+   DARKY AI PASSWORD PROTECTION
+============================================================ */
+
+/*
+ * ============================================================
+ * CHANGE YOUR PASSWORD HERE
+ * ============================================================
+ */
+
+const DARKY_PASSWORD = "1129";
+
+
+/* ============================================================
+   UNLOCK DASHBOARD
+============================================================ */
+
+function unlockDashboard(){
+
+    const passwordInput =
+        document.getElementById(
+            "dashboardPassword"
+        );
+
+    const errorBox =
+        document.getElementById(
+            "passwordError"
+        );
+
+    const passwordLock =
+        document.getElementById(
+            "passwordLock"
+        );
+
+    const enteredPassword =
+        passwordInput.value;
+
+
+    if(
+        enteredPassword ===
+        DARKY_PASSWORD
+    ){
+
+        sessionStorage.setItem(
+            "darkyDashboardUnlocked",
+            "true"
+        );
+
+        passwordLock.style.display =
+            "none";
+
+        passwordInput.value = "";
+
+        errorBox.textContent = "";
+
+    }
+    else{
+
+        errorBox.textContent =
+            "Incorrect password.";
+
+        passwordInput.value = "";
+
+        passwordInput.focus();
+
+    }
+
+}
+
+
+/* ============================================================
+   CHECK DASHBOARD ACCESS
+============================================================ */
+
+(function(){
+
+    const passwordLock =
+        document.getElementById(
+            "passwordLock"
+        );
+
+    const passwordInput =
+        document.getElementById(
+            "dashboardPassword"
+        );
+
+    const unlocked =
+        sessionStorage.getItem(
+            "darkyDashboardUnlocked"
+        );
+
+
+    if(
+        unlocked === "true"
+    ){
+
+        passwordLock.style.display =
+            "none";
+
+    }
+    else{
+
+        passwordLock.style.display =
+            "flex";
+
+        setTimeout(
+            function(){
+
+                passwordInput.focus();
+
+            },
+            100
+        );
+
+    }
+
+})();
+
+
+/* ============================================================
+   PASSWORD ENTER KEY
+============================================================ */
+
+document
+    .getElementById(
+        "dashboardPassword"
+    )
+    .addEventListener(
+        "keydown",
+        function(event){
+
+            if(
+                event.key ===
+                "Enter"
+            ){
+
+                event.preventDefault();
+
+                unlockDashboard();
+
+            }
+
+        }
+    );
+
 
 /* ============================================================
    SUPABASE
@@ -4082,11 +4466,6 @@ async function loadLowAlertInventory(){
         );
 
 
-        /*
-         * USE EXACT SAME TABLE AND FIELD NAMES
-         * AS THE WORKING INVENTORY MANAGEMENT PAGE.
-         */
-
         const result =
             await supabaseClient
 
@@ -4183,11 +4562,6 @@ async function loadLowAlertInventory(){
             data
         );
 
-
-        /*
-         * Convert the REAL database columns into
-         * the values used by the dashboard.
-         */
 
         const items =
             (data || [])
@@ -5199,7 +5573,7 @@ function configureDarkyVoice(
                     voice.lang
                 )
                 &&
-                /male|man|david|daniel|george|microsoft.*male|google.*male/i.test(
+                /male|man|david|daniel|george|rishi|microsoft.*male|google.*male/i.test(
                     voice.name
                 )
         )
@@ -5579,6 +5953,10 @@ console.log(
 
 console.log(
     "Supabase Realtime inventory subscription enabled."
+);
+
+console.log(
+    "Darky AI password protection enabled."
 );
 
 </script>
