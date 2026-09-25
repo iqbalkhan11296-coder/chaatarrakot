@@ -1,0 +1,6531 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>Darky AI — Chaatarra</title>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+
+<style>
+
+/* ============================================================
+   RESET
+============================================================ */
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+html{
+    scroll-behavior:smooth;
+}
+
+body{
+
+    min-height:100vh;
+
+    font-family:
+        Inter,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+
+    color:#f5f5f5;
+
+    background:
+        radial-gradient(
+            circle at 50% -10%,
+            rgba(255,255,255,.08),
+            transparent 35%
+        ),
+        radial-gradient(
+            circle at 90% 30%,
+            rgba(255,255,255,.04),
+            transparent 30%
+        ),
+        #020711;
+
+    overflow-x:hidden;
+}
+
+
+/* ============================================================
+   APP
+============================================================ */
+
+.app{
+
+    position:relative;
+
+    width:min(
+        1200px,
+        100%
+    );
+
+    min-height:100vh;
+
+    margin:0 auto;
+
+    padding-bottom:100px;
+}
+
+
+/* ============================================================
+   TOP BAR
+============================================================ */
+
+.topbar{
+
+    position:sticky;
+
+    top:0;
+
+    z-index:500;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    gap:15px;
+
+    padding:16px 20px;
+
+    background:
+        rgba(8,8,8,.86);
+
+    backdrop-filter:
+        blur(18px);
+
+    -webkit-backdrop-filter:
+        blur(18px);
+
+    border-bottom:
+        1px solid
+        rgba(255,255,255,.06);
+}
+
+
+.brand{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+    min-width:0;
+}
+
+
+.brand-logo{
+
+    width:42px;
+    height:42px;
+
+    flex:none;
+
+    display:grid;
+
+    place-items:center;
+
+    border-radius:13px;
+
+    color:#ffffff;
+
+    font-size:20px;
+
+    font-weight:900;
+
+    background:
+        radial-gradient(
+            circle at 35% 30%,
+            #ffffff,
+            #dcdcdc 35%,
+            #777777 70%,
+            #050505
+        );
+
+    box-shadow:
+        0 0 18px
+        rgba(255,255,255,.35),
+        inset 0 0 15px
+        rgba(255,255,255,.12);
+}
+
+
+.brand-text{
+
+    display:flex;
+
+    flex-direction:column;
+
+    min-width:0;
+}
+
+
+.brand-text strong{
+
+    color:#ffffff;
+
+    font-size:16px;
+
+    letter-spacing:1px;
+}
+
+
+.brand-text span{
+
+    color:#9a9a9a;
+
+    font-size:9px;
+
+    letter-spacing:1.8px;
+
+    text-transform:uppercase;
+}
+
+
+.status{
+
+    margin-top:3px;
+
+    color:#ffffff;
+
+    font-size:9px;
+
+    letter-spacing:1.3px;
+
+    white-space:nowrap;
+}
+
+
+/* ============================================================
+   LOGOUT
+============================================================ */
+
+.logout-button{
+
+    flex:none;
+
+    padding:10px 16px;
+
+    border:
+        1px solid
+        rgba(255,255,255,.18);
+
+    border-radius:10px;
+
+    background:
+        rgba(20,20,20,.78);
+
+    color:#dddddd;
+
+    font-size:10px;
+
+    font-weight:700;
+
+    letter-spacing:1.5px;
+
+    cursor:pointer;
+
+    transition:
+        .25s ease;
+
+    box-shadow:
+        0 0 12px
+        rgba(255,255,255,.05);
+}
+
+.logout-button:hover{
+
+    color:#ffffff;
+
+    border-color:
+        rgba(255,255,255,.55);
+
+    background:
+        rgba(255,255,255,.10);
+
+    box-shadow:
+        0 0 20px
+        rgba(255,255,255,.18);
+
+    transform:
+        translateY(-1px);
+}
+
+.logout-button:active{
+
+    transform:
+        scale(.96);
+}
+
+
+/* ============================================================
+   PAGES
+============================================================ */
+
+.page{
+
+    display:none;
+
+    min-height:
+        calc(
+            100vh - 80px
+        );
+
+    padding:
+        25px 20px 120px;
+}
+
+.page.active{
+
+    display:block;
+
+}
+
+
+/* ============================================================
+   HOME
+============================================================ */
+
+.home-title{
+
+    text-align:center;
+
+    margin:
+        22px auto 10px;
+}
+
+
+.home-title small{
+
+    display:block;
+
+    margin-bottom:7px;
+
+    color:#8f8f8f;
+
+    font-size:11px;
+
+    letter-spacing:2px;
+
+    text-transform:uppercase;
+}
+
+
+.home-title h1{
+
+    color:#ffffff;
+
+    font-size:
+        clamp(
+            26px,
+            5vw,
+            38px
+        );
+
+    font-weight:800;
+
+    letter-spacing:-1px;
+}
+
+
+.home-title h1 span{
+
+    color:#ffffff;
+
+    text-shadow:
+        0 0 22px
+        rgba(255,255,255,.18);
+}
+
+
+/* ============================================================
+   LIVE SECTION
+============================================================ */
+
+.live-section{
+
+    width:min(
+        900px,
+        100%
+    );
+
+    margin:0 auto 25px;
+
+    padding:18px;
+
+    border:
+        1px solid
+        rgba(255,255,255,.07);
+
+    border-radius:18px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(18,18,18,.72),
+            rgba(8,8,8,.68)
+        );
+
+    box-shadow:
+        0 20px 60px
+        rgba(0,0,0,.20);
+
+    backdrop-filter:
+        blur(15px);
+}
+
+
+.live-header{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    gap:12px;
+
+    margin-bottom:17px;
+}
+
+
+.live-heading{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+}
+
+
+.live-heading-icon{
+
+    width:42px;
+    height:42px;
+
+    display:grid;
+
+    place-items:center;
+
+    border-radius:12px;
+
+    color:#f2f2f2;
+
+    background:
+        rgba(255,255,255,.06);
+
+    border:
+        1px solid
+        rgba(255,255,255,.08);
+}
+
+
+.live-heading-text{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:3px;
+}
+
+
+.live-heading-text strong{
+
+    color:#ffffff;
+
+    font-size:14px;
+}
+
+
+.live-heading-text span{
+
+    color:#888888;
+
+    font-size:9px;
+
+    letter-spacing:1px;
+}
+
+
+.live-status{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:7px;
+
+    padding:7px 10px;
+
+    border-radius:20px;
+
+    color:#ffffff;
+
+    background:
+        rgba(255,255,255,.04);
+
+    border:
+        1px solid
+        rgba(80,220,255,.13);
+
+    font-size:9px;
+
+    font-weight:800;
+
+    letter-spacing:1px;
+}
+
+
+.live-dot{
+
+    width:6px;
+    height:6px;
+
+    border-radius:50%;
+
+    background:#ffffff;
+
+    box-shadow:
+        0 0 10px
+        rgba(80,230,255,.9);
+
+    animation:
+        livePulse 1.5s infinite;
+}
+
+
+.live-status.offline{
+
+    color:#ff8c8c;
+}
+
+
+.live-status.offline .live-dot{
+
+    background:#bdbdbd;
+
+    box-shadow:
+        0 0 10px
+        rgba(255,70,70,.8);
+}
+
+
+.live-status.syncing{
+
+    color:#ffe28a;
+}
+
+
+.live-status.syncing .live-dot{
+
+    background:#d0d0d0;
+
+    box-shadow:
+        0 0 10px
+        rgba(255,210,80,.8);
+}
+
+
+@keyframes livePulse{
+
+    0%,100%{
+        opacity:.5;
+        transform:scale(.85);
+    }
+
+    50%{
+        opacity:1;
+        transform:scale(1.15);
+    }
+
+}
+
+
+/* ============================================================
+   SALES GRID
+============================================================ */
+
+.sales-grid{
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(
+            4,
+            minmax(0,1fr)
+        );
+
+    gap:10px;
+}
+
+
+.sales-card{
+
+    padding:15px;
+
+    border:
+        1px solid
+        rgba(255,255,255,.05);
+
+    border-radius:13px;
+
+    background:
+        rgba(12,12,12,.58);
+}
+
+
+.sales-label{
+
+    color:#858585;
+
+    font-size:9px;
+
+    font-weight:700;
+
+    letter-spacing:1.2px;
+
+    text-transform:uppercase;
+}
+
+
+.sales-value{
+
+    margin-top:7px;
+
+    color:#eeeeee;
+
+    font-size:22px;
+
+    font-weight:800;
+}
+
+
+.sales-value.primary{
+
+    color:#f0f0f0;
+
+    text-shadow:
+        0 0 18px
+        rgba(255,255,255,.12);
+}
+
+
+/* ============================================================
+   PAYMENT
+============================================================ */
+
+.payment-grid{
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(
+            3,
+            minmax(0,1fr)
+        );
+
+    gap:10px;
+
+    margin-top:10px;
+}
+
+
+.payment-card{
+
+    padding:13px 15px;
+
+    border:
+        1px solid
+        rgba(80,210,255,.07);
+
+    border-radius:12px;
+
+    background:
+        rgba(10,10,10,.42);
+}
+
+
+.payment-label{
+
+    color:#777777;
+
+    font-size:8px;
+
+    font-weight:800;
+
+    letter-spacing:1.5px;
+}
+
+
+.payment-value{
+
+    margin-top:5px;
+
+    color:#d7d7d7;
+
+    font-size:16px;
+
+    font-weight:750;
+}
+
+
+.sales-error{
+
+    display:none;
+
+    margin-top:10px;
+
+    padding:9px 12px;
+
+    border-radius:8px;
+
+    color:#ffaaaa;
+
+    background:
+        rgba(255,70,70,.07);
+
+    border:
+        1px solid
+        rgba(255,90,90,.15);
+
+    font-size:10px;
+}
+
+
+/* ============================================================
+   LOW ALERT
+============================================================ */
+
+.low-alert-section{
+
+    margin-top:14px;
+
+    padding:16px;
+
+    border:
+        1px solid
+        rgba(255,190,70,.10);
+
+    border-radius:15px;
+
+    background:
+        rgba(20,18,8,.35);
+}
+
+
+.low-alert-header{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    margin-bottom:12px;
+}
+
+
+.low-alert-title{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+}
+
+
+.low-alert-icon{
+
+    width:34px;
+    height:34px;
+
+    display:grid;
+
+    place-items:center;
+
+    border-radius:10px;
+
+    color:#d5d5d5;
+
+    background:
+        rgba(255,190,50,.08);
+}
+
+
+.low-alert-title strong{
+
+    display:block;
+
+    color:#ffffff;
+
+    font-size:12px;
+}
+
+
+.low-alert-title span{
+
+    display:block;
+
+    margin-top:3px;
+
+    color:#718f99;
+
+    font-size:8px;
+}
+
+
+.low-alert-count{
+
+    min-width:30px;
+    height:30px;
+
+    display:grid;
+
+    place-items:center;
+
+    padding:0 8px;
+
+    border-radius:10px;
+
+    color:#d5d5d5;
+
+    background:
+        rgba(255,190,50,.09);
+
+    border:
+        1px solid
+        rgba(255,190,50,.14);
+
+    font-size:11px;
+
+    font-weight:800;
+}
+
+
+.low-alert-items{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:6px;
+}
+
+
+.low-alert-item{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    gap:10px;
+
+    padding:10px 11px;
+
+    border-radius:9px;
+
+    background:
+        rgba(255,190,50,.035);
+
+    border:
+        1px solid
+        rgba(255,190,50,.06);
+}
+
+
+.low-alert-item.out{
+
+    border-color:
+        rgba(255,80,80,.16);
+
+    background:
+        rgba(255,50,50,.045);
+}
+
+
+.low-alert-item-name{
+
+    overflow:hidden;
+
+    text-overflow:ellipsis;
+
+    white-space:nowrap;
+
+    color:#e3e3e3;
+
+    font-size:10px;
+}
+
+
+.low-alert-item-stock{
+
+    flex:none;
+
+    color:#d5d5d5;
+
+    font-size:9px;
+
+    font-weight:700;
+
+    letter-spacing:.5px;
+}
+
+
+.low-alert-item.out
+.low-alert-item-stock{
+
+    color:#cfcfcf;
+}
+
+
+.low-alert-loading,
+.low-alert-empty,
+.low-alert-error{
+
+    padding:13px;
+
+    color:#858585;
+
+    font-size:9px;
+
+    text-align:center;
+}
+
+
+.low-alert-empty{
+
+    color:#bdbdbd;
+}
+
+
+.low-alert-error{
+
+    color:#cfcfcf;
+
+    text-align:left;
+}
+
+
+/* ============================================================
+   DARKY ORB
+============================================================ */
+
+.orb-wrap{
+
+    position:relative;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    margin:
+        5px auto 22px;
+
+    height:170px;
+}
+
+
+.orb{
+
+    position:relative;
+
+    width:120px;
+    height:120px;
+
+    display:grid;
+
+    place-items:center;
+
+    border-radius:50%;
+
+    background:
+        radial-gradient(
+            circle at 35% 28%,
+            #e8fdff 0%,
+            #7deaff 10%,
+            #16a9e4 28%,
+            #07548e 54%,
+            #02192e 74%,
+            #010914 100%
+        );
+
+    box-shadow:
+        0 0 22px
+        rgba(40,210,255,.55),
+        0 0 55px
+        rgba(0,150,255,.30),
+        inset 0 0 25px
+        rgba(255,255,255,.13);
+
+    animation:
+        orbFloat 4s ease-in-out infinite;
+}
+
+
+.orb::before{
+
+    content:"";
+
+    position:absolute;
+
+    inset:-13px;
+
+    border-radius:50%;
+
+    border:
+        1px solid
+        rgba(70,220,255,.22);
+
+    box-shadow:
+        0 0 22px
+        rgba(40,210,255,.16);
+
+    animation:
+        orbRing 3s linear infinite;
+}
+
+
+.orb::after{
+
+    content:"";
+
+    position:absolute;
+
+    inset:-27px;
+
+    border-radius:50%;
+
+    border:
+        1px solid
+        rgba(70,190,255,.10);
+
+    animation:
+        orbRing 5s linear infinite reverse;
+}
+
+
+.orb-icon{
+
+    position:relative;
+
+    z-index:2;
+
+    color:#ffffff;
+
+    font-size:31px;
+
+    text-shadow:
+        0 0 20px
+        rgba(160,245,255,.9);
+}
+
+
+.home-listening{
+
+    animation:
+        orbListening
+        1.2s
+        ease-in-out
+        infinite;
+}
+
+
+.home-thinking{
+
+    animation:
+        orbThinking
+        .8s
+        linear
+        infinite;
+}
+
+
+.home-speaking{
+
+    animation:
+        orbSpeaking
+        .65s
+        ease-in-out
+        infinite;
+}
+
+
+@keyframes orbFloat{
+
+    0%,100%{
+        transform:translateY(0);
+    }
+
+    50%{
+        transform:translateY(-7px);
+    }
+
+}
+
+
+@keyframes orbRing{
+
+    from{
+        transform:rotate(0deg) scale(.96);
+    }
+
+    to{
+        transform:rotate(360deg) scale(1.04);
+    }
+
+}
+
+
+@keyframes orbListening{
+
+    0%,100%{
+        transform:scale(1);
+    }
+
+    50%{
+        transform:scale(1.08);
+    }
+
+}
+
+
+@keyframes orbThinking{
+
+    to{
+        transform:rotate(360deg);
+    }
+
+}
+
+
+@keyframes orbSpeaking{
+
+    0%,100%{
+        transform:scale(1);
+    }
+
+    50%{
+        transform:scale(1.12);
+    }
+
+}
+
+
+/* ============================================================
+   CHAT
+============================================================ */
+
+.chat-container{
+
+    width:min(
+        820px,
+        100%
+    );
+
+    margin:0 auto;
+
+    position:relative;
+
+    z-index:5;
+}
+
+
+.chat-messages{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:13px;
+
+    margin-bottom:15px;
+
+    max-height:
+        min(
+            42vh,
+            430px
+        );
+
+    overflow-y:auto;
+
+    padding:
+        4px 3px 8px;
+
+    scrollbar-width:thin;
+
+    scrollbar-color:
+        rgba(70,200,255,.25)
+        transparent;
+}
+
+
+.chat-row{
+
+    display:flex;
+
+    width:100%;
+}
+
+
+.chat-row.user{
+
+    justify-content:flex-end;
+}
+
+
+.chat-row.darky{
+
+    justify-content:flex-start;
+}
+
+
+.chat-bubble{
+
+    max-width:min(
+        82%,
+        650px
+    );
+
+    padding:
+        11px 14px;
+
+    border-radius:14px;
+
+    line-height:1.5;
+
+    font-size:11px;
+
+    white-space:pre-wrap;
+
+    overflow-wrap:anywhere;
+}
+
+
+.darky-bubble{
+
+    color:#cceef7;
+
+    background:
+        rgba(5,30,48,.74);
+
+    border:
+        1px solid
+        rgba(60,205,255,.12);
+
+    box-shadow:
+        0 5px 25px
+        rgba(0,0,0,.14);
+}
+
+
+.user-bubble{
+
+    color:#e9fbff;
+
+    background:
+        rgba(0,105,160,.30);
+
+    border:
+        1px solid
+        rgba(70,205,255,.20);
+}
+
+
+.chat-name{
+
+    margin-bottom:4px;
+
+    color:#5fdcff;
+
+    font-size:8px;
+
+    font-weight:800;
+
+    letter-spacing:1px;
+
+    text-transform:uppercase;
+}
+
+
+.user-name{
+
+    color:#8fb9c8;
+}
+
+
+.ask-box{
+
+    position:relative;
+
+    z-index:10;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:8px;
+
+    width:100%;
+
+    padding:8px;
+
+    border:
+        1px solid
+        rgba(80,210,255,.17);
+
+    border-radius:15px;
+
+    background:
+        rgba(3,17,31,.90);
+
+    box-shadow:
+        0 15px 40px
+        rgba(0,0,0,.28);
+
+    backdrop-filter:
+        blur(15px);
+
+    -webkit-backdrop-filter:
+        blur(15px);
+}
+
+
+.ask-box input{
+
+    flex:1;
+
+    min-width:0;
+
+    height:42px;
+
+    border:0;
+
+    outline:0;
+
+    color:#ffffff;
+
+    background:transparent;
+
+    font-size:12px;
+}
+
+
+.ask-box input::placeholder{
+
+    color:#557c89;
+}
+
+
+.ask-button{
+
+    width:42px;
+    height:42px;
+
+    flex:none;
+
+    display:grid;
+
+    place-items:center;
+
+    border:
+        1px solid
+        rgba(80,210,255,.14);
+
+    border-radius:11px;
+
+    color:#8deaff;
+
+    background:
+        rgba(0,100,150,.12);
+
+    cursor:pointer;
+
+    transition:.2s ease;
+
+    font-size:17px;
+}
+
+
+.ask-button:hover{
+
+    color:#ffffff;
+
+    background:
+        rgba(0,160,220,.22);
+
+    border-color:
+        rgba(80,220,255,.40);
+
+    box-shadow:
+        0 0 15px
+        rgba(0,190,255,.18);
+}
+
+
+.ask-button:active{
+
+    transform:scale(.94);
+}
+
+
+.mic-active{
+
+    color:#ffffff !important;
+
+    background:
+        rgba(0,180,230,.28) !important;
+
+    border-color:
+        rgba(90,230,255,.65) !important;
+
+    box-shadow:
+        0 0 22px
+        rgba(50,220,255,.45) !important;
+
+    animation:
+        micPulse
+        1s
+        infinite;
+}
+
+
+@keyframes micPulse{
+
+    0%,100%{
+        box-shadow:
+            0 0 12px
+            rgba(50,220,255,.25);
+    }
+
+    50%{
+        box-shadow:
+            0 0 25px
+            rgba(50,220,255,.65);
+    }
+
+}
+
+
+/* ============================================================
+   TYPING
+============================================================ */
+
+.typing{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:4px;
+
+    height:18px;
+}
+
+
+.typing span{
+
+    width:5px;
+    height:5px;
+
+    border-radius:50%;
+
+    background:#6cddf7;
+
+    animation:
+        typingDot
+        1.1s
+        infinite;
+}
+
+
+.typing span:nth-child(2){
+
+    animation-delay:.15s;
+}
+
+
+.typing span:nth-child(3){
+
+    animation-delay:.3s;
+}
+
+
+@keyframes typingDot{
+
+    0%,100%{
+        opacity:.25;
+        transform:translateY(0);
+    }
+
+    50%{
+        opacity:1;
+        transform:translateY(-3px);
+    }
+
+}
+
+
+/* ============================================================
+   SECONDARY PAGES
+============================================================ */
+
+.secondary-page{
+
+    width:min(
+        850px,
+        100%
+    );
+
+    margin:0 auto;
+}
+
+
+.page-heading{
+
+    margin-bottom:22px;
+
+    text-align:center;
+}
+
+
+.page-heading h2{
+
+    color:#ffffff;
+
+    font-size:27px;
+
+    letter-spacing:-.5px;
+}
+
+
+.page-heading p{
+
+    margin-top:5px;
+
+    color:#648b98;
+
+    font-size:10px;
+
+    letter-spacing:.8px;
+}
+
+
+.data-card{
+
+    margin-bottom:12px;
+
+    padding:18px;
+
+    border:
+        1px solid
+        rgba(255,255,255,.06);
+
+    border-radius:15px;
+
+    background:
+        rgba(5,23,39,.62);
+}
+
+
+.data-card h3{
+
+    margin-bottom:8px;
+
+    color:#bcefff;
+
+    font-size:13px;
+}
+
+
+.data-card p{
+
+    color:#718f9c;
+
+    font-size:10px;
+
+    line-height:1.7;
+}
+
+
+.quick-card{
+
+    width:100%;
+
+    margin-bottom:9px;
+
+    padding:15px;
+
+    border:
+        1px solid
+        rgba(255,255,255,.06);
+
+    border-radius:12px;
+
+    color:#dddddd;
+
+    background:
+        rgba(5,24,40,.65);
+
+    text-align:left;
+
+    cursor:pointer;
+
+    font-size:11px;
+
+    transition:.2s ease;
+}
+
+
+.quick-card:hover{
+
+    border-color:
+        rgba(80,220,255,.35);
+
+    background:
+        rgba(0,120,175,.15);
+
+    transform:
+        translateY(-1px);
+}
+
+
+/* ============================================================
+   VOICE PAGE
+============================================================ */
+
+.voice-page{
+
+    display:none;
+
+    align-items:center;
+
+    justify-content:center;
+}
+
+
+.voice-page.active{
+
+    display:flex;
+}
+
+
+.voice-center{
+
+    width:min(
+        700px,
+        100%
+    );
+
+    text-align:center;
+
+    margin:auto;
+}
+
+
+.voice-orb{
+
+    width:145px;
+    height:145px;
+
+    margin:25px auto;
+
+    display:grid;
+
+    place-items:center;
+
+    border-radius:50%;
+
+    background:
+        radial-gradient(
+            circle,
+            #9ef1ff 0%,
+            #168fc6 32%,
+            #053e6a 60%,
+            #011322 100%
+        );
+
+    box-shadow:
+        0 0 30px
+        rgba(50,210,255,.40),
+        0 0 80px
+        rgba(0,130,255,.20);
+
+    transition:.3s ease;
+}
+
+
+.voice-orb.speaking{
+
+    animation:
+        voiceSpeaking
+        .7s
+        ease-in-out
+        infinite;
+}
+
+
+@keyframes voiceSpeaking{
+
+    0%,100%{
+        transform:scale(1);
+    }
+
+    50%{
+        transform:scale(1.10);
+    }
+
+}
+
+
+.voice-mic{
+
+    font-size:42px;
+}
+
+
+.voice-status{
+
+    color:#9deaff;
+
+    font-size:13px;
+
+    font-weight:700;
+}
+
+
+.voice-hint{
+
+    margin-top:6px;
+
+    color:#608b9a;
+
+    font-size:9px;
+}
+
+
+.voice-transcript{
+
+    min-height:70px;
+
+    margin:22px auto;
+
+    padding:15px;
+
+    border:
+        1px solid
+        rgba(255,255,255,.06);
+
+    border-radius:13px;
+
+    color:#9ec0cb;
+
+    background:
+        rgba(3,18,32,.58);
+
+    font-size:11px;
+
+    line-height:1.6;
+
+    white-space:pre-wrap;
+}
+
+
+.voice-button{
+
+    width:58px;
+    height:58px;
+
+    border:
+        1px solid
+        rgba(80,220,255,.25);
+
+    border-radius:50%;
+
+    color:#eeeeee;
+
+    background:
+        rgba(0,120,180,.18);
+
+    cursor:pointer;
+
+    font-size:21px;
+
+    box-shadow:
+        0 0 20px
+        rgba(0,180,255,.12);
+
+    transition:.2s ease;
+}
+
+
+.voice-button:hover{
+
+    transform:scale(1.05);
+
+    box-shadow:
+        0 0 30px
+        rgba(0,200,255,.30);
+}
+
+
+/* ============================================================
+   BOTTOM NAV
+============================================================ */
+
+.bottom-nav{
+
+    position:fixed;
+
+    left:50%;
+
+    bottom:14px;
+
+    transform:
+        translateX(-50%);
+
+    z-index:800;
+
+    width:min(
+        720px,
+        calc(100% - 24px)
+    );
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(
+            5,
+            1fr
+        );
+
+    gap:5px;
+
+    padding:7px;
+
+    border:
+        1px solid
+        rgba(80,210,255,.14);
+
+    border-radius:17px;
+
+    background:
+        rgba(3,15,28,.91);
+
+    box-shadow:
+        0 15px 50px
+        rgba(0,0,0,.45);
+
+    backdrop-filter:
+        blur(20px);
+
+    -webkit-backdrop-filter:
+        blur(20px);
+}
+
+
+.nav-btn{
+
+    min-width:0;
+
+    padding:9px 5px;
+
+    border:0;
+
+    border-radius:11px;
+
+    color:#557987;
+
+    background:transparent;
+
+    cursor:pointer;
+
+    font-size:8px;
+
+    font-weight:700;
+
+    letter-spacing:.5px;
+
+    transition:.2s ease;
+}
+
+
+.nav-icon{
+
+    display:block;
+
+    margin-bottom:3px;
+
+    font-size:15px;
+}
+
+
+.nav-btn:hover{
+
+    color:#a8eafa;
+
+    background:
+        rgba(60,190,240,.07);
+}
+
+
+.nav-btn.active{
+
+    color:#76e5ff;
+
+    background:
+        rgba(30,170,220,.12);
+
+    box-shadow:
+        inset 0 0 15px
+        rgba(50,200,255,.05);
+}
+
+
+/* ============================================================
+   PASSWORD LOCK
+============================================================ */
+
+#passwordLock{
+
+    position:fixed;
+
+    inset:0;
+
+    z-index:99999;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    padding:20px;
+
+    background:
+        radial-gradient(
+            circle at center,
+            rgba(0,150,230,.12),
+            rgba(2,7,17,.98) 55%,
+            #01050c 100%
+        );
+
+    backdrop-filter:
+        blur(12px);
+
+    -webkit-backdrop-filter:
+        blur(12px);
+}
+
+
+.password-box{
+
+    width:min(
+        380px,
+        100%
+    );
+
+    padding:34px 28px;
+
+    text-align:center;
+
+    border:
+        1px solid
+        rgba(80,210,255,.18);
+
+    border-radius:22px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(7,28,47,.88),
+            rgba(2,12,24,.92)
+        );
+
+    box-shadow:
+        0 30px 100px
+        rgba(0,0,0,.65),
+        0 0 50px
+        rgba(0,160,255,.08);
+}
+
+
+.password-logo{
+
+    width:65px;
+    height:65px;
+
+    margin:0 auto 17px;
+
+    display:grid;
+
+    place-items:center;
+
+    border-radius:19px;
+
+    color:#ffffff;
+
+    font-size:30px;
+
+    font-weight:900;
+
+    background:
+        radial-gradient(
+            circle at 35% 25%,
+            #e9ffff,
+            #41d2ff 28%,
+            #0873ad 58%,
+            #02172b
+        );
+
+    box-shadow:
+        0 0 30px
+        rgba(30,210,255,.45);
+}
+
+
+.password-box h2{
+
+    color:#ffffff;
+
+    font-size:20px;
+
+    letter-spacing:3px;
+}
+
+
+.password-box p{
+
+    margin:
+        8px 0 22px;
+
+    color:#688e9b;
+
+    font-size:10px;
+
+    line-height:1.5;
+}
+
+
+.password-input{
+
+    width:100%;
+
+    height:48px;
+
+    padding:0 15px;
+
+    outline:0;
+
+    border:
+        1px solid
+        rgba(80,210,255,.14);
+
+    border-radius:11px;
+
+    color:#ffffff;
+
+    background:
+        rgba(0,10,20,.65);
+
+    text-align:center;
+
+    font-size:14px;
+
+    letter-spacing:3px;
+
+    transition:.2s ease;
+}
+
+
+.password-input:focus{
+
+    border-color:
+        rgba(80,220,255,.55);
+
+    box-shadow:
+        0 0 20px
+        rgba(0,180,255,.12);
+}
+
+
+.password-button{
+
+    width:100%;
+
+    height:46px;
+
+    margin-top:10px;
+
+    border:
+        1px solid
+        rgba(80,220,255,.25);
+
+    border-radius:11px;
+
+    color:#ffffff;
+
+    background:
+        rgba(0,135,190,.20);
+
+    cursor:pointer;
+
+    font-size:10px;
+
+    font-weight:800;
+
+    letter-spacing:1.5px;
+
+    transition:.2s ease;
+}
+
+
+.password-button:hover{
+
+    background:
+        rgba(0,160,220,.30);
+
+    border-color:
+        rgba(80,230,255,.55);
+
+    box-shadow:
+        0 0 25px
+        rgba(0,190,255,.18);
+}
+
+
+.password-error{
+
+    min-height:17px;
+
+    margin-top:10px;
+
+    color:#cfcfcf;
+
+    font-size:9px;
+}
+
+
+/* ============================================================
+   DARKY UNLOCK ANIMATION
+============================================================ */
+
+#darkyUnlockAnimation{
+
+    position:fixed;
+
+    inset:0;
+
+    z-index:100000;
+
+    display:none;
+
+    align-items:center;
+
+    justify-content:center;
+
+    background:
+        radial-gradient(
+            circle at center,
+            rgba(0,190,255,.22),
+            rgba(2,7,17,.97) 52%,
+            #020711 100%
+        );
+
+    opacity:0;
+
+    pointer-events:none;
+
+    overflow:hidden;
+}
+
+
+#darkyUnlockAnimation.active{
+
+    display:flex;
+
+    animation:
+        darkyUnlockScreen
+        2.4s
+        ease-in-out
+        forwards;
+}
+
+
+.unlock-orb{
+
+    position:relative;
+
+    width:105px;
+    height:105px;
+
+    border-radius:50%;
+
+    background:
+        radial-gradient(
+            circle,
+            #e9ffff 0%,
+            #68e1ff 17%,
+            #087fc9 46%,
+            #031c36 70%,
+            transparent 73%
+        );
+
+    box-shadow:
+        0 0 25px
+        rgba(0,210,255,.9),
+        0 0 65px
+        rgba(0,160,255,.65),
+        0 0 130px
+        rgba(0,120,255,.4);
+
+    animation:
+        unlockOrb
+        2.1s
+        cubic-bezier(.2,.8,.2,1)
+        forwards;
+}
+
+
+.unlock-orb::before,
+.unlock-orb::after{
+
+    content:"";
+
+    position:absolute;
+
+    inset:-25px;
+
+    border-radius:50%;
+
+    border:
+        1px solid
+        rgba(90,220,255,.60);
+
+    box-shadow:
+        0 0 25px
+        rgba(0,180,255,.25);
+}
+
+
+.unlock-orb::before{
+
+    animation:
+        unlockRing
+        1.5s
+        ease-out
+        infinite;
+}
+
+
+.unlock-orb::after{
+
+    inset:-45px;
+
+    border-color:
+        rgba(80,190,255,.25);
+
+    animation:
+        unlockRing
+        2s
+        ease-out
+        infinite
+        .2s;
+}
+
+
+.unlock-letter{
+
+    position:absolute;
+
+    inset:0;
+
+    display:grid;
+
+    place-items:center;
+
+    color:#ffffff;
+
+    font-size:38px;
+
+    font-weight:900;
+
+    letter-spacing:-2px;
+
+    text-shadow:
+        0 0 20px
+        rgba(120,240,255,.9);
+
+    animation:
+        unlockLetter
+        1.7s
+        ease-in-out
+        forwards;
+}
+
+
+.unlock-particle{
+
+    position:absolute;
+
+    width:5px;
+    height:5px;
+
+    border-radius:50%;
+
+    background:#8eeeff;
+
+    box-shadow:
+        0 0 12px
+        rgba(80,220,255,.9);
+}
+
+
+.unlock-particle.p1{
+    animation:
+        particle1
+        1.7s
+        ease-out
+        forwards;
+}
+
+.unlock-particle.p2{
+    animation:
+        particle2
+        1.9s
+        ease-out
+        forwards;
+}
+
+.unlock-particle.p3{
+    animation:
+        particle3
+        1.5s
+        ease-out
+        forwards;
+}
+
+.unlock-particle.p4{
+    animation:
+        particle4
+        2s
+        ease-out
+        forwards;
+}
+
+.unlock-particle.p5{
+    animation:
+        particle5
+        1.8s
+        ease-out
+        forwards;
+}
+
+.unlock-particle.p6{
+    animation:
+        particle6
+        1.6s
+        ease-out
+        forwards;
+}
+
+
+.unlock-text{
+
+    position:absolute;
+
+    margin-top:220px;
+
+    color:#dddddd;
+
+    font-size:12px;
+
+    font-weight:600;
+
+    letter-spacing:5px;
+
+    text-transform:uppercase;
+
+    text-shadow:
+        0 0 15px
+        rgba(80,220,255,.7);
+
+    animation:
+        unlockText
+        1.9s
+        ease-in-out
+        forwards;
+}
+
+
+@keyframes darkyUnlockScreen{
+
+    0%{
+        opacity:0;
+    }
+
+    12%{
+        opacity:1;
+    }
+
+    72%{
+        opacity:1;
+    }
+
+    100%{
+        opacity:0;
+    }
+}
+
+
+@keyframes unlockOrb{
+
+    0%{
+        transform:
+            scale(.15)
+            rotate(0deg);
+
+        opacity:0;
+    }
+
+    18%{
+        transform:
+            scale(.65)
+            rotate(45deg);
+
+        opacity:1;
+    }
+
+    52%{
+        transform:
+            scale(1.15)
+            rotate(180deg);
+    }
+
+    100%{
+        transform:
+            scale(9)
+            rotate(360deg);
+
+        opacity:0;
+    }
+}
+
+
+@keyframes unlockRing{
+
+    0%{
+        transform:scale(.3);
+        opacity:0;
+    }
+
+    25%{
+        opacity:1;
+    }
+
+    100%{
+        transform:scale(3);
+        opacity:0;
+    }
+}
+
+
+@keyframes unlockLetter{
+
+    0%{
+        opacity:0;
+        transform:scale(.5);
+    }
+
+    30%{
+        opacity:1;
+        transform:scale(1);
+    }
+
+    70%{
+        opacity:1;
+    }
+
+    100%{
+        opacity:0;
+        transform:scale(1.5);
+    }
+}
+
+
+@keyframes unlockText{
+
+    0%{
+        opacity:0;
+        transform:translateY(15px);
+    }
+
+    30%{
+        opacity:1;
+        transform:translateY(0);
+    }
+
+    75%{
+        opacity:1;
+    }
+
+    100%{
+        opacity:0;
+        transform:translateY(-10px);
+    }
+}
+
+
+@keyframes particle1{
+
+    to{
+        transform:
+            translate(-180px,-130px)
+            scale(0);
+
+        opacity:0;
+    }
+}
+
+
+@keyframes particle2{
+
+    to{
+        transform:
+            translate(190px,-100px)
+            scale(0);
+
+        opacity:0;
+    }
+}
+
+
+@keyframes particle3{
+
+    to{
+        transform:
+            translate(-150px,150px)
+            scale(0);
+
+        opacity:0;
+    }
+}
+
+
+@keyframes particle4{
+
+    to{
+        transform:
+            translate(170px,140px)
+            scale(0);
+
+        opacity:0;
+    }
+}
+
+
+@keyframes particle5{
+
+    to{
+        transform:
+            translate(-250px,20px)
+            scale(0);
+
+        opacity:0;
+    }
+}
+
+
+@keyframes particle6{
+
+    to{
+        transform:
+            translate(250px,30px)
+            scale(0);
+
+        opacity:0;
+    }
+}
+
+
+/* ============================================================
+   MOBILE
+============================================================ */
+
+@media(max-width:700px){
+
+    .topbar{
+
+        padding:
+            13px 14px;
+    }
+
+
+    .brand-logo{
+
+        width:37px;
+        height:37px;
+
+        border-radius:11px;
+    }
+
+
+    .brand-text strong{
+
+        font-size:14px;
+    }
+
+
+    .brand-text span{
+
+        display:none;
+    }
+
+
+    .logout-button{
+
+        padding:
+            9px 11px;
+
+        font-size:8px;
+    }
+
+
+    .page{
+
+        padding:
+            18px 12px 115px;
+    }
+
+
+    .sales-grid{
+
+        grid-template-columns:
+            repeat(2,1fr);
+    }
+
+
+    .payment-grid{
+
+        grid-template-columns:
+            repeat(3,1fr);
+    }
+
+
+    .sales-value{
+
+        font-size:18px;
+    }
+
+
+    .live-section{
+
+        padding:13px;
+    }
+
+
+    .live-heading-text span{
+
+        display:none;
+    }
+
+
+    .chat-bubble{
+
+        max-width:88%;
+    }
+
+
+    .orb-wrap{
+
+        height:145px;
+    }
+
+
+    .orb{
+
+        width:105px;
+        height:105px;
+    }
+
+
+    .bottom-nav{
+
+        bottom:9px;
+
+        width:
+            calc(100% - 14px);
+    }
+
+}
+
+
+@media(max-width:430px){
+
+    .payment-card{
+
+        padding:
+            11px 8px;
+    }
+
+
+    .payment-value{
+
+        font-size:13px;
+    }
+
+
+    .payment-label{
+
+        font-size:7px;
+    }
+
+
+    .low-alert-item{
+
+        padding:
+            9px;
+    }
+
+
+    .low-alert-item-stock{
+
+        font-size:8px;
+    }
+
+}
+
+
+/* ============================================================
+   REDUCED MOTION
+============================================================ */
+
+@media(prefers-reduced-motion:reduce){
+
+    *,
+    *::before,
+    *::after{
+
+        animation-duration:
+            .01ms !important;
+
+        animation-iteration-count:
+            1 !important;
+
+        scroll-behavior:
+            auto !important;
+    }
+
+}
+
+
+/* External page navigation sidebar */
+.page-link-sidebar{
+  position:fixed;
+  left:14px;
+  top:50%;
+  transform:translateY(-50%);
+  z-index:999;
+  width:150px;
+  display:flex;
+  flex-direction:column;
+  gap:9px;
+}
+.page-link-sidebar a{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:44px;
+  padding:0 12px;
+  box-sizing:border-box;
+  border:1px solid rgba(212,175,55,.38);
+  border-radius:12px;
+  background:rgba(75,0,31,.88);
+  color:#fff;
+  text-decoration:none;
+  font-size:13px;
+  font-weight:700;
+  letter-spacing:.3px;
+  box-shadow:0 8px 24px rgba(0,0,0,.18);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  transition:transform .18s ease,background .18s ease,border-color .18s ease;
+}
+.page-link-sidebar a:hover{
+  transform:translateX(3px);
+  background:rgba(101,0,40,.96);
+  border-color:rgba(212,175,55,.7);
+}
+@media (min-width:701px){
+  body{zoom:.92;}
+}
+@media (max-width:700px){
+  .page-link-sidebar{
+    left:8px;
+    top:50%;
+    width:116px;
+    gap:6px;
+  }
+  .page-link-sidebar a{min-height:38px;font-size:11px;border-radius:10px;padding:0 7px;}
+}
+
+/* ============================================================
+   BLACK & WHITE FUTURISTIC GLASS THEME
+   Keeps existing layout and functionality; only visual styling.
+============================================================ */
+body{
+    color:#f5f5f5 !important;
+    background:
+        radial-gradient(circle at 20% 10%, rgba(255,255,255,.055), transparent 28%),
+        radial-gradient(circle at 85% 80%, rgba(255,255,255,.035), transparent 30%),
+        linear-gradient(135deg,#020202 0%,#0a0a0a 48%,#000 100%) !important;
+}
+.topbar,.card,.panel,.glass,.modal,.dropdown,.sidebar,.side-nav,.page-card{
+    background:rgba(255,255,255,.055) !important;
+    border-color:rgba(255,255,255,.13) !important;
+    box-shadow:0 18px 50px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.07) !important;
+    backdrop-filter:blur(22px) saturate(110%);
+    -webkit-backdrop-filter:blur(22px) saturate(110%);
+}
+input,textarea,select,button,.nav-btn{
+    border-color:rgba(255,255,255,.14) !important;
+}
+input,textarea,select{background:rgba(255,255,255,.045) !important;color:#fff !important;}
+button,.nav-btn{background:rgba(255,255,255,.065) !important;color:#fff !important;}
+button:hover,.nav-btn:hover{background:rgba(255,255,255,.12) !important;}
+/* The left page-link navigation remains in place, now matching the monochrome glass UI. */
+.page-sidebar a{background:rgba(255,255,255,.055) !important;color:#f5f5f5 !important;border-color:rgba(255,255,255,.13) !important;box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 10px 28px rgba(0,0,0,.28) !important;}
+.page-sidebar a:hover{background:rgba(255,255,255,.12) !important;}
+
+</style>
+
+</head>
+
+
+<body>
+<nav class="page-link-sidebar" aria-label="Web pages">
+  <a href="https://iqbalkhan11296-coder.github.io/pandalam/sales" target="_blank" rel="noopener">Sales</a>
+  <a href="https://iqbalkhan11296-coder.github.io/pandalam/billing" target="_blank" rel="noopener">Billing</a>
+  <a href="https://iqbalkhan11296-coder.github.io/chaatarrakot/staffmanagement" target="_blank" rel="noopener">Staff Management</a>
+  <a href="https://iqbalkhan11296-coder.github.io/chaatarrakot/inventory" target="_blank" rel="noopener">Inventory</a>
+</nav>
+
+
+
+<!-- ==========================================================
+     DARKY AI PASSWORD LOCK
+========================================================== -->
+
+<div id="passwordLock">
+
+    <div class="password-box">
+
+        <div class="password-logo">
+            D
+        </div>
+
+        <h2>
+            DARKY AI
+        </h2>
+
+        <p>
+            Enter your password to access the dashboard
+        </p>
+
+        <input
+            id="dashboardPassword"
+            class="password-input"
+            type="password"
+            placeholder="PASSWORD"
+            autocomplete="off"
+        >
+
+        <button
+            id="passwordButton"
+            class="password-button"
+            onclick="unlockDashboard()"
+        >
+            UNLOCK DASHBOARD
+        </button>
+
+        <div
+            id="passwordError"
+            class="password-error">
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ==========================================================
+     UNLOCK ANIMATION
+========================================================== -->
+
+<div id="darkyUnlockAnimation">
+
+    <div class="unlock-orb">
+
+        <div class="unlock-letter">
+            D
+        </div>
+
+    </div>
+
+
+    <div class="unlock-particle p1"></div>
+    <div class="unlock-particle p2"></div>
+    <div class="unlock-particle p3"></div>
+    <div class="unlock-particle p4"></div>
+    <div class="unlock-particle p5"></div>
+    <div class="unlock-particle p6"></div>
+
+
+    <div class="unlock-text">
+        DARKY AI
+    </div>
+
+</div>
+
+
+<!-- ==========================================================
+     APP
+========================================================== -->
+
+<div class="app">
+
+
+<!-- ==========================================================
+     TOP BAR
+========================================================== -->
+
+<header class="topbar">
+
+    <div class="brand">
+
+        <div class="brand-logo">
+            D
+        </div>
+
+        <div class="brand-text">
+
+            <strong>
+                DARKY AI
+            </strong>
+
+            <span>
+                Chaatarra Restaurant Assistant
+            </span>
+
+            <div
+                id="connectionStatus"
+                class="status">
+                ● READY
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <button
+        id="logoutButton"
+        class="logout-button"
+        onclick="logoutDashboard()"
+    >
+        ⏻ LOGOUT
+    </button>
+
+</header>
+
+
+<!-- ==========================================================
+     HOME PAGE
+========================================================== -->
+
+<section
+    id="homePage"
+    class="page active"
+>
+
+
+<!-- ==========================================================
+     LIVE BUSINESS
+========================================================== -->
+
+<div class="live-section">
+
+    <div class="live-header">
+
+        <div class="live-heading">
+
+            <div class="live-heading-icon">
+                ◉
+            </div>
+
+            <div class="live-heading-text">
+
+                <strong>
+                    Admin's Dashboard
+                </strong>
+
+                <span>
+                    Powered By Rarks Darky AI
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div
+            id="liveStatus"
+            class="live-status">
+
+            <span class="live-dot"></span>
+
+            LIVE
+
+        </div>
+
+    </div>
+
+
+    <div class="sales-grid">
+
+
+        <div class="sales-card">
+
+            <div class="sales-label">
+                Today's Sales
+            </div>
+
+            <div
+                id="liveTotalSales"
+                class="sales-value primary">
+                ₹0
+            </div>
+
+        </div>
+
+
+        <div class="sales-card">
+
+            <div class="sales-label">
+                Total Orders
+            </div>
+
+            <div
+                id="liveTotalOrders"
+                class="sales-value">
+                0
+            </div>
+
+        </div>
+
+
+        <div class="sales-card">
+
+            <div class="sales-label">
+                Items Sold
+            </div>
+
+            <div
+                id="liveTotalItems"
+                class="sales-value">
+                0
+            </div>
+
+        </div>
+
+
+        <div class="sales-card">
+
+            <div class="sales-label">
+                Average Bill
+            </div>
+
+            <div
+                id="liveAverageBill"
+                class="sales-value">
+                ₹0
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+    <div class="payment-grid">
+
+
+        <div class="payment-card">
+
+            <div class="payment-label">
+                CASH
+            </div>
+
+            <div
+                id="liveCash"
+                class="payment-value">
+                ₹0
+            </div>
+
+        </div>
+
+
+        <div class="payment-card">
+
+            <div class="payment-label">
+                UPI
+            </div>
+
+            <div
+                id="liveUPI"
+                class="payment-value">
+                ₹0
+            </div>
+
+        </div>
+
+
+        <div class="payment-card">
+
+            <div class="payment-label">
+                CARD
+            </div>
+
+            <div
+                id="liveCard"
+                class="payment-value">
+                ₹0
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+    <div
+        id="salesError"
+        class="sales-error">
+        Unable to load live sales data.
+    </div>
+
+
+    <!-- LOW ALERT -->
+
+    <div class="low-alert-section">
+
+        <div class="low-alert-header">
+
+            <div class="low-alert-title">
+
+                <div class="low-alert-icon">
+                    ⚠
+                </div>
+
+                <div>
+
+                    <strong>
+                        Low Alert Items
+                    </strong>
+
+                    <span>
+                        Items at or below their alert level
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div
+                id="lowAlertCount"
+                class="low-alert-count">
+                0
+            </div>
+
+        </div>
+
+
+        <div
+            id="lowAlertItems"
+            class="low-alert-items">
+
+            <div class="low-alert-loading">
+                Checking inventory...
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- GREETING -->
+
+<div class="home-title">
+
+    <small id="greeting">
+        Good evening.
+    </small>
+
+    <h1>
+
+        Hello,
+        <span>
+            Iqbal
+        </span>
+
+    </h1>
+
+</div>
+
+
+<!-- DARKY ORB -->
+
+<div class="orb-wrap">
+
+    <div
+        id="homeOrb"
+        class="orb">
+
+        <div class="orb-icon">
+            ✦
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- CHAT -->
+
+<div class="chat-container">
+
+    <div
+        id="chatMessages"
+        class="chat-messages">
+    </div>
+
+
+    <div class="ask-box">
+
+        <button
+            id="homeMicButton"
+            class="ask-button"
+            onclick="openVoice()"
+        >
+            🎙
+        </button>
+
+
+        <input
+            id="askInput"
+            type="text"
+            placeholder="Ask Darky anything..."
+            autocomplete="off"
+        >
+
+
+        <button
+            class="ask-button ask-send"
+            onclick="sendHomeQuestion()"
+        >
+            ➤
+        </button>
+
+    </div>
+
+</div>
+
+
+</section>
+
+
+<!-- ==========================================================
+     VOICE PAGE
+========================================================== -->
+
+<section
+    id="voicePage"
+    class="page voice-page"
+>
+
+    <div class="voice-center">
+
+        <div class="page-heading">
+
+            <h2>
+                Voice Command
+            </h2>
+
+            <p>
+                Speak naturally to Darky
+            </p>
+
+        </div>
+
+
+        <div
+            id="voiceOrb"
+            class="voice-orb">
+
+            <div
+                id="voiceMicIcon"
+                class="voice-mic">
+                🎙
+            </div>
+
+        </div>
+
+
+        <div
+            id="voiceStatus"
+            class="voice-status">
+            Ready to listen
+        </div>
+
+
+        <div
+            id="voiceHint"
+            class="voice-hint">
+            Tap the microphone and speak
+        </div>
+
+
+        <div
+            id="voiceTranscript"
+            class="voice-transcript">
+            Your voice command will appear here.
+        </div>
+
+
+        <button
+            id="voiceButton"
+            class="voice-button"
+            onclick="startVoiceCommand()"
+        >
+            🎙
+        </button>
+
+    </div>
+
+</section>
+
+
+<!-- ==========================================================
+     STOCK
+========================================================== -->
+
+<section
+    id="stockPage"
+    class="page secondary-page"
+>
+
+    <div class="page-heading">
+
+        <h2>
+            Stock
+        </h2>
+
+        <p>
+            Inventory information
+        </p>
+
+    </div>
+
+
+    <div class="data-card">
+
+        <h3>
+            Inventory Assistant
+        </h3>
+
+        <p>
+            Ask Darky about current stock,
+            low-stock items, vendors,
+            purchase prices or stock movements.
+        </p>
+
+    </div>
+
+
+    <button
+        class="quick-card"
+        onclick="askQuick('Give me the current inventory overview.')"
+    >
+        📦 &nbsp;
+        Check current inventory
+    </button>
+
+
+    <button
+        class="quick-card"
+        onclick="askQuick('Show me the recent inventory history.')"
+    >
+        ↕ &nbsp;
+        Check stock history
+    </button>
+
+</section>
+
+
+<!-- ==========================================================
+     ORDERS
+========================================================== -->
+
+<section
+    id="ordersPage"
+    class="page secondary-page"
+>
+
+    <div class="page-heading">
+
+        <h2>
+            Orders
+        </h2>
+
+        <p>
+            Restaurant order information
+        </p>
+
+    </div>
+
+
+    <div class="data-card">
+
+        <h3>
+            Order Assistant
+        </h3>
+
+        <p>
+            Ask Darky about recent orders,
+            order totals, customer names,
+            tables or order details.
+        </p>
+
+    </div>
+
+
+    <button
+        class="quick-card"
+        onclick="askQuick('Show me the latest orders.')"
+    >
+        🧾 &nbsp;
+        Show latest orders
+    </button>
+
+</section>
+
+
+<!-- ==========================================================
+     REPORTS
+========================================================== -->
+
+<section
+    id="reportsPage"
+    class="page secondary-page"
+>
+
+    <div class="page-heading">
+
+        <h2>
+            Reports
+        </h2>
+
+        <p>
+            Business information through Darky
+        </p>
+
+    </div>
+
+
+    <div class="data-card">
+
+        <h3>
+            Today's Live Report
+        </h3>
+
+        <p>
+            The figures shown on the Home page
+            are connected to the same
+            chaat_orders sales data.
+        </p>
+
+    </div>
+
+
+    <button
+        class="quick-card"
+        onclick="askQuick('Give me a summary of today\'s restaurant activity.')"
+    >
+        📊 &nbsp;
+        Today's summary
+    </button>
+
+
+    <button
+        class="quick-card"
+        onclick="askQuick('Give me today\'s total sales, orders, items sold and average bill.')"
+    >
+        💰 &nbsp;
+        Today's sales report
+    </button>
+
+</section>
+
+
+<!-- ==========================================================
+     BOTTOM NAV
+========================================================== -->
+
+<nav class="bottom-nav">
+
+    <button
+        class="nav-btn active"
+        data-page="homePage"
+        onclick="openPage('homePage')"
+    >
+
+        <span class="nav-icon">
+            ⌂
+        </span>
+
+        Home
+
+    </button>
+
+
+    <button
+        class="nav-btn"
+        data-page="voicePage"
+        onclick="openPage('voicePage')"
+    >
+
+        <span class="nav-icon">
+            🎙
+        </span>
+
+        Voice
+
+    </button>
+
+
+    <button
+        class="nav-btn"
+        data-page="stockPage"
+        onclick="openPage('stockPage')"
+    >
+
+        <span class="nav-icon">
+            📦
+        </span>
+
+        Stock
+
+    </button>
+
+
+    <button
+        class="nav-btn"
+        data-page="ordersPage"
+        onclick="openPage('ordersPage')"
+    >
+
+        <span class="nav-icon">
+            🧾
+        </span>
+
+        Orders
+
+    </button>
+
+
+    <button
+        class="nav-btn"
+        data-page="reportsPage"
+        onclick="openPage('reportsPage')"
+    >
+
+        <span class="nav-icon">
+            ▥
+        </span>
+
+        Reports
+
+    </button>
+
+</nav>
+
+
+</div>
+
+
+<script>
+
+/* ============================================================
+   DARKY AI PASSWORD PROTECTION
+============================================================ */
+
+const DARKY_PASSWORD = "1129";
+
+
+/* ============================================================
+   UNLOCK DASHBOARD
+============================================================ */
+
+function unlockDashboard(){
+
+    const passwordInput =
+        document.getElementById(
+            "dashboardPassword"
+        );
+
+    const errorBox =
+        document.getElementById(
+            "passwordError"
+        );
+
+    const passwordLock =
+        document.getElementById(
+            "passwordLock"
+        );
+
+    const unlockAnimation =
+        document.getElementById(
+            "darkyUnlockAnimation"
+        );
+
+    const enteredPassword =
+        passwordInput.value.trim();
+
+
+    if(
+        enteredPassword ===
+        DARKY_PASSWORD
+    ){
+
+        sessionStorage.setItem(
+            "darkyDashboardUnlocked",
+            "true"
+        );
+
+
+        errorBox.textContent = "";
+
+        passwordInput.blur();
+
+
+        /* ------------------------------------------
+           START DARKY UNLOCK ANIMATION
+        ------------------------------------------ */
+
+        unlockAnimation.classList.remove(
+            "active"
+        );
+
+        /*
+         * Force browser reflow so the animation
+         * restarts every time.
+         */
+
+        void unlockAnimation.offsetWidth;
+
+
+        unlockAnimation.classList.add(
+            "active"
+        );
+
+
+        /* ------------------------------------------
+           FADE PASSWORD SCREEN
+        ------------------------------------------ */
+
+        passwordLock.style.transition =
+            "opacity .45s ease";
+
+        passwordLock.style.opacity =
+            "0";
+
+
+        setTimeout(
+            function(){
+
+                passwordLock.style.display =
+                    "none";
+
+                passwordLock.style.opacity =
+                    "1";
+
+                passwordInput.value = "";
+
+            },
+            450
+        );
+
+
+        /* ------------------------------------------
+           DIRECT TO HOME PAGE
+        ------------------------------------------ */
+
+        openPage(
+            "homePage"
+        );
+
+
+        /* ------------------------------------------
+           END ANIMATION
+        ------------------------------------------ */
+
+        setTimeout(
+            function(){
+
+                unlockAnimation.classList.remove(
+                    "active"
+                );
+
+            },
+            2400
+        );
+
+    }
+    else{
+
+        errorBox.textContent =
+            "Incorrect password.";
+
+        passwordInput.value = "";
+
+        passwordInput.focus();
+
+    }
+
+}
+
+
+/* ============================================================
+   DARKY AI LOGOUT
+============================================================ */
+
+function logoutDashboard(){
+
+    sessionStorage.removeItem(
+        "darkyDashboardUnlocked"
+    );
+
+
+    const passwordLock =
+        document.getElementById(
+            "passwordLock"
+        );
+
+    const passwordInput =
+        document.getElementById(
+            "dashboardPassword"
+        );
+
+    const passwordError =
+        document.getElementById(
+            "passwordError"
+        );
+
+    const unlockAnimation =
+        document.getElementById(
+            "darkyUnlockAnimation"
+        );
+
+
+    if(unlockAnimation){
+
+        unlockAnimation.classList.remove(
+            "active"
+        );
+
+    }
+
+
+    if(passwordError){
+
+        passwordError.textContent = "";
+
+    }
+
+
+    if(passwordInput){
+
+        passwordInput.value = "";
+
+        passwordInput.disabled = false;
+
+    }
+
+
+    if(passwordLock){
+
+        passwordLock.style.display =
+            "flex";
+
+        passwordLock.style.opacity =
+            "1";
+
+    }
+
+
+    openPage(
+        "homePage"
+    );
+
+
+    setTimeout(
+        function(){
+
+            if(passwordInput){
+
+                passwordInput.focus();
+
+            }
+
+        },
+        150
+    );
+
+}
+
+
+/* ============================================================
+   CHECK DASHBOARD ACCESS
+============================================================ */
+
+(function(){
+
+    const passwordLock =
+        document.getElementById(
+            "passwordLock"
+        );
+
+    const passwordInput =
+        document.getElementById(
+            "dashboardPassword"
+        );
+
+    const unlocked =
+        sessionStorage.getItem(
+            "darkyDashboardUnlocked"
+        );
+
+
+    if(
+        unlocked === "true"
+    ){
+
+        passwordLock.style.display =
+            "none";
+
+    }
+    else{
+
+        passwordLock.style.display =
+            "flex";
+
+        setTimeout(
+            function(){
+
+                passwordInput.focus();
+
+            },
+            100
+        );
+
+    }
+
+})();
+
+
+/* ============================================================
+   PASSWORD ENTER KEY
+============================================================ */
+
+document
+    .getElementById(
+        "dashboardPassword"
+    )
+    .addEventListener(
+        "keydown",
+        function(event){
+
+            if(
+                event.key ===
+                "Enter"
+            ){
+
+                event.preventDefault();
+
+                unlockDashboard();
+
+            }
+
+        }
+    );
+
+
+/* ============================================================
+   SUPABASE
+============================================================ */
+
+const SUPABASE_URL =
+    "https://ucqeyhcycwksiubmlilg.supabase.co";
+
+const SUPABASE_KEY =
+    "sb_publishable_YdIvl7IqdpT0UZOHBumEiw_ZThYEsgV";
+
+const SUPABASE_FUNCTION_URL =
+    "https://ucqeyhcycwksiubmlilg.supabase.co/functions/v1/restaurant-ai";
+
+
+const supabaseClient =
+    supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+    );
+
+
+/* ============================================================
+   ELEMENTS
+============================================================ */
+
+const askInput =
+    document.getElementById(
+        "askInput"
+    );
+
+const connectionStatus =
+    document.getElementById(
+        "connectionStatus"
+    );
+
+const chatMessages =
+    document.getElementById(
+        "chatMessages"
+    );
+
+const homeOrb =
+    document.getElementById(
+        "homeOrb"
+    );
+
+const homeMicButton =
+    document.getElementById(
+        "homeMicButton"
+    );
+
+const liveStatus =
+    document.getElementById(
+        "liveStatus"
+    );
+
+const lowAlertItems =
+    document.getElementById(
+        "lowAlertItems"
+    );
+
+const lowAlertCount =
+    document.getElementById(
+        "lowAlertCount"
+    );
+
+
+/* ============================================================
+   PAGE NAVIGATION
+============================================================ */
+
+function openPage(pageId){
+
+    document
+        .querySelectorAll(".page")
+        .forEach(
+            page =>
+                page.classList.remove(
+                    "active"
+                )
+        );
+
+
+    const target =
+        document.getElementById(
+            pageId
+        );
+
+
+    if(target){
+
+        target.classList.add(
+            "active"
+        );
+
+    }
+
+
+    document
+        .querySelectorAll(".nav-btn")
+        .forEach(
+            button => {
+
+                button.classList.remove(
+                    "active"
+                );
+
+
+                if(
+                    button.dataset.page ===
+                    pageId
+                ){
+
+                    button.classList.add(
+                        "active"
+                    );
+
+                }
+
+            }
+        );
+
+
+    window.scrollTo({
+        top:0,
+        behavior:"smooth"
+    });
+
+}
+
+
+/* ============================================================
+   CHAT MESSAGE
+============================================================ */
+
+function addChatMessage(
+    sender,
+    message,
+    typing = false
+){
+
+    const row =
+        document.createElement(
+            "div"
+        );
+
+
+    row.className =
+        "chat-row " +
+        (
+            sender === "user"
+            ? "user"
+            : "darky"
+        );
+
+
+    const bubble =
+        document.createElement(
+            "div"
+        );
+
+
+    bubble.className =
+        "chat-bubble " +
+        (
+            sender === "user"
+            ? "user-bubble"
+            : "darky-bubble"
+        );
+
+
+    const name =
+        document.createElement(
+            "div"
+        );
+
+
+    name.className =
+        "chat-name " +
+        (
+            sender === "user"
+            ? "user-name"
+            : ""
+        );
+
+
+    name.textContent =
+        sender === "user"
+        ? "You"
+        : "Darky AI";
+
+
+    const content =
+        document.createElement(
+            "div"
+        );
+
+
+    if(typing){
+
+        content.innerHTML = `
+
+            <div class="typing">
+
+                <span></span>
+                <span></span>
+                <span></span>
+
+            </div>
+
+        `;
+
+    }
+    else{
+
+        content.textContent =
+            message;
+
+    }
+
+
+    bubble.appendChild(
+        name
+    );
+
+    bubble.appendChild(
+        content
+    );
+
+    row.appendChild(
+        bubble
+    );
+
+    chatMessages.appendChild(
+        row
+    );
+
+
+    scrollChatToBottom();
+
+
+    return {
+        row,
+        bubble,
+        content
+    };
+
+}
+
+
+/* ============================================================
+   CHAT SCROLL
+============================================================ */
+
+function scrollChatToBottom(){
+
+    setTimeout(
+        () => {
+
+            const lastMessage =
+                chatMessages.lastElementChild;
+
+
+            if(lastMessage){
+
+                lastMessage.scrollIntoView({
+                    behavior:"smooth",
+                    block:"nearest"
+                });
+
+            }
+
+        },
+        50
+    );
+
+}
+
+
+/* ============================================================
+   HOME QUESTION
+============================================================ */
+
+function sendHomeQuestion(){
+
+    const message =
+        askInput.value.trim();
+
+
+    if(!message){
+
+        return;
+
+    }
+
+
+    askInput.value = "";
+
+
+    addChatMessage(
+        "user",
+        message
+    );
+
+
+    sendMessageToAI(
+        message
+    );
+
+}
+
+
+/* ============================================================
+   ENTER KEY
+============================================================ */
+
+askInput.addEventListener(
+    "keydown",
+    function(event){
+
+        if(
+            event.key ===
+            "Enter"
+        ){
+
+            event.preventDefault();
+
+            sendHomeQuestion();
+
+        }
+
+    }
+);
+
+
+/* ============================================================
+   QUICK QUESTIONS
+============================================================ */
+
+function askQuick(message){
+
+    openPage(
+        "homePage"
+    );
+
+
+    addChatMessage(
+        "user",
+        message
+    );
+
+
+    sendMessageToAI(
+        message
+    );
+
+}
+
+
+/* ============================================================
+   SEND MESSAGE TO DARKY
+============================================================ */
+
+async function sendMessageToAI(
+    message
+){
+
+    const darkyMessage =
+        addChatMessage(
+            "darky",
+            "",
+            true
+        );
+
+
+    connectionStatus.textContent =
+        "● THINKING";
+
+
+    try{
+
+        const response =
+            await fetch(
+                SUPABASE_FUNCTION_URL,
+                {
+
+                    method:"POST",
+
+                    headers:{
+
+                        "Content-Type":
+                            "application/json",
+
+                        "Authorization":
+                            "Bearer " +
+                            SUPABASE_KEY
+
+                    },
+
+                    body:
+                        JSON.stringify({
+
+                            message:
+                                message
+
+                        })
+
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        console.log(
+            "Darky response:",
+            data
+        );
+
+
+        if(!response.ok){
+
+            throw new Error(
+                data.error ||
+                "Request failed"
+            );
+
+        }
+
+
+        const answer =
+            data.reply ||
+            data.answer ||
+            "I couldn't get a response right now.";
+
+
+        darkyMessage.content.textContent =
+            answer;
+
+
+        connectionStatus.textContent =
+            "● READY";
+
+
+        scrollChatToBottom();
+
+
+        speakReply(
+            answer
+        );
+
+    }
+    catch(error){
+
+        console.error(
+            "Darky connection error:",
+            error
+        );
+
+
+        darkyMessage.content.textContent =
+            "I'm having trouble connecting right now. Please try again.";
+
+
+        connectionStatus.textContent =
+            "● CONNECTION ERROR";
+
+
+        scrollChatToBottom();
+
+    }
+
+}
+
+
+/* ============================================================
+   DATE
+============================================================ */
+
+function localDateString(
+    date
+){
+
+    const year =
+        date.getFullYear();
+
+    const month =
+        String(
+            date.getMonth()+1
+        ).padStart(
+            2,
+            "0"
+        );
+
+    const day =
+        String(
+            date.getDate()
+        ).padStart(
+            2,
+            "0"
+        );
+
+
+    return (
+        year +
+        "-" +
+        month +
+        "-" +
+        day
+    );
+
+}
+
+
+/* ============================================================
+   LIVE SALES
+============================================================ */
+
+async function loadLiveSales(){
+
+    const errorBox =
+        document.getElementById(
+            "salesError"
+        );
+
+
+    try{
+
+        errorBox.style.display =
+            "none";
+
+
+        setLiveStatus(
+            "syncing",
+            "SYNCING"
+        );
+
+
+        const today =
+            localDateString(
+                new Date()
+            );
+
+
+        const startDate =
+            new Date(
+                today +
+                "T00:00:00"
+            );
+
+
+        const start =
+            startDate.toISOString();
+
+
+        const endDate =
+            new Date(
+                today +
+                "T00:00:00"
+            );
+
+
+        endDate.setDate(
+            endDate.getDate()+1
+        );
+
+
+        const end =
+            endDate.toISOString();
+
+
+        const result =
+            await supabaseClient
+
+                .from(
+                    "chaat_orders"
+                )
+
+                .select("*")
+
+                .gte(
+                    "created_at",
+                    start
+                )
+
+                .lt(
+                    "created_at",
+                    end
+                );
+
+
+        const data =
+            result.data;
+
+        const error =
+            result.error;
+
+
+        if(error){
+
+            console.error(
+                "Live sales Supabase error:",
+                error
+            );
+
+
+            errorBox.textContent =
+                "Sales connection error: " +
+                error.message;
+
+
+            errorBox.style.display =
+                "block";
+
+
+            setLiveStatus(
+                "offline",
+                "OFFLINE"
+            );
+
+
+            return;
+
+        }
+
+
+        calculateLiveSales(
+            data || []
+        );
+
+
+        setLiveStatus(
+            "online",
+            "LIVE"
+        );
+
+
+    }
+    catch(error){
+
+        console.error(
+            "Live sales error:",
+            error
+        );
+
+
+        errorBox.textContent =
+            "Unable to load live sales data.";
+
+
+        errorBox.style.display =
+            "block";
+
+
+        setLiveStatus(
+            "offline",
+            "OFFLINE"
+        );
+
+    }
+
+}
+
+
+/* ============================================================
+   LIVE STATUS
+============================================================ */
+
+function setLiveStatus(
+    state,
+    label
+){
+
+    if(!liveStatus){
+
+        return;
+
+    }
+
+
+    liveStatus.classList.remove(
+        "offline",
+        "syncing"
+    );
+
+
+    if(state === "offline"){
+
+        liveStatus.classList.add(
+            "offline"
+        );
+
+    }
+
+
+    if(state === "syncing"){
+
+        liveStatus.classList.add(
+            "syncing"
+        );
+
+    }
+
+
+    liveStatus.innerHTML = `
+
+        <span class="live-dot"></span>
+
+        ${label}
+
+    `;
+
+}
+
+
+/* ============================================================
+   CALCULATE LIVE SALES
+============================================================ */
+
+function calculateLiveSales(
+    orders
+){
+
+    let totalSales = 0;
+
+    let totalItems = 0;
+
+    let cash = 0;
+
+    let upi = 0;
+
+    let card = 0;
+
+
+    orders.forEach(
+        order => {
+
+            const total =
+                Number(
+                    order.total || 0
+                );
+
+
+            totalSales +=
+                total;
+
+
+            const payment =
+                String(
+                    order.payment_method ||
+                    ""
+                )
+                .trim()
+                .toLowerCase();
+
+
+            if(
+                payment === "cash"
+            ){
+
+                cash += total;
+
+            }
+
+
+            if(
+                payment === "upi"
+            ){
+
+                upi += total;
+
+            }
+
+
+            if(
+                payment === "card"
+            ){
+
+                card += total;
+
+            }
+
+
+            if(
+                Array.isArray(
+                    order.items
+                )
+            ){
+
+                order.items.forEach(
+                    item => {
+
+                        totalItems +=
+                            Number(
+                                item.qty || 0
+                            );
+
+                    }
+                );
+
+            }
+
+        }
+    );
+
+
+    const averageBill =
+        orders.length > 0
+        ? totalSales / orders.length
+        : 0;
+
+
+    document.getElementById(
+        "liveTotalSales"
+    ).textContent =
+        "₹" +
+        formatMoney(
+            totalSales
+        );
+
+
+    document.getElementById(
+        "liveTotalOrders"
+    ).textContent =
+        orders.length;
+
+
+    document.getElementById(
+        "liveTotalItems"
+    ).textContent =
+        totalItems;
+
+
+    document.getElementById(
+        "liveAverageBill"
+    ).textContent =
+        "₹" +
+        formatMoney(
+            averageBill
+        );
+
+
+    document.getElementById(
+        "liveCash"
+    ).textContent =
+        "₹" +
+        formatMoney(
+            cash
+        );
+
+
+    document.getElementById(
+        "liveUPI"
+    ).textContent =
+        "₹" +
+        formatMoney(
+            upi
+        );
+
+
+    document.getElementById(
+        "liveCard"
+    ).textContent =
+        "₹" +
+        formatMoney(
+            card
+        );
+
+}
+
+
+/* ============================================================
+   MONEY
+============================================================ */
+
+function formatMoney(
+    number
+){
+
+    return Number(
+        number || 0
+    )
+    .toFixed(2)
+    .replace(
+        /\.00$/,
+        ""
+    );
+
+}
+
+
+/* ============================================================
+   SALES REALTIME
+============================================================ */
+
+let salesRealtimeChannel = null;
+
+let salesRefreshTimer = null;
+
+
+function scheduleLiveSalesRefresh(){
+
+    clearTimeout(
+        salesRefreshTimer
+    );
+
+
+    salesRefreshTimer =
+        setTimeout(
+            function(){
+
+                loadLiveSales();
+
+            },
+            150
+        );
+
+}
+
+
+function subscribeToLiveSales(){
+
+    if(salesRealtimeChannel){
+
+        try{
+
+            supabaseClient.removeChannel(
+                salesRealtimeChannel
+            );
+
+        }
+        catch(error){
+
+            console.warn(
+                "Could not remove old sales channel:",
+                error
+            );
+
+        }
+
+        salesRealtimeChannel =
+            null;
+
+    }
+
+
+    setLiveStatus(
+        "syncing",
+        "CONNECTING"
+    );
+
+
+    salesRealtimeChannel =
+        supabaseClient
+
+            .channel(
+                "darky-live-sales"
+            )
+
+            .on(
+                "postgres_changes",
+                {
+                    event:"INSERT",
+                    schema:"public",
+                    table:"chaat_orders"
+                },
+                function(payload){
+
+                    console.log(
+                        "LIVE ORDER INSERT:",
+                        payload
+                    );
+
+                    scheduleLiveSalesRefresh();
+
+                }
+            )
+
+            .on(
+                "postgres_changes",
+                {
+                    event:"UPDATE",
+                    schema:"public",
+                    table:"chaat_orders"
+                },
+                function(payload){
+
+                    console.log(
+                        "LIVE ORDER UPDATE:",
+                        payload
+                    );
+
+                    scheduleLiveSalesRefresh();
+
+                }
+            )
+
+            .on(
+                "postgres_changes",
+                {
+                    event:"DELETE",
+                    schema:"public",
+                    table:"chaat_orders"
+                },
+                function(payload){
+
+                    console.log(
+                        "LIVE ORDER DELETE:",
+                        payload
+                    );
+
+                    scheduleLiveSalesRefresh();
+
+                }
+            )
+
+            .subscribe(
+                function(status){
+
+                    console.log(
+                        "Darky sales realtime status:",
+                        status
+                    );
+
+
+                    if(
+                        status === "SUBSCRIBED"
+                    ){
+
+                        setLiveStatus(
+                            "online",
+                            "LIVE"
+                        );
+
+                        scheduleLiveSalesRefresh();
+
+                    }
+
+
+                    if(
+                        status === "CHANNEL_ERROR"
+                    ){
+
+                        setLiveStatus(
+                            "offline",
+                            "OFFLINE"
+                        );
+
+
+                        const errorBox =
+                            document.getElementById(
+                                "salesError"
+                            );
+
+
+                        errorBox.textContent =
+                            "Live sales realtime connection failed. Make sure chaat_orders is enabled for Supabase Realtime.";
+
+
+                        errorBox.style.display =
+                            "block";
+
+                    }
+
+
+                    if(
+                        status === "TIMED_OUT"
+                    ){
+
+                        setLiveStatus(
+                            "offline",
+                            "OFFLINE"
+                        );
+
+                    }
+
+
+                    if(
+                        status === "CLOSED"
+                    ){
+
+                        setLiveStatus(
+                            "offline",
+                            "OFFLINE"
+                        );
+
+                    }
+
+                }
+            );
+
+}
+
+
+loadLiveSales();
+
+subscribeToLiveSales();
+
+
+/* ============================================================
+   LOW ALERT INVENTORY
+============================================================ */
+
+let inventoryRealtimeChannel = null;
+
+let inventoryRefreshTimer = null;
+
+
+function formatInventoryNumber(
+    value
+){
+
+    const number =
+        Number(
+            value || 0
+        );
+
+
+    if(
+        Number.isInteger(
+            number
+        )
+    ){
+
+        return String(
+            number
+        );
+
+    }
+
+
+    return number
+        .toFixed(2)
+        .replace(
+            /0+$/,
+            ""
+        )
+        .replace(
+            /\.$/,
+            ""
+        );
+
+}
+
+
+function escapeHtml(
+    value
+){
+
+    return String(
+        value ?? ""
+    )
+    .replace(
+        /&/g,
+        "&amp;"
+    )
+    .replace(
+        /</g,
+        "&lt;"
+    )
+    .replace(
+        />/g,
+        "&gt;"
+    )
+    .replace(
+        /"/g,
+        "&quot;"
+    )
+    .replace(
+        /'/g,
+        "&#039;"
+    );
+
+}
+
+
+async function loadLowAlertInventory(){
+
+    if(!lowAlertItems){
+
+        return;
+
+    }
+
+
+    lowAlertItems.innerHTML = `
+
+        <div class="low-alert-loading">
+            Syncing inventory...
+        </div>
+
+    `;
+
+
+    try{
+
+        const result =
+            await supabaseClient
+
+                .from(
+                    "inventory_items"
+                )
+
+                .select(
+                    "*"
+                )
+
+                .order(
+                    "name",
+                    {
+                        ascending:true
+                    }
+                );
+
+
+        const data =
+            result.data;
+
+        const error =
+            result.error;
+
+
+        if(error){
+
+            console.error(
+                "DARKY INVENTORY SUPABASE ERROR:",
+                error
+            );
+
+
+            if(lowAlertCount){
+
+                lowAlertCount.textContent =
+                    "!";
+
+            }
+
+
+            lowAlertItems.innerHTML = `
+
+                <div class="low-alert-error">
+
+                    <strong>
+                        Unable to load inventory.
+                    </strong>
+
+                    <br>
+
+                    ${escapeHtml(
+                        error.message ||
+                        "Unknown Supabase error"
+                    )}
+
+                </div>
+
+            `;
+
+
+            return;
+
+        }
+
+
+        const items =
+            (data || [])
+                .map(
+                    item => ({
+
+                        id:
+                            item.id,
+
+                        name:
+                            item.name ||
+                            "Unnamed item",
+
+                        unit:
+                            item.unit ||
+                            "",
+
+                        stock:
+                            Number(
+                                item.current_stock || 0
+                            ),
+
+                        alert:
+                            Number(
+                                item.alert_level || 0
+                            )
+
+                    })
+                )
+                .filter(
+                    item =>
+                        item.stock <=
+                        item.alert
+                )
+                .sort(
+                    (a,b) =>
+                        a.stock -
+                        b.stock
+                );
+
+
+        if(lowAlertCount){
+
+            lowAlertCount.textContent =
+                items.length;
+
+        }
+
+
+        if(!items.length){
+
+            lowAlertItems.innerHTML = `
+
+                <div class="low-alert-empty">
+
+                    ✓ All inventory items are above their alert level
+
+                </div>
+
+            `;
+
+
+            return;
+
+        }
+
+
+        lowAlertItems.innerHTML =
+            items
+                .map(
+                    item => {
+
+                        const stock =
+                            Number(
+                                item.stock
+                            );
+
+                        const alert =
+                            Number(
+                                item.alert
+                            );
+
+                        const unit =
+                            escapeHtml(
+                                item.unit
+                            );
+
+                        const name =
+                            escapeHtml(
+                                item.name
+                            );
+
+
+                        const isOut =
+                            stock <= 0;
+
+
+                        return `
+
+                            <div
+                                class="low-alert-item ${isOut ? "out" : ""}"
+                            >
+
+                                <span
+                                    class="low-alert-item-name"
+                                    title="${name}"
+                                >
+                                    ${name}
+                                </span>
+
+
+                                <span
+                                    class="low-alert-item-stock"
+                                >
+
+                                    ${
+                                        isOut
+
+                                        ? "OUT OF STOCK"
+
+                                        : formatInventoryNumber(
+                                            stock
+                                        )
+                                        +
+                                        " / "
+                                        +
+                                        formatInventoryNumber(
+                                            alert
+                                        )
+                                        +
+                                        (
+                                            unit
+                                            ? " " + unit
+                                            : ""
+                                        )
+                                    }
+
+                                </span>
+
+                            </div>
+
+                        `;
+
+                    }
+                )
+                .join("");
+
+
+    }
+    catch(error){
+
+        console.error(
+            "DARKY INVENTORY EXCEPTION:",
+            error
+        );
+
+
+        if(lowAlertCount){
+
+            lowAlertCount.textContent =
+                "!";
+
+        }
+
+
+        lowAlertItems.innerHTML = `
+
+            <div class="low-alert-error">
+
+                <strong>
+                    Unable to load inventory.
+                </strong>
+
+                <br>
+
+                ${escapeHtml(
+                    error.message ||
+                    String(error)
+                )}
+
+            </div>
+
+        `;
+
+    }
+
+}
+
+
+function scheduleLowAlertRefresh(){
+
+    clearTimeout(
+        inventoryRefreshTimer
+    );
+
+
+    inventoryRefreshTimer =
+        setTimeout(
+            function(){
+
+                loadLowAlertInventory();
+
+            },
+            150
+        );
+
+}
+
+
+function subscribeToInventory(){
+
+    if(inventoryRealtimeChannel){
+
+        try{
+
+            supabaseClient.removeChannel(
+                inventoryRealtimeChannel
+            );
+
+        }
+        catch(error){
+
+            console.warn(
+                "Could not remove old inventory channel:",
+                error
+            );
+
+        }
+
+        inventoryRealtimeChannel =
+            null;
+
+    }
+
+
+    inventoryRealtimeChannel =
+        supabaseClient
+
+            .channel(
+                "darky-low-alert-inventory"
+            )
+
+            .on(
+                "postgres_changes",
+                {
+                    event:"INSERT",
+                    schema:"public",
+                    table:"inventory_items"
+                },
+                function(payload){
+
+                    console.log(
+                        "DARKY INVENTORY INSERT:",
+                        payload
+                    );
+
+                    scheduleLowAlertRefresh();
+
+                }
+            )
+
+            .on(
+                "postgres_changes",
+                {
+                    event:"UPDATE",
+                    schema:"public",
+                    table:"inventory_items"
+                },
+                function(payload){
+
+                    console.log(
+                        "DARKY INVENTORY UPDATE:",
+                        payload
+                    );
+
+                    scheduleLowAlertRefresh();
+
+                }
+            )
+
+            .on(
+                "postgres_changes",
+                {
+                    event:"DELETE",
+                    schema:"public",
+                    table:"inventory_items"
+                },
+                function(payload){
+
+                    console.log(
+                        "DARKY INVENTORY DELETE:",
+                        payload
+                    );
+
+                    scheduleLowAlertRefresh();
+
+                }
+            )
+
+            .subscribe(
+                function(status){
+
+                    console.log(
+                        "Darky inventory realtime status:",
+                        status
+                    );
+
+
+                    if(
+                        status === "SUBSCRIBED"
+                    ){
+
+                        loadLowAlertInventory();
+
+                    }
+
+                }
+            );
+
+}
+
+
+loadLowAlertInventory();
+
+subscribeToInventory();
+
+
+/* ============================================================
+   VOICE
+============================================================ */
+
+const SpeechRecognition =
+    window.SpeechRecognition ||
+    window.webkitSpeechRecognition;
+
+
+let recognition = null;
+
+let listening = false;
+
+
+const voiceOrb =
+    document.getElementById(
+        "voiceOrb"
+    );
+
+const voiceStatus =
+    document.getElementById(
+        "voiceStatus"
+    );
+
+const voiceHint =
+    document.getElementById(
+        "voiceHint"
+    );
+
+const voiceTranscript =
+    document.getElementById(
+        "voiceTranscript"
+    );
+
+
+if(SpeechRecognition){
+
+    recognition =
+        new SpeechRecognition();
+
+
+    recognition.lang =
+        "en-IN";
+
+
+    recognition.continuous =
+        false;
+
+
+    recognition.interimResults =
+        false;
+
+
+    recognition.onstart =
+        function(){
+
+            listening = true;
+
+
+            homeOrb.classList.remove(
+                "home-thinking",
+                "home-speaking"
+            );
+
+
+            homeOrb.classList.add(
+                "home-listening"
+            );
+
+
+            homeMicButton.classList.add(
+                "mic-active"
+            );
+
+
+            connectionStatus.textContent =
+                "● LISTENING";
+
+
+            voiceStatus.textContent =
+                "Listening...";
+
+
+            voiceHint.textContent =
+                "Speak naturally";
+
+
+            voiceTranscript.textContent =
+                "Listening for your command...";
+
+        };
+
+
+    recognition.onresult =
+        async function(event){
+
+            const transcript =
+                event
+                    .results[0][0]
+                    .transcript;
+
+
+            homeOrb.classList.remove(
+                "home-listening"
+            );
+
+
+            homeOrb.classList.add(
+                "home-thinking"
+            );
+
+
+            homeMicButton.classList.remove(
+                "mic-active"
+            );
+
+
+            voiceTranscript.textContent =
+                transcript;
+
+
+            voiceStatus.textContent =
+                "Thinking...";
+
+
+            voiceHint.textContent =
+                "Darky is processing your command";
+
+
+            connectionStatus.textContent =
+                "● THINKING";
+
+
+            await sendVoiceMessage(
+                transcript
+            );
+
+        };
+
+
+    recognition.onerror =
+        function(event){
+
+            console.error(
+                "Speech recognition:",
+                event.error
+            );
+
+
+            listening = false;
+
+
+            homeOrb.classList.remove(
+                "home-listening",
+                "home-thinking",
+                "home-speaking"
+            );
+
+
+            homeMicButton.classList.remove(
+                "mic-active"
+            );
+
+
+            connectionStatus.textContent =
+                "● READY";
+
+
+            voiceStatus.textContent =
+                "Voice error";
+
+
+            voiceHint.textContent =
+                "Please try again";
+
+        };
+
+
+    recognition.onend =
+        function(){
+
+            listening = false;
+
+
+            homeMicButton.classList.remove(
+                "mic-active"
+            );
+
+        };
+
+}
+
+
+/* ============================================================
+   HOME MICROPHONE
+============================================================ */
+
+function openVoice(){
+
+    if(!recognition){
+
+        connectionStatus.textContent =
+            "● VOICE NOT SUPPORTED";
+
+        return;
+
+    }
+
+
+    if(listening){
+
+        recognition.stop();
+
+        return;
+
+    }
+
+
+    const greeting =
+        "Hey boss... I'm listening. Tell me what you need.";
+
+
+    homeOrb.classList.remove(
+        "home-listening",
+        "home-thinking"
+    );
+
+
+    homeOrb.classList.add(
+        "home-speaking"
+    );
+
+
+    homeMicButton.classList.add(
+        "mic-active"
+    );
+
+
+    connectionStatus.textContent =
+        "● SPEAKING";
+
+
+    speakVoiceGreeting(
+        greeting
+    );
+
+}
+
+
+/* ============================================================
+   DARKY VOICE GREETING
+============================================================ */
+
+function speakVoiceGreeting(
+    text
+){
+
+    if(
+        !("speechSynthesis" in window)
+    ){
+
+        startListeningAfterGreeting();
+
+        return;
+
+    }
+
+
+    speechSynthesis.cancel();
+
+
+    const utterance =
+        new SpeechSynthesisUtterance(
+            text
+        );
+
+
+    configureDarkyVoice(
+        utterance
+    );
+
+
+    utterance.onstart =
+        function(){
+
+            homeOrb.classList.remove(
+                "home-listening",
+                "home-thinking"
+            );
+
+
+            homeOrb.classList.add(
+                "home-speaking"
+            );
+
+
+            homeMicButton.classList.add(
+                "mic-active"
+            );
+
+        };
+
+
+    utterance.onend =
+        function(){
+
+            startListeningAfterGreeting();
+
+        };
+
+
+    utterance.onerror =
+        function(){
+
+            startListeningAfterGreeting();
+
+        };
+
+
+    speechSynthesis.speak(
+        utterance
+    );
+
+}
+
+
+/* ============================================================
+   START LISTENING AFTER GREETING
+============================================================ */
+
+function startListeningAfterGreeting(){
+
+    if(!recognition){
+
+        return;
+
+    }
+
+
+    homeOrb.classList.remove(
+        "home-speaking",
+        "home-thinking"
+    );
+
+
+    homeOrb.classList.add(
+        "home-listening"
+    );
+
+
+    connectionStatus.textContent =
+        "● LISTENING";
+
+
+    try{
+
+        recognition.start();
+
+    }
+    catch(error){
+
+        console.error(
+            "Voice start error:",
+            error
+        );
+
+    }
+
+}
+
+
+/* ============================================================
+   VOICE PAGE
+============================================================ */
+
+function startVoiceCommand(){
+
+    if(!recognition){
+
+        voiceStatus.textContent =
+            "Voice not supported";
+
+
+        voiceHint.textContent =
+            "Please use Chrome or Edge";
+
+
+        return;
+
+    }
+
+
+    if(listening){
+
+        recognition.stop();
+
+        return;
+
+    }
+
+
+    try{
+
+        recognition.start();
+
+    }
+    catch(error){
+
+        console.error(
+            error
+        );
+
+    }
+
+}
+
+
+/* ============================================================
+   VOICE → DARKY
+============================================================ */
+
+async function sendVoiceMessage(
+    message
+){
+
+    connectionStatus.textContent =
+        "● THINKING";
+
+
+    try{
+
+        const response =
+            await fetch(
+                SUPABASE_FUNCTION_URL,
+                {
+
+                    method:"POST",
+
+                    headers:{
+
+                        "Content-Type":
+                            "application/json",
+
+                        "Authorization":
+                            "Bearer " +
+                            SUPABASE_KEY
+
+                    },
+
+                    body:
+                        JSON.stringify({
+
+                            message:
+                                message
+
+                        })
+
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        console.log(
+            "Darky voice response:",
+            data
+        );
+
+
+        if(!response.ok){
+
+            throw new Error(
+                data.error ||
+                "Voice request failed"
+            );
+
+        }
+
+
+        const answer =
+            data.reply ||
+            data.answer ||
+            "I couldn't process that command.";
+
+
+        homeOrb.classList.remove(
+            "home-thinking",
+            "home-listening"
+        );
+
+
+        homeOrb.classList.add(
+            "home-speaking"
+        );
+
+
+        voiceStatus.textContent =
+            "Darky";
+
+
+        voiceHint.textContent =
+            "Speaking...";
+
+
+        voiceTranscript.textContent =
+            "You: " +
+            message +
+            "\n\nDarky: " +
+            answer;
+
+
+        connectionStatus.textContent =
+            "● SPEAKING";
+
+
+        addChatMessage(
+            "user",
+            message
+        );
+
+
+        addChatMessage(
+            "darky",
+            answer
+        );
+
+
+        speakReply(
+            answer,
+            true
+        );
+
+    }
+    catch(error){
+
+        console.error(
+            "Darky voice connection error:",
+            error
+        );
+
+
+        homeOrb.classList.remove(
+            "home-listening",
+            "home-thinking",
+            "home-speaking"
+        );
+
+
+        homeMicButton.classList.remove(
+            "mic-active"
+        );
+
+
+        voiceStatus.textContent =
+            "Connection error";
+
+
+        voiceHint.textContent =
+            "Please try again";
+
+
+        connectionStatus.textContent =
+            "● CONNECTION ERROR";
+
+    }
+
+}
+
+
+/* ============================================================
+   CONFIGURE DARKY VOICE
+============================================================ */
+
+function configureDarkyVoice(
+    utterance
+){
+
+    utterance.lang =
+        "en-IN";
+
+
+    utterance.rate =
+        0.78;
+
+
+    utterance.pitch =
+        0.48;
+
+
+    utterance.volume =
+        1;
+
+
+    const voices =
+        speechSynthesis.getVoices();
+
+
+    const preferredVoice =
+        voices.find(
+            voice =>
+                /en-IN/i.test(
+                    voice.lang
+                )
+                &&
+                /male|man|david|daniel|george|rishi|microsoft.*male|google.*male/i.test(
+                    voice.name
+                )
+        )
+        ||
+        voices.find(
+            voice =>
+                /en-GB/i.test(
+                    voice.lang
+                )
+                &&
+                /male|man|david|daniel|george|microsoft.*male|google.*male/i.test(
+                    voice.name
+                )
+        )
+        ||
+        voices.find(
+            voice =>
+                /en-US/i.test(
+                    voice.lang
+                )
+                &&
+                /male|man|david|daniel|george|rishi|microsoft.*male|google.*male/i.test(
+                    voice.name
+                )
+        )
+        ||
+        voices.find(
+            voice =>
+                /en-IN/i.test(
+                    voice.lang
+                )
+        )
+        ||
+        voices.find(
+            voice =>
+                /^en/i.test(
+                    voice.lang
+                )
+        );
+
+
+    if(preferredVoice){
+
+        utterance.voice =
+            preferredVoice;
+
+
+        console.log(
+            "Darky voice:",
+            preferredVoice.name,
+            preferredVoice.lang
+        );
+
+    }
+
+}
+
+
+/* ============================================================
+   TEXT TO SPEECH
+============================================================ */
+
+function speakReply(
+    text,
+    voiceMode = false
+){
+
+    if(
+        !("speechSynthesis" in window)
+    ){
+
+        homeOrb.classList.remove(
+            "home-speaking",
+            "home-thinking",
+            "home-listening"
+        );
+
+        return;
+
+    }
+
+
+    speechSynthesis.cancel();
+
+
+    const utterance =
+        new SpeechSynthesisUtterance(
+            text
+        );
+
+
+    configureDarkyVoice(
+        utterance
+    );
+
+
+    if(voiceMode){
+
+        homeOrb.classList.remove(
+            "home-thinking",
+            "home-listening"
+        );
+
+
+        homeOrb.classList.add(
+            "home-speaking"
+        );
+
+
+        homeMicButton.classList.add(
+            "mic-active"
+        );
+
+
+        voiceOrb.classList.add(
+            "speaking"
+        );
+
+
+        voiceStatus.textContent =
+            "Darky is speaking";
+
+
+        voiceHint.textContent =
+            "Listen...";
+
+
+        connectionStatus.textContent =
+            "● SPEAKING";
+
+    }
+
+
+    utterance.onstart =
+        function(){
+
+            if(voiceMode){
+
+                homeOrb.classList.remove(
+                    "home-thinking",
+                    "home-listening"
+                );
+
+
+                homeOrb.classList.add(
+                    "home-speaking"
+                );
+
+
+                homeMicButton.classList.add(
+                    "mic-active"
+                );
+
+
+                voiceOrb.classList.add(
+                    "speaking"
+                );
+
+
+                voiceStatus.textContent =
+                    "Darky is speaking";
+
+
+                voiceHint.textContent =
+                    "Listen...";
+
+
+                connectionStatus.textContent =
+                    "● SPEAKING";
+
+            }
+
+        };
+
+
+    utterance.onend =
+        function(){
+
+            voiceOrb.classList.remove(
+                "speaking"
+            );
+
+
+            homeOrb.classList.remove(
+                "home-speaking",
+                "home-thinking",
+                "home-listening"
+            );
+
+
+            homeMicButton.classList.remove(
+                "mic-active"
+            );
+
+
+            if(voiceMode){
+
+                voiceStatus.textContent =
+                    "Ready to listen";
+
+
+                voiceHint.textContent =
+                    "Tap the microphone and speak";
+
+
+                connectionStatus.textContent =
+                    "● READY";
+
+            }
+
+        };
+
+
+    utterance.onerror =
+        function(error){
+
+            console.error(
+                "Darky TTS error:",
+                error
+            );
+
+
+            homeOrb.classList.remove(
+                "home-speaking",
+                "home-thinking",
+                "home-listening"
+            );
+
+
+            homeMicButton.classList.remove(
+                "mic-active"
+            );
+
+
+            voiceOrb.classList.remove(
+                "speaking"
+            );
+
+
+            if(voiceMode){
+
+                voiceStatus.textContent =
+                    "Ready to listen";
+
+
+                voiceHint.textContent =
+                    "Tap the microphone and speak";
+
+
+                connectionStatus.textContent =
+                    "● READY";
+
+            }
+
+        };
+
+
+    speechSynthesis.speak(
+        utterance
+    );
+
+}
+
+
+/* ============================================================
+   SPEECH VOICES LOADED
+============================================================ */
+
+if(
+    "speechSynthesis" in window
+){
+
+    speechSynthesis.onvoiceschanged =
+        function(){
+
+            const voices =
+                speechSynthesis.getVoices();
+
+
+            console.log(
+                "Available Darky voices:",
+                voices.map(
+                    voice =>
+                        voice.name +
+                        " (" +
+                        voice.lang +
+                        ")"
+                )
+            );
+
+        };
+
+}
+
+
+/* ============================================================
+   GREETING
+============================================================ */
+
+const hour =
+    new Date().getHours();
+
+
+if(hour < 12){
+
+    document.getElementById(
+        "greeting"
+    ).textContent =
+        "Good morning.";
+
+}
+else if(hour < 17){
+
+    document.getElementById(
+        "greeting"
+    ).textContent =
+        "Good afternoon.";
+
+}
+else{
+
+    document.getElementById(
+        "greeting"
+    ).textContent =
+        "Good evening.";
+
+}
+
+
+/* ============================================================
+   DARKY INTRODUCTION
+============================================================ */
+
+const introduction =
+    "Hi, I'm Darky AI... You can call me Darky. I'm the AI assistant of Chaatarra, created by Iqbal.";
+
+
+const hasIntroduced =
+    localStorage.getItem(
+        "darkyIntroduced"
+    );
+
+
+if(!hasIntroduced){
+
+    setTimeout(
+        function(){
+
+            /*
+             * Only introduce Darky after the
+             * dashboard has been unlocked.
+             */
+
+            if(
+                sessionStorage.getItem(
+                    "darkyDashboardUnlocked"
+                ) !== "true"
+            ){
+
+                return;
+
+            }
+
+
+            addChatMessage(
+                "darky",
+                introduction
+            );
+
+
+            speakReply(
+                introduction
+            );
+
+
+            localStorage.setItem(
+                "darkyIntroduced",
+                "true"
+            );
+
+        },
+        1200
+    );
+
+}
+
+
+/* ============================================================
+   READY
+============================================================ */
+
+console.log(
+    "Darky AI dashboard loaded."
+);
+
+console.log(
+    "Voice interaction enabled."
+);
+
+console.log(
+    "Cinematic Darky voice enabled."
+);
+
+console.log(
+    "Live sales initial load enabled."
+);
+
+console.log(
+    "Supabase Realtime sales subscription enabled."
+);
+
+console.log(
+    "Low alert inventory initial load enabled."
+);
+
+console.log(
+    "Supabase Realtime inventory subscription enabled."
+);
+
+console.log(
+    "Darky AI password protection enabled."
+);
+
+console.log(
+    "Darky AI unlock animation enabled."
+);
+
+console.log(
+    "Darky AI logout enabled."
+);
+
+</script>
+
+</body>
+</html>
