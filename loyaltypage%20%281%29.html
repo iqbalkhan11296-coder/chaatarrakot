@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Loyalty Admin</title>
+<style>
+*{box-sizing:border-box}
+
+html,body{
+    margin:0;
+    min-height:100%;
+}
+
+body{
+    font-family:Inter,Arial,Helvetica,sans-serif;
+    background:
+        radial-gradient(circle at top left,#7a1238 0,#4b001f 32%,#250010 100%);
+    color:#24131a;
+}
+
+button,input{
+    font:inherit;
+}
+
+.app{
+    width:min(1180px,calc(100% - 48px));
+    min-height:calc(100vh - 48px);
+    margin:24px auto;
+    background:#fbf8f4;
+    border:1px solid rgba(255,215,0,.28);
+    border-radius:22px;
+    overflow:hidden;
+    box-shadow:0 24px 70px rgba(0,0,0,.35);
+}
+
+/* ---------- MAIN HEADER ---------- */
+
+.header{
+    height:76px;
+    padding:0 32px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    background:linear-gradient(135deg,#650028,#4b001f);
+    border-bottom:1px solid rgba(255,215,0,.35);
+    position:sticky;
+    top:0;
+    z-index:10;
+}
+
+.logo{
+    font-family:Georgia,"Times New Roman",serif;
+    font-size:25px;
+    font-weight:700;
+    letter-spacing:.4px;
+    color:#ffd700;
+}
+
+.header small{
+    color:#f4df9a;
+    font-size:13px;
+    letter-spacing:1px;
+    text-transform:uppercase;
+}
+
+/* ---------- HOME ---------- */
+
+.home{
+    padding:55px;
+    max-width:1000px;
+    margin:auto;
+}
+
+.hero{
+    padding:45px;
+    border-radius:22px;
+    background:linear-gradient(135deg,#fffdf9,#f6eee3);
+    border:1px solid #e7d3a5;
+    margin-bottom:24px;
+    box-shadow:0 12px 35px rgba(75,0,31,.08);
+}
+
+.hero h1{
+    margin:0 0 10px;
+    font-family:Georgia,"Times New Roman",serif;
+    font-size:38px;
+    color:#4b001f;
+    letter-spacing:.2px;
+}
+
+.hero p{
+    margin:0;
+    color:#76656a;
+    font-size:15px;
+}
+
+.data-btn{
+    width:auto;
+    min-width:220px;
+    border:1px solid #d7b63e;
+    border-radius:12px;
+    padding:15px 30px;
+    font-size:14px;
+    font-weight:800;
+    letter-spacing:1px;
+    cursor:pointer;
+    background:linear-gradient(135deg,#650028,#4b001f);
+    color:#ffd700;
+    box-shadow:0 8px 20px rgba(75,0,31,.18);
+    transition:.2s ease;
+}
+
+.data-btn:hover{
+    transform:translateY(-2px);
+    box-shadow:0 12px 25px rgba(75,0,31,.25);
+}
+
+/* ---------- PAGES ---------- */
+
+.page{
+    display:none;
+}
+
+.page.active{
+    display:block;
+}
+
+.page-header{
+    height:72px;
+    display:flex;
+    align-items:center;
+    gap:14px;
+    padding:0 28px;
+    background:linear-gradient(135deg,#650028,#4b001f);
+    border-bottom:1px solid rgba(255,215,0,.35);
+    position:sticky;
+    top:0;
+    z-index:10;
+}
+
+.back{
+    width:38px;
+    height:38px;
+    border:1px solid rgba(255,215,0,.45);
+    border-radius:10px;
+    background:rgba(255,255,255,.08);
+    color:#ffd700;
+    font-size:25px;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.page-title{
+    font-family:Georgia,"Times New Roman",serif;
+    font-size:22px;
+    font-weight:700;
+    color:#fff;
+}
+
+/* ---------- SEARCH ---------- */
+
+.search{
+    padding:22px 28px;
+    background:#fffaf4;
+    border-bottom:1px solid #eadfcf;
+}
+
+.search input{
+    width:100%;
+    max-width:620px;
+    border:1px solid #dbcba9;
+    background:#fff;
+    border-radius:12px;
+    padding:14px 17px;
+    outline:none;
+    font-size:14px;
+    color:#32151f;
+    box-shadow:0 3px 12px rgba(75,0,31,.05);
+}
+
+.search input:focus{
+    border-color:#b89428;
+    box-shadow:0 0 0 3px rgba(255,215,0,.13);
+}
+
+/* ---------- CUSTOMER ACCOUNTS ---------- */
+
+.accounts{
+    padding:20px 28px 40px;
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:12px;
+    background:#fbf8f4;
+}
+
+.account{
+    width:100%;
+    min-height:82px;
+    text-align:left;
+    border:1px solid #e5d8c3;
+    border-radius:14px;
+    background:#fff;
+    padding:15px 17px;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    gap:14px;
+    box-shadow:0 4px 14px rgba(75,0,31,.05);
+    transition:.18s ease;
+}
+
+.account:hover{
+    transform:translateY(-2px);
+    border-color:#c9a83d;
+    box-shadow:0 8px 22px rgba(75,0,31,.1);
+}
+
+.avatar{
+    width:48px;
+    height:48px;
+    border-radius:50%;
+    background:linear-gradient(135deg,#650028,#4b001f);
+    color:#ffd700;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:700;
+    font-size:18px;
+    flex:none;
+    border:2px solid #e4c75d;
+}
+
+.account-info{
+    min-width:0;
+}
+
+.account-name{
+    font-weight:800;
+    color:#391522;
+    margin-bottom:5px;
+}
+
+.account-phone{
+    color:#806f73;
+    font-size:13px;
+}
+
+.account-actions{
+    margin-left:auto;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    flex:none;
+}
+
+.whatsapp-btn{
+    border:0;
+    border-radius:9px;
+    padding:9px 12px;
+    background:#1fbd5b;
+    color:#fff;
+    font-size:12px;
+    font-weight:800;
+    cursor:pointer;
+}
+
+.whatsapp-btn:hover{
+    opacity:.9;
+}
+
+/* ---------- PROFILE ---------- */
+
+.profile{
+    padding:30px 38px 50px;
+    max-width:1000px;
+    margin:auto;
+}
+
+.profile-card{
+    border:1px solid #e4d4b8;
+    border-radius:18px;
+    padding:25px;
+    display:flex;
+    align-items:center;
+    gap:18px;
+    background:linear-gradient(135deg,#fffdf9,#f7efe4);
+    box-shadow:0 8px 25px rgba(75,0,31,.07);
+}
+
+.big-avatar{
+    width:68px;
+    height:68px;
+    border-radius:50%;
+    background:linear-gradient(135deg,#650028,#4b001f);
+    color:#ffd700;
+    border:2px solid #d9b83e;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:25px;
+    font-weight:700;
+    flex:none;
+}
+
+.profile-name{
+    font-family:Georgia,"Times New Roman",serif;
+    font-size:24px;
+    font-weight:700;
+    color:#4b001f;
+}
+
+.profile-phone{
+    color:#806f73;
+    margin-top:6px;
+}
+
+/* ---------- STATS ---------- */
+
+.stats{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:14px;
+    margin-top:16px;
+}
+
+.stat{
+    border:1px solid #e4d4b8;
+    border-radius:14px;
+    padding:18px;
+    background:#fff;
+    box-shadow:0 5px 16px rgba(75,0,31,.045);
+}
+
+.stat-label{
+    font-size:11px;
+    font-weight:800;
+    letter-spacing:.7px;
+    color:#8a777b;
+    margin-bottom:8px;
+}
+
+.stat-value{
+    font-size:20px;
+    font-weight:800;
+    color:#4b001f;
+}
+
+/* ---------- PURCHASE HISTORY ---------- */
+
+.history-title{
+    font-family:Georgia,"Times New Roman",serif;
+    font-size:21px;
+    font-weight:700;
+    color:#4b001f;
+    margin:32px 0 13px;
+}
+
+.purchase{
+    border:1px solid #e7dac7;
+    border-radius:13px;
+    background:#fff;
+    padding:17px 19px;
+    margin-bottom:10px;
+    box-shadow:0 4px 13px rgba(75,0,31,.04);
+}
+
+.purchase-top{
+    display:flex;
+    justify-content:space-between;
+    gap:10px;
+}
+
+.purchase-date{
+    font-size:13px;
+    color:#806f73;
+}
+
+.purchase-total{
+    font-weight:800;
+    color:#4b001f;
+}
+
+.items{
+    margin-top:10px;
+    line-height:1.55;
+    font-size:14px;
+    color:#44373a;
+}
+
+.points{
+    margin-top:10px;
+    font-size:13px;
+    font-weight:800;
+    color:#9a7410;
+}
+
+/* ---------- STATES ---------- */
+
+.empty{
+    padding:55px 20px;
+    text-align:center;
+    color:#806f73;
+    grid-column:1/-1;
+}
+
+.loading{
+    padding:45px;
+    text-align:center;
+    color:#806f73;
+    grid-column:1/-1;
+}
+
+.error{
+    margin:20px 28px;
+    padding:16px;
+    border-radius:12px;
+    background:#fff0f0;
+    color:#a00000;
+    font-size:14px;
+    border:1px solid #efcaca;
+}
+
+/* ---------- TABLET ---------- */
+
+@media(max-width:900px){
+    .app{
+        width:calc(100% - 28px);
+        margin:14px auto;
+        min-height:calc(100vh - 28px);
+    }
+
+    .accounts{
+        grid-template-columns:1fr;
+    }
+
+    .stats{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .home{
+        padding:35px;
+    }
+
+    .profile{
+        padding:25px;
+    }
+}
+
+/* ---------- SMALL SCREENS ---------- */
+
+@media(max-width:600px){
+    body{
+        background:#fbf8f4;
+    }
+
+    .app{
+        width:100%;
+        min-height:100vh;
+        margin:0;
+        border:0;
+        border-radius:0;
+        box-shadow:none;
+    }
+
+    .header{
+        padding:0 20px;
+    }
+
+    .home{
+        padding:25px 18px;
+    }
+
+    .hero{
+        padding:28px 22px;
+    }
+
+    .hero h1{
+        font-size:30px;
+    }
+
+    .page-header{
+        padding:0 18px;
+    }
+
+    .search{
+        padding:16px 18px;
+    }
+
+    .accounts{
+        padding:12px 18px 30px;
+    }
+
+    .profile{
+        padding:20px 18px 35px;
+    }
+
+    .stats{
+        grid-template-columns:repeat(2,1fr);
+    }
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+    <!-- HOME -->
+    <section id="homePage">
+        <header class="header">
+            <div class="logo">Loyalty</div>
+            <small>Admin</small>
+        </header>
+
+        <main class="home">
+            <div class="hero">
+                <h1>Customer Loyalty</h1>
+                <p>Manage customer accounts, purchases and loyalty points.</p>
+            </div>
+
+            <button class="data-btn" onclick="openAccounts()">
+                DATAS
+            </button>
+        </main>
+    </section>
+
+    <!-- ACCOUNTS -->
+    <section id="accountsPage" class="page">
+        <header class="page-header">
+            <button class="back" onclick="showPage('homePage')">‹</button>
+            <div class="page-title">Loyalty Accounts</div>
+        </header>
+
+        <div class="search">
+            <input id="searchInput" type="text"
+                   placeholder="Search name or phone..."
+                   oninput="filterAccounts()">
+        </div>
+
+        <div id="accountsList" class="accounts">
+            <div class="loading">Loading accounts...</div>
+        </div>
+    </section>
+
+    <!-- CUSTOMER -->
+    <section id="customerPage" class="page">
+        <header class="page-header">
+            <button class="back" onclick="showPage('accountsPage')">‹</button>
+            <div class="page-title">Customer</div>
+        </header>
+
+        <div id="customerContent"></div>
+    </section>
+
+</div>
+
+<!-- Supabase -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js?v=4"></script>
+
+<script>
+/*
+    OFFLINE LOYALTY DATABASE
+
+    Customer name and phone are stored only in IndexedDB.
+    This page does not connect to Supabase and works offline.
+*/
+
+const LOCAL_DB_NAME = "chaatarra_local_db";
+const LOCAL_DB_VERSION = 1;
+let localDB = null;
+let allCustomers = [];
+
+function openLocalDB(){
+    return new Promise((resolve,reject)=>{
+        if(localDB){ resolve(localDB); return; }
+        const request = indexedDB.open(LOCAL_DB_NAME, LOCAL_DB_VERSION);
+        request.onupgradeneeded = event => {
+            const db = event.target.result;
+            const customers = db.objectStoreNames.contains("customers")
+                ? request.transaction.objectStore("customers")
+                : db.createObjectStore("customers", {keyPath:"id"});
+            if(!customers.indexNames.contains("phone")){
+                customers.createIndex("phone","phone",{unique:false});
+            }
+            const orders = db.objectStoreNames.contains("orders")
+                ? request.transaction.objectStore("orders")
+                : db.createObjectStore("orders", {keyPath:"id"});
+            if(!orders.indexNames.contains("customerId")){
+                orders.createIndex("customerId","customerId",{unique:false});
+            }
+            if(!orders.indexNames.contains("createdAt")){
+                orders.createIndex("createdAt","createdAt",{unique:false});
+            }
+        };
+        request.onsuccess = event => { localDB=event.target.result; resolve(localDB); };
+        request.onerror = () => reject(request.error);
+    });
+}
+
+function getAllFromStore(storeName){
+    return openLocalDB().then(db => new Promise((resolve,reject)=>{
+        const request=db.transaction(storeName,"readonly").objectStore(storeName).getAll();
+        request.onsuccess=()=>resolve(request.result||[]);
+        request.onerror=()=>reject(request.error);
+    }));
+}
+
+function normalizePhone(phone){
+    let digits=String(phone||"").replace(/\D/g,"");
+    if(digits.length===12 && digits.startsWith("91")) digits=digits.substring(2);
+    return digits;
+}
+
+async function loadCustomers(){
+    const list=document.getElementById("accountsList");
+    list.innerHTML=`<div class="loading">Loading accounts...</div>`;
+
+    try{
+        const customers=await getAllFromStore("customers");
+        const orders=await getAllFromStore("orders");
+
+        const purchasesByCustomer={};
+        orders.forEach(order=>{
+            if(!order.customerId) return;
+            if(!purchasesByCustomer[order.customerId]) purchasesByCustomer[order.customerId]=[];
+            purchasesByCustomer[order.customerId].push({
+                amount:Number(order.total||0),
+                created_at:order.createdAt,
+                description:JSON.stringify(order.items||[]),
+                order_number:order.orderNumber,
+                order_id:order.serverOrderId||order.id,
+                type:"purchase"
+            });
+        });
+
+        allCustomers=customers.map(customer=>({
+            ...customer,
+            _purchases:(purchasesByCustomer[customer.id]||[]).sort(
+                (a,b)=>new Date(b.created_at)-new Date(a.created_at)
+            )
+        })).sort((a,b)=>String(a.name||"").localeCompare(String(b.name||"")));
+
+        renderCustomers(allCustomers);
+    }catch(error){
+        console.error(error);
+        list.innerHTML=`<div class="error">Could not load local loyalty data.<br><br>${escapeHtml(error.message||String(error))}</div>`;
+    }
+}
+
+function showPage(id){
+    document.querySelectorAll(".app > section").forEach(section=>{
+        section.classList.remove("active");
+        section.style.display="";
+    });
+    const page=document.getElementById(id);
+    if(id==="homePage") page.style.display="block";
+    else page.classList.add("active");
+}
+
+function openAccounts(){
+    showPage("accountsPage");
+    loadCustomers();
+}
+
+function renderCustomers(customers){
+    const list=document.getElementById("accountsList");
+    if(!customers.length){
+        list.innerHTML=`<div class="empty">No loyalty accounts found.</div>`;
+        return;
+    }
+
+    list.innerHTML=customers.map(customer=>{
+        const name=customer.name||"Unnamed Customer";
+        const phone=customer.phone||"No phone";
+        const stats=calculateStats(customer._purchases||[]);
+        return `
+            <button class="account" onclick="openCustomer('${escapeAttr(customer.id)}')">
+                <div class="avatar">${escapeHtml(name.charAt(0).toUpperCase())}</div>
+                <div class="account-info">
+                    <div class="account-name">${escapeHtml(name)}</div>
+                    <div class="account-phone">${escapeHtml(phone)}</div>
+                </div>
+                ${customer.phone ? `
+                    <div class="account-actions">
+                        <button class="whatsapp-btn" type="button"
+                            onclick="event.stopPropagation(); sendLoyaltyWhatsApp('${escapeAttr(customer.phone)}','${escapeAttr(name)}',${stats.points})">
+                            WhatsApp
+                        </button>
+                    </div>` : ""}
+            </button>`;
+    }).join("");
+}
+
+function filterAccounts(){
+    const query=document.getElementById("searchInput").value.trim().toLowerCase();
+    const filtered=allCustomers.filter(customer=>{
+        const name=String(customer.name||"").toLowerCase();
+        const phone=String(customer.phone||"").toLowerCase();
+        return name.includes(query)||phone.includes(query);
+    });
+    renderCustomers(filtered);
+}
+
+async function openCustomer(id){
+    showPage("customerPage");
+    const content=document.getElementById("customerContent");
+    content.innerHTML=`<div class="loading">Loading customer...</div>`;
+
+    const customer=allCustomers.find(c=>String(c.id)===String(id));
+    if(!customer){
+        content.innerHTML=`<div class="error">Customer not found.</div>`;
+        return;
+    }
+
+    const name=customer.name||"Unnamed Customer";
+    const phone=customer.phone||"No phone";
+    const history=customer._purchases||[];
+    const stats=calculateStats(history);
+
+    content.innerHTML=`
+        <main class="profile">
+            <div class="profile-card">
+                <div class="big-avatar">${escapeHtml(name.charAt(0).toUpperCase())}</div>
+                <div>
+                    <div class="profile-name">${escapeHtml(name)}</div>
+                    <div class="profile-phone">${escapeHtml(phone)}</div>
+                </div>
+            </div>
+
+            <div class="stats">
+                <div class="stat"><div class="stat-label">LOYALTY POINTS</div><div class="stat-value">⭐ ${stats.points}</div></div>
+                <div class="stat"><div class="stat-label">VISITS</div><div class="stat-value">${stats.visits}</div></div>
+                <div class="stat"><div class="stat-label">LIFETIME SPEND</div><div class="stat-value">₹${stats.lifetimeSpend.toFixed(2)}</div></div>
+                <div class="stat"><div class="stat-label">PURCHASES</div><div class="stat-value">${history.length}</div></div>
+            </div>
+
+            <div class="history-title">Purchase History</div>
+            <div>${history.length ? history.map(renderPurchase).join("") : `<div class="empty">No purchase history.</div>`}</div>
+        </main>`;
+}
+
+function renderPurchase(purchase){
+    const date=new Date(purchase.created_at);
+    const dateText=date.toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"});
+    const timeText=date.toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"});
+    const amount=Number(purchase.amount||0);
+    const calculatedPoints=Math.floor(amount/50);
+
+    return `
+        <div class="purchase">
+            <div class="purchase-top">
+                <div class="purchase-date">${dateText} • ${timeText}</div>
+                <div class="purchase-total">₹${amount.toFixed(2)}</div>
+            </div>
+            <div class="items">${formatDescription(purchase.description)}</div>
+            <div class="points">+${calculatedPoints} points</div>
+        </div>`;
+}
+
+function calculateStats(purchases){
+    const history=Array.isArray(purchases)?purchases:[];
+    let lifetimeSpend=0;
+    let points=0;
+    history.forEach(purchase=>{
+        const amount=Number(purchase.amount||0);
+        lifetimeSpend+=amount;
+        points+=Math.floor(amount/50);
+    });
+    return {points,visits:history.length,lifetimeSpend};
+}
+
+function sendLoyaltyWhatsApp(phone,name,points){
+    let number=String(phone||"").replace(/\D/g,"");
+    if(number.startsWith("00")) number=number.substring(2);
+    if(number.length===10) number="91"+number;
+    const message=`Hi ${name}! 🎉 You currently have ${points} loyalty points with Chaatarra. Thank you for being our valued customer! ❤️`;
+    window.open("https://wa.me/"+number+"?text="+encodeURIComponent(message),"_blank");
+}
+
+function formatDescription(description){
+    if(!description) return "Purchase";
+    try{
+        const parsed=typeof description==="string"?JSON.parse(description):description;
+        if(Array.isArray(parsed)){
+            return parsed.map(item=>{
+                if(typeof item==="string") return escapeHtml(item);
+                const name=item.name||item.item||"Item";
+                const qty=item.quantity||item.qty||1;
+                return `${escapeHtml(name)} × ${escapeHtml(qty)}`;
+            }).join("<br>");
+        }
+    }catch(e){}
+    return escapeHtml(String(description)).replace(/\n/g,"<br>");
+}
+
+function escapeHtml(value){
+    return String(value)
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
+}
+
+function escapeAttr(value){
+    return escapeHtml(value).replace(/`/g,"&#096;");
+}
+
+showPage("homePage");
+</script>
+
+</body>
+</html>
