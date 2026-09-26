@@ -95,6 +95,15 @@ button,input{
     font-size:15px;
 }
 
+/* ---------- HOME DATA BUTTONS ---------- */
+
+.home-actions{
+    display:flex;
+    flex-wrap:wrap;
+    gap:14px;
+    align-items:center;
+}
+
 .data-btn{
     width:auto;
     min-width:220px;
@@ -114,6 +123,35 @@ button,input{
 .data-btn:hover{
     transform:translateY(-2px);
     box-shadow:0 12px 25px rgba(75,0,31,.25);
+}
+
+.backup-btn{
+    width:auto;
+    min-width:220px;
+    border:1px solid #d7b63e;
+    border-radius:12px;
+    padding:15px 30px;
+    font-size:14px;
+    font-weight:800;
+    letter-spacing:1px;
+    cursor:pointer;
+    background:#fff;
+    color:#4b001f;
+    box-shadow:0 8px 20px rgba(75,0,31,.10);
+    transition:.2s ease;
+}
+
+.backup-btn:hover{
+    transform:translateY(-2px);
+    border-color:#b89428;
+    box-shadow:0 12px 25px rgba(75,0,31,.16);
+}
+
+.backup-status{
+    margin-top:16px;
+    min-height:20px;
+    color:#76656a;
+    font-size:13px;
 }
 
 /* ---------- PAGES ---------- */
@@ -481,6 +519,17 @@ button,input{
         font-size:30px;
     }
 
+    .home-actions{
+        flex-direction:column;
+        align-items:stretch;
+    }
+
+    .data-btn,
+    .backup-btn{
+        width:100%;
+        min-width:0;
+    }
+
     .page-header{
         padding:0 18px;
     }
@@ -503,64 +552,103 @@ button,input{
 }
 </style>
 </head>
+
 <body>
 
 <div class="app">
 
     <!-- HOME -->
     <section id="homePage">
+
         <header class="header">
             <div class="logo">Loyalty</div>
             <small>Admin</small>
         </header>
 
         <main class="home">
+
             <div class="hero">
                 <h1>Customer Loyalty</h1>
                 <p>Manage customer accounts, purchases and loyalty points.</p>
             </div>
 
-            <button class="data-btn" onclick="openAccounts()">
-                DATAS
-            </button>
+            <div class="home-actions">
+
+                <button class="data-btn" onclick="openAccounts()">
+                    DATAS
+                </button>
+
+                <button class="backup-btn" onclick="exportBackup()">
+                    📤 EXPORT BACKUP
+                </button>
+
+                <button class="backup-btn" onclick="document.getElementById('importFile').click()">
+                    📥 IMPORT BACKUP
+                </button>
+
+                <input
+                    id="importFile"
+                    type="file"
+                    accept=".json,application/json"
+                    style="display:none"
+                    onchange="importBackup(event)"
+                >
+
+            </div>
+
+            <div id="backupStatus" class="backup-status"></div>
+
         </main>
+
     </section>
+
 
     <!-- ACCOUNTS -->
     <section id="accountsPage" class="page">
+
         <header class="page-header">
             <button class="back" onclick="showPage('homePage')">‹</button>
             <div class="page-title">Loyalty Accounts</div>
         </header>
 
         <div class="search">
-            <input id="searchInput" type="text"
-                   placeholder="Search name or phone..."
-                   oninput="filterAccounts()">
+            <input
+                id="searchInput"
+                type="text"
+                placeholder="Search name or phone..."
+                oninput="filterAccounts()"
+            >
         </div>
 
         <div id="accountsList" class="accounts">
             <div class="loading">Loading accounts...</div>
         </div>
+
     </section>
+
 
     <!-- CUSTOMER -->
     <section id="customerPage" class="page">
+
         <header class="page-header">
             <button class="back" onclick="showPage('accountsPage')">‹</button>
             <div class="page-title">Customer</div>
         </header>
 
         <div id="customerContent"></div>
+
     </section>
 
 </div>
+
 
 <!-- Supabase -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase.js?v=4"></script>
 
+
 <script>
+
 /*
     OFFLINE LOYALTY DATABASE
 
@@ -569,247 +657,1210 @@ button,input{
 */
 
 const LOCAL_DB_NAME = "chaatarra_local_db";
-const LOCAL_DB_VERSION = 1;
+
+/*
+    VERSION 2
+    Must match the current Billing page.
+*/
+const LOCAL_DB_VERSION = 2;
+
 let localDB = null;
 let allCustomers = [];
 
+
+/* ============================================================
+   OPEN LOCAL DATABASE
+   ============================================================ */
+
 function openLocalDB(){
+
     return new Promise((resolve,reject)=>{
-        if(localDB){ resolve(localDB); return; }
-        const request = indexedDB.open(LOCAL_DB_NAME, LOCAL_DB_VERSION);
+
+        if(localDB){
+            resolve(localDB);
+            return;
+        }
+
+        const request = indexedDB.open(
+            LOCAL_DB_NAME,
+            LOCAL_DB_VERSION
+        );
+
         request.onupgradeneeded = event => {
+
             const db = event.target.result;
-            const customers = db.objectStoreNames.contains("customers")
+
+            const customers =
+                db.objectStoreNames.contains("customers")
                 ? request.transaction.objectStore("customers")
-                : db.createObjectStore("customers", {keyPath:"id"});
+                : db.createObjectStore(
+                    "customers",
+                    {keyPath:"id"}
+                );
+
             if(!customers.indexNames.contains("phone")){
-                customers.createIndex("phone","phone",{unique:false});
+                customers.createIndex(
+                    "phone",
+                    "phone",
+                    {unique:false}
+                );
             }
-            const orders = db.objectStoreNames.contains("orders")
+
+
+            const orders =
+                db.objectStoreNames.contains("orders")
                 ? request.transaction.objectStore("orders")
-                : db.createObjectStore("orders", {keyPath:"id"});
+                : db.createObjectStore(
+                    "orders",
+                    {keyPath:"id"}
+                );
+
             if(!orders.indexNames.contains("customerId")){
-                orders.createIndex("customerId","customerId",{unique:false});
+                orders.createIndex(
+                    "customerId",
+                    "customerId",
+                    {unique:false}
+                );
             }
+
             if(!orders.indexNames.contains("createdAt")){
-                orders.createIndex("createdAt","createdAt",{unique:false});
+                orders.createIndex(
+                    "createdAt",
+                    "createdAt",
+                    {unique:false}
+                );
             }
+
         };
-        request.onsuccess = event => { localDB=event.target.result; resolve(localDB); };
-        request.onerror = () => reject(request.error);
+
+        request.onsuccess = event => {
+
+            localDB = event.target.result;
+
+            localDB.onversionchange = () => {
+                localDB.close();
+                localDB = null;
+            };
+
+            resolve(localDB);
+
+        };
+
+        request.onerror = () => {
+            reject(request.error);
+        };
+
     });
+
 }
+
+
+/* ============================================================
+   GET ALL RECORDS FROM STORE
+   ============================================================ */
 
 function getAllFromStore(storeName){
-    return openLocalDB().then(db => new Promise((resolve,reject)=>{
-        const request=db.transaction(storeName,"readonly").objectStore(storeName).getAll();
-        request.onsuccess=()=>resolve(request.result||[]);
-        request.onerror=()=>reject(request.error);
-    }));
+
+    return openLocalDB().then(db => {
+
+        return new Promise((resolve,reject)=>{
+
+            const request =
+                db
+                .transaction(storeName,"readonly")
+                .objectStore(storeName)
+                .getAll();
+
+            request.onsuccess = () => {
+                resolve(request.result || []);
+            };
+
+            request.onerror = () => {
+                reject(request.error);
+            };
+
+        });
+
+    });
+
 }
 
+
+/* ============================================================
+   NORMALIZE PHONE
+   ============================================================ */
+
 function normalizePhone(phone){
-    let digits=String(phone||"").replace(/\D/g,"");
-    if(digits.length===12 && digits.startsWith("91")) digits=digits.substring(2);
+
+    let digits =
+        String(phone || "")
+        .replace(/\D/g,"");
+
+    if(
+        digits.length === 12 &&
+        digits.startsWith("91")
+    ){
+        digits = digits.substring(2);
+    }
+
     return digits;
 }
 
+
+/* ============================================================
+   LOAD CUSTOMERS
+   ============================================================ */
+
 async function loadCustomers(){
-    const list=document.getElementById("accountsList");
-    list.innerHTML=`<div class="loading">Loading accounts...</div>`;
+
+    const list =
+        document.getElementById("accountsList");
+
+    list.innerHTML =
+        `<div class="loading">Loading accounts...</div>`;
 
     try{
-        const customers=await getAllFromStore("customers");
-        const orders=await getAllFromStore("orders");
 
-        const purchasesByCustomer={};
-        orders.forEach(order=>{
+        const customers =
+            await getAllFromStore("customers");
+
+        const orders =
+            await getAllFromStore("orders");
+
+
+        const purchasesByCustomer = {};
+
+
+        orders.forEach(order => {
+
             if(!order.customerId) return;
-            if(!purchasesByCustomer[order.customerId]) purchasesByCustomer[order.customerId]=[];
-            purchasesByCustomer[order.customerId].push({
-                amount:Number(order.total||0),
+
+            if(
+                !purchasesByCustomer[order.customerId]
+            ){
+                purchasesByCustomer[order.customerId] = [];
+            }
+
+            purchasesByCustomer[
+                order.customerId
+            ].push({
+
+                amount:Number(order.total || 0),
+
                 created_at:order.createdAt,
-                description:JSON.stringify(order.items||[]),
-                order_number:order.orderNumber,
-                order_id:order.serverOrderId||order.id,
+
+                description:
+                    JSON.stringify(
+                        order.items || []
+                    ),
+
+                order_number:
+                    order.orderNumber,
+
+                order_id:
+                    order.serverOrderId ||
+                    order.id,
+
                 type:"purchase"
+
             });
+
         });
 
-        allCustomers=customers.map(customer=>({
-            ...customer,
-            _purchases:(purchasesByCustomer[customer.id]||[]).sort(
-                (a,b)=>new Date(b.created_at)-new Date(a.created_at)
-            )
-        })).sort((a,b)=>String(a.name||"").localeCompare(String(b.name||"")));
+
+        allCustomers =
+            customers
+            .map(customer => ({
+
+                ...customer,
+
+                _purchases:
+                    (
+                        purchasesByCustomer[
+                            customer.id
+                        ] || []
+                    ).sort(
+                        (a,b) =>
+                            new Date(b.created_at) -
+                            new Date(a.created_at)
+                    )
+
+            }))
+            .sort(
+                (a,b) =>
+                    String(a.name || "")
+                    .localeCompare(
+                        String(b.name || "")
+                    )
+            );
+
 
         renderCustomers(allCustomers);
+
     }catch(error){
+
         console.error(error);
-        list.innerHTML=`<div class="error">Could not load local loyalty data.<br><br>${escapeHtml(error.message||String(error))}</div>`;
+
+        list.innerHTML = `
+            <div class="error">
+                Could not load local loyalty data.
+                <br><br>
+                ${escapeHtml(
+                    error.message ||
+                    String(error)
+                )}
+            </div>
+        `;
+
     }
+
 }
+
+
+/* ============================================================
+   SHOW PAGE
+   ============================================================ */
 
 function showPage(id){
-    document.querySelectorAll(".app > section").forEach(section=>{
-        section.classList.remove("active");
-        section.style.display="";
-    });
-    const page=document.getElementById(id);
-    if(id==="homePage") page.style.display="block";
-    else page.classList.add("active");
+
+    document
+        .querySelectorAll(".app > section")
+        .forEach(section => {
+
+            section.classList.remove("active");
+            section.style.display = "";
+
+        });
+
+
+    const page =
+        document.getElementById(id);
+
+
+    if(id === "homePage"){
+
+        page.style.display = "block";
+
+    }else{
+
+        page.classList.add("active");
+
+    }
+
 }
+
+
+/* ============================================================
+   OPEN ACCOUNTS
+   ============================================================ */
 
 function openAccounts(){
+
     showPage("accountsPage");
+
     loadCustomers();
+
 }
+
+
+/* ============================================================
+   RENDER CUSTOMERS
+   ============================================================ */
 
 function renderCustomers(customers){
-    const list=document.getElementById("accountsList");
+
+    const list =
+        document.getElementById("accountsList");
+
+
     if(!customers.length){
-        list.innerHTML=`<div class="empty">No loyalty accounts found.</div>`;
+
+        list.innerHTML =
+            `<div class="empty">
+                No loyalty accounts found.
+            </div>`;
+
         return;
     }
 
-    list.innerHTML=customers.map(customer=>{
-        const name=customer.name||"Unnamed Customer";
-        const phone=customer.phone||"No phone";
-        const stats=calculateStats(customer._purchases||[]);
-        return `
-            <button class="account" onclick="openCustomer('${escapeAttr(customer.id)}')">
-                <div class="avatar">${escapeHtml(name.charAt(0).toUpperCase())}</div>
-                <div class="account-info">
-                    <div class="account-name">${escapeHtml(name)}</div>
-                    <div class="account-phone">${escapeHtml(phone)}</div>
-                </div>
-                ${customer.phone ? `
-                    <div class="account-actions">
-                        <button class="whatsapp-btn" type="button"
-                            onclick="event.stopPropagation(); sendLoyaltyWhatsApp('${escapeAttr(customer.phone)}','${escapeAttr(name)}',${stats.points})">
-                            WhatsApp
-                        </button>
-                    </div>` : ""}
-            </button>`;
-    }).join("");
+
+    list.innerHTML =
+        customers
+        .map(customer => {
+
+            const name =
+                customer.name ||
+                "Unnamed Customer";
+
+            const phone =
+                customer.phone ||
+                "No phone";
+
+            const stats =
+                calculateStats(
+                    customer._purchases || []
+                );
+
+
+            return `
+                <button
+                    class="account"
+                    onclick="openCustomer('${escapeAttr(customer.id)}')"
+                >
+
+                    <div class="avatar">
+                        ${escapeHtml(
+                            name
+                            .charAt(0)
+                            .toUpperCase()
+                        )}
+                    </div>
+
+                    <div class="account-info">
+
+                        <div class="account-name">
+                            ${escapeHtml(name)}
+                        </div>
+
+                        <div class="account-phone">
+                            ${escapeHtml(phone)}
+                        </div>
+
+                    </div>
+
+                    ${
+                        customer.phone
+                        ? `
+                            <div class="account-actions">
+
+                                <button
+                                    class="whatsapp-btn"
+                                    type="button"
+                                    onclick="
+                                        event.stopPropagation();
+                                        sendLoyaltyWhatsApp(
+                                            '${escapeAttr(customer.phone)}',
+                                            '${escapeAttr(name)}',
+                                            ${stats.points}
+                                        )
+                                    "
+                                >
+                                    WhatsApp
+                                </button>
+
+                            </div>
+                        `
+                        : ""
+                    }
+
+                </button>
+            `;
+
+        })
+        .join("");
+
 }
+
+
+/* ============================================================
+   FILTER ACCOUNTS
+   ============================================================ */
 
 function filterAccounts(){
-    const query=document.getElementById("searchInput").value.trim().toLowerCase();
-    const filtered=allCustomers.filter(customer=>{
-        const name=String(customer.name||"").toLowerCase();
-        const phone=String(customer.phone||"").toLowerCase();
-        return name.includes(query)||phone.includes(query);
-    });
+
+    const query =
+        document
+        .getElementById("searchInput")
+        .value
+        .trim()
+        .toLowerCase();
+
+
+    const filtered =
+        allCustomers.filter(customer => {
+
+            const name =
+                String(
+                    customer.name || ""
+                ).toLowerCase();
+
+            const phone =
+                String(
+                    customer.phone || ""
+                ).toLowerCase();
+
+            return (
+                name.includes(query) ||
+                phone.includes(query)
+            );
+
+        });
+
+
     renderCustomers(filtered);
+
 }
 
-async function openCustomer(id){
-    showPage("customerPage");
-    const content=document.getElementById("customerContent");
-    content.innerHTML=`<div class="loading">Loading customer...</div>`;
 
-    const customer=allCustomers.find(c=>String(c.id)===String(id));
+/* ============================================================
+   OPEN CUSTOMER
+   ============================================================ */
+
+async function openCustomer(id){
+
+    showPage("customerPage");
+
+    const content =
+        document.getElementById(
+            "customerContent"
+        );
+
+    content.innerHTML =
+        `<div class="loading">
+            Loading customer...
+        </div>`;
+
+
+    const customer =
+        allCustomers.find(
+            c => String(c.id) === String(id)
+        );
+
+
     if(!customer){
-        content.innerHTML=`<div class="error">Customer not found.</div>`;
+
+        content.innerHTML =
+            `<div class="error">
+                Customer not found.
+            </div>`;
+
         return;
     }
 
-    const name=customer.name||"Unnamed Customer";
-    const phone=customer.phone||"No phone";
-    const history=customer._purchases||[];
-    const stats=calculateStats(history);
 
-    content.innerHTML=`
+    const name =
+        customer.name ||
+        "Unnamed Customer";
+
+    const phone =
+        customer.phone ||
+        "No phone";
+
+    const history =
+        customer._purchases || [];
+
+    const stats =
+        calculateStats(history);
+
+
+    content.innerHTML = `
+
         <main class="profile">
+
             <div class="profile-card">
-                <div class="big-avatar">${escapeHtml(name.charAt(0).toUpperCase())}</div>
-                <div>
-                    <div class="profile-name">${escapeHtml(name)}</div>
-                    <div class="profile-phone">${escapeHtml(phone)}</div>
+
+                <div class="big-avatar">
+                    ${escapeHtml(
+                        name
+                        .charAt(0)
+                        .toUpperCase()
+                    )}
                 </div>
+
+                <div>
+
+                    <div class="profile-name">
+                        ${escapeHtml(name)}
+                    </div>
+
+                    <div class="profile-phone">
+                        ${escapeHtml(phone)}
+                    </div>
+
+                </div>
+
             </div>
+
 
             <div class="stats">
-                <div class="stat"><div class="stat-label">LOYALTY POINTS</div><div class="stat-value">⭐ ${stats.points}</div></div>
-                <div class="stat"><div class="stat-label">VISITS</div><div class="stat-value">${stats.visits}</div></div>
-                <div class="stat"><div class="stat-label">LIFETIME SPEND</div><div class="stat-value">₹${stats.lifetimeSpend.toFixed(2)}</div></div>
-                <div class="stat"><div class="stat-label">PURCHASES</div><div class="stat-value">${history.length}</div></div>
+
+                <div class="stat">
+                    <div class="stat-label">
+                        LOYALTY POINTS
+                    </div>
+
+                    <div class="stat-value">
+                        ⭐ ${stats.points}
+                    </div>
+                </div>
+
+
+                <div class="stat">
+                    <div class="stat-label">
+                        VISITS
+                    </div>
+
+                    <div class="stat-value">
+                        ${stats.visits}
+                    </div>
+                </div>
+
+
+                <div class="stat">
+                    <div class="stat-label">
+                        LIFETIME SPEND
+                    </div>
+
+                    <div class="stat-value">
+                        ₹${stats.lifetimeSpend.toFixed(2)}
+                    </div>
+                </div>
+
+
+                <div class="stat">
+                    <div class="stat-label">
+                        PURCHASES
+                    </div>
+
+                    <div class="stat-value">
+                        ${history.length}
+                    </div>
+                </div>
+
             </div>
 
-            <div class="history-title">Purchase History</div>
-            <div>${history.length ? history.map(renderPurchase).join("") : `<div class="empty">No purchase history.</div>`}</div>
-        </main>`;
+
+            <div class="history-title">
+                Purchase History
+            </div>
+
+
+            <div>
+                ${
+                    history.length
+                    ? history
+                        .map(renderPurchase)
+                        .join("")
+                    : `
+                        <div class="empty">
+                            No purchase history.
+                        </div>
+                    `
+                }
+            </div>
+
+        </main>
+
+    `;
+
 }
+
+
+/* ============================================================
+   RENDER PURCHASE
+   ============================================================ */
 
 function renderPurchase(purchase){
-    const date=new Date(purchase.created_at);
-    const dateText=date.toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"});
-    const timeText=date.toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"});
-    const amount=Number(purchase.amount||0);
-    const calculatedPoints=Math.floor(amount/50);
+
+    const date =
+        new Date(
+            purchase.created_at
+        );
+
+
+    const dateText =
+        date.toLocaleDateString(
+            "en-IN",
+            {
+                day:"2-digit",
+                month:"short",
+                year:"numeric"
+            }
+        );
+
+
+    const timeText =
+        date.toLocaleTimeString(
+            "en-IN",
+            {
+                hour:"2-digit",
+                minute:"2-digit"
+            }
+        );
+
+
+    const amount =
+        Number(
+            purchase.amount || 0
+        );
+
+
+    const calculatedPoints =
+        Math.floor(
+            amount / 50
+        );
+
 
     return `
+
         <div class="purchase">
+
             <div class="purchase-top">
-                <div class="purchase-date">${dateText} • ${timeText}</div>
-                <div class="purchase-total">₹${amount.toFixed(2)}</div>
+
+                <div class="purchase-date">
+                    ${dateText} • ${timeText}
+                </div>
+
+                <div class="purchase-total">
+                    ₹${amount.toFixed(2)}
+                </div>
+
             </div>
-            <div class="items">${formatDescription(purchase.description)}</div>
-            <div class="points">+${calculatedPoints} points</div>
-        </div>`;
+
+
+            <div class="items">
+                ${formatDescription(
+                    purchase.description
+                )}
+            </div>
+
+
+            <div class="points">
+                +${calculatedPoints} points
+            </div>
+
+        </div>
+
+    `;
+
 }
+
+
+/* ============================================================
+   CALCULATE STATS
+   ============================================================ */
 
 function calculateStats(purchases){
-    const history=Array.isArray(purchases)?purchases:[];
-    let lifetimeSpend=0;
-    let points=0;
-    history.forEach(purchase=>{
-        const amount=Number(purchase.amount||0);
-        lifetimeSpend+=amount;
-        points+=Math.floor(amount/50);
+
+    const history =
+        Array.isArray(purchases)
+        ? purchases
+        : [];
+
+
+    let lifetimeSpend = 0;
+
+    let points = 0;
+
+
+    history.forEach(purchase => {
+
+        const amount =
+            Number(
+                purchase.amount || 0
+            );
+
+
+        lifetimeSpend += amount;
+
+        points +=
+            Math.floor(
+                amount / 50
+            );
+
     });
-    return {points,visits:history.length,lifetimeSpend};
+
+
+    return {
+
+        points,
+
+        visits:
+            history.length,
+
+        lifetimeSpend
+
+    };
+
 }
 
-function sendLoyaltyWhatsApp(phone,name,points){
-    let number=String(phone||"").replace(/\D/g,"");
-    if(number.startsWith("00")) number=number.substring(2);
-    if(number.length===10) number="91"+number;
-    const message=`Hi ${name}! 🎉 You currently have ${points} loyalty points with Chaatarra. Thank you for being our valued customer! ❤️`;
-    window.open("https://wa.me/"+number+"?text="+encodeURIComponent(message),"_blank");
+
+/* ============================================================
+   WHATSAPP
+   ============================================================ */
+
+function sendLoyaltyWhatsApp(
+    phone,
+    name,
+    points
+){
+
+    let number =
+        String(phone || "")
+        .replace(/\D/g,"");
+
+
+    if(number.startsWith("00")){
+        number =
+            number.substring(2);
+    }
+
+
+    if(number.length === 10){
+        number =
+            "91" + number;
+    }
+
+
+    const message =
+        `Hi ${name}! 🎉 You currently have ${points} loyalty points with Chaatarra. Thank you for being our valued customer! ❤️`;
+
+
+    window.open(
+        "https://wa.me/" +
+        number +
+        "?text=" +
+        encodeURIComponent(message),
+        "_blank"
+    );
+
 }
+
+
+/* ============================================================
+   FORMAT PURCHASE DESCRIPTION
+   ============================================================ */
 
 function formatDescription(description){
-    if(!description) return "Purchase";
+
+    if(!description){
+        return "Purchase";
+    }
+
+
     try{
-        const parsed=typeof description==="string"?JSON.parse(description):description;
+
+        const parsed =
+            typeof description === "string"
+            ? JSON.parse(description)
+            : description;
+
+
         if(Array.isArray(parsed)){
-            return parsed.map(item=>{
-                if(typeof item==="string") return escapeHtml(item);
-                const name=item.name||item.item||"Item";
-                const qty=item.quantity||item.qty||1;
-                return `${escapeHtml(name)} × ${escapeHtml(qty)}`;
-            }).join("<br>");
+
+            return parsed
+                .map(item => {
+
+                    if(typeof item === "string"){
+                        return escapeHtml(item);
+                    }
+
+
+                    const name =
+                        item.name ||
+                        item.item ||
+                        "Item";
+
+
+                    const qty =
+                        item.quantity ||
+                        item.qty ||
+                        1;
+
+
+                    return `
+                        ${escapeHtml(name)}
+                        ×${escapeHtml(qty)}
+                    `;
+
+                })
+                .join("<br>");
+
         }
+
     }catch(e){}
-    return escapeHtml(String(description)).replace(/\n/g,"<br>");
+
+
+    return escapeHtml(
+        String(description)
+    ).replace(
+        /\n/g,
+        "<br>"
+    );
+
 }
+
+
+/* ============================================================
+   EXPORT BACKUP
+   ============================================================
+
+   Exports:
+   - customers
+   - orders
+
+   Nothing is uploaded anywhere.
+   The browser creates a JSON file and downloads it.
+   ============================================================ */
+
+async function exportBackup(){
+
+    const status =
+        document.getElementById(
+            "backupStatus"
+        );
+
+
+    try{
+
+        status.textContent =
+            "Preparing backup...";
+
+
+        const customers =
+            await getAllFromStore(
+                "customers"
+            );
+
+
+        const orders =
+            await getAllFromStore(
+                "orders"
+            );
+
+
+        const backup = {
+
+            backupType:
+                "CHAATARRA_LOCAL_LOYALTY_BACKUP",
+
+            version:1,
+
+            exportedAt:
+                new Date().toISOString(),
+
+            database:
+                LOCAL_DB_NAME,
+
+            customers:customers,
+
+            orders:orders
+
+        };
+
+
+        const json =
+            JSON.stringify(
+                backup,
+                null,
+                2
+            );
+
+
+        const blob =
+            new Blob(
+                [json],
+                {
+                    type:
+                        "application/json"
+                }
+            );
+
+
+        const url =
+            URL.createObjectURL(
+                blob
+            );
+
+
+        const link =
+            document.createElement("a");
+
+
+        const date =
+            new Date()
+            .toISOString()
+            .slice(0,10);
+
+
+        link.href = url;
+
+        link.download =
+            `chaatarra_loyalty_backup_${date}.json`;
+
+
+        document.body.appendChild(link);
+
+        link.click();
+
+        link.remove();
+
+
+        URL.revokeObjectURL(url);
+
+
+        status.textContent =
+            `Backup exported successfully — ${customers.length} customers and ${orders.length} orders.`;
+
+
+    }catch(error){
+
+        console.error(error);
+
+        status.textContent =
+            "Export failed: " +
+            (
+                error.message ||
+                String(error)
+            );
+
+    }
+
+}
+
+
+/* ============================================================
+   IMPORT BACKUP
+   ============================================================
+
+   The imported JSON is MERGED into the current database.
+
+   Existing records with the same ID are updated.
+   New records are added.
+
+   Nothing is automatically deleted.
+   ============================================================ */
+
+async function importBackup(event){
+
+    const file =
+        event.target.files &&
+        event.target.files[0];
+
+
+    const status =
+        document.getElementById(
+            "backupStatus"
+        );
+
+
+    if(!file){
+        return;
+    }
+
+
+    try{
+
+        status.textContent =
+            "Reading backup...";
+
+
+        const text =
+            await file.text();
+
+
+        const backup =
+            JSON.parse(text);
+
+
+        if(
+            !backup ||
+            backup.backupType !==
+            "CHAATARRA_LOCAL_LOYALTY_BACKUP"
+        ){
+
+            throw new Error(
+                "This is not a valid Chaatarra Loyalty backup file."
+            );
+
+        }
+
+
+        if(!Array.isArray(backup.customers)){
+            throw new Error(
+                "Backup does not contain customer data."
+            );
+        }
+
+
+        if(!Array.isArray(backup.orders)){
+            throw new Error(
+                "Backup does not contain order data."
+            );
+        }
+
+
+        const db =
+            await openLocalDB();
+
+
+        const transaction =
+            db.transaction(
+                ["customers","orders"],
+                "readwrite"
+            );
+
+
+        const customersStore =
+            transaction.objectStore(
+                "customers"
+            );
+
+
+        const ordersStore =
+            transaction.objectStore(
+                "orders"
+            );
+
+
+        backup.customers.forEach(customer => {
+
+            if(
+                customer &&
+                customer.id
+            ){
+
+                customersStore.put(
+                    customer
+                );
+
+            }
+
+        });
+
+
+        backup.orders.forEach(order => {
+
+            if(
+                order &&
+                order.id
+            ){
+
+                ordersStore.put(
+                    order
+                );
+
+            }
+
+        });
+
+
+        await new Promise(
+            (resolve,reject) => {
+
+                transaction.oncomplete =
+                    resolve;
+
+                transaction.onerror =
+                    () => reject(
+                        transaction.error
+                    );
+
+                transaction.onabort =
+                    () => reject(
+                        transaction.error ||
+                        new Error(
+                            "Import transaction aborted."
+                        )
+                    );
+
+            }
+        );
+
+
+        status.textContent =
+            `Backup imported successfully — ${backup.customers.length} customers and ${backup.orders.length} orders restored.`;
+
+
+        /*
+            Refresh the account list in case
+            the user imports while viewing accounts.
+        */
+
+        await loadCustomers();
+
+
+    }catch(error){
+
+        console.error(error);
+
+        status.textContent =
+            "Import failed: " +
+            (
+                error.message ||
+                String(error)
+            );
+
+    }finally{
+
+        /*
+            Allow the same file to be selected again.
+        */
+
+        event.target.value = "";
+
+    }
+
+}
+
+
+/* ============================================================
+   ESCAPE HTML
+   ============================================================ */
 
 function escapeHtml(value){
+
     return String(value)
-        .replace(/&/g,"&amp;")
-        .replace(/</g,"&lt;")
-        .replace(/>/g,"&gt;")
-        .replace(/"/g,"&quot;")
-        .replace(/'/g,"&#039;");
+
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+
+        .replace(
+            /</g,
+            "&lt;"
+        )
+
+        .replace(
+            />/g,
+            "&gt;"
+        )
+
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
 }
+
+
+/* ============================================================
+   ESCAPE ATTRIBUTE
+   ============================================================ */
 
 function escapeAttr(value){
-    return escapeHtml(value).replace(/`/g,"&#096;");
+
+    return escapeHtml(value)
+        .replace(
+            /`/g,
+            "&#096;"
+        );
+
 }
 
+
+/* ============================================================
+   START
+   ============================================================ */
+
 showPage("homePage");
+
 </script>
 
 </body>
