@@ -1,0 +1,1848 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Cafe Billing</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase.js?v=4"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            color: #222;
+        }
+
+        header {
+            background: #4b001f;
+            color: white;
+            padding: 18px;
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 28px;
+        }
+
+        header p {
+            margin: 5px 0 0;
+            font-size: 14px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: auto;
+            padding: 15px;
+        }
+
+        .section {
+            background: white;
+            margin-bottom: 15px;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .section h2 {
+            margin-top: 0;
+            color: #4b001f;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 8px;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 10px;
+        }
+
+        .item {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 12px;
+            background: #fff;
+        }
+
+        .item-name {
+            font-weight: bold;
+            font-size: 17px;
+        }
+
+        .item-price {
+            color: #4b001f;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        .combo-label {
+            display: inline-block;
+            margin-top: 5px;
+            padding: 3px 7px;
+            border-radius: 4px;
+            background: #4b001f;
+            color: white;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .quantity-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+
+        .quantity-row button {
+            width: 35px;
+            height: 35px;
+            border: none;
+            border-radius: 6px;
+            background: #4b001f;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .quantity {
+            font-size: 18px;
+            font-weight: bold;
+            min-width: 30px;
+            text-align: center;
+        }
+
+        .customer-box input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+
+        .cart {
+            margin-top: 10px;
+        }
+
+        .cart-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+            gap: 10px;
+        }
+
+        .cart-left {
+            flex: 1;
+        }
+
+        .cart-right {
+            white-space: nowrap;
+            font-weight: bold;
+        }
+
+        .total {
+            text-align: right;
+            font-size: 24px;
+            font-weight: bold;
+            color: #4b001f;
+            margin-top: 15px;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .buttons button {
+            flex: 1;
+            padding: 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        #placeOrder {
+            background: #4b001f;
+            color: white;
+        }
+
+        #printBill {
+            background: #222;
+            color: white;
+            display: none;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        #message {
+            text-align: center;
+            font-weight: bold;
+            margin-top: 15px;
+            min-height: 24px;
+        }
+
+        .success {
+            color: green;
+        }
+
+        .error {
+            color: red;
+        }
+
+        #receipt {
+            display: none;
+        }
+
+        @media print {
+
+            @page {
+                size: 58mm auto;
+                margin: 0;
+            }
+
+            body {
+                margin: 0;
+                padding: 0;
+                background: white;
+            }
+
+            body * {
+                visibility: hidden;
+            }
+
+            #receipt,
+            #receipt * {
+                visibility: visible;
+            }
+
+            #receipt {
+                display: block;
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 58mm;
+                padding: 3mm;
+                font-family: "Courier New", monospace;
+                font-size: 11px;
+                line-height: 1.3;
+                color: black;
+            }
+
+            .receipt-header {
+                text-align: center;
+            }
+
+            .receipt-title {
+                font-size: 18px;
+                font-weight: bold;
+            }
+
+            .receipt-subtitle {
+                font-size: 10px;
+            }
+
+            .receipt-line {
+                border-top: 1px dashed black;
+                margin: 5px 0;
+            }
+
+            .receipt-info {
+                font-size: 10px;
+            }
+
+            .receipt-item {
+                margin: 5px 0;
+            }
+
+            .receipt-item-line {
+                display: flex;
+                justify-content: space-between;
+                gap: 5px;
+            }
+
+            .receipt-item-name {
+                width: 36mm;
+                word-wrap: break-word;
+            }
+
+            .receipt-item-price {
+                width: 13mm;
+                text-align: right;
+                white-space: nowrap;
+            }
+
+            .receipt-qty {
+                font-size: 10px;
+            }
+
+            .receipt-total {
+                display: flex;
+                justify-content: space-between;
+                font-size: 14px;
+                font-weight: bold;
+            }
+
+            .receipt-footer {
+                text-align: center;
+                margin-top: 8px;
+                font-size: 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>Cafe Billing</h1>
+    <p>Main Billing Counter</p>
+</header>
+
+<div class="container">
+
+    <!-- CUSTOMER -->
+
+    <div class="section">
+
+        <h2>Customer</h2>
+
+        <div class="customer-box">
+
+            <input
+                type="text"
+                id="customerName"
+                placeholder="Customer Name"
+            >
+
+            <input
+                type="tel"
+                id="customerPhone"
+                list="savedCustomerPhones"
+                placeholder="Customer Phone Number"
+                autocomplete="off"
+            >
+
+            <datalist id="savedCustomerPhones"></datalist>
+
+        </div>
+
+    </div>
+
+
+    <!-- CHAATS -->
+
+    <div class="section">
+
+        <h2>Chaats</h2>
+
+        <div
+            class="menu-grid"
+            id="chaatsMenu"
+        ></div>
+
+    </div>
+
+
+    <!-- DRINKS -->
+
+    <div class="section">
+
+        <h2>Drinks</h2>
+
+        <div
+            class="menu-grid"
+            id="drinksMenu"
+        ></div>
+
+    </div>
+
+
+    <!-- BURGERS -->
+
+    <div class="section">
+
+        <h2>Burgers</h2>
+
+        <div
+            class="menu-grid"
+            id="burgersMenu"
+        ></div>
+
+    </div>
+
+
+    <!-- COMBOS -->
+
+    <div class="section">
+
+        <h2>Combos</h2>
+
+        <div
+            class="menu-grid"
+            id="combosMenu"
+        ></div>
+
+    </div>
+
+
+    <!-- ORDER -->
+
+    <div class="section">
+
+        <h2>Order</h2>
+
+        <div
+            id="cart"
+            class="cart"
+        >
+            No items selected.
+        </div>
+
+        <div class="total">
+            Total: ₹<span id="total">0</span>
+        </div>
+
+        <div class="buttons">
+
+            <button
+                id="placeOrder"
+                onclick="placeOrder()"
+            >
+                PLACE ORDER
+            </button>
+
+            <button
+                id="printBill"
+                onclick="printBill()"
+            >
+                PRINT BILL
+            </button>
+
+        </div>
+
+        <div id="message"></div>
+
+    </div>
+
+</div>
+
+
+<!-- ========================= -->
+<!-- 58MM THERMAL RECEIPT -->
+<!-- ========================= -->
+
+<div id="receipt">
+
+    <div class="receipt-header">
+
+        <div class="receipt-title">
+            CHAATARRA
+        </div>
+
+        <div class="receipt-subtitle">
+            The House of Chaats
+        </div>
+
+    </div>
+
+    <div class="receipt-line"></div>
+
+    <div class="receipt-info">
+
+        <div>
+            Order No:
+            <span id="receiptOrderNumber"></span>
+        </div>
+
+        <div>
+            Date:
+            <span id="receiptDate"></span>
+        </div>
+
+        <div id="receiptCustomerRow">
+
+            Customer:
+            <span id="receiptCustomer"></span>
+
+        </div>
+
+    </div>
+
+    <div class="receipt-line"></div>
+
+    <div id="receiptItems"></div>
+
+    <div class="receipt-line"></div>
+
+    <div class="receipt-total">
+
+        <span>TOTAL</span>
+
+        <span>
+            ₹<span id="receiptTotal"></span>
+        </span>
+
+    </div>
+
+    <div class="receipt-line"></div>
+
+    <div class="receipt-footer">
+
+        Thank you!
+
+        <br>
+
+        Please visit again.
+
+    </div>
+
+</div>
+
+
+<script>
+
+    /*
+    ==========================================
+    NORMAL MENU ITEMS
+    ==========================================
+    */
+
+    const menu = {
+
+        // CHAATS
+
+        "Pani Puri": {
+            price: 50,
+            counter: "chaats"
+        },
+
+        "Masala Puri": {
+            price: 60,
+            counter: "chaats"
+        },
+
+        "Samosa Chaat": {
+            price: 80,
+            counter: "chaats"
+        },
+
+        "Dahi Puri": {
+            price: 80,
+            counter: "chaats"
+        },
+
+
+        // DRINKS
+
+        "Mango Shake": {
+            price: 90,
+            counter: "drinks"
+        },
+
+        "Oreo Shake": {
+            price: 80,
+            counter: "drinks"
+        },
+
+        "Strawberry Shake": {
+            price: 90,
+            counter: "drinks"
+        },
+
+        "Mint Lime": {
+            price: 35,
+            counter: "drinks"
+        },
+
+
+        // BURGERS
+
+        "Classic Burger": {
+            price: 120,
+            counter: "burgers"
+        },
+
+        "Chicken Burger": {
+            price: 150,
+            counter: "burgers"
+        },
+
+        "Cheese Burger": {
+            price: 140,
+            counter: "burgers"
+        },
+
+        "Double Burger": {
+            price: 180,
+            counter: "burgers"
+        }
+
+    };
+
+
+    /*
+    ==========================================
+    DUMMY COMBOS
+    ==========================================
+    */
+
+    const combos = {
+
+        "Pani Puri + Mint Lime": {
+
+            price: 80,
+
+            items: [
+
+                {
+                    name: "Pani Puri",
+                    counter: "chaats"
+                },
+
+                {
+                    name: "Mint Lime",
+                    counter: "drinks"
+                }
+
+            ]
+
+        },
+
+
+        "Masala Puri + Mango Shake": {
+
+            price: 140,
+
+            items: [
+
+                {
+                    name: "Masala Puri",
+                    counter: "chaats"
+                },
+
+                {
+                    name: "Mango Shake",
+                    counter: "drinks"
+                }
+
+            ]
+
+        },
+
+
+        "Classic Burger + Mango Shake": {
+
+            price: 190,
+
+            items: [
+
+                {
+                    name: "Classic Burger",
+                    counter: "burgers"
+                },
+
+                {
+                    name: "Mango Shake",
+                    counter: "drinks"
+                }
+
+            ]
+
+        },
+
+
+        "Chicken Burger + Oreo Shake": {
+
+            price: 210,
+
+            items: [
+
+                {
+                    name: "Chicken Burger",
+                    counter: "burgers"
+                },
+
+                {
+                    name: "Oreo Shake",
+                    counter: "drinks"
+                }
+
+            ]
+
+        }
+
+    };
+
+
+    /*
+    ==========================================
+    QUANTITIES
+    ==========================================
+    */
+
+    const quantities = {};
+
+    const comboQuantities = {};
+
+    let lastOrder = null;
+
+    /*
+    ==========================================
+    LOCAL CUSTOMER / ORDER DATABASE
+    ==========================================
+
+    Customer name and phone NEVER go to Supabase.
+    They are stored only in this browser's IndexedDB.
+    Orders are also stored locally so the loyalty page
+    can work completely offline.
+    */
+
+    const LOCAL_DB_NAME = "chaatarra_local_db";
+    const LOCAL_DB_VERSION = 1;
+
+    let localDB = null;
+    let savedCustomers = [];
+
+    function openLocalDB() {
+
+        return new Promise((resolve, reject) => {
+
+            if (localDB) {
+                resolve(localDB);
+                return;
+            }
+
+            const request = indexedDB.open(LOCAL_DB_NAME, LOCAL_DB_VERSION);
+
+            request.onupgradeneeded = event => {
+
+                const db = event.target.result;
+
+                const customers = db.objectStoreNames.contains("customers")
+                    ? request.transaction.objectStore("customers")
+                    : db.createObjectStore("customers", { keyPath: "id" });
+
+                if (!customers.indexNames.contains("phone")) {
+                    customers.createIndex("phone", "phone", { unique: false });
+                }
+
+                const orders = db.objectStoreNames.contains("orders")
+                    ? request.transaction.objectStore("orders")
+                    : db.createObjectStore("orders", { keyPath: "id" });
+
+                if (!orders.indexNames.contains("customerId")) {
+                    orders.createIndex("customerId", "customerId", { unique: false });
+                }
+
+                if (!orders.indexNames.contains("createdAt")) {
+                    orders.createIndex("createdAt", "createdAt", { unique: false });
+                }
+            };
+
+            request.onsuccess = event => {
+                localDB = event.target.result;
+                resolve(localDB);
+            };
+
+            request.onerror = () => reject(request.error);
+        });
+    }
+
+    function normalizePhone(phone) {
+
+        let digits = String(phone || "").replace(/\D/g, "");
+
+        if (digits.length === 12 && digits.startsWith("91")) {
+            digits = digits.substring(2);
+        }
+
+        return digits;
+    }
+
+    async function getLocalCustomers() {
+
+        const db = await openLocalDB();
+
+        return new Promise((resolve, reject) => {
+            const request = db.transaction("customers", "readonly")
+                .objectStore("customers").getAll();
+            request.onsuccess = () => resolve(request.result || []);
+            request.onerror = () => reject(request.error);
+        });
+    }
+
+    async function saveLocalCustomer(name, phone) {
+
+        name = String(name || "").trim();
+        phone = String(phone || "").trim();
+
+        if (!name && !phone) return null;
+
+        const db = await openLocalDB();
+        const customers = await getLocalCustomers();
+        const normalized = normalizePhone(phone);
+
+        let customer = normalized
+            ? customers.find(c => normalizePhone(c.phone) === normalized)
+            : null;
+
+        if (!customer && name) {
+            customer = customers.find(c =>
+                !normalizePhone(c.phone) &&
+                String(c.name || "").trim().toLowerCase() === name.toLowerCase()
+            );
+        }
+
+        if (!customer) {
+            customer = {
+                id: "local-customer-" + Date.now() + "-" + Math.random().toString(36).slice(2),
+                name: name,
+                phone: phone,
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+            };
+        } else {
+            customer.name = name || customer.name || "";
+            customer.phone = phone || customer.phone || "";
+            customer.updatedAt = new Date().toISOString();
+        }
+
+        return new Promise((resolve, reject) => {
+            const request = db.transaction("customers", "readwrite")
+                .objectStore("customers").put(customer);
+            request.onsuccess = () => resolve(customer);
+            request.onerror = () => reject(request.error);
+        });
+    }
+
+    async function saveLocalOrder(orderData) {
+
+        const db = await openLocalDB();
+
+        return new Promise((resolve, reject) => {
+            const request = db.transaction("orders", "readwrite")
+                .objectStore("orders").put(orderData);
+            request.onsuccess = () => resolve(orderData);
+            request.onerror = () => reject(request.error);
+        });
+    }
+
+    async function loadSavedCustomers() {
+
+        try {
+            savedCustomers = await getLocalCustomers();
+
+            const datalist = document.getElementById("savedCustomerPhones");
+            datalist.innerHTML = "";
+
+            savedCustomers.forEach(customer => {
+                if (!customer.phone) return;
+
+                const option = document.createElement("option");
+                option.value = customer.phone;
+                if (customer.name) option.label = customer.name;
+                datalist.appendChild(option);
+            });
+        } catch (error) {
+            console.error("Local customer loading failed:", error);
+        }
+    }
+
+
+    /*
+    ==========================================
+    FIND SAVED CUSTOMER BY PHONE
+    ==========================================
+    */
+
+    function findSavedCustomer() {
+
+        const phoneInput = document.getElementById("customerPhone");
+        const nameInput = document.getElementById("customerName");
+
+        if (!phoneInput || !nameInput) return;
+
+        const phone = normalizePhone(phoneInput.value);
+        if (!phone) return;
+
+        const customer = savedCustomers.find(item =>
+            normalizePhone(item.phone) === phone
+        );
+
+        if (customer && customer.name) {
+            nameInput.value = customer.name;
+        }
+    }
+
+
+    document
+        .getElementById("customerPhone")
+        .addEventListener(
+            "input",
+            findSavedCustomer
+        );
+
+    document
+        .getElementById("customerPhone")
+        .addEventListener(
+            "change",
+            findSavedCustomer
+        );
+
+
+    /*
+    ==========================================
+    CREATE NORMAL MENU
+    ==========================================
+    */
+
+    function createMenu(containerId, counter) {
+
+        const container =
+            document.getElementById(containerId);
+
+        container.innerHTML = "";
+
+
+        Object.keys(menu).forEach(item => {
+
+            if (menu[item].counter !== counter) {
+                return;
+            }
+
+
+            quantities[item] = 0;
+
+
+            const div =
+                document.createElement("div");
+
+            div.className = "item";
+
+
+            div.innerHTML = `
+
+                <div class="item-name">
+                    ${item}
+                </div>
+
+                <div class="item-price">
+                    ₹${menu[item].price}
+                </div>
+
+                <div class="quantity-row">
+
+                    <button
+                        onclick="changeQuantity('${item}', -1)"
+                    >
+                        −
+                    </button>
+
+                    <span
+                        class="quantity"
+                        id="qty-${item.replace(/[^a-zA-Z0-9]/g, '')}"
+                    >
+                        0
+                    </span>
+
+                    <button
+                        onclick="changeQuantity('${item}', 1)"
+                    >
+                        +
+                    </button>
+
+                </div>
+
+            `;
+
+
+            container.appendChild(div);
+
+        });
+
+    }
+
+
+    /*
+    ==========================================
+    CREATE COMBO MENU
+    ==========================================
+    */
+
+    function createComboMenu() {
+
+        const container =
+            document.getElementById("combosMenu");
+
+        container.innerHTML = "";
+
+
+        Object.keys(combos).forEach(combo => {
+
+            comboQuantities[combo] = 0;
+
+
+            const div =
+                document.createElement("div");
+
+            div.className = "item";
+
+
+            div.innerHTML = `
+
+                <div class="item-name">
+                    ${combo}
+                </div>
+
+                <span class="combo-label">
+                    COMBO
+                </span>
+
+                <div class="item-price">
+                    ₹${combos[combo].price}
+                </div>
+
+                <div class="quantity-row">
+
+                    <button
+                        onclick="changeComboQuantity('${combo}', -1)"
+                    >
+                        −
+                    </button>
+
+                    <span
+                        class="quantity"
+                        id="comboQty-${combo.replace(/[^a-zA-Z0-9]/g, '')}"
+                    >
+                        0
+                    </span>
+
+                    <button
+                        onclick="changeComboQuantity('${combo}', 1)"
+                    >
+                        +
+                    </button>
+
+                </div>
+
+            `;
+
+
+            container.appendChild(div);
+
+        });
+
+    }
+
+
+    createMenu(
+        "chaatsMenu",
+        "chaats"
+    );
+
+    createMenu(
+        "drinksMenu",
+        "drinks"
+    );
+
+    createMenu(
+        "burgersMenu",
+        "burgers"
+    );
+
+    createComboMenu();
+
+    loadSavedCustomers();
+
+
+    /*
+    ==========================================
+    NORMAL ITEM QUANTITY
+    ==========================================
+    */
+
+    function changeQuantity(item, change) {
+
+        quantities[item] += change;
+
+
+        if (quantities[item] < 0) {
+            quantities[item] = 0;
+        }
+
+
+        const id =
+            "qty-" +
+            item.replace(/[^a-zA-Z0-9]/g, "");
+
+
+        document.getElementById(id).textContent =
+            quantities[item];
+
+
+        updateCart();
+
+    }
+
+
+    /*
+    ==========================================
+    COMBO QUANTITY
+    ==========================================
+    */
+
+    function changeComboQuantity(combo, change) {
+
+        comboQuantities[combo] += change;
+
+
+        if (comboQuantities[combo] < 0) {
+            comboQuantities[combo] = 0;
+        }
+
+
+        const id =
+            "comboQty-" +
+            combo.replace(/[^a-zA-Z0-9]/g, "");
+
+
+        document.getElementById(id).textContent =
+            comboQuantities[combo];
+
+
+        updateCart();
+
+    }
+
+
+    /*
+    ==========================================
+    UPDATE CART
+    ==========================================
+    */
+
+    function updateCart() {
+
+        const cart =
+            document.getElementById("cart");
+
+        let total = 0;
+
+        let html = "";
+
+        let hasItems = false;
+
+
+        /*
+        NORMAL ITEMS
+        */
+
+        Object.keys(menu).forEach(item => {
+
+            const qty =
+                quantities[item];
+
+
+            if (qty > 0) {
+
+                hasItems = true;
+
+
+                const amount =
+                    menu[item].price * qty;
+
+
+                total += amount;
+
+
+                html += `
+
+                    <div class="cart-row">
+
+                        <div class="cart-left">
+
+                            ${item}
+                            × ${qty}
+
+                        </div>
+
+                        <div class="cart-right">
+
+                            ₹${amount}
+
+                        </div>
+
+                    </div>
+
+                `;
+
+            }
+
+        });
+
+
+        /*
+        COMBOS
+        */
+
+        Object.keys(combos).forEach(combo => {
+
+            const qty =
+                comboQuantities[combo];
+
+
+            if (qty > 0) {
+
+                hasItems = true;
+
+
+                const amount =
+                    combos[combo].price * qty;
+
+
+                total += amount;
+
+
+                html += `
+
+                    <div class="cart-row">
+
+                        <div class="cart-left">
+
+                            ${combo}
+                            × ${qty}
+
+                        </div>
+
+                        <div class="cart-right">
+
+                            ₹${amount}
+
+                        </div>
+
+                    </div>
+
+                `;
+
+            }
+
+        });
+
+
+        if (!hasItems) {
+
+            cart.innerHTML =
+                "No items selected.";
+
+        } else {
+
+            cart.innerHTML =
+                html;
+
+        }
+
+
+        document.getElementById("total").textContent =
+            total;
+
+    }
+
+
+    /*
+    ==========================================
+    PLACE ORDER
+    ==========================================
+    */
+
+    async function placeOrder() {
+
+        const button =
+            document.getElementById("placeOrder");
+
+        const printButton =
+            document.getElementById("printBill");
+
+        const message =
+            document.getElementById("message");
+
+        const customerName =
+            document.getElementById("customerName")
+                .value
+                .trim();
+
+        const customerPhone =
+            document.getElementById("customerPhone")
+                .value
+                .trim();
+
+
+        const selectedItems = [];
+
+        let total = 0;
+
+
+        /*
+        ======================================
+        NORMAL ITEMS
+        ======================================
+        */
+
+        Object.keys(menu).forEach(item => {
+
+            const qty =
+                quantities[item];
+
+
+            if (qty > 0) {
+
+                const amount =
+                    menu[item].price * qty;
+
+
+                selectedItems.push({
+
+                    name: item,
+
+                    price: menu[item].price,
+
+                    quantity: qty,
+
+                    counter: menu[item].counter,
+
+                    type: "single"
+
+                });
+
+
+                total += amount;
+
+            }
+
+        });
+
+
+        /*
+        ======================================
+        COMBOS
+        ======================================
+        */
+
+        Object.keys(combos).forEach(combo => {
+
+            const qty =
+                comboQuantities[combo];
+
+
+            if (qty > 0) {
+
+                const amount =
+                    combos[combo].price * qty;
+
+
+                selectedItems.push({
+
+                    name: combo,
+
+                    price: combos[combo].price,
+
+                    quantity: qty,
+
+                    type: "combo",
+
+                    components:
+                        combos[combo].items
+
+                });
+
+
+                total += amount;
+
+            }
+
+        });
+
+
+        /*
+        ======================================
+        CHECK ORDER
+        ======================================
+        */
+
+        if (selectedItems.length === 0) {
+
+            message.className =
+                "error";
+
+            message.textContent =
+                "Please select at least one item.";
+
+            return;
+
+        }
+
+
+        button.disabled = true;
+
+        button.textContent =
+            "PLACING ORDER...";
+
+        printButton.style.display =
+            "none";
+
+        message.textContent =
+            "";
+
+
+        try {
+
+            /*
+            ==================================
+            CREATE MAIN ORDER
+            ==================================
+            */
+
+            const { data: order, error: orderError } =
+                await supabaseClient
+
+                    .from("orders")
+
+                    .insert({
+
+                        items:
+                            selectedItems,
+
+                        total:
+                            total,
+
+                        status:
+                            "Pending"
+
+                    })
+
+                    .select()
+
+                    .single();
+
+
+            if (orderError) {
+                throw orderError;
+            }
+
+
+            /*
+            ==================================
+            CREATE COUNTER ITEM GROUPS
+            ==================================
+            */
+
+            const counterItems = {
+
+                chaats: [],
+
+                drinks: [],
+
+                burgers: []
+
+            };
+
+
+            /*
+            ==================================
+            SPLIT NORMAL ITEMS
+            ==================================
+            */
+
+            selectedItems.forEach(item => {
+
+                if (item.type === "single") {
+
+                    if (counterItems[item.counter]) {
+
+                        counterItems[item.counter].push({
+
+                            name:
+                                item.name,
+
+                            quantity:
+                                item.quantity
+
+                        });
+
+                    }
+
+                }
+
+            });
+
+
+            /*
+            ==================================
+            SPLIT COMBOS
+            ==================================
+            */
+
+            selectedItems.forEach(item => {
+
+                if (
+                    item.type === "combo" &&
+                    item.components
+                ) {
+
+                    item.components.forEach(component => {
+
+                        if (
+                            counterItems[
+                                component.counter
+                            ]
+                        ) {
+
+                            counterItems[
+                                component.counter
+                            ].push({
+
+                                name:
+                                    component.name,
+
+                                quantity:
+                                    item.quantity
+
+                            });
+
+                        }
+
+                    });
+
+                }
+
+            });
+
+
+            /*
+            ==================================
+            CREATE KOT ROWS
+            ==================================
+            */
+
+            const kotRows = [];
+
+
+            Object.keys(counterItems).forEach(counter => {
+
+                if (
+                    counterItems[counter].length > 0
+                ) {
+
+                    kotRows.push({
+
+                        order_id:
+                            order.id,
+
+                        counter:
+                            counter,
+
+                        items:
+                            counterItems[counter],
+
+                        status:
+                            "Pending"
+
+                    });
+
+                }
+
+            });
+
+
+            /*
+            ==================================
+            INSERT KOTS
+            ==================================
+            */
+
+            if (kotRows.length > 0) {
+
+                const { error: kotError } =
+                    await supabaseClient
+
+                        .from("counter_kot")
+
+                        .insert(kotRows);
+
+
+                if (kotError) {
+                    throw kotError;
+                }
+
+            }
+
+
+            /*
+            ==================================
+            SAVE CUSTOMER + ORDER LOCALLY
+            ==================================
+            */
+
+            let localCustomer = null;
+
+            if (customerPhone || customerName) {
+                localCustomer = await saveLocalCustomer(
+                    customerName,
+                    customerPhone
+                );
+            }
+
+            const localOrderId =
+                "local-order-" +
+                Date.now() +
+                "-" +
+                Math.random().toString(36).slice(2);
+
+            await saveLocalOrder({
+                id: localOrderId,
+                serverOrderId: order.id,
+                orderNumber: order.order_number,
+                customerId: localCustomer ? localCustomer.id : null,
+                customerName: customerName,
+                customerPhone: customerPhone,
+                items: selectedItems,
+                total: total,
+                status: "Pending",
+                createdAt: new Date().toISOString()
+            });
+
+
+            /*
+            ==================================
+            SAVE FOR PRINTING
+            ==================================
+            */
+
+            lastOrder = {
+
+                orderNumber:
+                    order.order_number,
+
+                customerName:
+                    customerName,
+
+                items:
+                    selectedItems,
+
+                total:
+                    total
+
+            };
+
+
+            prepareReceipt(lastOrder);
+
+
+            message.className =
+                "success";
+
+            message.textContent =
+                "Order #" +
+                order.order_number +
+                " sent to counters.";
+
+
+            button.style.display =
+                "none";
+
+            printButton.style.display =
+                "block";
+
+        } catch (error) {
+
+            console.error(error);
+
+            message.className =
+                "error";
+
+            message.textContent =
+                "Order failed. Please try again.";
+
+            button.disabled = false;
+
+            button.textContent =
+                "PLACE ORDER";
+
+        }
+
+    }
+
+
+    /*
+    ==========================================
+    PREPARE RECEIPT
+    ==========================================
+    */
+
+    function prepareReceipt(order) {
+
+        document.getElementById(
+            "receiptOrderNumber"
+        ).textContent =
+            order.orderNumber;
+
+
+        const now =
+            new Date();
+
+
+        document.getElementById(
+            "receiptDate"
+        ).textContent =
+            now.toLocaleString();
+
+
+        const customerRow =
+            document.getElementById(
+                "receiptCustomerRow"
+            );
+
+
+        if (order.customerName) {
+
+            document.getElementById(
+                "receiptCustomer"
+            ).textContent =
+                order.customerName;
+
+            customerRow.style.display =
+                "block";
+
+        } else {
+
+            customerRow.style.display =
+                "none";
+
+        }
+
+
+        const receiptItems =
+            document.getElementById(
+                "receiptItems"
+            );
+
+
+        receiptItems.innerHTML =
+            "";
+
+
+        order.items.forEach(item => {
+
+            const amount =
+                item.price *
+                item.quantity;
+
+
+            const row =
+                document.createElement("div");
+
+
+            row.className =
+                "receipt-item";
+
+
+            row.innerHTML = `
+
+                <div class="receipt-item-line">
+
+                    <span class="receipt-item-name">
+
+                        ${item.name}
+
+                    </span>
+
+                    <span class="receipt-item-price">
+
+                        ₹${amount}
+
+                    </span>
+
+                </div>
+
+                <div class="receipt-qty">
+
+                    ${item.quantity}
+                    × ₹${item.price}
+
+                </div>
+
+            `;
+
+
+            receiptItems.appendChild(row);
+
+        });
+
+
+        document.getElementById(
+            "receiptTotal"
+        ).textContent =
+            order.total;
+
+    }
+
+
+    /*
+    ==========================================
+    PRINT
+    ==========================================
+    */
+
+    function printBill() {
+
+        if (!lastOrder) {
+            return;
+        }
+
+
+        prepareReceipt(lastOrder);
+
+
+        setTimeout(() => {
+
+            window.print();
+
+        }, 200);
+
+    }
+
+
+    /*
+    ==========================================
+    AFTER PRINT
+    ==========================================
+    */
+
+    window.onafterprint = function() {
+
+        setTimeout(() => {
+
+            window.location.reload();
+
+        }, 500);
+
+    };
+
+</script>
+
+</body>
+</html>
