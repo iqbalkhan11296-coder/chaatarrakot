@@ -1,309 +1,308 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Cafe Billing</title>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="supabase.js?v=4"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js?v=4"></script>
 
-    <style>
-        * {
-            box-sizing: border-box;
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #f4f4f4;
+        color: #222;
+    }
+
+    header {
+        background: #4b001f;
+        color: white;
+        padding: 18px;
+        text-align: center;
+    }
+
+    header h1 {
+        margin: 0;
+        font-size: 28px;
+    }
+
+    header p {
+        margin: 5px 0 0;
+        font-size: 14px;
+    }
+
+    .container {
+        max-width: 1000px;
+        margin: auto;
+        padding: 15px;
+    }
+
+    .section {
+        background: white;
+        margin-bottom: 15px;
+        padding: 15px;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .section h2 {
+        margin-top: 0;
+        color: #4b001f;
+        border-bottom: 2px solid #eee;
+        padding-bottom: 8px;
+    }
+
+    .menu-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 10px;
+    }
+
+    .item {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 12px;
+        background: #fff;
+    }
+
+    .item-name {
+        font-weight: bold;
+        font-size: 17px;
+    }
+
+    .item-price {
+        color: #4b001f;
+        font-weight: bold;
+        margin-top: 5px;
+    }
+
+    .combo-label {
+        display: inline-block;
+        margin-top: 5px;
+        padding: 3px 7px;
+        border-radius: 4px;
+        background: #4b001f;
+        color: white;
+        font-size: 11px;
+        font-weight: bold;
+    }
+
+    .quantity-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 10px;
+    }
+
+    .quantity-row button {
+        width: 35px;
+        height: 35px;
+        border: none;
+        border-radius: 6px;
+        background: #4b001f;
+        color: white;
+        font-size: 20px;
+        cursor: pointer;
+    }
+
+    .quantity {
+        font-size: 18px;
+        font-weight: bold;
+        min-width: 30px;
+        text-align: center;
+    }
+
+    .customer-box input {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 16px;
+        margin-bottom: 8px;
+    }
+
+    .cart {
+        margin-top: 10px;
+    }
+
+    .cart-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        border-bottom: 1px solid #eee;
+        gap: 10px;
+    }
+
+    .cart-left {
+        flex: 1;
+    }
+
+    .cart-right {
+        white-space: nowrap;
+        font-weight: bold;
+    }
+
+    .total {
+        text-align: right;
+        font-size: 24px;
+        font-weight: bold;
+        color: #4b001f;
+        margin-top: 15px;
+    }
+
+    .buttons {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+    }
+
+    .buttons button {
+        flex: 1;
+        padding: 16px;
+        border: none;
+        border-radius: 8px;
+        font-size: 18px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    #placeOrder {
+        background: #4b001f;
+        color: white;
+    }
+
+    #printBill {
+        background: #222;
+        color: white;
+        display: none;
+    }
+
+    button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    #message {
+        text-align: center;
+        font-weight: bold;
+        margin-top: 15px;
+        min-height: 24px;
+    }
+
+    .success {
+        color: green;
+    }
+
+    .error {
+        color: red;
+    }
+
+    #receipt {
+        display: none;
+    }
+
+    @media print {
+
+        @page {
+            size: 58mm auto;
+            margin: 0;
         }
 
         body {
             margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f4f4f4;
-            color: #222;
-        }
-
-        header {
-            background: #4b001f;
-            color: white;
-            padding: 18px;
-            text-align: center;
-        }
-
-        header h1 {
-            margin: 0;
-            font-size: 28px;
-        }
-
-        header p {
-            margin: 5px 0 0;
-            font-size: 14px;
-        }
-
-        .container {
-            max-width: 1000px;
-            margin: auto;
-            padding: 15px;
-        }
-
-        .section {
+            padding: 0;
             background: white;
-            margin-bottom: 15px;
-            padding: 15px;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
         }
 
-        .section h2 {
-            margin-top: 0;
-            color: #4b001f;
-            border-bottom: 2px solid #eee;
-            padding-bottom: 8px;
+        body * {
+            visibility: hidden;
         }
 
-        .menu-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 10px;
-        }
-
-        .item {
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 12px;
-            background: #fff;
-        }
-
-        .item-name {
-            font-weight: bold;
-            font-size: 17px;
-        }
-
-        .item-price {
-            color: #4b001f;
-            font-weight: bold;
-            margin-top: 5px;
-        }
-
-        .combo-label {
-            display: inline-block;
-            margin-top: 5px;
-            padding: 3px 7px;
-            border-radius: 4px;
-            background: #4b001f;
-            color: white;
-            font-size: 11px;
-            font-weight: bold;
-        }
-
-        .quantity-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-top: 10px;
-        }
-
-        .quantity-row button {
-            width: 35px;
-            height: 35px;
-            border: none;
-            border-radius: 6px;
-            background: #4b001f;
-            color: white;
-            font-size: 20px;
-            cursor: pointer;
-        }
-
-        .quantity {
-            font-size: 18px;
-            font-weight: bold;
-            min-width: 30px;
-            text-align: center;
-        }
-
-        .customer-box input {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            font-size: 16px;
-        }
-
-        .cart {
-            margin-top: 10px;
-        }
-
-        .cart-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid #eee;
-            gap: 10px;
-        }
-
-        .cart-left {
-            flex: 1;
-        }
-
-        .cart-right {
-            white-space: nowrap;
-            font-weight: bold;
-        }
-
-        .total {
-            text-align: right;
-            font-size: 24px;
-            font-weight: bold;
-            color: #4b001f;
-            margin-top: 15px;
-        }
-
-        .buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        .buttons button {
-            flex: 1;
-            padding: 16px;
-            border: none;
-            border-radius: 8px;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        #placeOrder {
-            background: #4b001f;
-            color: white;
-        }
-
-        #printBill {
-            background: #222;
-            color: white;
-            display: none;
-        }
-
-        button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        #message {
-            text-align: center;
-            font-weight: bold;
-            margin-top: 15px;
-            min-height: 24px;
-        }
-
-        .success {
-            color: green;
-        }
-
-        .error {
-            color: red;
+        #receipt,
+        #receipt * {
+            visibility: visible;
         }
 
         #receipt {
-            display: none;
+            display: block;
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 58mm;
+            padding: 3mm;
+            font-family: "Courier New", monospace;
+            font-size: 11px;
+            line-height: 1.3;
+            color: black;
         }
 
-        @media print {
-
-            @page {
-                size: 58mm auto;
-                margin: 0;
-            }
-
-            body {
-                margin: 0;
-                padding: 0;
-                background: white;
-            }
-
-            body * {
-                visibility: hidden;
-            }
-
-            #receipt,
-            #receipt * {
-                visibility: visible;
-            }
-
-            #receipt {
-                display: block;
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 58mm;
-                padding: 3mm;
-                font-family: "Courier New", monospace;
-                font-size: 11px;
-                line-height: 1.3;
-                color: black;
-            }
-
-            .receipt-header {
-                text-align: center;
-            }
-
-            .receipt-title {
-                font-size: 18px;
-                font-weight: bold;
-            }
-
-            .receipt-subtitle {
-                font-size: 10px;
-            }
-
-            .receipt-line {
-                border-top: 1px dashed black;
-                margin: 5px 0;
-            }
-
-            .receipt-info {
-                font-size: 10px;
-            }
-
-            .receipt-item {
-                margin: 5px 0;
-            }
-
-            .receipt-item-line {
-                display: flex;
-                justify-content: space-between;
-                gap: 5px;
-            }
-
-            .receipt-item-name {
-                width: 36mm;
-                word-wrap: break-word;
-            }
-
-            .receipt-item-price {
-                width: 13mm;
-                text-align: right;
-                white-space: nowrap;
-            }
-
-            .receipt-qty {
-                font-size: 10px;
-            }
-
-            .receipt-total {
-                display: flex;
-                justify-content: space-between;
-                font-size: 14px;
-                font-weight: bold;
-            }
-
-            .receipt-footer {
-                text-align: center;
-                margin-top: 8px;
-                font-size: 10px;
-            }
+        .receipt-header {
+            text-align: center;
         }
-    </style>
+
+        .receipt-title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .receipt-subtitle {
+            font-size: 10px;
+        }
+
+        .receipt-line {
+            border-top: 1px dashed black;
+            margin: 5px 0;
+        }
+
+        .receipt-info {
+            font-size: 10px;
+        }
+
+        .receipt-item {
+            margin: 5px 0;
+        }
+
+        .receipt-item-line {
+            display: flex;
+            justify-content: space-between;
+            gap: 5px;
+        }
+
+        .receipt-item-name {
+            width: 36mm;
+            word-wrap: break-word;
+        }
+
+        .receipt-item-price {
+            width: 13mm;
+            text-align: right;
+            white-space: nowrap;
+        }
+
+        .receipt-qty {
+            font-size: 10px;
+        }
+
+        .receipt-total {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .receipt-footer {
+            text-align: center;
+            margin-top: 8px;
+            font-size: 10px;
+        }
+    }
+</style>
 </head>
 
 <body>
@@ -516,972 +515,1294 @@
 
 <script>
 
-    /*
-    ==========================================
-    NORMAL MENU ITEMS
-    ==========================================
-    */
+/*
+==========================================
+NORMAL MENU ITEMS
+==========================================
+*/
 
-    const menu = {
+const menu = {
 
-        // CHAATS
+    // CHAATS
 
-        "Pani Puri": {
-            price: 50,
-            counter: "chaats"
-        },
+    "Pani Puri": {
+        price: 50,
+        counter: "chaats"
+    },
 
-        "Masala Puri": {
-            price: 60,
-            counter: "chaats"
-        },
+    "Masala Puri": {
+        price: 60,
+        counter: "chaats"
+    },
 
-        "Samosa Chaat": {
-            price: 80,
-            counter: "chaats"
-        },
+    "Samosa Chaat": {
+        price: 80,
+        counter: "chaats"
+    },
 
-        "Dahi Puri": {
-            price: 80,
-            counter: "chaats"
-        },
+    "Dahi Puri": {
+        price: 80,
+        counter: "chaats"
+    },
 
 
-        // DRINKS
+    // DRINKS
 
-        "Mango Shake": {
-            price: 90,
-            counter: "drinks"
-        },
+    "Mango Shake": {
+        price: 90,
+        counter: "drinks"
+    },
 
-        "Oreo Shake": {
-            price: 80,
-            counter: "drinks"
-        },
+    "Oreo Shake": {
+        price: 80,
+        counter: "drinks"
+    },
 
-        "Strawberry Shake": {
-            price: 90,
-            counter: "drinks"
-        },
+    "Strawberry Shake": {
+        price: 90,
+        counter: "drinks"
+    },
 
-        "Mint Lime": {
-            price: 35,
-            counter: "drinks"
-        },
+    "Mint Lime": {
+        price: 35,
+        counter: "drinks"
+    },
 
 
-        // BURGERS
+    // BURGERS
 
-        "Classic Burger": {
-            price: 120,
-            counter: "burgers"
-        },
+    "Classic Burger": {
+        price: 120,
+        counter: "burgers"
+    },
 
-        "Chicken Burger": {
-            price: 150,
-            counter: "burgers"
-        },
+    "Chicken Burger": {
+        price: 150,
+        counter: "burgers"
+    },
 
-        "Cheese Burger": {
-            price: 140,
-            counter: "burgers"
-        },
+    "Cheese Burger": {
+        price: 140,
+        counter: "burgers"
+    },
 
-        "Double Burger": {
-            price: 180,
-            counter: "burgers"
-        }
+    "Double Burger": {
+        price: 180,
+        counter: "burgers"
+    }
 
-    };
+};
 
 
-    /*
-    ==========================================
-    DUMMY COMBOS
-    ==========================================
-    */
+/*
+==========================================
+DUMMY COMBOS
+==========================================
+*/
 
-    const combos = {
+const combos = {
 
-        "Pani Puri + Mint Lime": {
+    "Pani Puri + Mint Lime": {
 
-            price: 80,
+        price: 80,
 
-            items: [
+        items: [
 
-                {
-                    name: "Pani Puri",
-                    counter: "chaats"
-                },
+            {
+                name: "Pani Puri",
+                counter: "chaats"
+            },
 
-                {
-                    name: "Mint Lime",
-                    counter: "drinks"
-                }
-
-            ]
-
-        },
-
-
-        "Masala Puri + Mango Shake": {
-
-            price: 140,
-
-            items: [
-
-                {
-                    name: "Masala Puri",
-                    counter: "chaats"
-                },
-
-                {
-                    name: "Mango Shake",
-                    counter: "drinks"
-                }
-
-            ]
-
-        },
-
-
-        "Classic Burger + Mango Shake": {
-
-            price: 190,
-
-            items: [
-
-                {
-                    name: "Classic Burger",
-                    counter: "burgers"
-                },
-
-                {
-                    name: "Mango Shake",
-                    counter: "drinks"
-                }
-
-            ]
-
-        },
-
-
-        "Chicken Burger + Oreo Shake": {
-
-            price: 210,
-
-            items: [
-
-                {
-                    name: "Chicken Burger",
-                    counter: "burgers"
-                },
-
-                {
-                    name: "Oreo Shake",
-                    counter: "drinks"
-                }
-
-            ]
-
-        }
-
-    };
-
-
-    /*
-    ==========================================
-    QUANTITIES
-    ==========================================
-    */
-
-    const quantities = {};
-
-    const comboQuantities = {};
-
-    let lastOrder = null;
-
-    /*
-    ==========================================
-    LOCAL CUSTOMER / ORDER DATABASE
-    ==========================================
-
-    Customer name and phone NEVER go to Supabase.
-    They are stored only in this browser's IndexedDB.
-    Orders are also stored locally so the loyalty page
-    can work completely offline.
-    */
-
-    const LOCAL_DB_NAME = "chaatarra_local_db";
-    const LOCAL_DB_VERSION = 1;
-
-    let localDB = null;
-    let savedCustomers = [];
-
-    function openLocalDB() {
-
-        return new Promise((resolve, reject) => {
-
-            if (localDB) {
-                resolve(localDB);
-                return;
+            {
+                name: "Mint Lime",
+                counter: "drinks"
             }
 
-            const request = indexedDB.open(LOCAL_DB_NAME, LOCAL_DB_VERSION);
+        ]
 
-            request.onupgradeneeded = event => {
-
-                const db = event.target.result;
-
-                const customers = db.objectStoreNames.contains("customers")
-                    ? request.transaction.objectStore("customers")
-                    : db.createObjectStore("customers", { keyPath: "id" });
-
-                if (!customers.indexNames.contains("phone")) {
-                    customers.createIndex("phone", "phone", { unique: false });
-                }
-
-                const orders = db.objectStoreNames.contains("orders")
-                    ? request.transaction.objectStore("orders")
-                    : db.createObjectStore("orders", { keyPath: "id" });
-
-                if (!orders.indexNames.contains("customerId")) {
-                    orders.createIndex("customerId", "customerId", { unique: false });
-                }
-
-                if (!orders.indexNames.contains("createdAt")) {
-                    orders.createIndex("createdAt", "createdAt", { unique: false });
-                }
-            };
-
-            request.onsuccess = event => {
-                localDB = event.target.result;
-                resolve(localDB);
-            };
-
-            request.onerror = () => reject(request.error);
-        });
-    }
-
-    function normalizePhone(phone) {
-
-        let digits = String(phone || "").replace(/\D/g, "");
-
-        if (digits.length === 12 && digits.startsWith("91")) {
-            digits = digits.substring(2);
-        }
-
-        return digits;
-    }
-
-    async function getLocalCustomers() {
-
-        const db = await openLocalDB();
-
-        return new Promise((resolve, reject) => {
-            const request = db.transaction("customers", "readonly")
-                .objectStore("customers").getAll();
-            request.onsuccess = () => resolve(request.result || []);
-            request.onerror = () => reject(request.error);
-        });
-    }
-
-    async function saveLocalCustomer(name, phone) {
-
-        name = String(name || "").trim();
-        phone = String(phone || "").trim();
-
-        if (!name && !phone) return null;
-
-        const db = await openLocalDB();
-        const customers = await getLocalCustomers();
-        const normalized = normalizePhone(phone);
-
-        let customer = normalized
-            ? customers.find(c => normalizePhone(c.phone) === normalized)
-            : null;
-
-        if (!customer && name) {
-            customer = customers.find(c =>
-                !normalizePhone(c.phone) &&
-                String(c.name || "").trim().toLowerCase() === name.toLowerCase()
-            );
-        }
-
-        if (!customer) {
-            customer = {
-                id: "local-customer-" + Date.now() + "-" + Math.random().toString(36).slice(2),
-                name: name,
-                phone: phone,
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString()
-            };
-        } else {
-            customer.name = name || customer.name || "";
-            customer.phone = phone || customer.phone || "";
-            customer.updatedAt = new Date().toISOString();
-        }
-
-        return new Promise((resolve, reject) => {
-            const request = db.transaction("customers", "readwrite")
-                .objectStore("customers").put(customer);
-            request.onsuccess = () => resolve(customer);
-            request.onerror = () => reject(request.error);
-        });
-    }
-
-    async function saveLocalOrder(orderData) {
-
-        const db = await openLocalDB();
-
-        return new Promise((resolve, reject) => {
-            const request = db.transaction("orders", "readwrite")
-                .objectStore("orders").put(orderData);
-            request.onsuccess = () => resolve(orderData);
-            request.onerror = () => reject(request.error);
-        });
-    }
-
-    async function loadSavedCustomers() {
-
-        try {
-            savedCustomers = await getLocalCustomers();
-
-            const datalist = document.getElementById("savedCustomerPhones");
-            datalist.innerHTML = "";
-
-            savedCustomers.forEach(customer => {
-                if (!customer.phone) return;
-
-                const option = document.createElement("option");
-                option.value = customer.phone;
-                if (customer.name) option.label = customer.name;
-                datalist.appendChild(option);
-            });
-        } catch (error) {
-            console.error("Local customer loading failed:", error);
-        }
-    }
+    },
 
 
-    /*
-    ==========================================
-    FIND SAVED CUSTOMER BY PHONE
-    ==========================================
-    */
+    "Masala Puri + Mango Shake": {
 
-    function findSavedCustomer() {
+        price: 140,
 
-        const phoneInput = document.getElementById("customerPhone");
-        const nameInput = document.getElementById("customerName");
+        items: [
 
-        if (!phoneInput || !nameInput) return;
+            {
+                name: "Masala Puri",
+                counter: "chaats"
+            },
 
-        const phone = normalizePhone(phoneInput.value);
-        if (!phone) return;
-
-        const customer = savedCustomers.find(item =>
-            normalizePhone(item.phone) === phone
-        );
-
-        if (customer && customer.name) {
-            nameInput.value = customer.name;
-        }
-    }
-
-
-    document
-        .getElementById("customerPhone")
-        .addEventListener(
-            "input",
-            findSavedCustomer
-        );
-
-    document
-        .getElementById("customerPhone")
-        .addEventListener(
-            "change",
-            findSavedCustomer
-        );
-
-
-    /*
-    ==========================================
-    CREATE NORMAL MENU
-    ==========================================
-    */
-
-    function createMenu(containerId, counter) {
-
-        const container =
-            document.getElementById(containerId);
-
-        container.innerHTML = "";
-
-
-        Object.keys(menu).forEach(item => {
-
-            if (menu[item].counter !== counter) {
-                return;
+            {
+                name: "Mango Shake",
+                counter: "drinks"
             }
 
+        ]
 
-            quantities[item] = 0;
+    },
 
 
-            const div =
-                document.createElement("div");
+    "Classic Burger + Mango Shake": {
 
-            div.className = "item";
+        price: 190,
 
+        items: [
 
-            div.innerHTML = `
+            {
+                name: "Classic Burger",
+                counter: "burgers"
+            },
 
-                <div class="item-name">
-                    ${item}
-                </div>
-
-                <div class="item-price">
-                    ₹${menu[item].price}
-                </div>
-
-                <div class="quantity-row">
-
-                    <button
-                        onclick="changeQuantity('${item}', -1)"
-                    >
-                        −
-                    </button>
-
-                    <span
-                        class="quantity"
-                        id="qty-${item.replace(/[^a-zA-Z0-9]/g, '')}"
-                    >
-                        0
-                    </span>
-
-                    <button
-                        onclick="changeQuantity('${item}', 1)"
-                    >
-                        +
-                    </button>
-
-                </div>
-
-            `;
-
-
-            container.appendChild(div);
-
-        });
-
-    }
-
-
-    /*
-    ==========================================
-    CREATE COMBO MENU
-    ==========================================
-    */
-
-    function createComboMenu() {
-
-        const container =
-            document.getElementById("combosMenu");
-
-        container.innerHTML = "";
-
-
-        Object.keys(combos).forEach(combo => {
-
-            comboQuantities[combo] = 0;
-
-
-            const div =
-                document.createElement("div");
-
-            div.className = "item";
-
-
-            div.innerHTML = `
-
-                <div class="item-name">
-                    ${combo}
-                </div>
-
-                <span class="combo-label">
-                    COMBO
-                </span>
-
-                <div class="item-price">
-                    ₹${combos[combo].price}
-                </div>
-
-                <div class="quantity-row">
-
-                    <button
-                        onclick="changeComboQuantity('${combo}', -1)"
-                    >
-                        −
-                    </button>
-
-                    <span
-                        class="quantity"
-                        id="comboQty-${combo.replace(/[^a-zA-Z0-9]/g, '')}"
-                    >
-                        0
-                    </span>
-
-                    <button
-                        onclick="changeComboQuantity('${combo}', 1)"
-                    >
-                        +
-                    </button>
-
-                </div>
-
-            `;
-
-
-            container.appendChild(div);
-
-        });
-
-    }
-
-
-    createMenu(
-        "chaatsMenu",
-        "chaats"
-    );
-
-    createMenu(
-        "drinksMenu",
-        "drinks"
-    );
-
-    createMenu(
-        "burgersMenu",
-        "burgers"
-    );
-
-    createComboMenu();
-
-    loadSavedCustomers();
-
-
-    /*
-    ==========================================
-    NORMAL ITEM QUANTITY
-    ==========================================
-    */
-
-    function changeQuantity(item, change) {
-
-        quantities[item] += change;
-
-
-        if (quantities[item] < 0) {
-            quantities[item] = 0;
-        }
-
-
-        const id =
-            "qty-" +
-            item.replace(/[^a-zA-Z0-9]/g, "");
-
-
-        document.getElementById(id).textContent =
-            quantities[item];
-
-
-        updateCart();
-
-    }
-
-
-    /*
-    ==========================================
-    COMBO QUANTITY
-    ==========================================
-    */
-
-    function changeComboQuantity(combo, change) {
-
-        comboQuantities[combo] += change;
-
-
-        if (comboQuantities[combo] < 0) {
-            comboQuantities[combo] = 0;
-        }
-
-
-        const id =
-            "comboQty-" +
-            combo.replace(/[^a-zA-Z0-9]/g, "");
-
-
-        document.getElementById(id).textContent =
-            comboQuantities[combo];
-
-
-        updateCart();
-
-    }
-
-
-    /*
-    ==========================================
-    UPDATE CART
-    ==========================================
-    */
-
-    function updateCart() {
-
-        const cart =
-            document.getElementById("cart");
-
-        let total = 0;
-
-        let html = "";
-
-        let hasItems = false;
-
-
-        /*
-        NORMAL ITEMS
-        */
-
-        Object.keys(menu).forEach(item => {
-
-            const qty =
-                quantities[item];
-
-
-            if (qty > 0) {
-
-                hasItems = true;
-
-
-                const amount =
-                    menu[item].price * qty;
-
-
-                total += amount;
-
-
-                html += `
-
-                    <div class="cart-row">
-
-                        <div class="cart-left">
-
-                            ${item}
-                            × ${qty}
-
-                        </div>
-
-                        <div class="cart-right">
-
-                            ₹${amount}
-
-                        </div>
-
-                    </div>
-
-                `;
-
+            {
+                name: "Mango Shake",
+                counter: "drinks"
             }
 
-        });
+        ]
+
+    },
 
 
-        /*
-        COMBOS
-        */
+    "Chicken Burger + Oreo Shake": {
 
-        Object.keys(combos).forEach(combo => {
+        price: 210,
 
-            const qty =
-                comboQuantities[combo];
+        items: [
 
+            {
+                name: "Chicken Burger",
+                counter: "burgers"
+            },
 
-            if (qty > 0) {
-
-                hasItems = true;
-
-
-                const amount =
-                    combos[combo].price * qty;
-
-
-                total += amount;
-
-
-                html += `
-
-                    <div class="cart-row">
-
-                        <div class="cart-left">
-
-                            ${combo}
-                            × ${qty}
-
-                        </div>
-
-                        <div class="cart-right">
-
-                            ₹${amount}
-
-                        </div>
-
-                    </div>
-
-                `;
-
+            {
+                name: "Oreo Shake",
+                counter: "drinks"
             }
 
-        });
-
-
-        if (!hasItems) {
-
-            cart.innerHTML =
-                "No items selected.";
-
-        } else {
-
-            cart.innerHTML =
-                html;
-
-        }
-
-
-        document.getElementById("total").textContent =
-            total;
+        ]
 
     }
 
-
-    /*
-    ==========================================
-    PLACE ORDER
-    ==========================================
-    */
-
-    async function placeOrder() {
-
-        const button =
-            document.getElementById("placeOrder");
-
-        const printButton =
-            document.getElementById("printBill");
-
-        const message =
-            document.getElementById("message");
-
-        const customerName =
-            document.getElementById("customerName")
-                .value
-                .trim();
-
-        const customerPhone =
-            document.getElementById("customerPhone")
-                .value
-                .trim();
+};
 
 
-        const selectedItems = [];
+/*
+==========================================
+QUANTITIES
+==========================================
+*/
 
-        let total = 0;
+const quantities = {};
 
+const comboQuantities = {};
 
-        /*
-        ======================================
-        NORMAL ITEMS
-        ======================================
-        */
-
-        Object.keys(menu).forEach(item => {
-
-            const qty =
-                quantities[item];
+let lastOrder = null;
 
 
-            if (qty > 0) {
+/*
+==========================================
+LOCAL CUSTOMER / ORDER DATABASE
+==========================================
 
-                const amount =
-                    menu[item].price * qty;
+CUSTOMER DATA NEVER GOES TO SUPABASE.
 
+The following are stored locally:
 
-                selectedItems.push({
+- customer name
+- customer phone
+- customer account ID
+- local purchase history
+- local order details
 
-                    name: item,
+The local save happens BEFORE Supabase.
 
-                    price: menu[item].price,
+Therefore:
 
-                    quantity: qty,
+ONLINE:
+IndexedDB + Supabase
 
-                    counter: menu[item].counter,
-
-                    type: "single"
-
-                });
-
-
-                total += amount;
-
-            }
-
-        });
-
-
-        /*
-        ======================================
-        COMBOS
-        ======================================
-        */
-
-        Object.keys(combos).forEach(combo => {
-
-            const qty =
-                comboQuantities[combo];
+OFFLINE:
+IndexedDB only
+*/
 
 
-            if (qty > 0) {
+const LOCAL_DB_NAME = "chaatarra_local_db";
 
-                const amount =
-                    combos[combo].price * qty;
+const LOCAL_DB_VERSION = 1;
 
+let localDB = null;
 
-                selectedItems.push({
-
-                    name: combo,
-
-                    price: combos[combo].price,
-
-                    quantity: qty,
-
-                    type: "combo",
-
-                    components:
-                        combos[combo].items
-
-                });
+let savedCustomers = [];
 
 
-                total += amount;
+/*
+==========================================
+OPEN LOCAL DATABASE
+==========================================
+*/
 
-            }
+function openLocalDB() {
 
-        });
+    return new Promise((resolve, reject) => {
 
+        if (localDB) {
 
-        /*
-        ======================================
-        CHECK ORDER
-        ======================================
-        */
-
-        if (selectedItems.length === 0) {
-
-            message.className =
-                "error";
-
-            message.textContent =
-                "Please select at least one item.";
+            resolve(localDB);
 
             return;
 
         }
 
 
-        button.disabled = true;
-
-        button.textContent =
-            "PLACING ORDER...";
-
-        printButton.style.display =
-            "none";
-
-        message.textContent =
-            "";
+        const request =
+            indexedDB.open(
+                LOCAL_DB_NAME,
+                LOCAL_DB_VERSION
+            );
 
 
-        try {
+        request.onupgradeneeded = event => {
+
+            const db =
+                event.target.result;
+
 
             /*
-            ==================================
-            CREATE MAIN ORDER
-            ==================================
+            ==============================
+            CUSTOMERS STORE
+            ==============================
             */
 
-            const { data: order, error: orderError } =
-                await supabaseClient
+            const customers =
+                db.objectStoreNames.contains("customers")
 
-                    .from("orders")
+                    ? request.transaction
+                        .objectStore("customers")
 
-                    .insert({
-
-                        items:
-                            selectedItems,
-
-                        total:
-                            total,
-
-                        status:
-                            "Pending"
-
-                    })
-
-                    .select()
-
-                    .single();
+                    : db.createObjectStore(
+                        "customers",
+                        {
+                            keyPath: "id"
+                        }
+                    );
 
 
-            if (orderError) {
-                throw orderError;
+            if (!customers.indexNames.contains("phone")) {
+
+                customers.createIndex(
+                    "phone",
+                    "phone",
+                    {
+                        unique: false
+                    }
+                );
+
             }
 
 
             /*
-            ==================================
-            CREATE COUNTER ITEM GROUPS
-            ==================================
+            ==============================
+            ORDERS STORE
+            ==============================
             */
 
-            const counterItems = {
+            const orders =
+                db.objectStoreNames.contains("orders")
 
-                chaats: [],
+                    ? request.transaction
+                        .objectStore("orders")
 
-                drinks: [],
+                    : db.createObjectStore(
+                        "orders",
+                        {
+                            keyPath: "id"
+                        }
+                    );
 
-                burgers: []
 
-            };
+            if (!orders.indexNames.contains("customerId")) {
+
+                orders.createIndex(
+                    "customerId",
+                    "customerId",
+                    {
+                        unique: false
+                    }
+                );
+
+            }
 
 
-            /*
-            ==================================
-            SPLIT NORMAL ITEMS
-            ==================================
-            */
+            if (!orders.indexNames.contains("createdAt")) {
 
-            selectedItems.forEach(item => {
+                orders.createIndex(
+                    "createdAt",
+                    "createdAt",
+                    {
+                        unique: false
+                    }
+                );
 
-                if (item.type === "single") {
+            }
 
-                    if (counterItems[item.counter]) {
+        };
 
-                        counterItems[item.counter].push({
 
-                            name:
-                                item.name,
+        request.onsuccess = event => {
 
-                            quantity:
-                                item.quantity
+            localDB =
+                event.target.result;
 
-                        });
+            resolve(localDB);
+
+        };
+
+
+        request.onerror = () => {
+
+            reject(request.error);
+
+        };
+
+    });
+
+}
+
+
+/*
+==========================================
+NORMALIZE PHONE
+==========================================
+*/
+
+function normalizePhone(phone) {
+
+    let digits =
+        String(phone || "")
+            .replace(/\D/g, "");
+
+
+    if (
+        digits.length === 12 &&
+        digits.startsWith("91")
+    ) {
+
+        digits =
+            digits.substring(2);
+
+    }
+
+
+    return digits;
+
+}
+
+
+/*
+==========================================
+GET LOCAL CUSTOMERS
+==========================================
+*/
+
+async function getLocalCustomers() {
+
+    const db =
+        await openLocalDB();
+
+
+    return new Promise((resolve, reject) => {
+
+        const request =
+            db
+                .transaction(
+                    "customers",
+                    "readonly"
+                )
+                .objectStore("customers")
+                .getAll();
+
+
+        request.onsuccess = () => {
+
+            resolve(
+                request.result || []
+            );
+
+        };
+
+
+        request.onerror = () => {
+
+            reject(request.error);
+
+        };
+
+    });
+
+}
+
+
+/*
+==========================================
+SAVE / UPDATE CUSTOMER ACCOUNT LOCALLY
+==========================================
+
+If phone exists:
+    use existing customer account.
+
+If phone does not exist:
+    create new customer account.
+
+This is the account creation logic.
+==========================================
+*/
+
+async function saveLocalCustomer(
+    name,
+    phone
+) {
+
+    name =
+        String(name || "").trim();
+
+    phone =
+        String(phone || "").trim();
+
+
+    if (!name && !phone) {
+
+        return null;
+
+    }
+
+
+    const db =
+        await openLocalDB();
+
+
+    const customers =
+        await getLocalCustomers();
+
+
+    const normalized =
+        normalizePhone(phone);
+
+
+    /*
+    ==============================
+    FIND EXISTING CUSTOMER
+    ==============================
+    */
+
+    let customer =
+        normalized
+
+            ? customers.find(
+                c =>
+                    normalizePhone(c.phone) ===
+                    normalized
+            )
+
+            : null;
+
+
+    /*
+    ==============================
+    FALLBACK:
+    FIND BY NAME IF NO PHONE
+    ==============================
+    */
+
+    if (!customer && name) {
+
+        customer =
+            customers.find(
+                c =>
+                    !normalizePhone(c.phone) &&
+                    String(c.name || "")
+                        .trim()
+                        .toLowerCase() ===
+                    name.toLowerCase()
+            );
+
+    }
+
+
+    /*
+    ==============================
+    CREATE NEW CUSTOMER
+    ==============================
+    */
+
+    if (!customer) {
+
+        customer = {
+
+            id:
+                "local-customer-" +
+                Date.now() +
+                "-" +
+                Math.random()
+                    .toString(36)
+                    .slice(2),
+
+            name:
+                name,
+
+            phone:
+                phone,
+
+            createdAt:
+                new Date().toISOString(),
+
+            updatedAt:
+                new Date().toISOString()
+
+        };
+
+    }
+
+    /*
+    ==============================
+    UPDATE EXISTING CUSTOMER
+    ==============================
+    */
+
+    else {
+
+        customer.name =
+            name ||
+            customer.name ||
+            "";
+
+        customer.phone =
+            phone ||
+            customer.phone ||
+            "";
+
+        customer.updatedAt =
+            new Date().toISOString();
+
+    }
+
+
+    /*
+    ==============================
+    SAVE CUSTOMER
+    ==============================
+    */
+
+    return new Promise((resolve, reject) => {
+
+        const request =
+            db
+                .transaction(
+                    "customers",
+                    "readwrite"
+                )
+                .objectStore("customers")
+                .put(customer);
+
+
+        request.onsuccess = () => {
+
+            resolve(customer);
+
+        };
+
+
+        request.onerror = () => {
+
+            reject(request.error);
+
+        };
+
+    });
+
+}
+
+
+/*
+==========================================
+SAVE LOCAL ORDER
+==========================================
+*/
+
+async function saveLocalOrder(orderData) {
+
+    const db =
+        await openLocalDB();
+
+
+    return new Promise((resolve, reject) => {
+
+        const request =
+            db
+                .transaction(
+                    "orders",
+                    "readwrite"
+                )
+                .objectStore("orders")
+                .put(orderData);
+
+
+        request.onsuccess = () => {
+
+            resolve(orderData);
+
+        };
+
+
+        request.onerror = () => {
+
+            reject(request.error);
+
+        };
+
+    });
+
+}
+
+
+/*
+==========================================
+LOAD SAVED CUSTOMERS
+==========================================
+*/
+
+async function loadSavedCustomers() {
+
+    try {
+
+        savedCustomers =
+            await getLocalCustomers();
+
+
+        const datalist =
+            document.getElementById(
+                "savedCustomerPhones"
+            );
+
+
+        datalist.innerHTML = "";
+
+
+        savedCustomers.forEach(customer => {
+
+            if (!customer.phone) {
+
+                return;
+
+            }
+
+
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+
+            option.value =
+                customer.phone;
+
+
+            if (customer.name) {
+
+                option.label =
+                    customer.name;
+
+            }
+
+
+            datalist.appendChild(option);
+
+        });
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Local customer loading failed:",
+            error
+        );
+
+    }
+
+}
+
+
+/*
+==========================================
+FIND SAVED CUSTOMER BY PHONE
+==========================================
+*/
+
+function findSavedCustomer() {
+
+    const phoneInput =
+        document.getElementById(
+            "customerPhone"
+        );
+
+    const nameInput =
+        document.getElementById(
+            "customerName"
+        );
+
+
+    if (!phoneInput || !nameInput) {
+
+        return;
+
+    }
+
+
+    const phone =
+        normalizePhone(
+            phoneInput.value
+        );
+
+
+    if (!phone) {
+
+        return;
+
+    }
+
+
+    const customer =
+        savedCustomers.find(
+            item =>
+                normalizePhone(item.phone) ===
+                phone
+        );
+
+
+    if (customer && customer.name) {
+
+        nameInput.value =
+            customer.name;
+
+    }
+
+}
+
+
+document
+    .getElementById("customerPhone")
+    .addEventListener(
+        "input",
+        findSavedCustomer
+    );
+
+
+document
+    .getElementById("customerPhone")
+    .addEventListener(
+        "change",
+        findSavedCustomer
+    );
+
+
+/*
+==========================================
+CREATE NORMAL MENU
+==========================================
+*/
+
+function createMenu(
+    containerId,
+    counter
+) {
+
+    const container =
+        document.getElementById(
+            containerId
+        );
+
+
+    container.innerHTML = "";
+
+
+    Object.keys(menu).forEach(item => {
+
+        if (
+            menu[item].counter !==
+            counter
+        ) {
+
+            return;
+
+        }
+
+
+        quantities[item] = 0;
+
+
+        const div =
+            document.createElement(
+                "div"
+            );
+
+
+        div.className = "item";
+
+
+        div.innerHTML = `
+
+            <div class="item-name">
+                ${item}
+            </div>
+
+            <div class="item-price">
+                ₹${menu[item].price}
+            </div>
+
+            <div class="quantity-row">
+
+                <button
+                    onclick="changeQuantity('${item}', -1)"
+                >
+                    −
+                </button>
+
+                <span
+                    class="quantity"
+                    id="qty-${item.replace(/[^a-zA-Z0-9]/g, '')}"
+                >
+                    0
+                </span>
+
+                <button
+                    onclick="changeQuantity('${item}', 1)"
+                >
+                    +
+                </button>
+
+            </div>
+
+        `;
+
+
+        container.appendChild(div);
+
+    });
+
+}
+
+
+/*
+==========================================
+CREATE COMBO MENU
+==========================================
+*/
+
+function createComboMenu() {
+
+    const container =
+        document.getElementById(
+            "combosMenu"
+        );
+
+
+    container.innerHTML = "";
+
+
+    Object.keys(combos).forEach(combo => {
+
+        comboQuantities[combo] = 0;
+
+
+        const div =
+            document.createElement(
+                "div"
+            );
+
+
+        div.className = "item";
+
+
+        div.innerHTML = `
+
+            <div class="item-name">
+                ${combo}
+            </div>
+
+            <span class="combo-label">
+                COMBO
+            </span>
+
+            <div class="item-price">
+                ₹${combos[combo].price}
+            </div>
+
+            <div class="quantity-row">
+
+                <button
+                    onclick="changeComboQuantity('${combo}', -1)"
+                >
+                    −
+                </button>
+
+                <span
+                    class="quantity"
+                    id="comboQty-${combo.replace(/[^a-zA-Z0-9]/g, '')}"
+                >
+                    0
+                </span>
+
+                <button
+                    onclick="changeComboQuantity('${combo}', 1)"
+                >
+                    +
+                </button>
+
+            </div>
+
+        `;
+
+
+        container.appendChild(div);
+
+    });
+
+}
+
+
+createMenu(
+    "chaatsMenu",
+    "chaats"
+);
+
+
+createMenu(
+    "drinksMenu",
+    "drinks"
+);
+
+
+createMenu(
+    "burgersMenu",
+    "burgers"
+);
+
+
+createComboMenu();
+
+
+loadSavedCustomers();
+
+
+/*
+==========================================
+NORMAL ITEM QUANTITY
+==========================================
+*/
+
+function changeQuantity(
+    item,
+    change
+) {
+
+    quantities[item] += change;
+
+
+    if (quantities[item] < 0) {
+
+        quantities[item] = 0;
+
+    }
+
+
+    const id =
+        "qty-" +
+        item.replace(
+            /[^a-zA-Z0-9]/g,
+            ""
+        );
+
+
+    document.getElementById(id).textContent =
+        quantities[item];
+
+
+    updateCart();
+
+}
+
+
+/*
+==========================================
+COMBO QUANTITY
+==========================================
+*/
+
+function changeComboQuantity(
+    combo,
+    change
+) {
+
+    comboQuantities[combo] += change;
+
+
+    if (comboQuantities[combo] < 0) {
+
+        comboQuantities[combo] = 0;
+
+    }
+
+
+    const id =
+        "comboQty-" +
+        combo.replace(
+            /[^a-zA-Z0-9]/g,
+            ""
+        );
+
+
+    document.getElementById(id).textContent =
+        comboQuantities[combo];
+
+
+    updateCart();
+
+}
+
+
+/*
+==========================================
+UPDATE CART
+==========================================
+*/
+
+function updateCart() {
+
+    const cart =
+        document.getElementById(
+            "cart"
+        );
+
+
+    let total = 0;
+
+    let html = "";
+
+    let hasItems = false;
+
+
+    /*
+    NORMAL ITEMS
+    */
+
+    Object.keys(menu).forEach(item => {
+
+        const qty =
+            quantities[item];
+
+
+        if (qty > 0) {
+
+            hasItems = true;
+
+
+            const amount =
+                menu[item].price *
+                qty;
+
+
+            total += amount;
+
+
+            html += `
+
+                <div class="cart-row">
+
+                    <div class="cart-left">
+
+                        ${item}
+                        × ${qty}
+
+                    </div>
+
+                    <div class="cart-right">
+
+                        ₹${amount}
+
+                    </div>
+
+                </div>
+
+            `;
+
+        }
+
+    });
+
+
+    /*
+    COMBOS
+    */
+
+    Object.keys(combos).forEach(combo => {
+
+        const qty =
+            comboQuantities[combo];
+
+
+        if (qty > 0) {
+
+            hasItems = true;
+
+
+            const amount =
+                combos[combo].price *
+                qty;
+
+
+            total += amount;
+
+
+            html += `
+
+                <div class="cart-row">
+
+                    <div class="cart-left">
+
+                        ${combo}
+                        × ${qty}
+
+                    </div>
+
+                    <div class="cart-right">
+
+                        ₹${amount}
+
+                    </div>
+
+                </div>
+
+            `;
+
+        }
+
+    });
+
+
+    if (!hasItems) {
+
+        cart.innerHTML =
+            "No items selected.";
+
+    }
+
+    else {
+
+        cart.innerHTML =
+            html;
+
+    }
+
+
+    document.getElementById(
+        "total"
+    ).textContent =
+        total;
+
+}
+
+
+/*
+==========================================
+GENERATE LOCAL ORDER NUMBER
+==========================================
+
+Used when Supabase is unavailable.
+
+Example:
+
+OFF-20260926-001
+
+The number is generated locally and
+does NOT require internet.
+==========================================
+*/
+
+async function generateLocalOrderNumber() {
+
+    const db =
+        await openLocalDB();
+
+
+    return new Promise((resolve, reject) => {
+
+        const transaction =
+            db.transaction(
+                "orders",
+                "readonly"
+            );
+
+
+        const store =
+            transaction.objectStore(
+                "orders"
+            );
+
+
+        const request =
+            store.getAll();
+
+
+        request.onsuccess = () => {
+
+            const orders =
+                request.result || [];
+
+
+            const today =
+                new Date()
+                    .toISOString()
+                    .slice(0, 10)
+                    .replace(/-/g, "");
+
+
+            let highest = 0;
+
+
+            orders.forEach(order => {
+
+                const number =
+                    String(
+                        order.orderNumber || ""
+                    );
+
+
+                const match =
+                    number.match(
+                        new RegExp(
+                            "^OFF-" +
+                            today +
+                            "-(\\d+)$"
+                        )
+                    );
+
+
+                if (match) {
+
+                    const value =
+                        parseInt(
+                            match[1],
+                            10
+                        );
+
+
+                    if (
+                        value > highest
+                    ) {
+
+                        highest = value;
 
                     }
 
@@ -1490,33 +1811,453 @@
             });
 
 
-            /*
-            ==================================
-            SPLIT COMBOS
-            ==================================
-            */
+            const next =
+                highest + 1;
 
-            selectedItems.forEach(item => {
 
-                if (
-                    item.type === "combo" &&
-                    item.components
-                ) {
+            const formatted =
+                String(next)
+                    .padStart(3, "0");
 
-                    item.components.forEach(component => {
+
+            resolve(
+                "OFF-" +
+                today +
+                "-" +
+                formatted
+            );
+
+        };
+
+
+        request.onerror = () => {
+
+            reject(request.error);
+
+        };
+
+    });
+
+}
+
+
+/*
+==========================================
+PLACE ORDER
+==========================================
+*/
+
+async function placeOrder() {
+
+    const button =
+        document.getElementById(
+            "placeOrder"
+        );
+
+
+    const printButton =
+        document.getElementById(
+            "printBill"
+        );
+
+
+    const message =
+        document.getElementById(
+            "message"
+        );
+
+
+    const customerName =
+        document
+            .getElementById(
+                "customerName"
+            )
+            .value
+            .trim();
+
+
+    const customerPhone =
+        document
+            .getElementById(
+                "customerPhone"
+            )
+            .value
+            .trim();
+
+
+    const selectedItems = [];
+
+    let total = 0;
+
+
+    /*
+    ======================================
+    NORMAL ITEMS
+    ======================================
+    */
+
+    Object.keys(menu).forEach(item => {
+
+        const qty =
+            quantities[item];
+
+
+        if (qty > 0) {
+
+            const amount =
+                menu[item].price *
+                qty;
+
+
+            selectedItems.push({
+
+                name:
+                    item,
+
+                price:
+                    menu[item].price,
+
+                quantity:
+                    qty,
+
+                counter:
+                    menu[item].counter,
+
+                type:
+                    "single"
+
+            });
+
+
+            total += amount;
+
+        }
+
+    });
+
+
+    /*
+    ======================================
+    COMBOS
+    ======================================
+    */
+
+    Object.keys(combos).forEach(combo => {
+
+        const qty =
+            comboQuantities[combo];
+
+
+        if (qty > 0) {
+
+            const amount =
+                combos[combo].price *
+                qty;
+
+
+            selectedItems.push({
+
+                name:
+                    combo,
+
+                price:
+                    combos[combo].price,
+
+                quantity:
+                    qty,
+
+                type:
+                    "combo",
+
+                components:
+                    combos[combo].items
+
+            });
+
+
+            total += amount;
+
+        }
+
+    });
+
+
+    /*
+    ======================================
+    CHECK ORDER
+    ======================================
+    */
+
+    if (
+        selectedItems.length === 0
+    ) {
+
+        message.className =
+            "error";
+
+        message.textContent =
+            "Please select at least one item.";
+
+        return;
+
+    }
+
+
+    button.disabled = true;
+
+    button.textContent =
+        "PLACING ORDER...";
+
+
+    printButton.style.display =
+        "none";
+
+
+    message.textContent =
+        "";
+
+
+    try {
+
+        /*
+        ==================================================
+        STEP 1
+        SAVE CUSTOMER LOCALLY FIRST
+        ==================================================
+
+        THIS ALWAYS HAPPENS.
+
+        Supabase is NOT required.
+        */
+
+        let localCustomer = null;
+
+
+        if (
+            customerPhone ||
+            customerName
+        ) {
+
+            localCustomer =
+                await saveLocalCustomer(
+                    customerName,
+                    customerPhone
+                );
+
+        }
+
+
+        /*
+        ==================================================
+        STEP 2
+        GENERATE LOCAL ORDER NUMBER
+        ==================================================
+        */
+
+        const localOrderNumber =
+            await generateLocalOrderNumber();
+
+
+        /*
+        ==================================================
+        STEP 3
+        SAVE ORDER TO INDEXEDDB FIRST
+        ==================================================
+
+        This is the important offline-first part.
+        */
+
+        const localOrderId =
+            "local-order-" +
+            Date.now() +
+            "-" +
+            Math.random()
+                .toString(36)
+                .slice(2);
+
+
+        const localOrder = {
+
+            id:
+                localOrderId,
+
+            serverOrderId:
+                null,
+
+            orderNumber:
+                localOrderNumber,
+
+            customerId:
+                localCustomer
+                    ? localCustomer.id
+                    : null,
+
+            customerName:
+                customerName,
+
+            customerPhone:
+                customerPhone,
+
+            items:
+                selectedItems,
+
+            total:
+                total,
+
+            status:
+                "Pending",
+
+            syncStatus:
+                "pending",
+
+            createdAt:
+                new Date().toISOString()
+
+        };
+
+
+        await saveLocalOrder(
+            localOrder
+        );
+
+
+        /*
+        ==================================================
+        STEP 4
+        LOCAL SAVE SUCCESS
+        ==================================================
+        */
+
+        lastOrder = {
+
+            orderNumber:
+                localOrderNumber,
+
+            customerName:
+                customerName,
+
+            items:
+                selectedItems,
+
+            total:
+                total
+
+        };
+
+
+        prepareReceipt(
+            lastOrder
+        );
+
+
+        /*
+        ==================================================
+        STEP 5
+        TRY SUPABASE
+        ==================================================
+
+        Supabase failure DOES NOT delete or undo
+        the local customer/order.
+        */
+
+        let serverOrder = null;
+
+        let serverSynced = false;
+
+
+        try {
+
+            if (
+                typeof supabaseClient !==
+                "undefined" &&
+                supabaseClient
+            ) {
+
+                /*
+                ==============================
+                CREATE MAIN SERVER ORDER
+                ==============================
+                */
+
+                const {
+                    data: order,
+                    error: orderError
+                } =
+                    await supabaseClient
+
+                        .from("orders")
+
+                        .insert({
+
+                            items:
+                                selectedItems,
+
+                            total:
+                                total,
+
+                            status:
+                                "Pending"
+
+                        })
+
+                        .select()
+
+                        .single();
+
+
+                if (orderError) {
+
+                    throw orderError;
+
+                }
+
+
+                serverOrder =
+                    order;
+
+
+                /*
+                ==============================
+                CREATE COUNTER ITEM GROUPS
+                ==============================
+                */
+
+                const counterItems = {
+
+                    chaats: [],
+
+                    drinks: [],
+
+                    burgers: []
+
+                };
+
+
+                /*
+                ==============================
+                SPLIT NORMAL ITEMS
+                ==============================
+                */
+
+                selectedItems.forEach(item => {
+
+                    if (
+                        item.type ===
+                        "single"
+                    ) {
 
                         if (
                             counterItems[
-                                component.counter
+                                item.counter
                             ]
                         ) {
 
                             counterItems[
-                                component.counter
+                                item.counter
                             ].push({
 
                                 name:
-                                    component.name,
+                                    item.name,
 
                                 quantity:
                                     item.quantity
@@ -1525,322 +2266,421 @@
 
                         }
 
-                    });
+                    }
 
-                }
-
-            });
+                });
 
 
-            /*
-            ==================================
-            CREATE KOT ROWS
-            ==================================
-            */
+                /*
+                ==============================
+                SPLIT COMBOS
+                ==============================
+                */
 
-            const kotRows = [];
+                selectedItems.forEach(item => {
+
+                    if (
+                        item.type ===
+                            "combo" &&
+                        item.components
+                    ) {
+
+                        item.components
+                            .forEach(
+                                component => {
+
+                                    if (
+                                        counterItems[
+                                            component.counter
+                                        ]
+                                    ) {
+
+                                        counterItems[
+                                            component.counter
+                                        ].push({
+
+                                            name:
+                                                component.name,
+
+                                            quantity:
+                                                item.quantity
+
+                                        });
+
+                                    }
+
+                                }
+                            );
+
+                    }
+
+                });
 
 
-            Object.keys(counterItems).forEach(counter => {
+                /*
+                ==============================
+                CREATE KOT ROWS
+                ==============================
+                */
+
+                const kotRows = [];
+
+
+                Object.keys(
+                    counterItems
+                ).forEach(counter => {
+
+                    if (
+                        counterItems[
+                            counter
+                        ].length > 0
+                    ) {
+
+                        kotRows.push({
+
+                            order_id:
+                                order.id,
+
+                            counter:
+                                counter,
+
+                            items:
+                                counterItems[
+                                    counter
+                                ],
+
+                            status:
+                                "Pending"
+
+                        });
+
+                    }
+
+                });
+
+
+                /*
+                ==============================
+                INSERT KOTS
+                ==============================
+                */
 
                 if (
-                    counterItems[counter].length > 0
+                    kotRows.length > 0
                 ) {
 
-                    kotRows.push({
+                    const {
+                        error: kotError
+                    } =
+                        await supabaseClient
 
-                        order_id:
-                            order.id,
+                            .from(
+                                "counter_kot"
+                            )
 
-                        counter:
-                            counter,
+                            .insert(
+                                kotRows
+                            );
 
-                        items:
-                            counterItems[counter],
 
-                        status:
-                            "Pending"
+                    if (kotError) {
 
-                    });
+                        throw kotError;
+
+                    }
 
                 }
 
-            });
+
+                /*
+                ==============================
+                SUPABASE SUCCESS
+                ==============================
+                */
+
+                serverSynced = true;
 
 
-            /*
-            ==================================
-            INSERT KOTS
-            ==================================
-            */
+                /*
+                UPDATE LOCAL ORDER WITH
+                SERVER INFORMATION
+                */
 
-            if (kotRows.length > 0) {
-
-                const { error: kotError } =
-                    await supabaseClient
-
-                        .from("counter_kot")
-
-                        .insert(kotRows);
+                localOrder.serverOrderId =
+                    order.id;
 
 
-                if (kotError) {
-                    throw kotError;
+                if (
+                    order.order_number
+                ) {
+
+                    localOrder.orderNumber =
+                        order.order_number;
+
+                    lastOrder.orderNumber =
+                        order.order_number;
+
                 }
 
-            }
+
+                localOrder.syncStatus =
+                    "synced";
 
 
-            /*
-            ==================================
-            SAVE CUSTOMER + ORDER LOCALLY
-            ==================================
-            */
-
-            let localCustomer = null;
-
-            if (customerPhone || customerName) {
-                localCustomer = await saveLocalCustomer(
-                    customerName,
-                    customerPhone
+                await saveLocalOrder(
+                    localOrder
                 );
+
+
+                prepareReceipt(
+                    lastOrder
+                );
+
             }
 
-            const localOrderId =
-                "local-order-" +
-                Date.now() +
-                "-" +
-                Math.random().toString(36).slice(2);
+        }
 
-            await saveLocalOrder({
-                id: localOrderId,
-                serverOrderId: order.id,
-                orderNumber: order.order_number,
-                customerId: localCustomer ? localCustomer.id : null,
-                customerName: customerName,
-                customerPhone: customerPhone,
-                items: selectedItems,
-                total: total,
-                status: "Pending",
-                createdAt: new Date().toISOString()
-            });
+        catch (supabaseError) {
+
+            console.warn(
+                "Supabase unavailable. Order remains safely stored locally.",
+                supabaseError
+            );
+
+            serverSynced = false;
+
+        }
 
 
-            /*
-            ==================================
-            SAVE FOR PRINTING
-            ==================================
-            */
+        /*
+        ==================================================
+        STEP 6
+        SHOW SUCCESS
+        ==================================================
+        */
 
-            lastOrder = {
-
-                orderNumber:
-                    order.order_number,
-
-                customerName:
-                    customerName,
-
-                items:
-                    selectedItems,
-
-                total:
-                    total
-
-            };
+        message.className =
+            "success";
 
 
-            prepareReceipt(lastOrder);
-
-
-            message.className =
-                "success";
+        if (serverSynced) {
 
             message.textContent =
                 "Order #" +
-                order.order_number +
+                lastOrder.orderNumber +
                 " sent to counters.";
 
+        }
 
-            button.style.display =
-                "none";
-
-            printButton.style.display =
-                "block";
-
-        } catch (error) {
-
-            console.error(error);
-
-            message.className =
-                "error";
+        else {
 
             message.textContent =
-                "Order failed. Please try again.";
-
-            button.disabled = false;
-
-            button.textContent =
-                "PLACE ORDER";
+                "Order #" +
+                lastOrder.orderNumber +
+                " saved offline.";
 
         }
+
+
+        button.style.display =
+            "none";
+
+
+        printButton.style.display =
+            "block";
+
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Local order save failed:",
+            error
+        );
+
+
+        message.className =
+            "error";
+
+
+        message.textContent =
+            "Could not save the order locally. Please try again.";
+
+
+        button.disabled = false;
+
+        button.textContent =
+            "PLACE ORDER";
+
+    }
+
+}
+
+
+/*
+==========================================
+PREPARE RECEIPT
+==========================================
+*/
+
+function prepareReceipt(order) {
+
+    document.getElementById(
+        "receiptOrderNumber"
+    ).textContent =
+        order.orderNumber;
+
+
+    const now =
+        new Date();
+
+
+    document.getElementById(
+        "receiptDate"
+    ).textContent =
+        now.toLocaleString();
+
+
+    const customerRow =
+        document.getElementById(
+            "receiptCustomerRow"
+        );
+
+
+    if (order.customerName) {
+
+        document.getElementById(
+            "receiptCustomer"
+        ).textContent =
+            order.customerName;
+
+
+        customerRow.style.display =
+            "block";
+
+    }
+
+    else {
+
+        customerRow.style.display =
+            "none";
 
     }
 
 
-    /*
-    ==========================================
-    PREPARE RECEIPT
-    ==========================================
-    */
-
-    function prepareReceipt(order) {
-
+    const receiptItems =
         document.getElementById(
-            "receiptOrderNumber"
-        ).textContent =
-            order.orderNumber;
+            "receiptItems"
+        );
 
 
-        const now =
-            new Date();
+    receiptItems.innerHTML =
+        "";
 
 
-        document.getElementById(
-            "receiptDate"
-        ).textContent =
-            now.toLocaleString();
+    order.items.forEach(item => {
+
+        const amount =
+            item.price *
+            item.quantity;
 
 
-        const customerRow =
-            document.getElementById(
-                "receiptCustomerRow"
+        const row =
+            document.createElement(
+                "div"
             );
 
 
-        if (order.customerName) {
-
-            document.getElementById(
-                "receiptCustomer"
-            ).textContent =
-                order.customerName;
-
-            customerRow.style.display =
-                "block";
-
-        } else {
-
-            customerRow.style.display =
-                "none";
-
-        }
+        row.className =
+            "receipt-item";
 
 
-        const receiptItems =
-            document.getElementById(
-                "receiptItems"
-            );
+        row.innerHTML = `
+
+            <div class="receipt-item-line">
+
+                <span class="receipt-item-name">
+
+                    ${item.name}
+
+                </span>
+
+                <span class="receipt-item-price">
+
+                    ₹${amount}
+
+                </span>
+
+            </div>
+
+            <div class="receipt-qty">
+
+                ${item.quantity}
+                × ₹${item.price}
+
+            </div>
+
+        `;
 
 
-        receiptItems.innerHTML =
-            "";
+        receiptItems.appendChild(row);
+
+    });
 
 
-        order.items.forEach(item => {
+    document.getElementById(
+        "receiptTotal"
+    ).textContent =
+        order.total;
 
-            const amount =
-                item.price *
-                item.quantity;
-
-
-            const row =
-                document.createElement("div");
+}
 
 
-            row.className =
-                "receipt-item";
+/*
+==========================================
+PRINT
+==========================================
+*/
 
+function printBill() {
 
-            row.innerHTML = `
+    if (!lastOrder) {
 
-                <div class="receipt-item-line">
-
-                    <span class="receipt-item-name">
-
-                        ${item.name}
-
-                    </span>
-
-                    <span class="receipt-item-price">
-
-                        ₹${amount}
-
-                    </span>
-
-                </div>
-
-                <div class="receipt-qty">
-
-                    ${item.quantity}
-                    × ₹${item.price}
-
-                </div>
-
-            `;
-
-
-            receiptItems.appendChild(row);
-
-        });
-
-
-        document.getElementById(
-            "receiptTotal"
-        ).textContent =
-            order.total;
+        return;
 
     }
 
 
-    /*
-    ==========================================
-    PRINT
-    ==========================================
-    */
-
-    function printBill() {
-
-        if (!lastOrder) {
-            return;
-        }
+    prepareReceipt(
+        lastOrder
+    );
 
 
-        prepareReceipt(lastOrder);
+    setTimeout(() => {
+
+        window.print();
+
+    }, 200);
+
+}
 
 
-        setTimeout(() => {
+/*
+==========================================
+AFTER PRINT
+==========================================
+*/
 
-            window.print();
+window.onafterprint = function() {
 
-        }, 200);
+    setTimeout(() => {
 
-    }
+        window.location.reload();
 
+    }, 500);
 
-    /*
-    ==========================================
-    AFTER PRINT
-    ==========================================
-    */
-
-    window.onafterprint = function() {
-
-        setTimeout(() => {
-
-            window.location.reload();
-
-        }, 500);
-
-    };
+};
 
 </script>
 
