@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Loyalty Admin</title>
+<title>Loyalty Points Admin Dashboard</title>
+
 <style>
 *{box-sizing:border-box}
 
@@ -464,6 +465,7 @@ button,input{
 /* ---------- TABLET ---------- */
 
 @media(max-width:900px){
+
     .app{
         width:calc(100% - 28px);
         margin:14px auto;
@@ -490,6 +492,7 @@ button,input{
 /* ---------- SMALL SCREENS ---------- */
 
 @media(max-width:600px){
+
     body{
         background:#fbf8f4;
     }
@@ -574,15 +577,27 @@ button,input{
 
             <div class="home-actions">
 
-                <button class="data-btn" onclick="openAccounts()">
+                <button
+                    class="data-btn"
+                    type="button"
+                    onclick="openAccounts()"
+                >
                     DATAS
                 </button>
 
-                <button class="backup-btn" onclick="exportBackup()">
+                <button
+                    class="backup-btn"
+                    type="button"
+                    onclick="exportBackup()"
+                >
                     📤 EXPORT BACKUP
                 </button>
 
-                <button class="backup-btn" onclick="document.getElementById('importFile').click()">
+                <button
+                    class="backup-btn"
+                    type="button"
+                    onclick="document.getElementById('importFile').click()"
+                >
                     📥 IMPORT BACKUP
                 </button>
 
@@ -596,7 +611,10 @@ button,input{
 
             </div>
 
-            <div id="backupStatus" class="backup-status"></div>
+            <div
+                id="backupStatus"
+                class="backup-status"
+            ></div>
 
         </main>
 
@@ -604,36 +622,74 @@ button,input{
 
 
     <!-- ACCOUNTS -->
-    <section id="accountsPage" class="page">
+    <section
+        id="accountsPage"
+        class="page"
+    >
 
         <header class="page-header">
-            <button class="back" onclick="showPage('homePage')">‹</button>
-            <div class="page-title">Loyalty Accounts</div>
+
+            <button
+                class="back"
+                type="button"
+                onclick="showPage('homePage')"
+            >
+                ‹
+            </button>
+
+            <div class="page-title">
+                Loyalty Accounts
+            </div>
+
         </header>
 
+
         <div class="search">
+
             <input
                 id="searchInput"
                 type="text"
                 placeholder="Search name or phone..."
                 oninput="filterAccounts()"
             >
+
         </div>
 
-        <div id="accountsList" class="accounts">
-            <div class="loading">Loading accounts...</div>
+
+        <div
+            id="accountsList"
+            class="accounts"
+        >
+            <div class="loading">
+                Loading accounts...
+            </div>
         </div>
 
     </section>
 
 
     <!-- CUSTOMER -->
-    <section id="customerPage" class="page">
+    <section
+        id="customerPage"
+        class="page"
+    >
 
         <header class="page-header">
-            <button class="back" onclick="showPage('accountsPage')">‹</button>
-            <div class="page-title">Customer</div>
+
+            <button
+                class="back"
+                type="button"
+                onclick="showPage('accountsPage')"
+            >
+                ‹
+            </button>
+
+            <div class="page-title">
+                Customer
+            </div>
+
         </header>
+
 
         <div id="customerContent"></div>
 
@@ -650,17 +706,31 @@ button,input{
 <script>
 
 /*
-    OFFLINE LOYALTY DATABASE
+============================================================
+OFFLINE LOYALTY DATABASE
+============================================================
 
-    Customer name and phone are stored only in IndexedDB.
-    This page does not connect to Supabase and works offline.
+Customer name and phone are stored ONLY in IndexedDB.
+
+This Loyalty page does not send customer information
+to Supabase.
+
+Database:
+    chaatarra_local_db
+
+Stores:
+    customers
+    orders
+
+============================================================
 */
 
 const LOCAL_DB_NAME = "chaatarra_local_db";
 
 /*
-    VERSION 2
-    Must match the current Billing page.
+IMPORTANT:
+Billing currently uses database version 2.
+Loyalty must also use version 2.
 */
 const LOCAL_DB_VERSION = 2;
 
@@ -677,77 +747,135 @@ function openLocalDB(){
     return new Promise((resolve,reject)=>{
 
         if(localDB){
+
             resolve(localDB);
+
             return;
         }
 
-        const request = indexedDB.open(
-            LOCAL_DB_NAME,
-            LOCAL_DB_VERSION
-        );
+
+        const request =
+            indexedDB.open(
+                LOCAL_DB_NAME,
+                LOCAL_DB_VERSION
+            );
+
 
         request.onupgradeneeded = event => {
 
-            const db = event.target.result;
+            const db =
+                event.target.result;
+
+
+            /* -------------------------
+               CUSTOMERS STORE
+            ------------------------- */
 
             const customers =
                 db.objectStoreNames.contains("customers")
                 ? request.transaction.objectStore("customers")
                 : db.createObjectStore(
                     "customers",
-                    {keyPath:"id"}
+                    {
+                        keyPath:"id"
+                    }
                 );
 
-            if(!customers.indexNames.contains("phone")){
+
+            if(
+                !customers.indexNames.contains("phone")
+            ){
+
                 customers.createIndex(
                     "phone",
                     "phone",
-                    {unique:false}
+                    {
+                        unique:false
+                    }
                 );
+
             }
 
+
+            /* -------------------------
+               ORDERS STORE
+            ------------------------- */
 
             const orders =
                 db.objectStoreNames.contains("orders")
                 ? request.transaction.objectStore("orders")
                 : db.createObjectStore(
                     "orders",
-                    {keyPath:"id"}
+                    {
+                        keyPath:"id"
+                    }
                 );
 
-            if(!orders.indexNames.contains("customerId")){
+
+            if(
+                !orders.indexNames.contains("customerId")
+            ){
+
                 orders.createIndex(
                     "customerId",
                     "customerId",
-                    {unique:false}
+                    {
+                        unique:false
+                    }
                 );
+
             }
 
-            if(!orders.indexNames.contains("createdAt")){
+
+            if(
+                !orders.indexNames.contains("createdAt")
+            ){
+
                 orders.createIndex(
                     "createdAt",
                     "createdAt",
-                    {unique:false}
+                    {
+                        unique:false
+                    }
                 );
+
             }
 
         };
 
+
         request.onsuccess = event => {
 
-            localDB = event.target.result;
+            localDB =
+                event.target.result;
+
+
+            /*
+                If another tab/browser page
+                upgrades the database, close
+                this connection safely.
+            */
 
             localDB.onversionchange = () => {
+
                 localDB.close();
+
                 localDB = null;
+
             };
+
 
             resolve(localDB);
 
         };
 
+
         request.onerror = () => {
-            reject(request.error);
+
+            reject(
+                request.error
+            );
+
         };
 
     });
@@ -767,16 +895,29 @@ function getAllFromStore(storeName){
 
             const request =
                 db
-                .transaction(storeName,"readonly")
+                .transaction(
+                    storeName,
+                    "readonly"
+                )
                 .objectStore(storeName)
                 .getAll();
 
+
             request.onsuccess = () => {
-                resolve(request.result || []);
+
+                resolve(
+                    request.result || []
+                );
+
             };
 
+
             request.onerror = () => {
-                reject(request.error);
+
+                reject(
+                    request.error
+                );
+
             };
 
         });
@@ -796,14 +937,20 @@ function normalizePhone(phone){
         String(phone || "")
         .replace(/\D/g,"");
 
+
     if(
         digits.length === 12 &&
         digits.startsWith("91")
     ){
-        digits = digits.substring(2);
+
+        digits =
+            digits.substring(2);
+
     }
 
+
     return digits;
+
 }
 
 
@@ -814,18 +961,29 @@ function normalizePhone(phone){
 async function loadCustomers(){
 
     const list =
-        document.getElementById("accountsList");
+        document.getElementById(
+            "accountsList"
+        );
+
 
     list.innerHTML =
-        `<div class="loading">Loading accounts...</div>`;
+        `<div class="loading">
+            Loading accounts...
+        </div>`;
+
 
     try{
 
         const customers =
-            await getAllFromStore("customers");
+            await getAllFromStore(
+                "customers"
+            );
+
 
         const orders =
-            await getAllFromStore("orders");
+            await getAllFromStore(
+                "orders"
+            );
 
 
         const purchasesByCustomer = {};
@@ -833,21 +991,37 @@ async function loadCustomers(){
 
         orders.forEach(order => {
 
-            if(!order.customerId) return;
+            if(!order.customerId){
+
+                return;
+
+            }
+
 
             if(
-                !purchasesByCustomer[order.customerId]
+                !purchasesByCustomer[
+                    order.customerId
+                ]
             ){
-                purchasesByCustomer[order.customerId] = [];
+
+                purchasesByCustomer[
+                    order.customerId
+                ] = [];
+
             }
+
 
             purchasesByCustomer[
                 order.customerId
             ].push({
 
-                amount:Number(order.total || 0),
+                amount:
+                    Number(
+                        order.total || 0
+                    ),
 
-                created_at:order.createdAt,
+                created_at:
+                    order.createdAt,
 
                 description:
                     JSON.stringify(
@@ -861,7 +1035,8 @@ async function loadCustomers(){
                     order.serverOrderId ||
                     order.id,
 
-                type:"purchase"
+                type:
+                    "purchase"
 
             });
 
@@ -870,36 +1045,55 @@ async function loadCustomers(){
 
         allCustomers =
             customers
-            .map(customer => ({
+            .map(customer => {
 
-                ...customer,
+                return {
 
-                _purchases:
-                    (
-                        purchasesByCustomer[
-                            customer.id
-                        ] || []
-                    ).sort(
-                        (a,b) =>
-                            new Date(b.created_at) -
-                            new Date(a.created_at)
-                    )
+                    ...customer,
 
-            }))
+                    _purchases:
+                        (
+                            purchasesByCustomer[
+                                customer.id
+                            ] || []
+                        )
+                        .sort(
+                            (a,b) =>
+                                new Date(
+                                    b.created_at
+                                ) -
+                                new Date(
+                                    a.created_at
+                                )
+                        )
+
+                };
+
+            })
             .sort(
                 (a,b) =>
-                    String(a.name || "")
+                    String(
+                        a.name || ""
+                    )
                     .localeCompare(
-                        String(b.name || "")
+                        String(
+                            b.name || ""
+                        )
                     )
             );
 
 
-        renderCustomers(allCustomers);
+        renderCustomers(
+            allCustomers
+        );
+
 
     }catch(error){
 
-        console.error(error);
+        console.error(
+            error
+        );
+
 
         list.innerHTML = `
             <div class="error">
@@ -924,10 +1118,15 @@ async function loadCustomers(){
 function showPage(id){
 
     document
-        .querySelectorAll(".app > section")
+        .querySelectorAll(
+            ".app > section"
+        )
         .forEach(section => {
 
-            section.classList.remove("active");
+            section.classList.remove(
+                "active"
+            );
+
             section.style.display = "";
 
         });
@@ -939,11 +1138,14 @@ function showPage(id){
 
     if(id === "homePage"){
 
-        page.style.display = "block";
+        page.style.display =
+            "block";
 
     }else{
 
-        page.classList.add("active");
+        page.classList.add(
+            "active"
+        );
 
     }
 
@@ -956,7 +1158,9 @@ function showPage(id){
 
 function openAccounts(){
 
-    showPage("accountsPage");
+    showPage(
+        "accountsPage"
+    );
 
     loadCustomers();
 
@@ -970,7 +1174,9 @@ function openAccounts(){
 function renderCustomers(customers){
 
     const list =
-        document.getElementById("accountsList");
+        document.getElementById(
+            "accountsList"
+        );
 
 
     if(!customers.length){
@@ -981,6 +1187,7 @@ function renderCustomers(customers){
             </div>`;
 
         return;
+
     }
 
 
@@ -992,9 +1199,11 @@ function renderCustomers(customers){
                 customer.name ||
                 "Unnamed Customer";
 
+
             const phone =
                 customer.phone ||
                 "No phone";
+
 
             const stats =
                 calculateStats(
@@ -1003,18 +1212,21 @@ function renderCustomers(customers){
 
 
             return `
+
                 <button
                     class="account"
+                    type="button"
                     onclick="openCustomer('${escapeAttr(customer.id)}')"
                 >
 
                     <div class="avatar">
                         ${escapeHtml(
                             name
-                            .charAt(0)
-                            .toUpperCase()
+                                .charAt(0)
+                                .toUpperCase()
                         )}
                     </div>
+
 
                     <div class="account-info">
 
@@ -1028,9 +1240,11 @@ function renderCustomers(customers){
 
                     </div>
 
+
                     ${
                         customer.phone
                         ? `
+
                             <div class="account-actions">
 
                                 <button
@@ -1049,11 +1263,13 @@ function renderCustomers(customers){
                                 </button>
 
                             </div>
+
                         `
                         : ""
                     }
 
                 </button>
+
             `;
 
         })
@@ -1070,34 +1286,44 @@ function filterAccounts(){
 
     const query =
         document
-        .getElementById("searchInput")
+        .getElementById(
+            "searchInput"
+        )
         .value
         .trim()
         .toLowerCase();
 
 
     const filtered =
-        allCustomers.filter(customer => {
+        allCustomers.filter(
+            customer => {
 
-            const name =
-                String(
-                    customer.name || ""
-                ).toLowerCase();
-
-            const phone =
-                String(
-                    customer.phone || ""
-                ).toLowerCase();
-
-            return (
-                name.includes(query) ||
-                phone.includes(query)
-            );
-
-        });
+                const name =
+                    String(
+                        customer.name || ""
+                    )
+                    .toLowerCase();
 
 
-    renderCustomers(filtered);
+                const phone =
+                    String(
+                        customer.phone || ""
+                    )
+                    .toLowerCase();
+
+
+                return (
+                    name.includes(query) ||
+                    phone.includes(query)
+                );
+
+            }
+        );
+
+
+    renderCustomers(
+        filtered
+    );
 
 }
 
@@ -1108,12 +1334,16 @@ function filterAccounts(){
 
 async function openCustomer(id){
 
-    showPage("customerPage");
+    showPage(
+        "customerPage"
+    );
+
 
     const content =
         document.getElementById(
             "customerContent"
         );
+
 
     content.innerHTML =
         `<div class="loading">
@@ -1123,7 +1353,9 @@ async function openCustomer(id){
 
     const customer =
         allCustomers.find(
-            c => String(c.id) === String(id)
+            c =>
+                String(c.id) ===
+                String(id)
         );
 
 
@@ -1135,6 +1367,7 @@ async function openCustomer(id){
             </div>`;
 
         return;
+
     }
 
 
@@ -1142,15 +1375,21 @@ async function openCustomer(id){
         customer.name ||
         "Unnamed Customer";
 
+
     const phone =
         customer.phone ||
         "No phone";
 
+
     const history =
-        customer._purchases || [];
+        customer._purchases ||
+        [];
+
 
     const stats =
-        calculateStats(history);
+        calculateStats(
+            history
+        );
 
 
     content.innerHTML = `
@@ -1160,12 +1399,15 @@ async function openCustomer(id){
             <div class="profile-card">
 
                 <div class="big-avatar">
+
                     ${escapeHtml(
                         name
-                        .charAt(0)
-                        .toUpperCase()
+                            .charAt(0)
+                            .toUpperCase()
                     )}
+
                 </div>
+
 
                 <div>
 
@@ -1185,6 +1427,7 @@ async function openCustomer(id){
             <div class="stats">
 
                 <div class="stat">
+
                     <div class="stat-label">
                         LOYALTY POINTS
                     </div>
@@ -1192,10 +1435,12 @@ async function openCustomer(id){
                     <div class="stat-value">
                         ⭐ ${stats.points}
                     </div>
+
                 </div>
 
 
                 <div class="stat">
+
                     <div class="stat-label">
                         VISITS
                     </div>
@@ -1203,10 +1448,12 @@ async function openCustomer(id){
                     <div class="stat-value">
                         ${stats.visits}
                     </div>
+
                 </div>
 
 
                 <div class="stat">
+
                     <div class="stat-label">
                         LIFETIME SPEND
                     </div>
@@ -1214,10 +1461,12 @@ async function openCustomer(id){
                     <div class="stat-value">
                         ₹${stats.lifetimeSpend.toFixed(2)}
                     </div>
+
                 </div>
 
 
                 <div class="stat">
+
                     <div class="stat-label">
                         PURCHASES
                     </div>
@@ -1225,6 +1474,7 @@ async function openCustomer(id){
                     <div class="stat-value">
                         ${history.length}
                     </div>
+
                 </div>
 
             </div>
@@ -1236,17 +1486,23 @@ async function openCustomer(id){
 
 
             <div>
+
                 ${
                     history.length
+
                     ? history
                         .map(renderPurchase)
                         .join("")
+
                     : `
+
                         <div class="empty">
                             No purchase history.
                         </div>
+
                     `
                 }
+
             </div>
 
         </main>
@@ -1353,32 +1609,41 @@ function calculateStats(purchases){
     let points = 0;
 
 
-    history.forEach(purchase => {
+    history.forEach(
+        purchase => {
 
-        const amount =
-            Number(
-                purchase.amount || 0
-            );
+            const amount =
+                Number(
+                    purchase.amount || 0
+                );
 
 
-        lifetimeSpend += amount;
+            lifetimeSpend +=
+                amount;
 
-        points +=
-            Math.floor(
-                amount / 50
-            );
 
-    });
+            points +=
+                Math.floor(
+                    amount / 50
+                );
+
+        }
+    );
 
 
     return {
 
-        points,
+        points:
+
+            points,
 
         visits:
+
             history.length,
 
-        lifetimeSpend
+        lifetimeSpend:
+
+            lifetimeSpend
 
     };
 
@@ -1400,15 +1665,23 @@ function sendLoyaltyWhatsApp(
         .replace(/\D/g,"");
 
 
-    if(number.startsWith("00")){
+    if(
+        number.startsWith("00")
+    ){
+
         number =
             number.substring(2);
+
     }
 
 
-    if(number.length === 10){
+    if(
+        number.length === 10
+    ){
+
         number =
             "91" + number;
+
     }
 
 
@@ -1420,7 +1693,9 @@ function sendLoyaltyWhatsApp(
         "https://wa.me/" +
         number +
         "?text=" +
-        encodeURIComponent(message),
+        encodeURIComponent(
+            message
+        ),
         "_blank"
     );
 
@@ -1428,31 +1703,49 @@ function sendLoyaltyWhatsApp(
 
 
 /* ============================================================
-   FORMAT PURCHASE DESCRIPTION
+   FORMAT DESCRIPTION
    ============================================================ */
 
-function formatDescription(description){
+function formatDescription(
+    description
+){
 
     if(!description){
+
         return "Purchase";
+
     }
 
 
     try{
 
         const parsed =
-            typeof description === "string"
-            ? JSON.parse(description)
+            typeof description ===
+            "string"
+
+            ? JSON.parse(
+                description
+            )
+
             : description;
 
 
-        if(Array.isArray(parsed)){
+        if(
+            Array.isArray(parsed)
+        ){
 
             return parsed
                 .map(item => {
 
-                    if(typeof item === "string"){
-                        return escapeHtml(item);
+                    if(
+                        typeof item ===
+                        "string"
+                    ){
+
+                        return escapeHtml(
+                            item
+                        );
+
                     }
 
 
@@ -1478,12 +1771,20 @@ function formatDescription(description){
 
         }
 
-    }catch(e){}
+    }catch(e){
+
+        console.warn(
+            "Could not parse purchase description:",
+            e
+        );
+
+    }
 
 
     return escapeHtml(
         String(description)
-    ).replace(
+    )
+    .replace(
         /\n/g,
         "<br>"
     );
@@ -1492,15 +1793,24 @@ function formatDescription(description){
 
 
 /* ============================================================
-   EXPORT BACKUP
+   EXPORT LOCAL LOYALTY BACKUP
    ============================================================
 
-   Exports:
-   - customers
-   - orders
+   This exports ONLY local IndexedDB data.
 
-   Nothing is uploaded anywhere.
-   The browser creates a JSON file and downloads it.
+   Included:
+       customers
+       orders
+
+   Nothing is sent to Supabase.
+
+   On supported Android browsers the native
+   share sheet is used first.
+
+   Otherwise a normal JSON download is attempted.
+
+   If download is blocked, the JSON is opened
+   in a new tab as a fallback.
    ============================================================ */
 
 async function exportBackup(){
@@ -1517,6 +1827,10 @@ async function exportBackup(){
             "Preparing backup...";
 
 
+        /* ---------------------------------------------
+           READ LOCAL DATA
+        --------------------------------------------- */
+
         const customers =
             await getAllFromStore(
                 "customers"
@@ -1529,12 +1843,17 @@ async function exportBackup(){
             );
 
 
+        /* ---------------------------------------------
+           CREATE BACKUP
+        --------------------------------------------- */
+
         const backup = {
 
             backupType:
                 "CHAATARRA_LOCAL_LOYALTY_BACKUP",
 
-            version:1,
+            version:
+                1,
 
             exportedAt:
                 new Date().toISOString(),
@@ -1542,12 +1861,18 @@ async function exportBackup(){
             database:
                 LOCAL_DB_NAME,
 
-            customers:customers,
+            customers:
+                customers,
 
-            orders:orders
+            orders:
+                orders
 
         };
 
+
+        /* ---------------------------------------------
+           JSON
+        --------------------------------------------- */
 
         const json =
             JSON.stringify(
@@ -1556,6 +1881,22 @@ async function exportBackup(){
                 2
             );
 
+
+        const date =
+            new Date()
+            .toISOString()
+            .slice(0,10);
+
+
+        const fileName =
+            "chaatarra_loyalty_backup_" +
+            date +
+            ".json";
+
+
+        /* ---------------------------------------------
+           CREATE BLOB
+        --------------------------------------------- */
 
         const blob =
             new Blob(
@@ -1567,6 +1908,119 @@ async function exportBackup(){
             );
 
 
+        /* =================================================
+           METHOD 1
+           ANDROID / BROWSER SHARE
+           ================================================= */
+
+        if(
+            navigator.share &&
+            typeof File !== "undefined"
+        ){
+
+            try{
+
+                const file =
+                    new File(
+                        [blob],
+                        fileName,
+                        {
+                            type:
+                                "application/json"
+                        }
+                    );
+
+
+                let canShareFile =
+                    true;
+
+
+                if(
+                    navigator.canShare
+                ){
+
+                    canShareFile =
+                        navigator.canShare({
+                            files:[
+                                file
+                            ]
+                        });
+
+                }
+
+
+                if(
+                    canShareFile
+                ){
+
+                    status.textContent =
+                        "Opening share options...";
+
+
+                    await navigator.share({
+
+                        title:
+                            "Chaatarra Loyalty Backup",
+
+                        text:
+                            "Chaatarra local loyalty database backup",
+
+                        files:[
+                            file
+                        ]
+
+                    });
+
+
+                    status.textContent =
+                        "Backup ready — " +
+                        customers.length +
+                        " customers and " +
+                        orders.length +
+                        " orders.";
+
+
+                    return;
+
+                }
+
+            }catch(shareError){
+
+                console.warn(
+                    "Share method unavailable:",
+                    shareError
+                );
+
+
+                /*
+                    If user manually cancelled
+                    the Android share sheet,
+                    do not continue.
+                */
+
+                if(
+                    shareError &&
+                    shareError.name ===
+                    "AbortError"
+                ){
+
+                    status.textContent =
+                        "Backup sharing cancelled.";
+
+                    return;
+
+                }
+
+            }
+
+        }
+
+
+        /* =================================================
+           METHOD 2
+           NORMAL DOWNLOAD
+           ================================================= */
+
         const url =
             URL.createObjectURL(
                 blob
@@ -1574,45 +2028,178 @@ async function exportBackup(){
 
 
         const link =
-            document.createElement("a");
+            document.createElement(
+                "a"
+            );
 
 
-        const date =
-            new Date()
-            .toISOString()
-            .slice(0,10);
+        link.href =
+            url;
 
-
-        link.href = url;
 
         link.download =
-            `chaatarra_loyalty_backup_${date}.json`;
+            fileName;
 
 
-        document.body.appendChild(link);
+        link.style.display =
+            "none";
 
-        link.click();
+
+        document.body.appendChild(
+            link
+        );
+
+
+        /*
+            Dispatch the click after the
+            element has been added to the page.
+        */
+
+        link.dispatchEvent(
+            new MouseEvent(
+                "click",
+                {
+                    bubbles:true,
+                    cancelable:true,
+                    view:window
+                }
+            )
+        );
+
 
         link.remove();
 
 
-        URL.revokeObjectURL(url);
+        setTimeout(
+            () => {
+
+                URL.revokeObjectURL(
+                    url
+                );
+
+            },
+            5000
+        );
 
 
         status.textContent =
-            `Backup exported successfully — ${customers.length} customers and ${orders.length} orders.`;
+            "Backup exported — " +
+            customers.length +
+            " customers and " +
+            orders.length +
+            " orders.";
 
 
     }catch(error){
 
-        console.error(error);
+        console.error(
+            "BACKUP EXPORT ERROR:",
+            error
+        );
 
-        status.textContent =
-            "Export failed: " +
-            (
-                error.message ||
-                String(error)
+
+        /* =================================================
+           METHOD 3
+           FALLBACK — OPEN JSON
+           ================================================= */
+
+        try{
+
+            const customers =
+                await getAllFromStore(
+                    "customers"
+                );
+
+
+            const orders =
+                await getAllFromStore(
+                    "orders"
+                );
+
+
+            const backup = {
+
+                backupType:
+                    "CHAATARRA_LOCAL_LOYALTY_BACKUP",
+
+                version:
+                    1,
+
+                exportedAt:
+                    new Date().toISOString(),
+
+                database:
+                    LOCAL_DB_NAME,
+
+                customers:
+                    customers,
+
+                orders:
+                    orders
+
+            };
+
+
+            const json =
+                JSON.stringify(
+                    backup,
+                    null,
+                    2
+                );
+
+
+            const blob =
+                new Blob(
+                    [json],
+                    {
+                        type:
+                            "application/json"
+                    }
+                );
+
+
+            const url =
+                URL.createObjectURL(
+                    blob
+                );
+
+
+            const newWindow =
+                window.open(
+                    url,
+                    "_blank"
+                );
+
+
+            if(!newWindow){
+
+                throw new Error(
+                    "The browser blocked the backup window."
+                );
+
+            }
+
+
+            status.textContent =
+                "Download was blocked. The backup JSON was opened in a new tab. Save it from there.";
+
+
+        }catch(fallbackError){
+
+            console.error(
+                "BACKUP FALLBACK ERROR:",
+                fallbackError
             );
+
+
+            status.textContent =
+                "Export failed: " +
+                (
+                    fallbackError.message ||
+                    String(fallbackError)
+                );
+
+        }
 
     }
 
@@ -1620,15 +2207,17 @@ async function exportBackup(){
 
 
 /* ============================================================
-   IMPORT BACKUP
+   IMPORT LOCAL LOYALTY BACKUP
    ============================================================
 
-   The imported JSON is MERGED into the current database.
+   Import behavior:
 
-   Existing records with the same ID are updated.
-   New records are added.
+   - Existing records with the same ID are updated.
+   - New records are added.
+   - Existing records that are not in the backup
+     are NOT deleted.
 
-   Nothing is automatically deleted.
+   Therefore this is a MERGE, not a destructive restore.
    ============================================================ */
 
 async function importBackup(event){
@@ -1645,7 +2234,9 @@ async function importBackup(event){
 
 
     if(!file){
+
         return;
+
     }
 
 
@@ -1655,13 +2246,27 @@ async function importBackup(event){
             "Reading backup...";
 
 
+        /* ---------------------------------------------
+           READ FILE
+        --------------------------------------------- */
+
         const text =
             await file.text();
 
 
-        const backup =
-            JSON.parse(text);
+        /* ---------------------------------------------
+           PARSE JSON
+        --------------------------------------------- */
 
+        const backup =
+            JSON.parse(
+                text
+            );
+
+
+        /* ---------------------------------------------
+           VALIDATE BACKUP
+        --------------------------------------------- */
 
         if(
             !backup ||
@@ -1676,27 +2281,50 @@ async function importBackup(event){
         }
 
 
-        if(!Array.isArray(backup.customers)){
+        if(
+            !Array.isArray(
+                backup.customers
+            )
+        ){
+
             throw new Error(
                 "Backup does not contain customer data."
             );
+
         }
 
 
-        if(!Array.isArray(backup.orders)){
+        if(
+            !Array.isArray(
+                backup.orders
+            )
+        ){
+
             throw new Error(
                 "Backup does not contain order data."
             );
+
         }
 
+
+        /* ---------------------------------------------
+           OPEN DATABASE
+        --------------------------------------------- */
 
         const db =
             await openLocalDB();
 
 
+        /* ---------------------------------------------
+           START TRANSACTION
+        --------------------------------------------- */
+
         const transaction =
             db.transaction(
-                ["customers","orders"],
+                [
+                    "customers",
+                    "orders"
+                ],
                 "readwrite"
             );
 
@@ -1713,68 +2341,106 @@ async function importBackup(event){
             );
 
 
-        backup.customers.forEach(customer => {
+        /* ---------------------------------------------
+           IMPORT CUSTOMERS
+        --------------------------------------------- */
 
-            if(
-                customer &&
-                customer.id
-            ){
+        backup.customers.forEach(
+            customer => {
 
-                customersStore.put(
-                    customer
-                );
+                if(
+                    customer &&
+                    customer.id
+                ){
 
-            }
-
-        });
-
-
-        backup.orders.forEach(order => {
-
-            if(
-                order &&
-                order.id
-            ){
-
-                ordersStore.put(
-                    order
-                );
-
-            }
-
-        });
-
-
-        await new Promise(
-            (resolve,reject) => {
-
-                transaction.oncomplete =
-                    resolve;
-
-                transaction.onerror =
-                    () => reject(
-                        transaction.error
+                    customersStore.put(
+                        customer
                     );
 
-                transaction.onabort =
-                    () => reject(
-                        transaction.error ||
-                        new Error(
-                            "Import transaction aborted."
-                        )
-                    );
+                }
 
             }
         );
 
 
+        /* ---------------------------------------------
+           IMPORT ORDERS
+        --------------------------------------------- */
+
+        backup.orders.forEach(
+            order => {
+
+                if(
+                    order &&
+                    order.id
+                ){
+
+                    ordersStore.put(
+                        order
+                    );
+
+                }
+
+            }
+        );
+
+
+        /* ---------------------------------------------
+           WAIT FOR TRANSACTION
+        --------------------------------------------- */
+
+        await new Promise(
+            (resolve,reject) => {
+
+                transaction.oncomplete =
+                    () => {
+
+                        resolve();
+
+                    };
+
+
+                transaction.onerror =
+                    () => {
+
+                        reject(
+                            transaction.error
+                        );
+
+                    };
+
+
+                transaction.onabort =
+                    () => {
+
+                        reject(
+                            transaction.error ||
+                            new Error(
+                                "Import transaction aborted."
+                            )
+                        );
+
+                    };
+
+            }
+        );
+
+
+        /* ---------------------------------------------
+           SUCCESS
+        --------------------------------------------- */
+
         status.textContent =
-            `Backup imported successfully — ${backup.customers.length} customers and ${backup.orders.length} orders restored.`;
+            "Backup imported successfully — " +
+            backup.customers.length +
+            " customers and " +
+            backup.orders.length +
+            " orders restored.";
 
 
         /*
-            Refresh the account list in case
-            the user imports while viewing accounts.
+            Refresh local customer data
+            after import.
         */
 
         await loadCustomers();
@@ -1782,7 +2448,11 @@ async function importBackup(event){
 
     }catch(error){
 
-        console.error(error);
+        console.error(
+            "BACKUP IMPORT ERROR:",
+            error
+        );
+
 
         status.textContent =
             "Import failed: " +
@@ -1794,7 +2464,8 @@ async function importBackup(event){
     }finally{
 
         /*
-            Allow the same file to be selected again.
+            Allows the exact same JSON file
+            to be selected again later.
         */
 
         event.target.value = "";
@@ -1846,11 +2517,13 @@ function escapeHtml(value){
 
 function escapeAttr(value){
 
-    return escapeHtml(value)
-        .replace(
-            /`/g,
-            "&#096;"
-        );
+    return escapeHtml(
+        value
+    )
+    .replace(
+        /`/g,
+        "&#096;"
+    );
 
 }
 
@@ -1859,7 +2532,9 @@ function escapeAttr(value){
    START
    ============================================================ */
 
-showPage("homePage");
+showPage(
+    "homePage"
+);
 
 </script>
 
