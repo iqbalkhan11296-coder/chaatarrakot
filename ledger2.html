@@ -3,11 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
+
 <title>Chaatarra Ledger</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
+
 :root{
   --burgundy:#4b001f;
   --burgundy2:#650028;
@@ -22,24 +24,46 @@
   --shadow:0 12px 35px rgba(75,0,31,.08)
 }
 
-*{box-sizing:border-box}
+*{
+  box-sizing:border-box;
+}
 
 body{
   margin:0;
   font-family:Arial,Helvetica,sans-serif;
-  background:linear-gradient(135deg,#f7f0e9,#fffdf9 50%,#f5edf0);
+  background:linear-gradient(
+    135deg,
+    #f7f0e9,
+    #fffdf9 50%,
+    #f5edf0
+  );
   color:var(--ink);
-  min-height:100vh
+  min-height:100vh;
 }
 
-button,input,select,textarea{font:inherit}
-button{cursor:pointer}
+button,
+input,
+select,
+textarea{
+  font:inherit;
+}
+
+button{
+  cursor:pointer;
+}
+
+
+/* HEADER */
 
 header{
-  background:linear-gradient(110deg,var(--burgundy),var(--burgundy2));
+  background:linear-gradient(
+    110deg,
+    var(--burgundy),
+    var(--burgundy2)
+  );
   color:#fff;
   padding:25px 32px;
-  box-shadow:0 5px 22px rgba(0,0,0,.12)
+  box-shadow:0 5px 22px rgba(0,0,0,.12);
 }
 
 .header-inner{
@@ -48,12 +72,12 @@ header{
   display:flex;
   align-items:center;
   justify-content:space-between;
-  gap:20px
+  gap:20px;
 }
 
 .brand{
   font:700 30px Georgia,serif;
-  letter-spacing:.8px
+  letter-spacing:.8px;
 }
 
 .subtitle{
@@ -61,25 +85,31 @@ header{
   font-size:13px;
   color:#ead7dd;
   letter-spacing:1.2px;
-  text-transform:uppercase
+  text-transform:uppercase;
 }
 
 .connection{
   font-size:12px;
   color:#f0d36b;
-  font-weight:700
+  font-weight:700;
 }
+
+
+/* MAIN */
 
 .container{
   max-width:1450px;
   margin:auto;
-  padding:28px
+  padding:28px;
 }
+
+
+/* TOP BUTTONS */
 
 .main-buttons{
   display:grid;
   grid-template-columns:1fr 1fr;
-  gap:18px
+  gap:18px;
 }
 
 .main-button{
@@ -90,42 +120,52 @@ header{
   padding:24px;
   text-align:left;
   box-shadow:var(--shadow);
-  transition:.2s
+  transition:.2s;
 }
 
 .main-button:hover{
   transform:translateY(-2px);
-  box-shadow:0 16px 40px rgba(75,0,31,.12)
+  box-shadow:0 16px 40px rgba(75,0,31,.12);
 }
 
 .main-button h2{
   margin:0 0 7px;
   color:var(--burgundy);
-  font:700 24px Georgia,serif
+  font:700 24px Georgia,serif;
 }
 
 .main-button p{
   margin:0;
-  color:var(--muted)
+  color:var(--muted);
 }
 
 .main-button.gold-button{
-  background:linear-gradient(110deg,var(--burgundy),var(--burgundy2));
-  border-color:var(--burgundy)
+  background:linear-gradient(
+    110deg,
+    var(--burgundy),
+    var(--burgundy2)
+  );
+  border-color:var(--burgundy);
 }
 
 .main-button.gold-button h2{
-  color:var(--gold)
+  color:var(--gold);
 }
 
 .main-button.gold-button p{
-  color:#ead7dd
+  color:#ead7dd;
 }
+
+
+/* WINDOWS */
 
 .window{
   display:none;
-  margin-top:20px
+  margin-top:20px;
 }
+
+
+/* TOOLBAR */
 
 .toolbar{
   background:var(--paper);
@@ -136,32 +176,36 @@ header{
   gap:10px;
   align-items:end;
   flex-wrap:wrap;
-  box-shadow:0 7px 22px rgba(75,0,31,.05)
+  box-shadow:0 7px 22px rgba(75,0,31,.05);
 }
 
 .field{
   display:flex;
   flex-direction:column;
-  gap:6px
+  gap:6px;
 }
 
 .field label{
   font-size:12px;
   color:var(--muted);
-  font-weight:700
+  font-weight:700;
 }
 
-input,select,textarea{
+input,
+select,
+textarea{
   padding:11px 12px;
   border:1px solid #d8ccd0;
   border-radius:9px;
   background:#fff;
   color:#222;
-  outline:none
+  outline:none;
 }
 
-input:focus,select:focus,textarea:focus{
-  border-color:var(--gold)
+input:focus,
+select:focus,
+textarea:focus{
+  border-color:var(--gold);
 }
 
 .secondary{
@@ -170,7 +214,7 @@ input:focus,select:focus,textarea:focus{
   border:1px solid #ddd;
   background:#fff;
   color:var(--burgundy);
-  font-weight:700
+  font-weight:700;
 }
 
 .primary{
@@ -179,11 +223,11 @@ input:focus,select:focus,textarea:focus{
   border:0;
   padding:11px 16px;
   border-radius:9px;
-  font-weight:700
+  font-weight:700;
 }
 
 .primary:hover{
-  background:var(--burgundy2)
+  background:var(--burgundy2);
 }
 
 .gold-btn{
@@ -192,14 +236,18 @@ input:focus,select:focus,textarea:focus{
   border:0;
   padding:10px 13px;
   border-radius:8px;
-  font-weight:800
+  font-weight:800;
 }
+
+
+/* SALES / EXPENSES */
 
 .sections{
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:18px;
-  margin-top:18px
+  margin-top:18px;
+  align-items:start;
 }
 
 .section{
@@ -207,7 +255,8 @@ input:focus,select:focus,textarea:focus{
   border:1px solid var(--line);
   border-radius:16px;
   padding:18px;
-  box-shadow:0 7px 22px rgba(75,0,31,.05)
+  box-shadow:0 7px 22px rgba(75,0,31,.05);
+  min-width:0;
 }
 
 .section-head{
@@ -215,13 +264,13 @@ input:focus,select:focus,textarea:focus{
   justify-content:space-between;
   align-items:center;
   gap:10px;
-  margin-bottom:14px
+  margin-bottom:14px;
 }
 
 .section h3{
   margin:0;
   color:var(--burgundy);
-  font:700 20px Georgia,serif
+  font:700 20px Georgia,serif;
 }
 
 .badge{
@@ -230,52 +279,61 @@ input:focus,select:focus,textarea:focus{
   border-radius:20px;
   background:#f3eee8;
   color:#666;
-  font-weight:700
+  font-weight:700;
+  white-space:nowrap;
 }
 
 .reference-note{
   margin:-5px 0 13px;
   color:var(--muted);
-  font-size:12px
+  font-size:12px;
 }
 
+
+/* TABLE */
+
 .table-wrap{
-  overflow:auto
+  overflow:auto;
+  max-height:540px;
 }
 
 table{
   width:100%;
   border-collapse:collapse;
   font-size:13px;
-  min-width:600px
+  min-width:600px;
 }
 
-th,td{
+th,
+td{
   padding:10px 7px;
   border-bottom:1px solid #eee;
   text-align:left;
-  vertical-align:middle
+  vertical-align:middle;
 }
 
 th{
   color:#777;
   background:#faf8f5;
-  font-size:12px
+  font-size:12px;
+  position:sticky;
+  top:0;
+  z-index:2;
 }
 
 .num{
   text-align:right;
-  white-space:nowrap
+  white-space:nowrap;
 }
 
 .amount{
   font-weight:800;
-  white-space:nowrap
+  white-space:nowrap;
 }
 
 .source{
   font-size:11px;
-  color:#8a7f82
+  color:#8a7f82;
 }
 
 .edit-btn,
@@ -286,35 +344,38 @@ th{
   border-radius:7px;
   padding:6px 9px;
   font-size:11px;
-  font-weight:700
+  font-weight:700;
 }
 
 .edit-btn{
-  color:var(--burgundy)
+  color:var(--burgundy);
 }
 
 .reset-btn{
   color:#777;
-  margin-left:4px
+  margin-left:4px;
 }
 
 .delete-btn{
   color:var(--red);
   border-color:#efd0d3;
-  margin-left:4px
+  margin-left:4px;
 }
 
 .empty{
   text-align:center;
   color:#888;
-  padding:25px 5px
+  padding:25px 5px;
 }
 
 .loading{
   text-align:center;
   padding:25px;
-  color:var(--muted)
+  color:var(--muted);
 }
+
+
+/* PAYMENT */
 
 .payment-pill{
   display:inline-block;
@@ -323,70 +384,80 @@ th{
   background:#f3eee8;
   color:var(--burgundy);
   font-size:11px;
-  font-weight:800
+  font-weight:800;
 }
 
 .payment-pill.cash{
   background:#edf8f1;
-  color:#287a52
+  color:#287a52;
 }
 
 .payment-pill.upi{
   background:#f0f2ff;
-  color:#3747a5
+  color:#3747a5;
 }
 
 .payment-pill.card{
   background:#fff5df;
-  color:#9b6410
+  color:#9b6410;
 }
+
+
+/* SUMMARY */
 
 .summary{
   margin-top:18px;
-  background:linear-gradient(110deg,var(--burgundy),var(--burgundy2));
+  background:linear-gradient(
+    110deg,
+    var(--burgundy),
+    var(--burgundy2)
+  );
   color:#fff;
   border-radius:17px;
   padding:20px;
-  box-shadow:var(--shadow)
+  box-shadow:var(--shadow);
 }
 
 .summary-grid{
   display:grid;
   grid-template-columns:repeat(3,1fr);
-  gap:15px
+  gap:15px;
 }
 
 .summary-card{
   background:#ffffff12;
   border:1px solid #ffffff22;
   border-radius:11px;
-  padding:15px
+  padding:15px;
 }
 
 .summary-label{
   font-size:12px;
-  opacity:.75
+  opacity:.75;
 }
 
 .summary-value{
   font-size:25px;
   font-weight:900;
-  margin-top:7px
+  margin-top:7px;
 }
 
 .profit{
-  color:#8ee4b0
+  color:#8ee4b0;
 }
 
 .loss{
-  color:#ffaaa9
+  color:#ffaaa9;
 }
+
+
+/* CASH SUMMARY */
 
 .cash-summary{
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:18px;
-  margin-top:18px
+  margin-top:18px;
 }
 
 .cash-card{
@@ -394,13 +465,13 @@ th{
   border:1px solid var(--line);
   border-radius:16px;
   padding:22px;
-  box-shadow:var(--shadow)
+  box-shadow:var(--shadow);
 }
 
 .cash-card h3{
   margin:0 0 18px;
   color:var(--burgundy);
-  font:700 21px Georgia,serif
+  font:700 21px Georgia,serif;
 }
 
 .cash-row{
@@ -408,74 +479,84 @@ th{
   justify-content:space-between;
   align-items:center;
   padding:12px 0;
-  border-bottom:1px solid #eee
+  border-bottom:1px solid #eee;
 }
 
 .cash-row:last-child{
-  border-bottom:0
+  border-bottom:0;
 }
 
 .cash-row span:first-child{
   color:var(--muted);
   font-size:13px;
-  font-weight:700
+  font-weight:700;
 }
 
 .cash-row strong{
-  font-size:19px
+  font-size:19px;
 }
 
 .cash-total{
   margin-top:8px;
   padding-top:14px;
   border-top:2px solid var(--burgundy);
-  color:var(--burgundy)
+  color:var(--burgundy);
 }
 
+
+/* BALANCE */
+
 .big-balance{
-  background:linear-gradient(110deg,var(--burgundy),var(--burgundy2));
+  background:linear-gradient(
+    110deg,
+    var(--burgundy),
+    var(--burgundy2)
+  );
   color:#fff;
   border-radius:18px;
   padding:24px;
   margin-top:18px;
-  box-shadow:var(--shadow)
+  box-shadow:var(--shadow);
 }
 
 .big-balance h2{
   margin:0 0 18px;
   color:var(--gold);
-  font:700 23px Georgia,serif
+  font:700 23px Georgia,serif;
 }
 
 .balance-grid{
   display:grid;
   grid-template-columns:repeat(4,1fr);
-  gap:15px
+  gap:15px;
 }
 
 .balance-card{
   border:1px solid #ffffff22;
   background:#ffffff10;
   border-radius:12px;
-  padding:17px
+  padding:17px;
 }
 
 .balance-card small{
   display:block;
   opacity:.7;
   font-size:11px;
-  margin-bottom:7px
+  margin-bottom:7px;
 }
 
 .balance-card strong{
-  font-size:23px
+  font-size:23px;
 }
 
 .summary-note{
   margin-top:15px;
   font-size:11px;
-  color:#ead7dd
+  color:#ead7dd;
 }
+
+
+/* MODALS */
 
 .modal{
   display:none;
@@ -485,11 +566,11 @@ th{
   align-items:center;
   justify-content:center;
   padding:20px;
-  z-index:20
+  z-index:20;
 }
 
 .modal.show{
-  display:flex
+  display:flex;
 }
 
 .modal-box{
@@ -497,20 +578,20 @@ th{
   background:var(--paper);
   border-radius:18px;
   padding:24px;
-  box-shadow:0 25px 70px rgba(0,0,0,.25)
+  box-shadow:0 25px 70px rgba(0,0,0,.25);
 }
 
 .modal-head{
   display:flex;
   justify-content:space-between;
   align-items:center;
-  margin-bottom:18px
+  margin-bottom:18px;
 }
 
 .modal-head h2{
   margin:0;
   color:var(--burgundy);
-  font:700 23px Georgia,serif
+  font:700 23px Georgia,serif;
 }
 
 .close{
@@ -520,31 +601,34 @@ th{
   width:34px;
   height:34px;
   border-radius:50%;
-  font-size:20px
+  font-size:20px;
 }
 
 .form-grid{
   display:grid;
   grid-template-columns:1fr 1fr;
-  gap:14px
+  gap:14px;
 }
 
 .form-grid .full{
-  grid-column:1/-1
+  grid-column:1/-1;
 }
 
 .form-actions{
   display:flex;
   justify-content:flex-end;
   gap:9px;
-  margin-top:20px
+  margin-top:20px;
 }
 
 .helper{
   font-size:11px;
   color:var(--muted);
-  margin-top:5px
+  margin-top:5px;
 }
+
+
+/* TOAST */
 
 .toast{
   position:fixed;
@@ -557,244 +641,305 @@ th{
   display:none;
   z-index:30;
   box-shadow:var(--shadow);
-  font-weight:700
+  font-weight:700;
 }
 
 .toast.show{
-  display:block
+  display:block;
 }
 
+
+/* MOBILE */
+
 @media(max-width:1100px){
+
   .balance-grid{
-    grid-template-columns:repeat(2,1fr)
+    grid-template-columns:repeat(2,1fr);
   }
+
 }
 
 @media(max-width:900px){
+
   .container{
-    padding:15px
+    padding:15px;
   }
 
   .sections{
-    grid-template-columns:1fr
+    grid-template-columns:1fr;
   }
 
   .summary-grid{
-    grid-template-columns:1fr
+    grid-template-columns:1fr;
   }
 
   .cash-summary{
-    grid-template-columns:1fr
+    grid-template-columns:1fr;
   }
 
   .main-buttons{
-    grid-template-columns:1fr
+    grid-template-columns:1fr;
   }
 
   .header-inner{
-    align-items:flex-start
+    align-items:flex-start;
   }
 
   .connection{
-    display:none
+    display:none;
   }
+
 }
 
 @media(max-width:600px){
+
   .form-grid{
-    grid-template-columns:1fr
+    grid-template-columns:1fr;
   }
 
   .form-grid .full{
-    grid-column:auto
+    grid-column:auto;
   }
 
   .brand{
-    font-size:25px
+    font-size:25px;
   }
 
   .balance-grid{
-    grid-template-columns:1fr
+    grid-template-columns:1fr;
   }
+
+  .section-head{
+    align-items:flex-start;
+  }
+
+  .section-head button{
+    white-space:nowrap;
+  }
+
 }
+
 </style>
 </head>
 
+
 <body>
 
+
 <header>
+
   <div class="header-inner">
 
     <div>
-      <div class="brand">CHAATARRA LEDGER</div>
+
+      <div class="brand">
+        CHAATARRA LEDGER
+      </div>
 
       <div class="subtitle">
         The House of Chaats · Sales & Expenses
       </div>
+
     </div>
 
-    <div class="connection" id="connectionText">
+    <div
+      class="connection"
+      id="connectionText"
+    >
       Connecting to Supabase…
     </div>
 
   </div>
+
 </header>
+
 
 <div class="container">
 
+
+  <!-- TOP NAVIGATION -->
+
   <div class="main-buttons">
 
-    <button class="main-button" id="openLedger">
-      <h2>Sales & Expenses</h2>
+    <button
+      class="main-button"
+      id="openLedger"
+    >
+
+      <h2>
+        Sales & Expenses
+      </h2>
+
       <p>
         View imported sales and enter all expenses manually.
       </p>
+
     </button>
 
-    <button class="main-button gold-button" id="openCashSummary">
-      <h2>Cash & UPI Summary</h2>
+
+    <button
+      class="main-button gold-button"
+      id="openCashSummary"
+    >
+
+      <h2>
+        Cash & UPI Summary
+      </h2>
+
       <p>
         See sales and manually entered expenses by payment method.
       </p>
+
     </button>
 
   </div>
 
 
-  <!-- SALES + EXPENSES -->
 
-  <div class="window" id="ledgerWindow">
+  <!-- SALES + EXPENSES WINDOW -->
+
+  <div
+    class="window"
+    id="ledgerWindow"
+  >
+
+
+    <!-- DATE TOOLBAR -->
 
     <div class="toolbar">
 
       <div class="field">
 
-        <label>Ledger Date</label>
+        <label>
+          Ledger Date
+        </label>
 
-        <input type="date" id="ledgerDate">
+        <input
+          type="date"
+          id="ledgerDate"
+        >
 
       </div>
 
-      <button class="primary" id="loadDate">
+
+      <button
+        class="primary"
+        id="loadDate"
+      >
         Load Date
       </button>
 
-      <button class="secondary" id="todayBtn">
+
+      <button
+        class="secondary"
+        id="todayBtn"
+      >
         Today
       </button>
 
-      <button class="secondary" id="closeLedger">
-        Close
-      </button>
 
-      <button class="primary" id="addExpenseBtn">
-        ＋ Add Expense
+      <button
+        class="secondary"
+        id="closeLedger"
+      >
+        Close
       </button>
 
     </div>
 
 
+
+    <!-- TWO COLUMN AREA -->
+
     <div class="sections">
 
-      <!-- SALES -->
+
+      <!-- SALES LEFT -->
 
       <section class="section">
 
         <div class="section-head">
 
-          <h3>Imported Sales</h3>
+          <div>
+
+            <h3>
+              Imported Sales
+            </h3>
+
+            <div
+              class="reference-note"
+              style="margin-top:6px"
+            >
+              Sales are imported directly from
+              <b>chaat_orders</b>.
+              Amount uses <b>total</b> and payment uses
+              <b>payment_method</b>.
+            </div>
+
+          </div>
+
 
           <span class="badge">
-            Automatic · chaat_orders
+            Automatic
           </span>
 
         </div>
 
-        <div class="reference-note">
 
-          Sales are imported directly from
-          <b>chaat_orders</b>.
-
-          The amount comes from
-          <b>total</b>
-
-          and the payment method comes from
-          <b>payment_method</b>.
-
-        </div>
-
-        <div id="salesArea" class="loading">
+        <div
+          id="salesArea"
+          class="loading"
+        >
           Loading sales…
         </div>
 
       </section>
 
 
-      <!-- MANUAL EXPENSES INFO -->
+
+      <!-- MANUAL EXPENSES RIGHT -->
 
       <section class="section">
 
         <div class="section-head">
 
-          <h3>Manual Expenses</h3>
+          <div>
 
-          <span class="badge">
-            Manual only
-          </span>
+            <h3>
+              Manual Expenses
+            </h3>
 
-        </div>
-
-        <div class="reference-note">
-
-          No salary or inventory expenses are imported.
-
-          Enter every expense manually below.
-
-        </div>
-
-        <div id="fixedExpensesArea">
-
-          <div class="empty">
-
-            Expenses are entered in the Manual Expenses
-            section below.
+            <div
+              class="reference-note"
+              style="margin-top:6px"
+            >
+              All expenses are entered manually.
+            </div>
 
           </div>
 
+
+          <button
+            class="primary"
+            id="addExpenseBtn"
+          >
+            ＋ Add Expense
+          </button>
+
+        </div>
+
+
+        <div
+          id="fixedExpensesArea"
+          class="loading"
+        >
+          Loading expenses…
         </div>
 
       </section>
 
     </div>
 
-
-    <!-- DAILY EXPENSES -->
-
-    <section class="section" style="margin-top:18px">
-
-      <div class="section-head">
-
-        <h3>Daily Expenses</h3>
-
-        <button class="primary" id="addExpenseBtn2">
-          ＋ Add Expense
-        </button>
-
-      </div>
-
-      <div class="reference-note">
-
-        Every expense is entered manually.
-
-        Select the actual payment method used.
-
-      </div>
-
-      <div id="dailyExpensesArea" class="loading">
-        Loading expenses…
-      </div>
-
-    </section>
 
 
     <!-- DAILY RESULT -->
@@ -803,13 +948,17 @@ th{
 
       <div class="summary-grid">
 
+
         <div class="summary-card">
 
           <div class="summary-label">
             TOTAL SALES
           </div>
 
-          <div class="summary-value" id="totalSales">
+          <div
+            class="summary-value"
+            id="totalSales"
+          >
             ₹0.00
           </div>
 
@@ -822,7 +971,10 @@ th{
             TOTAL EXPENSES
           </div>
 
-          <div class="summary-value" id="totalExpenses">
+          <div
+            class="summary-value"
+            id="totalExpenses"
+          >
             ₹0.00
           </div>
 
@@ -831,11 +983,17 @@ th{
 
         <div class="summary-card">
 
-          <div class="summary-label" id="resultLabel">
+          <div
+            class="summary-label"
+            id="resultLabel"
+          >
             PROFIT / LOSS
           </div>
 
-          <div class="summary-value" id="profitLoss">
+          <div
+            class="summary-value"
+            id="profitLoss"
+          >
             ₹0.00
           </div>
 
@@ -848,45 +1006,69 @@ th{
   </div>
 
 
-  <!-- CASH SUMMARY -->
 
-  <div class="window" id="cashSummaryWindow">
+  <!-- CASH SUMMARY WINDOW -->
+
+  <div
+    class="window"
+    id="cashSummaryWindow"
+  >
+
 
     <div class="toolbar">
 
       <div class="field">
 
-        <label>Summary Date</label>
+        <label>
+          Summary Date
+        </label>
 
-        <input type="date" id="summaryDate">
+        <input
+          type="date"
+          id="summaryDate"
+        >
 
       </div>
 
-      <button class="primary" id="loadCashSummary">
+
+      <button
+        class="primary"
+        id="loadCashSummary"
+      >
         Calculate
       </button>
 
-      <button class="secondary" id="todaySummaryBtn">
+
+      <button
+        class="secondary"
+        id="todaySummaryBtn"
+      >
         Today
       </button>
 
-      <button class="secondary" id="closeCashSummary">
+
+      <button
+        class="secondary"
+        id="closeCashSummary"
+      >
         Close
       </button>
 
     </div>
 
 
+
     <div class="cash-summary">
 
 
-      <!-- SALES BY PAYMENT -->
+      <!-- SALES -->
 
       <section class="cash-card">
 
         <h3>
           Sales by Payment
         </h3>
+
 
         <div class="cash-row">
 
@@ -900,6 +1082,7 @@ th{
 
         </div>
 
+
         <div class="cash-row">
 
           <span>
@@ -912,6 +1095,7 @@ th{
 
         </div>
 
+
         <div class="cash-row">
 
           <span>
@@ -923,6 +1107,7 @@ th{
           </strong>
 
         </div>
+
 
         <div class="cash-row cash-total">
 
@@ -939,13 +1124,15 @@ th{
       </section>
 
 
-      <!-- EXPENSES BY PAYMENT -->
+
+      <!-- EXPENSES -->
 
       <section class="cash-card">
 
         <h3>
           Expenses by Payment
         </h3>
+
 
         <div class="cash-row">
 
@@ -959,6 +1146,7 @@ th{
 
         </div>
 
+
         <div class="cash-row">
 
           <span>
@@ -970,6 +1158,7 @@ th{
           </strong>
 
         </div>
+
 
         <div class="cash-row">
 
@@ -983,6 +1172,7 @@ th{
 
         </div>
 
+
         <div class="cash-row">
 
           <span>
@@ -994,6 +1184,7 @@ th{
           </strong>
 
         </div>
+
 
         <div class="cash-row cash-total">
 
@@ -1012,6 +1203,7 @@ th{
     </div>
 
 
+
     <!-- BALANCE -->
 
     <div class="big-balance">
@@ -1020,7 +1212,9 @@ th{
         Payment Balance
       </h2>
 
+
       <div class="balance-grid">
+
 
         <div class="balance-card">
 
@@ -1079,9 +1273,8 @@ th{
       <div class="summary-note">
 
         Sales use the payment method saved with each order.
-
-        Expenses use the payment method you select when
-        entering the expense.
+        Expenses use the payment method selected when
+        the expense was entered.
 
       </div>
 
@@ -1092,19 +1285,27 @@ th{
 </div>
 
 
+
 <!-- EXPENSE MODAL -->
 
-<div class="modal" id="expenseModal">
+<div
+  class="modal"
+  id="expenseModal"
+>
 
   <div class="modal-box">
+
 
     <div class="modal-head">
 
       <h2 id="expenseModalTitle">
-        Add Daily Expense
+        Add Expense
       </h2>
 
-      <button class="close" id="closeExpense">
+      <button
+        class="close"
+        id="closeExpense"
+      >
         ×
       </button>
 
@@ -1112,6 +1313,7 @@ th{
 
 
     <form id="expenseForm">
+
 
       <div class="form-grid">
 
@@ -1245,9 +1447,8 @@ th{
 
       <div class="helper">
 
-        The selected Ledger Date is used for this expense.
-
-        This is the only expense source used by the Ledger.
+        This expense will be saved against the selected
+        Ledger Date.
 
       </div>
 
@@ -1278,11 +1479,16 @@ th{
 </div>
 
 
+
 <!-- CORRECTION MODAL -->
 
-<div class="modal" id="adjustModal">
+<div
+  class="modal"
+  id="adjustModal"
+>
 
   <div class="modal-box">
+
 
     <div class="modal-head">
 
@@ -1290,7 +1496,10 @@ th{
         Correct Ledger Amount
       </h2>
 
-      <button class="close" id="closeAdjust">
+      <button
+        class="close"
+        id="closeAdjust"
+      >
         ×
       </button>
 
@@ -1311,7 +1520,10 @@ th{
     </div>
 
 
-    <div class="field" style="margin-top:13px">
+    <div
+      class="field"
+      style="margin-top:13px"
+    >
 
       <label>
         Ledger Amount *
@@ -1327,7 +1539,10 @@ th{
     </div>
 
 
-    <div class="field" style="margin-top:13px">
+    <div
+      class="field"
+      style="margin-top:13px"
+    >
 
       <label>
         Correction Note
@@ -1367,23 +1582,26 @@ th{
 </div>
 
 
-<div class="toast" id="toast"></div>
+
+<!-- TOAST -->
+
+<div
+  class="toast"
+  id="toast"
+></div>
+
 
 
 <script>
 
+
+/* ==========================================
+   SUPABASE
+========================================== */
+
 const SUPABASE_URL =
 "https://ucqeyhcycwksiubmlilg.supabase.co";
 
-
-/*
- IMPORTANT:
-
- Keep the same Supabase publishable key you already use
- in this Ledger.
-
- NEVER put a service_role / secret key in this public HTML.
-*/
 
 const SUPABASE_KEY =
 "sb_publishable_YdIvl7IqdpT0UZOHBumEiw_ZThYEsgV";
@@ -1396,8 +1614,15 @@ supabase.createClient(
 );
 
 
+
+/* ==========================================
+   VARIABLES
+========================================== */
+
 let selectedDate =
-new Date().toLocaleDateString("en-CA");
+new Date().toLocaleDateString(
+  "en-CA"
+);
 
 
 let salesRows = [];
@@ -1411,81 +1636,83 @@ let adjustmentTarget = null;
 let editingExpenseId = null;
 
 
+
+/* ==========================================
+   HELPERS
+========================================== */
+
 const $ =
 id => document.getElementById(id);
 
 
-const money =
-n =>
-"₹" +
-Number(n || 0).toLocaleString(
-  "en-IN",
-  {
-    minimumFractionDigits:2,
-    maximumFractionDigits:2
-  }
-);
+function money(n){
 
-
-const esc =
-v =>
-String(v ?? "").replace(
-  /[&<>"']/g,
-  c =>
-  ({
-    "&":"&amp;",
-    "<":"&lt;",
-    ">":"&gt;",
-    '"':"&quot;",
-    "'":"&#039;"
-  }[c])
-);
-
-
-const toast =
-msg => {
-
-  $("toast").textContent = msg;
-
-  $("toast").classList.add("show");
-
-  setTimeout(
-    () =>
-      $("toast").classList.remove("show"),
-    2500
-  );
-
-};
-
-
-function dateOfTimestamp(ts){
-
-  if(!ts) return "";
-
-  const d = new Date(ts);
-
-  if(isNaN(d.getTime())) return "";
-
-  return new Intl.DateTimeFormat(
-    "en-CA",
-    {
-      timeZone:"Asia/Kolkata"
-    }
-  ).format(d);
+  return "₹" +
+    Number(n || 0).toLocaleString(
+      "en-IN",
+      {
+        minimumFractionDigits:2,
+        maximumFractionDigits:2
+      }
+    );
 
 }
 
 
-function sourceKey(type,id){
+function esc(v){
 
-  return type + "|" + String(id);
+  return String(v ?? "")
+    .replace(
+      /[&<>"']/g,
+      c => ({
+        "&":"&amp;",
+        "<":"&lt;",
+        ">":"&gt;",
+        '"':"&quot;",
+        "'":"&#039;"
+      }[c])
+    );
+
+}
+
+
+function toast(msg){
+
+  $("toast").textContent =
+    msg;
+
+  $("toast")
+    .classList
+    .add("show");
+
+  setTimeout(
+    () =>
+      $("toast")
+      .classList
+      .remove("show"),
+    2500
+  );
+
+}
+
+
+function sourceKey(
+  type,
+  id
+){
+
+  return (
+    type +
+    "|" +
+    String(id)
+  );
 
 }
 
 
 function effectiveAmount(row){
 
-  const o =
+  const override =
     overrides[
       sourceKey(
         row.source_type,
@@ -1493,9 +1720,14 @@ function effectiveAmount(row){
       )
     ];
 
-  return o
-    ? Number(o.adjusted_amount || 0)
-    : Number(row.original_amount || 0);
+
+  return override
+    ? Number(
+        override.adjusted_amount || 0
+      )
+    : Number(
+        row.original_amount || 0
+      );
 
 }
 
@@ -1503,16 +1735,22 @@ function effectiveAmount(row){
 function paymentClass(method){
 
   const m =
-    String(method || "").toLowerCase();
+    String(
+      method || ""
+    ).toLowerCase();
+
 
   if(m === "cash")
     return "cash";
 
+
   if(m === "upi")
     return "upi";
 
+
   if(m === "card")
     return "card";
+
 
   return "";
 
@@ -1530,202 +1768,21 @@ function paymentPill(method){
 }
 
 
-/* LOAD DATE */
-
-async function loadDate(){
-
-  selectedDate =
-    $("ledgerDate").value;
-
-  if(!selectedDate)
-    return;
-
-
-  $("salesArea").innerHTML =
-    '<div class="loading">Loading sales…</div>';
-
-
-  $("dailyExpensesArea").innerHTML =
-    '<div class="loading">Loading expenses…</div>';
-
-
-  try{
-
-    const [
-
-      ordersRes,
-
-      dailyRes,
-
-      overrideRes
-
-    ] =
-    await Promise.all([
-
-      db
-      .from("chaat_orders")
-      .select(
-        "id,order_number,customer_name,total,payment_method,status,created_at"
-      )
-      .gte(
-        "created_at",
-        selectedDate +
-        "T00:00:00+05:30"
-      )
-      .lt(
-        "created_at",
-        nextDateIso(selectedDate)
-      )
-      .order(
-        "created_at",
-        {
-          ascending:true
-        }
-      ),
-
-
-      db
-      .from("ledger_daily_expenses")
-      .select("*")
-      .eq(
-        "expense_date",
-        selectedDate
-      )
-      .order(
-        "created_at",
-        {
-          ascending:true
-        }
-      ),
-
-
-      db
-      .from("ledger_overrides")
-      .select("*")
-      .eq(
-        "ledger_date",
-        selectedDate
-      )
-
-    ]);
-
-
-    if(ordersRes.error)
-      throw ordersRes.error;
-
-
-    if(dailyRes.error)
-      throw dailyRes.error;
-
-
-    if(overrideRes.error)
-      throw overrideRes.error;
-
-
-    salesRows =
-      (ordersRes.data || [])
-      .map(order => ({
-
-        source_type:
-          "sale_order",
-
-        source_id:
-          order.id,
-
-        ledger_date:
-          selectedDate,
-
-        label:
-          "Order #" +
-          (order.order_number ??
-           order.id),
-
-        detail:
-          (order.customer_name ||
-           "Walk-in Customer") +
-
-          (order.status
-            ? " · " + order.status
-            : ""),
-
-        original_amount:
-          Number(order.total || 0),
-
-        payment_method:
-          order.payment_method ||
-          "Not specified",
-
-        kind:
-          "sale",
-
-        created_at:
-          order.created_at
-
-      }));
-
-
-    dailyExpenses =
-      dailyRes.data || [];
-
-
-    overrides = {};
-
-
-    (overrideRes.data || [])
-    .forEach(o => {
-
-      overrides[
-        sourceKey(
-          o.source_type,
-          o.source_id
-        )
-      ] = o;
-
-    });
-
-
-    renderAll();
-
-
-    $("connectionText").textContent =
-      "Supabase Connected";
-
-
-  }catch(err){
-
-    console.error(err);
-
-    $("connectionText").textContent =
-      "Supabase error";
-
-
-    $("salesArea").innerHTML =
-      '<div class="empty">' +
-      'Could not load sales: ' +
-      esc(err.message) +
-      '</div>';
-
-
-    $("dailyExpensesArea").innerHTML =
-      '<div class="empty">' +
-      'Could not load expenses.' +
-      '</div>';
-
-  }
-
-}
-
-
-function nextDateIso(dateStr){
-
-  const [
-    y,
-    m,
-    d
-  ] =
+function nextDateIso(
+  dateStr
+){
+
+  const parts =
     dateStr
     .split("-")
     .map(Number);
+
+
+  const y = parts[0];
+
+  const m = parts[1];
+
+  const d = parts[2];
 
 
   const dt =
@@ -1749,36 +1806,266 @@ function nextDateIso(dateStr){
 }
 
 
-/* RENDER */
+
+/* ==========================================
+   LOAD DATE
+========================================== */
+
+async function loadDate(){
+
+  selectedDate =
+    $("ledgerDate").value;
+
+
+  if(!selectedDate)
+    return;
+
+
+  $("salesArea").innerHTML =
+    '<div class="loading">Loading sales…</div>';
+
+
+  $("fixedExpensesArea").innerHTML =
+    '<div class="loading">Loading expenses…</div>';
+
+
+  try{
+
+
+    const [
+      ordersRes,
+      expensesRes,
+      overrideRes
+    ] =
+    await Promise.all([
+
+
+      /* SALES */
+
+      db
+      .from("chaat_orders")
+      .select(
+        "id,order_number,customer_name,total,payment_method,status,created_at"
+      )
+      .gte(
+        "created_at",
+        selectedDate +
+        "T00:00:00+05:30"
+      )
+      .lt(
+        "created_at",
+        nextDateIso(
+          selectedDate
+        )
+      )
+      .order(
+        "created_at",
+        {
+          ascending:true
+        }
+      ),
+
+
+      /* MANUAL EXPENSES */
+
+      db
+      .from("ledger_daily_expenses")
+      .select("*")
+      .eq(
+        "expense_date",
+        selectedDate
+      )
+      .order(
+        "created_at",
+        {
+          ascending:true
+        }
+      ),
+
+
+      /* CORRECTIONS */
+
+      db
+      .from("ledger_overrides")
+      .select("*")
+      .eq(
+        "ledger_date",
+        selectedDate
+      )
+
+    ]);
+
+
+    if(ordersRes.error)
+      throw ordersRes.error;
+
+
+    if(expensesRes.error)
+      throw expensesRes.error;
+
+
+    if(overrideRes.error)
+      throw overrideRes.error;
+
+
+
+    /* CONVERT SALES */
+
+    salesRows =
+      (ordersRes.data || [])
+      .map(
+        order => ({
+
+          source_type:
+            "sale_order",
+
+          source_id:
+            order.id,
+
+          ledger_date:
+            selectedDate,
+
+          label:
+            "Order #" +
+            (
+              order.order_number ??
+              order.id
+            ),
+
+          detail:
+            (
+              order.customer_name ||
+              "Walk-in Customer"
+            ) +
+            (
+              order.status
+              ? " · " +
+                order.status
+              : ""
+            ),
+
+          original_amount:
+            Number(
+              order.total || 0
+            ),
+
+          payment_method:
+            order.payment_method ||
+            "Not specified",
+
+          kind:
+            "sale",
+
+          created_at:
+            order.created_at
+
+        })
+      );
+
+
+    dailyExpenses =
+      expensesRes.data || [];
+
+
+    overrides = {};
+
+
+    (overrideRes.data || [])
+      .forEach(
+        o => {
+
+          overrides[
+            sourceKey(
+              o.source_type,
+              o.source_id
+            )
+          ] = o;
+
+        }
+      );
+
+
+    renderAll();
+
+
+    $("connectionText")
+      .textContent =
+      "Supabase Connected";
+
+
+  }
+  catch(err){
+
+    console.error(err);
+
+
+    $("connectionText")
+      .textContent =
+      "Supabase error";
+
+
+    $("salesArea").innerHTML =
+      `
+        <div class="empty">
+          Could not load sales.
+          <br><br>
+          ${esc(err.message)}
+        </div>
+      `;
+
+
+    $("fixedExpensesArea").innerHTML =
+      `
+        <div class="empty">
+          Could not load expenses.
+          <br><br>
+          ${esc(err.message)}
+        </div>
+      `;
+
+  }
+
+}
+
+
+
+/* ==========================================
+   RENDER ALL
+========================================== */
 
 function renderAll(){
 
   renderSales();
 
-  renderDailyExpenses();
+  renderExpenses();
 
   updateSummary();
 
 }
 
 
-/* SALES */
+
+/* ==========================================
+   SALES TABLE
+========================================== */
 
 function renderSales(){
 
   if(!salesRows.length){
 
     $("salesArea").innerHTML =
-      '<div class="empty">' +
-      'No sales records for this date.' +
-      '</div>';
+      `
+        <div class="empty">
+          No sales records for this date.
+        </div>
+      `;
 
     return;
 
   }
 
 
-  let h = `
+  let html = `
 
     <div class="table-wrap">
 
@@ -1821,140 +2108,161 @@ function renderSales(){
   `;
 
 
-  salesRows.forEach(r => {
+  salesRows.forEach(
+    row => {
 
-    const actual =
-      effectiveAmount(r);
-
-
-    const corrected =
-      Math.abs(
-        actual -
-        Number(r.original_amount)
-      ) > .001;
+      const actual =
+        effectiveAmount(row);
 
 
-    const override =
-      overrides[
-        sourceKey(
-          r.source_type,
-          r.source_id
-        )
-      ];
+      const corrected =
+        Math.abs(
+          actual -
+          Number(
+            row.original_amount
+          )
+        ) > 0.001;
 
 
-    h += `
+      const override =
+        overrides[
+          sourceKey(
+            row.source_type,
+            row.source_id
+          )
+        ];
 
-      <tr>
 
-        <td>
+      let time = "";
 
-          <b>
-            ${esc(r.label)}
-          </b>
 
-          <div class="source">
+      if(row.created_at){
+
+        const d =
+          new Date(
+            row.created_at
+          );
+
+
+        if(!isNaN(d.getTime())){
+
+          time =
+            d.toLocaleTimeString(
+              "en-IN",
+              {
+                hour:"2-digit",
+                minute:"2-digit"
+              }
+            );
+
+        }
+
+      }
+
+
+      html += `
+
+        <tr>
+
+          <td>
+
+            <b>
+              ${esc(row.label)}
+            </b>
+
+            <div class="source">
+              ${esc(time)}
+            </div>
+
+          </td>
+
+
+          <td>
+            ${esc(row.detail)}
+          </td>
+
+
+          <td>
+            ${paymentPill(
+              row.payment_method
+            )}
+          </td>
+
+
+          <td class="num">
+            ${money(
+              row.original_amount
+            )}
+          </td>
+
+
+          <td class="num amount">
+
+            ${money(actual)}
 
             ${
-              new Date(
-                r.created_at
-              ).toLocaleTimeString(
-                "en-IN",
-                {
-                  hour:"2-digit",
-                  minute:"2-digit"
-                }
-              )
+              corrected
+              ?
+              `
+                <div class="source">
+                  Corrected
+                </div>
+              `
+              :
+              ""
             }
 
-          </div>
-
-        </td>
+          </td>
 
 
-        <td>
-          ${esc(r.detail)}
-        </td>
+          <td>
 
-
-        <td>
-          ${paymentPill(
-            r.payment_method
-          )}
-        </td>
-
-
-        <td class="num">
-
-          ${money(
-            r.original_amount
-          )}
-
-        </td>
-
-
-        <td class="num amount">
-
-          ${money(actual)}
-
-          ${
-            corrected
-            ?
-            '<div class="source">Corrected</div>'
-            :
-            ''
-          }
-
-        </td>
-
-
-        <td>
-
-          <button
-            class="edit-btn"
-            onclick='openAdjust(
-              ${JSON.stringify(r.source_type)},
-              ${JSON.stringify(String(r.source_id))},
-              ${JSON.stringify(r.label)},
-              ${Number(r.original_amount)},
-              ${Number(actual)},
-              ${JSON.stringify(override?.note || "")}
-            )'
-          >
-            Edit
-          </button>
-
-
-          ${
-            corrected
-
-            ?
-
-            `<button
-              class="reset-btn"
-              onclick='resetAdjust(
-                ${JSON.stringify(r.source_type)},
-                ${JSON.stringify(String(r.source_id))}
+            <button
+              class="edit-btn"
+              onclick='openAdjust(
+                ${JSON.stringify(row.source_type)},
+                ${JSON.stringify(String(row.source_id))},
+                ${JSON.stringify(row.label)},
+                ${Number(row.original_amount)},
+                ${Number(actual)},
+                ${JSON.stringify(
+                  override?.note || ""
+                )}
               )'
             >
-              Reset
-            </button>`
-
-            :
-
-            ""
-          }
-
-        </td>
-
-      </tr>
-
-    `;
-
-  });
+              Edit
+            </button>
 
 
-  h += `
+            ${
+              corrected
+              ?
+              `
+                <button
+                  class="reset-btn"
+                  onclick='resetAdjust(
+                    ${JSON.stringify(row.source_type)},
+                    ${JSON.stringify(String(row.source_id))}
+                  )'
+                >
+                  Reset
+                </button>
+              `
+              :
+              ""
+            }
+
+          </td>
+
+        </tr>
+
+      `;
+
+    }
+  );
+
+
+  html += `
 
         </tbody>
 
@@ -1965,28 +2273,37 @@ function renderSales(){
   `;
 
 
-  $("salesArea").innerHTML = h;
+  $("salesArea").innerHTML =
+    html;
 
 }
 
 
-/* EXPENSES */
 
-function renderDailyExpenses(){
+/* ==========================================
+   EXPENSE TABLE
+========================================== */
+
+function renderExpenses(){
 
   if(!dailyExpenses.length){
 
-    $("dailyExpensesArea").innerHTML =
-      '<div class="empty">' +
-      'No expenses entered for this date.' +
-      '</div>';
+    $("fixedExpensesArea").innerHTML =
+      `
+        <div class="empty">
+          No expenses entered for this date.
+          <br><br>
+          Click <b>＋ Add Expense</b> above
+          to enter one.
+        </div>
+      `;
 
     return;
 
   }
 
 
-  let h = `
+  let html = `
 
     <div class="table-wrap">
 
@@ -2008,10 +2325,6 @@ function renderDailyExpenses(){
               Payment
             </th>
 
-            <th>
-              Notes
-            </th>
-
             <th class="num">
               Amount
             </th>
@@ -2029,78 +2342,94 @@ function renderDailyExpenses(){
   `;
 
 
-  dailyExpenses.forEach(e => {
+  dailyExpenses.forEach(
+    expense => {
 
-    h += `
+      html += `
 
-      <tr>
+        <tr>
 
-        <td>
+          <td>
 
-          <b>
-            ${esc(e.expense_name)}
-          </b>
+            <b>
+              ${esc(
+                expense.expense_name
+              )}
+            </b>
 
-        </td>
+            ${
+              expense.notes
+              ?
+              `
+                <div class="source">
+                  ${esc(
+                    expense.notes
+                  )}
+                </div>
+              `
+              :
+              ""
+            }
 
-
-        <td>
-          ${esc(e.category || "—")}
-        </td>
-
-
-        <td>
-          ${paymentPill(
-            e.payment_method
-          )}
-        </td>
-
-
-        <td>
-          ${esc(
-            e.notes || "—"
-          )}
-        </td>
+          </td>
 
 
-        <td class="num amount">
-
-          ${money(e.amount)}
-
-        </td>
-
-
-        <td>
-
-          <button
-            class="edit-btn"
-            onclick='editExpense(
-              ${JSON.stringify(e)}
-            )'
-          >
-            Edit
-          </button>
+          <td>
+            ${esc(
+              expense.category ||
+              "Other"
+            )}
+          </td>
 
 
-          <button
-            class="delete-btn"
-            onclick='deleteExpense(
-              ${JSON.stringify(String(e.id))}
-            )'
-          >
-            Delete
-          </button>
-
-        </td>
-
-      </tr>
-
-    `;
-
-  });
+          <td>
+            ${paymentPill(
+              expense.payment_method
+            )}
+          </td>
 
 
-  h += `
+          <td class="num amount">
+            ${money(
+              expense.amount
+            )}
+          </td>
+
+
+          <td>
+
+            <button
+              class="edit-btn"
+              onclick='editExpense(
+                ${JSON.stringify(expense)}
+              )'
+            >
+              Edit
+            </button>
+
+
+            <button
+              class="delete-btn"
+              onclick='deleteExpense(
+                ${JSON.stringify(
+                  String(expense.id)
+                )}
+              )'
+            >
+              Delete
+            </button>
+
+          </td>
+
+        </tr>
+
+      `;
+
+    }
+  );
+
+
+  html += `
 
         </tbody>
 
@@ -2111,65 +2440,90 @@ function renderDailyExpenses(){
   `;
 
 
-  $("dailyExpensesArea").innerHTML = h;
+  $("fixedExpensesArea").innerHTML =
+    html;
 
 }
 
 
-/* DAILY TOTAL */
+
+/* ==========================================
+   DAILY SUMMARY
+========================================== */
 
 function updateSummary(){
 
   const sales =
     salesRows.reduce(
-      (s,r) =>
-        s + effectiveAmount(r),
+      (
+        total,
+        row
+      ) =>
+        total +
+        effectiveAmount(row),
       0
     );
 
 
   const expenses =
     dailyExpenses.reduce(
-      (s,e) =>
-        s + Number(e.amount || 0),
+      (
+        total,
+        expense
+      ) =>
+        total +
+        Number(
+          expense.amount || 0
+        ),
       0
     );
 
 
   const result =
-    sales - expenses;
+    sales -
+    expenses;
 
 
-  $("totalSales").textContent =
+  $("totalSales")
+    .textContent =
     money(sales);
 
 
-  $("totalExpenses").textContent =
+  $("totalExpenses")
+    .textContent =
     money(expenses);
 
 
-  $("profitLoss").textContent =
-    money(Math.abs(result));
+  $("profitLoss")
+    .textContent =
+    money(
+      Math.abs(result)
+    );
 
 
-  $("resultLabel").textContent =
+  $("resultLabel")
+    .textContent =
     result >= 0
       ? "PROFIT"
       : "LOSS";
 
 
-  $("profitLoss").className =
-    "summary-value " +
-    (
-      result >= 0
+  $("profitLoss")
+    .className =
+      "summary-value " +
+      (
+        result >= 0
         ? "profit"
         : "loss"
-    );
+      );
 
 }
 
 
-/* SALES CORRECTION */
+
+/* ==========================================
+   SALES CORRECTION
+========================================== */
 
 function openAdjust(
   type,
@@ -2181,28 +2535,38 @@ function openAdjust(
 ){
 
   adjustmentTarget = {
-    type,
-    id,
-    label,
-    original
+
+    type:type,
+
+    id:id,
+
+    label:label,
+
+    original:original
+
   };
 
 
-  $("adjustTitle").textContent =
-    "Correct: " + label;
+  $("adjustTitle")
+    .textContent =
+    "Correct: " +
+    label;
 
 
-  $("adjustOriginal").value =
+  $("adjustOriginal")
+    .value =
     money(original);
 
 
-  $("adjustAmount").value =
+  $("adjustAmount")
+    .value =
     Number(
       current || 0
     ).toFixed(2);
 
 
-  $("adjustNote").value =
+  $("adjustNote")
+    .value =
     note || "";
 
 
@@ -2211,6 +2575,7 @@ function openAdjust(
     .add("show");
 
 }
+
 
 
 async function saveAdjust(){
@@ -2265,22 +2630,27 @@ async function saveAdjust(){
 
     note:
       $("adjustNote")
-      .value
-      .trim() || null
+        .value
+        .trim() ||
+      null
 
   };
 
 
-  const {error} =
+  const {
+    error
+  } =
     await db
-    .from("ledger_overrides")
-    .upsert(
-      payload,
-      {
-        onConflict:
-          "ledger_date,source_type,source_id"
-      }
-    );
+      .from(
+        "ledger_overrides"
+      )
+      .upsert(
+        payload,
+        {
+          onConflict:
+            "ledger_date,source_type,source_id"
+        }
+      );
 
 
   if(error){
@@ -2310,6 +2680,7 @@ async function saveAdjust(){
 }
 
 
+
 async function resetAdjust(
   type,
   id
@@ -2323,22 +2694,26 @@ async function resetAdjust(
     return;
 
 
-  const {error} =
+  const {
+    error
+  } =
     await db
-    .from("ledger_overrides")
-    .delete()
-    .eq(
-      "ledger_date",
-      selectedDate
-    )
-    .eq(
-      "source_type",
-      type
-    )
-    .eq(
-      "source_id",
-      String(id)
-    );
+      .from(
+        "ledger_overrides"
+      )
+      .delete()
+      .eq(
+        "ledger_date",
+        selectedDate
+      )
+      .eq(
+        "source_type",
+        type
+      )
+      .eq(
+        "source_id",
+        String(id)
+      );
 
 
   if(error){
@@ -2362,41 +2737,55 @@ async function resetAdjust(
 }
 
 
-/* EXPENSE MODAL */
+
+/* ==========================================
+   EXPENSE MODAL
+========================================== */
 
 function openExpenseModal(
-  exp = null
+  expense = null
 ){
 
   editingExpenseId =
-    exp?.id || null;
+    expense?.id ||
+    null;
 
 
   $("expenseModalTitle")
     .textContent =
-      exp
-        ? "Edit Expense"
-        : "Add Expense";
+      expense
+      ? "Edit Expense"
+      : "Add Expense";
 
 
-  $("expenseName").value =
-    exp?.expense_name || "";
+  $("expenseName")
+    .value =
+    expense?.expense_name ||
+    "";
 
 
-  $("expenseAmount").value =
-    exp?.amount ?? "";
+  $("expenseAmount")
+    .value =
+    expense?.amount ??
+    "";
 
 
-  $("expenseCategory").value =
-    exp?.category || "Other";
+  $("expenseCategory")
+    .value =
+    expense?.category ||
+    "Other";
 
 
-  $("expensePayment").value =
-    exp?.payment_method || "Cash";
+  $("expensePayment")
+    .value =
+    expense?.payment_method ||
+    "Cash";
 
 
-  $("expenseNotes").value =
-    exp?.notes || "";
+  $("expenseNotes")
+    .value =
+    expense?.notes ||
+    "";
 
 
   $("expenseModal")
@@ -2406,6 +2795,7 @@ function openExpenseModal(
 }
 
 
+
 async function saveExpense(e){
 
   e.preventDefault();
@@ -2413,8 +2803,8 @@ async function saveExpense(e){
 
   const name =
     $("expenseName")
-    .value
-    .trim();
+      .value
+      .trim();
 
 
   const amount =
@@ -2457,41 +2847,49 @@ async function saveExpense(e){
 
     notes:
       $("expenseNotes")
-      .value
-      .trim() || null
+        .value
+        .trim() ||
+      null
 
   };
 
 
-  let res;
+  let result;
 
 
   if(editingExpenseId){
 
-    res =
+    result =
       await db
-      .from("ledger_daily_expenses")
-      .update(payload)
-      .eq(
-        "id",
-        editingExpenseId
-      );
+        .from(
+          "ledger_daily_expenses"
+        )
+        .update(payload)
+        .eq(
+          "id",
+          editingExpenseId
+        );
 
-  }else{
+  }
+  else{
 
-    res =
+    result =
       await db
-      .from("ledger_daily_expenses")
-      .insert(payload);
+        .from(
+          "ledger_daily_expenses"
+        )
+        .insert(
+          payload
+        );
 
   }
 
 
-  if(res.error){
+  if(result.error){
 
     toast(
       "Could not save expense: " +
-      res.error.message
+      result.error.message
     );
 
     return;
@@ -2516,7 +2914,22 @@ async function saveExpense(e){
 }
 
 
-async function deleteExpense(id){
+
+function editExpense(
+  expense
+){
+
+  openExpenseModal(
+    expense
+  );
+
+}
+
+
+
+async function deleteExpense(
+  id
+){
 
   if(
     !confirm(
@@ -2526,14 +2939,18 @@ async function deleteExpense(id){
     return;
 
 
-  const {error} =
+  const {
+    error
+  } =
     await db
-    .from("ledger_daily_expenses")
-    .delete()
-    .eq(
-      "id",
-      id
-    );
+      .from(
+        "ledger_daily_expenses"
+      )
+      .delete()
+      .eq(
+        "id",
+        id
+      );
 
 
   if(error){
@@ -2557,29 +2974,28 @@ async function deleteExpense(id){
 }
 
 
-function editExpense(e){
 
-  openExpenseModal(e);
-
-}
-
-
-/* CASH SUMMARY */
+/* ==========================================
+   CASH SUMMARY
+========================================== */
 
 async function loadCashSummary(){
 
   const date =
-    $("summaryDate").value;
+    $("summaryDate")
+      .value;
 
 
   if(!date)
     return;
 
 
-  selectedDate = date;
+  selectedDate =
+    date;
 
 
-  $("ledgerDate").value =
+  $("ledgerDate")
+    .value =
     date;
 
 
@@ -2589,6 +3005,7 @@ async function loadCashSummary(){
   calculateCashSummary();
 
 }
+
 
 
 function calculateCashSummary(){
@@ -2609,57 +3026,72 @@ function calculateCashSummary(){
   let otherExpenses = 0;
 
 
-  salesRows.forEach(r => {
 
-    const amount =
-      effectiveAmount(r);
+  /* SALES */
 
+  salesRows.forEach(
+    row => {
 
-    const method =
-      String(
-        r.payment_method || ""
-      ).toLowerCase();
-
-
-    if(method === "cash")
-      cashSales += amount;
-
-    else if(method === "upi")
-      upiSales += amount;
-
-    else if(method === "card")
-      cardSales += amount;
-
-  });
+      const amount =
+        effectiveAmount(
+          row
+        );
 
 
-  dailyExpenses.forEach(e => {
-
-    const amount =
-      Number(
-        e.amount || 0
-      );
-
-
-    const method =
-      String(
-        e.payment_method || ""
-      ).toLowerCase();
+      const method =
+        String(
+          row.payment_method ||
+          ""
+        ).toLowerCase();
 
 
-    if(method === "cash")
-      cashExpenses += amount;
+      if(method === "cash")
+        cashSales += amount;
 
-    else if(method === "upi")
-      upiExpenses += amount;
+      else if(method === "upi")
+        upiSales += amount;
 
-    else if(method === "card")
-      cardExpenses += amount;
+      else if(method === "card")
+        cardSales += amount;
 
-    else
-      otherExpenses += amount;
+    }
+  );
 
-  });
+
+
+  /* EXPENSES */
+
+  dailyExpenses.forEach(
+    expense => {
+
+      const amount =
+        Number(
+          expense.amount || 0
+        );
+
+
+      const method =
+        String(
+          expense.payment_method ||
+          ""
+        ).toLowerCase();
+
+
+      if(method === "cash")
+        cashExpenses += amount;
+
+      else if(method === "upi")
+        upiExpenses += amount;
+
+      else if(method === "card")
+        cardExpenses += amount;
+
+      else
+        otherExpenses += amount;
+
+    }
+  );
+
 
 
   const totalSales =
@@ -2675,102 +3107,111 @@ function calculateCashSummary(){
     otherExpenses;
 
 
+
   $("cashSalesSummary")
     .textContent =
-      money(cashSales);
+    money(cashSales);
 
 
   $("upiSalesSummary")
     .textContent =
-      money(upiSales);
+    money(upiSales);
 
 
   $("cardSalesSummary")
     .textContent =
-      money(cardSales);
+    money(cardSales);
 
 
   $("totalPaymentSales")
     .textContent =
-      money(totalSales);
+    money(totalSales);
+
 
 
   $("cashExpensesSummary")
     .textContent =
-      money(cashExpenses);
+    money(cashExpenses);
 
 
   $("upiExpensesSummary")
     .textContent =
-      money(upiExpenses);
+    money(upiExpenses);
 
 
   $("cardExpensesSummary")
     .textContent =
-      money(cardExpenses);
+    money(cardExpenses);
 
 
   $("otherExpensesSummary")
     .textContent =
-      money(otherExpenses);
+    money(otherExpenses);
 
 
   $("totalPaymentExpenses")
     .textContent =
-      money(totalExpenses);
+    money(totalExpenses);
+
 
 
   $("netCashSummary")
     .textContent =
-      money(
-        cashSales -
-        cashExpenses
-      );
+    money(
+      cashSales -
+      cashExpenses
+    );
 
 
   $("netUpiSummary")
     .textContent =
-      money(
-        upiSales -
-        upiExpenses
-      );
+    money(
+      upiSales -
+      upiExpenses
+    );
 
 
   $("netCardSummary")
     .textContent =
-      money(
-        cardSales -
-        cardExpenses
-      );
+    money(
+      cardSales -
+      cardExpenses
+    );
 
 
   $("netAllSummary")
     .textContent =
-      money(
-        totalSales -
-        totalExpenses
-      );
+    money(
+      totalSales -
+      totalExpenses
+    );
 
 }
 
 
-/* BUTTON EVENTS */
+
+/* ==========================================
+   BUTTONS
+========================================== */
 
 
 $("openLedger").onclick =
-async () => {
+async function(){
 
   $("ledgerWindow")
     .style
-    .display = "block";
+    .display =
+    "block";
 
 
   $("cashSummaryWindow")
     .style
-    .display = "none";
+    .display =
+    "none";
 
 
-  $("ledgerDate").value =
+  $("ledgerDate")
+    .value =
     selectedDate;
 
 
@@ -2779,28 +3220,36 @@ async () => {
 };
 
 
+
 $("closeLedger").onclick =
-() =>
+function(){
+
   $("ledgerWindow")
     .style
-    .display = "none";
+    .display =
+    "none";
+
+};
+
 
 
 $("loadDate").onclick =
 loadDate;
 
 
+
 $("todayBtn").onclick =
-async () => {
+async function(){
 
   selectedDate =
     new Date()
-    .toLocaleDateString(
-      "en-CA"
-    );
+      .toLocaleDateString(
+        "en-CA"
+      );
 
 
-  $("ledgerDate").value =
+  $("ledgerDate")
+    .value =
     selectedDate;
 
 
@@ -2809,29 +3258,48 @@ async () => {
 };
 
 
+
 $("ledgerDate").onchange =
-() => {
+function(){
 
   selectedDate =
-    $("ledgerDate").value;
+    $("ledgerDate")
+      .value;
 
 };
 
 
+
+/* ADD EXPENSE */
+
+$("addExpenseBtn").onclick =
+function(){
+
+  openExpenseModal();
+
+};
+
+
+
+/* CASH SUMMARY */
+
 $("openCashSummary").onclick =
-async () => {
+async function(){
 
   $("cashSummaryWindow")
     .style
-    .display = "block";
+    .display =
+    "block";
 
 
   $("ledgerWindow")
     .style
-    .display = "none";
+    .display =
+    "none";
 
 
-  $("summaryDate").value =
+  $("summaryDate")
+    .value =
     selectedDate;
 
 
@@ -2840,32 +3308,41 @@ async () => {
 };
 
 
+
 $("closeCashSummary").onclick =
-() =>
+function(){
+
   $("cashSummaryWindow")
     .style
-    .display = "none";
+    .display =
+    "none";
+
+};
+
 
 
 $("loadCashSummary").onclick =
 loadCashSummary;
 
 
+
 $("todaySummaryBtn").onclick =
-async () => {
+async function(){
 
   selectedDate =
     new Date()
-    .toLocaleDateString(
-      "en-CA"
-    );
+      .toLocaleDateString(
+        "en-CA"
+      );
 
 
-  $("summaryDate").value =
+  $("summaryDate")
+    .value =
     selectedDate;
 
 
-  $("ledgerDate").value =
+  $("ledgerDate")
+    .value =
     selectedDate;
 
 
@@ -2874,75 +3351,90 @@ async () => {
 };
 
 
+
 $("summaryDate").onchange =
-() => {
+function(){
 
   selectedDate =
-    $("summaryDate").value;
+    $("summaryDate")
+      .value;
 
 
-  $("ledgerDate").value =
+  $("ledgerDate")
+    .value =
     selectedDate;
 
 };
 
 
-$("addExpenseBtn").onclick =
-() =>
-  openExpenseModal();
 
-
-$("addExpenseBtn2").onclick =
-() =>
-  openExpenseModal();
-
+/* EXPENSE MODAL */
 
 $("expenseForm").onsubmit =
 saveExpense;
 
 
 $("closeExpense").onclick =
-() =>
+function(){
+
   $("expenseModal")
     .classList
     .remove("show");
+
+};
 
 
 $("cancelExpense").onclick =
-() =>
+function(){
+
   $("expenseModal")
     .classList
     .remove("show");
 
+};
+
+
+
+/* CORRECTION MODAL */
 
 $("closeAdjust").onclick =
-() =>
+function(){
+
   $("adjustModal")
     .classList
     .remove("show");
+
+};
 
 
 $("cancelAdjust").onclick =
-() =>
+function(){
+
   $("adjustModal")
     .classList
     .remove("show");
+
+};
 
 
 $("saveAdjust").onclick =
 saveAdjust;
 
 
+
+/* CLICK OUTSIDE MODAL */
+
 window.addEventListener(
   "click",
-  e => {
+  function(e){
 
     if(
       e.target.classList
-      .contains("modal")
+        .contains("modal")
     ){
 
-      e.target.classList
+      e.target
+        .classList
         .remove("show");
 
     }
@@ -2951,11 +3443,16 @@ window.addEventListener(
 );
 
 
-$("ledgerDate").value =
+
+/* INITIAL DATE */
+
+$("ledgerDate")
+  .value =
   selectedDate;
 
 
-$("summaryDate").value =
+$("summaryDate")
+  .value =
   selectedDate;
 
 </script>
