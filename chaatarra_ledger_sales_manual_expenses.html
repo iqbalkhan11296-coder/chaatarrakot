@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Chaatarra Ledger</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+:root{
+  --burgundy:#4b001f;--burgundy2:#650028;--gold:#d4af37;
+  --cream:#faf7f2;--paper:#fffdf9;--line:#e8dfe2;--ink:#261c20;
+  --muted:#756b6e;--green:#287a52;--red:#b43b45;--shadow:0 12px 35px rgba(75,0,31,.08)
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:linear-gradient(135deg,#f7f0e9,#fffdf9 50%,#f5edf0);color:var(--ink);min-height:100vh}
+button,input,select,textarea{font:inherit}button{cursor:pointer}
+header{background:linear-gradient(110deg,var(--burgundy),var(--burgundy2));color:#fff;padding:25px 32px;box-shadow:0 5px 22px rgba(0,0,0,.12)}
+.header-inner{max-width:1450px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.brand{font:700 30px Georgia,serif;letter-spacing:.8px}.subtitle{margin-top:5px;font-size:13px;color:#ead7dd;letter-spacing:1.2px;text-transform:uppercase}.connection{font-size:12px;color:#f0d36b;font-weight:700}
+.container{max-width:1450px;margin:auto;padding:28px}
+.main-buttons{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.main-button{width:100%;background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:24px;text-align:left;box-shadow:var(--shadow);transition:.2s}
+.main-button:hover{transform:translateY(-2px);box-shadow:0 16px 40px rgba(75,0,31,.12)}
+.main-button h2{margin:0 0 7px;color:var(--burgundy);font:700 24px Georgia,serif}.main-button p{margin:0;color:var(--muted)}
+.main-button.gold-button{background:linear-gradient(110deg,var(--burgundy),var(--burgundy2));border-color:var(--burgundy)}
+.main-button.gold-button h2{color:var(--gold)}.main-button.gold-button p{color:#ead7dd}
+.window{display:none;margin-top:20px}
+.toolbar{background:var(--paper);border:1px solid var(--line);border-radius:15px;padding:15px;display:flex;gap:10px;align-items:end;flex-wrap:wrap;box-shadow:0 7px 22px rgba(75,0,31,.05)}
+.field{display:flex;flex-direction:column;gap:6px}.field label{font-size:12px;color:var(--muted);font-weight:700}
+input,select,textarea{padding:11px 12px;border:1px solid #d8ccd0;border-radius:9px;background:#fff;color:#222;outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--gold)}
+.secondary{padding:11px 15px;border-radius:9px;border:1px solid #ddd;background:#fff;color:var(--burgundy);font-weight:700}
+.primary{background:var(--burgundy);color:#fff;border:0;padding:11px 16px;border-radius:9px;font-weight:700}.primary:hover{background:var(--burgundy2)}
+.gold-btn{background:var(--gold);color:#241500;border:0;padding:10px 13px;border-radius:8px;font-weight:800}
+.sections{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px}
+.section{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 7px 22px rgba(75,0,31,.05)}
+.section-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px}.section h3{margin:0;color:var(--burgundy);font:700 20px Georgia,serif}
+.badge{font-size:11px;padding:5px 8px;border-radius:20px;background:#f3eee8;color:#666;font-weight:700}
+.reference-note{margin:-5px 0 13px;color:var(--muted);font-size:12px}.table-wrap{overflow:auto}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:600px}th,td{padding:10px 7px;border-bottom:1px solid #eee;text-align:left;vertical-align:middle}
+th{color:#777;background:#faf8f5;font-size:12px}.num{text-align:right;white-space:nowrap}.amount{font-weight:800;white-space:nowrap}.source{font-size:11px;color:#8a7f82}
+.edit-btn,.reset-btn,.delete-btn{border:1px solid #ddd;background:#fff;border-radius:7px;padding:6px 9px;font-size:11px;font-weight:700}
+.edit-btn{color:var(--burgundy)}.reset-btn{color:#777;margin-left:4px}.delete-btn{color:var(--red);border-color:#efd0d3;margin-left:4px}
+.empty{text-align:center;color:#888;padding:25px 5px}.loading{text-align:center;padding:25px;color:var(--muted)}
+.payment-pill{display:inline-block;padding:5px 8px;border-radius:20px;background:#f3eee8;color:var(--burgundy);font-size:11px;font-weight:800}
+.payment-pill.cash{background:#edf8f1;color:#287a52}.payment-pill.upi{background:#f0f2ff;color:#3747a5}.payment-pill.card{background:#fff5df;color:#9b6410}
+.summary{margin-top:18px;background:linear-gradient(110deg,var(--burgundy),var(--burgundy2));color:#fff;border-radius:17px;padding:20px;box-shadow:var(--shadow)}
+.summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:15px}.summary-card{background:#ffffff12;border:1px solid #ffffff22;border-radius:11px;padding:15px}
+.summary-label{font-size:12px;opacity:.75}.summary-value{font-size:25px;font-weight:900;margin-top:7px}.profit{color:#8ee4b0}.loss{color:#ffaaa9}
+.cash-summary{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px}.cash-card{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:22px;box-shadow:var(--shadow)}
+.cash-card h3{margin:0 0 18px;color:var(--burgundy);font:700 21px Georgia,serif}.cash-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #eee}
+.cash-row:last-child{border-bottom:0}.cash-row span:first-child{color:var(--muted);font-size:13px;font-weight:700}.cash-row strong{font-size:19px}
+.cash-total{margin-top:8px;padding-top:14px;border-top:2px solid var(--burgundy);color:var(--burgundy)}
+.big-balance{background:linear-gradient(110deg,var(--burgundy),var(--burgundy2));color:#fff;border-radius:18px;padding:24px;margin-top:18px;box-shadow:var(--shadow)}
+.big-balance h2{margin:0 0 18px;color:var(--gold);font:700 23px Georgia,serif}.balance-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:15px}
+.balance-card{border:1px solid #ffffff22;background:#ffffff10;border-radius:12px;padding:17px}.balance-card small{display:block;opacity:.7;font-size:11px;margin-bottom:7px}.balance-card strong{font-size:23px}
+.summary-note{margin-top:15px;font-size:11px;color:#ead7dd}
+.modal{display:none;position:fixed;inset:0;background:rgba(35,10,20,.5);align-items:center;justify-content:center;padding:20px;z-index:20}.modal.show{display:flex}
+.modal-box{width:min(620px,100%);background:var(--paper);border-radius:18px;padding:24px;box-shadow:0 25px 70px rgba(0,0,0,.25)}
+.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}.modal-head h2{margin:0;color:var(--burgundy);font:700 23px Georgia,serif}
+.close{border:0;background:#f3e9eb;color:var(--burgundy);width:34px;height:34px;border-radius:50%;font-size:20px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.form-grid .full{grid-column:1/-1}.form-actions{display:flex;justify-content:flex-end;gap:9px;margin-top:20px}
+.helper{font-size:11px;color:var(--muted);margin-top:5px}.toast{position:fixed;right:22px;bottom:22px;background:var(--burgundy);color:#fff;padding:13px 17px;border-radius:10px;display:none;z-index:30;box-shadow:var(--shadow);font-weight:700}.toast.show{display:block}
+@media(max-width:1100px){.balance-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:900px){.container{padding:15px}.sections{grid-template-columns:1fr}.summary-grid{grid-template-columns:1fr}.cash-summary{grid-template-columns:1fr}.main-buttons{grid-template-columns:1fr}.header-inner{align-items:flex-start}.connection{display:none}}
+@media(max-width:600px){.form-grid{grid-template-columns:1fr}.form-grid .full{grid-column:auto}.brand{font-size:25px}.balance-grid{grid-template-columns:1fr}}
+</style>
+</head>
+
+<body>
+<header>
+  <div class="header-inner">
+    <div>
+      <div class="brand">CHAATARRA LEDGER</div>
+      <div class="subtitle">The House of Chaats · Sales & Expenses</div>
+    </div>
+    <div class="connection" id="connectionText">Connecting to Supabase…</div>
+  </div>
+</header>
+
+<div class="container">
+
+  <div class="main-buttons">
+    <button class="main-button" id="openLedger">
+      <h2>Sales & Expenses</h2>
+      <p>View imported sales and enter all expenses manually.</p>
+    </button>
+
+    <button class="main-button gold-button" id="openCashSummary">
+      <h2>Cash & UPI Summary</h2>
+      <p>See sales and manually entered expenses by payment method.</p>
+    </button>
+  </div>
+
+  <div class="window" id="ledgerWindow">
+    <div class="toolbar">
+      <div class="field">
+        <label>Ledger Date</label>
+        <input type="date" id="ledgerDate">
+      </div>
+      <button class="primary" id="loadDate">Load Date</button>
+      <button class="secondary" id="todayBtn">Today</button>
+      <button class="secondary" id="closeLedger">Close</button>
+      <button class="primary" id="addExpenseBtn">＋ Add Expense</button>
+    </div>
+
+    <div class="sections">
+      <section class="section">
+        <div class="section-head">
+          <h3>Imported Sales</h3>
+          <span class="badge">Automatic · chaat_orders</span>
+        </div>
+        <div class="reference-note">
+          Sales are imported directly from <b>chaat_orders</b>. The amount comes from
+          <b>total</b> and the payment method comes from <b>payment_method</b>.
+        </div>
+        <div id="salesArea" class="loading">Loading sales…</div>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <h3>Manual Expenses</h3>
+          <span class="badge">Manual only</span>
+        </div>
+        <div class="reference-note">
+          No salary or inventory expenses are imported. Enter every expense manually below.
+        </div>
+        <div id="fixedExpensesArea">
+          <div class="empty">Expenses are entered in the Manual Expenses section below.</div>
+        </div>
+      </section>
+    </div>
+
+    <section class="section" style="margin-top:18px">
+      <div class="section-head">
+        <h3>Daily Expenses</h3>
+        <button class="primary" id="addExpenseBtn2">＋ Add Expense</button>
+      </div>
+      <div class="reference-note">
+        Every expense is entered manually. Select the actual payment method used.
+      </div>
+      <div id="dailyExpensesArea" class="loading">Loading expenses…</div>
+    </section>
+
+    <div class="summary">
+      <div class="summary-grid">
+        <div class="summary-card"><div class="summary-label">TOTAL SALES</div><div class="summary-value" id="totalSales">₹0.00</div></div>
+        <div class="summary-card"><div class="summary-label">TOTAL EXPENSES</div><div class="summary-value" id="totalExpenses">₹0.00</div></div>
+        <div class="summary-card"><div class="summary-label" id="resultLabel">PROFIT / LOSS</div><div class="summary-value" id="profitLoss">₹0.00</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="window" id="cashSummaryWindow">
+    <div class="toolbar">
+      <div class="field">
+        <label>Summary Date</label>
+        <input type="date" id="summaryDate">
+      </div>
+      <button class="primary" id="loadCashSummary">Calculate</button>
+      <button class="secondary" id="todaySummaryBtn">Today</button>
+      <button class="secondary" id="closeCashSummary">Close</button>
+    </div>
+
+    <div class="cash-summary">
+      <section class="cash-card">
+        <h3>Sales by Payment</h3>
+        <div class="cash-row"><span>Cash Sales</span><strong id="cashSalesSummary">₹0.00</strong></div>
+        <div class="cash-row"><span>UPI Sales</span><strong id="upiSalesSummary">₹0.00</strong></div>
+        <div class="cash-row"><span>Card Sales</span><strong id="cardSalesSummary">₹0.00</strong></div>
+        <div class="cash-row cash-total"><span>Total Sales</span><strong id="totalPaymentSales">₹0.00</strong></div>
+      </section>
+
+      <section class="cash-card">
+        <h3>Expenses by Payment</h3>
+        <div class="cash-row"><span>Cash Expenses</span><strong id="cashExpensesSummary">₹0.00</strong></div>
+        <div class="cash-row"><span>UPI Expenses</span><strong id="upiExpensesSummary">₹0.00</strong></div>
+        <div class="cash-row"><span>Card Expenses</span><strong id="cardExpensesSummary">₹0.00</strong></div>
+        <div class="cash-row"><span>Other / Bank Expenses</span><strong id="otherExpensesSummary">₹0.00</strong></div>
+        <div class="cash-row cash-total"><span>Total Expenses</span><strong id="totalPaymentExpenses">₹0.00</strong></div>
+      </section>
+    </div>
+
+    <div class="big-balance">
+      <h2>Payment Balance</h2>
+      <div class="balance-grid">
+        <div class="balance-card"><small>NET CASH</small><strong id="netCashSummary">₹0.00</strong></div>
+        <div class="balance-card"><small>NET UPI</small><strong id="netUpiSummary">₹0.00</strong></div>
+        <div class="balance-card"><small>NET CARD</small><strong id="netCardSummary">₹0.00</strong></div>
+        <div class="balance-card"><small>NET ALL PAYMENTS</small><strong id="netAllSummary">₹0.00</strong></div>
+      </div>
+      <div class="summary-note">
+        Sales use the payment method saved with each order. Expenses use the payment method you select when entering the expense.
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="expenseModal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h2 id="expenseModalTitle">Add Daily Expense</h2>
+      <button class="close" id="closeExpense">×</button>
+    </div>
+    <form id="expenseForm">
+      <div class="form-grid">
+        <div class="field">
+          <label>Expense Name *</label>
+          <input id="expenseName" required placeholder="Tea, petrol, salary, cleaning…">
+        </div>
+        <div class="field">
+          <label>Amount (₹) *</label>
+          <input id="expenseAmount" type="number" min="0" step="0.01" required>
+        </div>
+        <div class="field">
+          <label>Category</label>
+          <select id="expenseCategory">
+            <option>Food / Staff</option><option>Transport</option><option>Cleaning</option>
+            <option>Maintenance</option><option>Utilities</option><option>Rent</option><option>Inventory</option><option>Other</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Payment Method</label>
+          <select id="expensePayment">
+            <option>Cash</option><option>UPI</option><option>Card</option><option>Bank Transfer</option><option>Other</option>
+          </select>
+        </div>
+        <div class="field full">
+          <label>Notes / Description</label>
+          <textarea id="expenseNotes" rows="3" placeholder="Optional"></textarea>
+        </div>
+      </div>
+      <div class="helper">
+        The selected Ledger Date is used for this expense. This is the only expense source used by the Ledger.
+      </div>
+      <div class="form-actions">
+        <button type="button" class="secondary" id="cancelExpense">Cancel</button>
+        <button type="submit" class="primary">Save Expense</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal" id="adjustModal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h2 id="adjustTitle">Correct Ledger Amount</h2>
+      <button class="close" id="closeAdjust">×</button>
+    </div>
+    <div class="field">
+      <label>Source Amount</label>
+      <input id="adjustOriginal" readonly>
+    </div>
+    <div class="field" style="margin-top:13px">
+      <label>Ledger Amount *</label>
+      <input id="adjustAmount" type="number" min="0" step="0.01">
+    </div>
+    <div class="field" style="margin-top:13px">
+      <label>Correction Note</label>
+      <textarea id="adjustNote" rows="3" placeholder="Why was this corrected?"></textarea>
+    </div>
+    <div class="form-actions">
+      <button type="button" class="secondary" id="cancelAdjust">Cancel</button>
+      <button type="button" class="primary" id="saveAdjust">Save Correction</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SUPABASE_URL="https://ucqeyhcycwksiubmlilg.supabase.co";
+
+/*
+  IMPORTANT:
+  Keep the same Supabase publishable key you already use in this Ledger.
+  Do not use a service_role/secret key in this public HTML.
+*/
+const SUPABASE_KEY="sb_publishable_YdIvl7IqdpT0UZOHBumEiw_ZThYEsgV";
+const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+
+let selectedDate=new Date().toLocaleDateString("en-CA");
+let salesRows=[];
+let dailyExpenses=[];
+let overrides={};
+let adjustmentTarget=null;
+let editingExpenseId=null;
+
+const $=id=>document.getElementById(id);
+const money=n=>"₹"+Number(n||0).toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2});
+const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
+const toast=msg=>{ $("toast").textContent=msg;$("toast").classList.add("show");setTimeout(()=>$("toast").classList.remove("show"),2500); };
+
+function dateOfTimestamp(ts){
+  if(!ts)return "";
+  const d=new Date(ts);
+  if(isNaN(d.getTime()))return "";
+  return new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Kolkata"}).format(d);
+}
+
+function sourceKey(type,id){return type+"|"+String(id);}
+
+function effectiveAmount(row){
+  const o=overrides[sourceKey(row.source_type,row.source_id)];
+  return o ? Number(o.adjusted_amount||0) : Number(row.original_amount||0);
+}
+
+function paymentClass(method){
+  const m=String(method||"").toLowerCase();
+  if(m==="cash")return "cash";
+  if(m==="upi")return "upi";
+  if(m==="card")return "card";
+  return "";
+}
+
+function paymentPill(method){
+  return `<span class="payment-pill ${paymentClass(method)}">${esc(method||"Not specified")}</span>`;
+}
+
+async function loadDate(){
+  selectedDate=$("ledgerDate").value;
+  if(!selectedDate)return;
+
+  $("salesArea").innerHTML='<div class="loading">Loading sales…</div>';
+  $("dailyExpensesArea").innerHTML='<div class="loading">Loading expenses…</div>';
+
+  try{
+    const [ordersRes,dailyRes,overrideRes]=await Promise.all([
+      db.from("chaat_orders")
+        .select("id,order_number,customer_name,total,payment_method,status,created_at")
+        .gte("created_at",selectedDate+"T00:00:00+05:30")
+        .lt("created_at",nextDateIso(selectedDate))
+        .order("created_at",{ascending:true}),
+
+      db.from("ledger_daily_expenses")
+        .select("*")
+        .eq("expense_date",selectedDate)
+        .order("created_at",{ascending:true}),
+
+      db.from("ledger_overrides")
+        .select("*")
+        .eq("ledger_date",selectedDate)
+    ]);
+
+    if(ordersRes.error)throw ordersRes.error;
+    if(dailyRes.error)throw dailyRes.error;
+    if(overrideRes.error)throw overrideRes.error;
+
+    salesRows=(ordersRes.data||[]).map(order=>({
+      source_type:"sale_order",
+      source_id:order.id,
+      ledger_date:selectedDate,
+      label:"Order #"+(order.order_number??order.id),
+      detail:(order.customer_name||"Walk-in Customer")+(order.status?" · "+order.status:""),
+      original_amount:Number(order.total||0),
+      payment_method:order.payment_method||"Not specified",
+      kind:"sale",
+      created_at:order.created_at
+    }));
+
+    dailyExpenses=dailyRes.data||[];
+
+    overrides={};
+    (overrideRes.data||[]).forEach(o=>{
+      overrides[sourceKey(o.source_type,o.source_id)]=o;
+    });
+
+    renderAll();
+    $("connectionText").textContent="Supabase Connected";
+  }catch(err){
+    console.error(err);
+    $("connectionText").textContent="Supabase error";
+    $("salesArea").innerHTML='<div class="empty">Could not load sales: '+esc(err.message)+'</div>';
+    $("dailyExpensesArea").innerHTML='<div class="empty">Could not load expenses.</div>';
+  }
+}
+
+function nextDateIso(dateStr){
+  const [y,m,d]=dateStr.split("-").map(Number);
+  const dt=new Date(Date.UTC(y,m-1,d+1));
+  return dt.toISOString().slice(0,10)+"T00:00:00+05:30";
+}
+
+function renderAll(){
+  renderSales();
+  renderDailyExpenses();
+  updateSummary();
+}
+
+function renderSales(){
+  if(!salesRows.length){
+    $("salesArea").innerHTML='<div class="empty">No sales records for this date.</div>';
+    return;
+  }
+
+  let h=`<div class="table-wrap"><table>
+    <thead><tr><th>Order</th><th>Details</th><th>Payment</th><th class="num">Sales</th><th class="num">Ledger</th><th>Action</th></tr></thead><tbody>`;
+
+  salesRows.forEach(r=>{
+    const actual=effectiveAmount(r);
+    const corrected=Math.abs(actual-Number(r.original_amount))>.001;
+    const override=overrides[sourceKey(r.source_type,r.source_id)];
+
+    h+=`<tr>
+      <td><b>${esc(r.label)}</b><div class="source">${new Date(r.created_at).toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"})}</div></td>
+      <td>${esc(r.detail)}</td>
+      <td>${paymentPill(r.payment_method)}</td>
+      <td class="num">${money(r.original_amount)}</td>
+      <td class="num amount">${money(actual)}${corrected?'<div class="source">Corrected</div>':""}</td>
+      <td>
+        <button class="edit-btn" onclick='openAdjust(${JSON.stringify(r.source_type)},${JSON.stringify(String(r.source_id))},${JSON.stringify(r.label)},${Number(r.original_amount)},${Number(actual)},${JSON.stringify(override?.note||"")})'>Edit</button>
+        ${corrected?`<button class="reset-btn" onclick='resetAdjust(${JSON.stringify(r.source_type)},${JSON.stringify(String(r.source_id))})'>Reset</button>`:""}
+      </td>
+    </tr>`;
+  });
+
+  h+=`</tbody></table></div>`;
+  $("salesArea").innerHTML=h;
+}
+
+function renderDailyExpenses(){
+  if(!dailyExpenses.length){
+    $("dailyExpensesArea").innerHTML='<div class="empty">No expenses entered for this date.</div>';
+    return;
+  }
+
+  let h=`<div class="table-wrap"><table>
+    <thead><tr><th>Expense</th><th>Category</th><th>Payment</th><th>Notes</th><th class="num">Amount</th><th>Action</th></tr></thead><tbody>`;
+
+  dailyExpenses.forEach(e=>{
+    h+=`<tr>
+      <td><b>${esc(e.expense_name)}</b></td>
+      <td>${esc(e.category||"—")}</td>
+      <td>${paymentPill(e.payment_method)}</td>
+      <td>${esc(e.notes||"—")}</td>
+      <td class="num amount">${money(e.amount)}</td>
+      <td>
+        <button class="edit-btn" onclick='editExpense(${JSON.stringify(e)})'>Edit</button>
+        <button class="delete-btn" onclick='deleteExpense(${JSON.stringify(String(e.id))})'>Delete</button>
+      </td>
+    </tr>`;
+  });
+
+  h+=`</tbody></table></div>`;
+  $("dailyExpensesArea").innerHTML=h;
+}
+
+function updateSummary(){
+  const sales=salesRows.reduce((s,r)=>s+effectiveAmount(r),0);
+  const expenses=dailyExpenses.reduce((s,e)=>s+Number(e.amount||0),0);
+  const result=sales-expenses;
+
+  $("totalSales").textContent=money(sales);
+  $("totalExpenses").textContent=money(expenses);
+  $("profitLoss").textContent=money(Math.abs(result));
+  $("resultLabel").textContent=result>=0?"PROFIT":"LOSS";
+  $("profitLoss").className="summary-value "+(result>=0?"profit":"loss");
+}
+
+function openAdjust(type,id,label,original,current,note){
+  adjustmentTarget={type,id,label,original};
+  $("adjustTitle").textContent="Correct: "+label;
+  $("adjustOriginal").value=money(original);
+  $("adjustAmount").value=Number(current||0).toFixed(2);
+  $("adjustNote").value=note||"";
+  $("adjustModal").classList.add("show");
+}
+
+async function saveAdjust(){
+  if(!adjustmentTarget)return;
+
+  const amount=Number($("adjustAmount").value);
+  if(!Number.isFinite(amount)||amount<0){toast("Enter a valid amount.");return;}
+
+  const payload={
+    ledger_date:selectedDate,
+    source_type:adjustmentTarget.type,
+    source_id:String(adjustmentTarget.id),
+    source_label:adjustmentTarget.label,
+    original_amount:Number(adjustmentTarget.original||0),
+    adjusted_amount:amount,
+    note:$("adjustNote").value.trim()||null
+  };
+
+  const {error}=await db.from("ledger_overrides").upsert(payload,{onConflict:"ledger_date,source_type,source_id"});
+  if(error){toast("Could not save correction: "+error.message);return;}
+
+  $("adjustModal").classList.remove("show");
+  await loadDate();
+  toast("Ledger correction saved.");
+}
+
+async function resetAdjust(type,id){
+  if(!confirm("Reset this sale back to its source value?"))return;
+
+  const {error}=await db.from("ledger_overrides").delete()
+    .eq("ledger_date",selectedDate)
+    .eq("source_type",type)
+    .eq("source_id",String(id));
+
+  if(error){toast("Could not reset correction.");return;}
+  await loadDate();
+  toast("Ledger value reset.");
+}
+
+function openExpenseModal(exp=null){
+  editingExpenseId=exp?.id||null;
+  $("expenseModalTitle").textContent=exp?"Edit Expense":"Add Expense";
+  $("expenseName").value=exp?.expense_name||"";
+  $("expenseAmount").value=exp?.amount??"";
+  $("expenseCategory").value=exp?.category||"Other";
+  $("expensePayment").value=exp?.payment_method||"Cash";
+  $("expenseNotes").value=exp?.notes||"";
+  $("expenseModal").classList.add("show");
+}
+
+async function saveExpense(e){
+  e.preventDefault();
+
+  const name=$("expenseName").value.trim();
+  const amount=Number($("expenseAmount").value);
+
+  if(!name||!Number.isFinite(amount)||amount<0){
+    toast("Enter a valid expense.");
+    return;
+  }
+
+  const payload={
+    expense_date:selectedDate,
+    expense_name:name,
+    amount,
+    category:$("expenseCategory").value,
+    payment_method:$("expensePayment").value,
+    notes:$("expenseNotes").value.trim()||null
+  };
+
+  let res;
+  if(editingExpenseId){
+    res=await db.from("ledger_daily_expenses").update(payload).eq("id",editingExpenseId);
+  }else{
+    res=await db.from("ledger_daily_expenses").insert(payload);
+  }
+
+  if(res.error){
+    toast("Could not save expense: "+res.error.message);
+    return;
+  }
+
+  $("expenseModal").classList.remove("show");
+  await loadDate();
+  toast(editingExpenseId?"Expense updated.":"Expense added.");
+}
+
+async function deleteExpense(id){
+  if(!confirm("Delete this expense?"))return;
+
+  const {error}=await db.from("ledger_daily_expenses").delete().eq("id",id);
+  if(error){toast("Could not delete expense.");return;}
+
+  await loadDate();
+  toast("Expense deleted.");
+}
+
+function editExpense(e){openExpenseModal(e);}
+
+async function loadCashSummary(){
+  const date=$("summaryDate").value;
+  if(!date)return;
+
+  selectedDate=date;
+  $("ledgerDate").value=date;
+  await loadDate();
+  calculateCashSummary();
+}
+
+function calculateCashSummary(){
+  let cashSales=0,upiSales=0,cardSales=0;
+  let cashExpenses=0,upiExpenses=0,cardExpenses=0,otherExpenses=0;
+
+  salesRows.forEach(r=>{
+    const amount=effectiveAmount(r);
+    const method=String(r.payment_method||"").toLowerCase();
+    if(method==="cash")cashSales+=amount;
+    else if(method==="upi")upiSales+=amount;
+    else if(method==="card")cardSales+=amount;
+  });
+
+  dailyExpenses.forEach(e=>{
+    const amount=Number(e.amount||0);
+    const method=String(e.payment_method||"").toLowerCase();
+    if(method==="cash")cashExpenses+=amount;
+    else if(method==="upi")upiExpenses+=amount;
+    else if(method==="card")cardExpenses+=amount;
+    else otherExpenses+=amount;
+  });
+
+  const totalSales=cashSales+upiSales+cardSales;
+  const totalExpenses=cashExpenses+upiExpenses+cardExpenses+otherExpenses;
+
+  $("cashSalesSummary").textContent=money(cashSales);
+  $("upiSalesSummary").textContent=money(upiSales);
+  $("cardSalesSummary").textContent=money(cardSales);
+  $("totalPaymentSales").textContent=money(totalSales);
+
+  $("cashExpensesSummary").textContent=money(cashExpenses);
+  $("upiExpensesSummary").textContent=money(upiExpenses);
+  $("cardExpensesSummary").textContent=money(cardExpenses);
+  $("otherExpensesSummary").textContent=money(otherExpenses);
+  $("totalPaymentExpenses").textContent=money(totalExpenses);
+
+  $("netCashSummary").textContent=money(cashSales-cashExpenses);
+  $("netUpiSummary").textContent=money(upiSales-upiExpenses);
+  $("netCardSummary").textContent=money(cardSales-cardExpenses);
+  $("netAllSummary").textContent=money(totalSales-totalExpenses);
+}
+
+/* BUTTON EVENTS */
+$("openLedger").onclick=async()=>{
+  $("ledgerWindow").style.display="block";
+  $("cashSummaryWindow").style.display="none";
+  $("ledgerDate").value=selectedDate;
+  await loadDate();
+};
+
+$("closeLedger").onclick=()=>$("ledgerWindow").style.display="none";
+$("loadDate").onclick=loadDate;
+
+$("todayBtn").onclick=async()=>{
+  selectedDate=new Date().toLocaleDateString("en-CA");
+  $("ledgerDate").value=selectedDate;
+  await loadDate();
+};
+
+$("ledgerDate").onchange=()=>{selectedDate=$("ledgerDate").value;};
+
+$("openCashSummary").onclick=async()=>{
+  $("cashSummaryWindow").style.display="block";
+  $("ledgerWindow").style.display="none";
+  $("summaryDate").value=selectedDate;
+  await loadCashSummary();
+};
+
+$("closeCashSummary").onclick=()=>$("cashSummaryWindow").style.display="none";
+$("loadCashSummary").onclick=loadCashSummary;
+
+$("todaySummaryBtn").onclick=async()=>{
+  selectedDate=new Date().toLocaleDateString("en-CA");
+  $("summaryDate").value=selectedDate;
+  $("ledgerDate").value=selectedDate;
+  await loadCashSummary();
+};
+
+$("summaryDate").onchange=()=>{selectedDate=$("summaryDate").value;$("ledgerDate").value=selectedDate;};
+
+$("addExpenseBtn").onclick=()=>openExpenseModal();
+$("addExpenseBtn2").onclick=()=>openExpenseModal();
+$("expenseForm").onsubmit=saveExpense;
+$("closeExpense").onclick=()=>$("expenseModal").classList.remove("show");
+$("cancelExpense").onclick=()=>$("expenseModal").classList.remove("show");
+
+$("closeAdjust").onclick=()=>$("adjustModal").classList.remove("show");
+$("cancelAdjust").onclick=()=>$("adjustModal").classList.remove("show");
+$("saveAdjust").onclick=saveAdjust;
+
+window.addEventListener("click",e=>{
+  if(e.target.classList.contains("modal"))e.target.classList.remove("show");
+});
+
+$("ledgerDate").value=selectedDate;
+$("summaryDate").value=selectedDate;
+</script>
+</body>
+</html>
