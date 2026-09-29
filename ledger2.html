@@ -193,32 +193,41 @@ function startDateIso(dateStr){
   return dateStr + "T00:00:00+05:30";
 }
 
-async function buildInventoryLedgerExpenses(stockInRows){
+async function buildInventoryLedgerExpenses(stockInRows, existingExpenses=[]){
   if(!stockInRows.length) return [];
 
-  return stockInRows.map(row=>{
+  const existingByMarker=new Map();
+  (existingExpenses||[]).forEach(exp=>{
+    const match=String(exp.notes||'').match(/\[INVENTORY_STOCK_IN:(\d+)\]/);
+    if(match) existingByMarker.set(String(match[1]),exp);
+  });
+
+  const missing=stockInRows.filter(row=>!existingByMarker.has(String(row.id)));
+
+  for(const row of missing){
     const quantity=Number(row.quantity||0);
     const amount=Number(row.total_cost||0) || Number((quantity*Number(row.price_per_unit||0)).toFixed(2));
-    const date=new Date(row.created_at||Date.now()).toLocaleDateString("en-CA",{timeZone:"Asia/Kolkata"});
     const details=[
+      `[INVENTORY_STOCK_IN:${row.id}]`,
       `${quantity} ${row.unit||"units"} ${row.item_name||"Inventory item"}`,
       row.reason||"Purchase",
       row.vendor?`Vendor: ${row.vendor}`:""
     ].filter(Boolean).join(" • ");
 
-    return {
-      id:`inventory-stock-in-${row.id}`,
-      inventory_history_id:row.id,
-      expense_date:date,
+    const {error}=await db.from("ledger_daily_expenses").insert({
+      expense_date:new Date(row.created_at||Date.now()).toLocaleDateString("en-CA",{timeZone:"Asia/Kolkata"}),
       expense_name:`${row.item_name||"Inventory item"} Stock In`,
       amount,
       category:"Inventory",
       payment_method:"Other",
-      notes:details,
-      created_at:row.created_at,
-      auto_inventory:true
-    };
-  });
+      notes:details
+    });
+
+    if(error) throw error;
+  }
+
+  // Reload the linked Ledger expenses so they behave exactly like normal expenses.
+  return [];
 }
 
 /* =====================================================
@@ -275,8 +284,18 @@ async function loadDate(){
     }));
 
     dailyExpenses=expensesRes.data||[];
-    inventoryLedgerExpenses=await buildInventoryLedgerExpenses(inventoryInRes.data||[]);
-    dailyExpenses=[...dailyExpenses,...inventoryLedgerExpenses];
+    await buildInventoryLedgerExpenses(inventoryInRes.data||[],dailyExpenses);
+
+    // Re-read after syncing Inventory Stock In entries so they get normal
+    // Edit/Delete buttons and are included consistently in Ledger summaries.
+    const {data:linkedExpenses,error:linkedExpenseError}=await db.from("ledger_daily_expenses")
+      .select("*")
+      .eq("expense_date",selectedDate)
+      .order("created_at",{ascending:true});
+    if(linkedExpenseError) throw linkedExpenseError;
+
+    dailyExpenses=(linkedExpenses||[]).filter(expense=>!String(expense.notes||"").includes("[INVENTORY_STOCK_IN_DELETED:"));
+    inventoryLedgerExpenses=[];
     dailyExpenses.sort((a,b)=>new Date(a.created_at||0)-new Date(b.created_at||0));
     overrides={};
     (overrideRes.data||[]).forEach(o=>{overrides[sourceKey(o.source_type,o.source_id)]=o;});
@@ -339,13 +358,13 @@ function renderExpenses(){
 
   let html=`<div class="table-wrap"><table><thead><tr><th>Expense</th><th>Category</th><th>Payment</th><th class="num">Amount</th><th>Action</th></tr></thead><tbody>`;
   dailyExpenses.forEach(expense=>{
-    const auto=expense.auto_inventory===true;
+    const auto=String(expense.notes||"").includes("[INVENTORY_STOCK_IN:");
     html+=`<tr>
-      <td><b>${esc(expense.expense_name)}</b>${expense.notes?`<div class="source">${esc(expense.notes)}</div>`:""}</td>
-      <td>${esc(expense.category||"Other")}${auto?`<div class="source">Automatic from Inventory Stock In</div>`:""}</td>
+      <td><b>${esc(expense.expense_name)}</b>${expense.notes?`<div class="source">${esc(String(expense.notes).replace(/\[INVENTORY_STOCK_IN:\d+\]\s*•?\s*/,'').trim())}</div>`:""}</td>
+      <td>${esc(expense.category||"Other")}${auto?`<div class="source">Linked to Inventory Stock In</div>`:""}</td>
       <td>${paymentPill(expense.payment_method)}</td>
       <td class="num amount">${money(expense.amount)}</td>
-      <td>${auto?`<span class="source">Auto</span>`:`<button class="edit-btn" onclick='editExpense(${JSON.stringify(expense)})'>Edit</button><button class="delete-btn" onclick='deleteExpense(${JSON.stringify(String(expense.id))})'>Delete</button>`}</td>
+      <td><button class="edit-btn" onclick='editExpense(${JSON.stringify(expense)})'>Edit</button><button class="delete-btn" onclick='deleteExpense(${JSON.stringify(String(expense.id))})'>Delete</button></td>
     </tr>`;
   });
   html+=`</tbody></table></div>`;
@@ -452,7 +471,20 @@ function editExpense(expense){openExpenseModal(expense);}
 
 async function deleteExpense(id){
   if(!confirm("Delete this expense?")) return;
-  const {error}=await db.from("ledger_daily_expenses").delete().eq("id",id);
+
+  const expense=dailyExpenses.find(e=>String(e.id)===String(id));
+  const linked=expense && String(expense.notes||"").match(/\[INVENTORY_STOCK_IN:(\d+)\]/);
+
+  let error=null;
+  if(linked){
+    const cleanNotes=String(expense.notes||"").replace(/\[INVENTORY_STOCK_IN:\d+\]/,`[INVENTORY_STOCK_IN_DELETED:${linked[1]}]`);
+    const result=await db.from("ledger_daily_expenses").update({amount:0,notes:cleanNotes}).eq("id",id);
+    error=result.error;
+  }else{
+    const result=await db.from("ledger_daily_expenses").delete().eq("id",id);
+    error=result.error;
+  }
+
   if(error){toast("Could not delete expense.");return;}
   await loadDate();
   toast("Expense deleted.");
