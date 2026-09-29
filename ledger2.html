@@ -197,12 +197,22 @@ async function buildInventoryLedgerExpenses(stockInRows, existingExpenses=[]){
   if(!stockInRows.length) return [];
 
   const existingByMarker=new Map();
+  const deletedMarkers=new Set();
   (existingExpenses||[]).forEach(exp=>{
-    const match=String(exp.notes||'').match(/\[INVENTORY_STOCK_IN:(\d+)\]/);
+    const notes=String(exp.notes||'');
+    const deleted=notes.match(/\[INVENTORY_STOCK_IN_DELETED:(\d+)\]/);
+    if(deleted) deletedMarkers.add(String(deleted[1]));
+
+    const match=notes.match(/\[INVENTORY_STOCK_IN:(\d+)\]/);
     if(match) existingByMarker.set(String(match[1]),exp);
   });
 
-  const missing=stockInRows.filter(row=>!existingByMarker.has(String(row.id)));
+  // A deleted Inventory Stock In must stay deleted and must not be
+  // recreated automatically when the Ledger reloads.
+  const missing=stockInRows.filter(row=>
+    !existingByMarker.has(String(row.id)) &&
+    !deletedMarkers.has(String(row.id))
+  );
 
   for(const row of missing){
     const quantity=Number(row.quantity||0);
