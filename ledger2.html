@@ -47,6 +47,12 @@ input,select,textarea{background:rgba(0,0,0,.42);color:#fff;border:1px solid rgb
 .balance-hero{background:linear-gradient(145deg,rgba(255,255,255,.105),rgba(255,255,255,.025));border:1px solid rgba(255,255,255,.16);box-shadow:0 25px 70px rgba(0,0,0,.45);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px)}.balance-hero h2,.current-card.total .big-number,.breakdown-result strong{color:#fff}.balance-subtitle,.current-card small,.breakdown-row span{color:#888}.current-card{background:rgba(255,255,255,.045);border-color:rgba(255,255,255,.12)}.current-card.total{background:linear-gradient(145deg,rgba(255,255,255,.12),rgba(255,255,255,.035));border-color:rgba(255,255,255,.22)}.current-card .big-number{color:#fff}.breakdown-card{background:rgba(0,0,0,.18);border-color:rgba(255,255,255,.1)}.breakdown-card h3{color:#fff}.breakdown-row{border-bottom-color:rgba(255,255,255,.08)}.breakdown-row strong{color:#ddd}.breakdown-result{border-top-color:rgba(255,255,255,.2)}
 .opening-section{border-radius:18px}.balance-status{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:#aaa}.modal{background:rgba(0,0,0,.72);backdrop-filter:blur(10px)}.modal-box{border-radius:20px}.close{background:rgba(255,255,255,.08);color:#fff}.toast{background:#fff;color:#050505;box-shadow:0 15px 45px rgba(0,0,0,.45)}
 @media(max-width:600px){.brand{font-size:25px;letter-spacing:4px}}
+
+/* ===== TABLET/DESKTOP COMPACT VIEW — VISUALS ONLY ===== */
+@media (min-width: 901px){
+  body{zoom:.70;}
+  .modal{zoom:1.428571;}
+}
 </style>
 </head>
 <body>
@@ -131,6 +137,7 @@ if(!db || typeof db.from !== "function"){
 let selectedDate = new Date().toLocaleDateString("en-CA");
 let salesRows = [];
 let dailyExpenses = [];
+let inventoryLedgerExpenses = [];
 let overrides = {};
 let adjustmentTarget = null;
 let editingExpenseId = null;
@@ -186,6 +193,67 @@ function startDateIso(dateStr){
   return dateStr + "T00:00:00+05:30";
 }
 
+async function buildInventoryLedgerExpenses(stockOutRows){
+  if(!stockOutRows.length) return [];
+
+  const itemIds=[...new Set(stockOutRows.map(r=>r.inventory_item_id).filter(Boolean).map(String))];
+  let itemMap={};
+  let priceHistory=[];
+
+  if(itemIds.length){
+    const {data:items,error:itemError}=await db.from("inventory_items")
+      .select("id,name,purchase_price,unit,vendor")
+      .in("id",itemIds);
+    if(itemError) throw itemError;
+    (items||[]).forEach(item=>{itemMap[String(item.id)]=item;});
+
+    const {data:historyRows,error:historyError}=await db.from("inventory_history")
+      .select("inventory_item_id,movement,quantity,price_per_unit,total_cost,created_at")
+      .in("inventory_item_id",itemIds)
+      .eq("movement","Stock In")
+      .order("created_at",{ascending:true});
+    if(historyError) throw historyError;
+    priceHistory=historyRows||[];
+  }
+
+  return stockOutRows.map(row=>{
+    const item=itemMap[String(row.inventory_item_id)]||{};
+    let unitPrice=Number(row.price_per_unit||0);
+
+    if(!unitPrice){
+      const stockIn=[...priceHistory]
+        .filter(h=>String(h.inventory_item_id)===String(row.inventory_item_id) && new Date(h.created_at)<=new Date(row.created_at) && Number(h.price_per_unit||0)>0)
+        .pop();
+      unitPrice=Number(stockIn?.price_per_unit||0);
+    }
+
+    if(!unitPrice) unitPrice=Number(item.purchase_price||0);
+
+    let amount=Number(row.total_cost||0);
+    if(!amount) amount=Number((Number(row.quantity||0)*unitPrice).toFixed(2));
+
+    const date=new Date(row.created_at||Date.now()).toLocaleDateString("en-CA",{timeZone:"Asia/Kolkata"});
+    const details=[
+      `${row.quantity||0} ${row.unit||item.unit||"units"} ${row.item_name||item.name||"Inventory item"}`,
+      row.reason||"Kitchen use",
+      row.vendor||item.vendor?`Vendor: ${row.vendor||item.vendor}`:""
+    ].filter(Boolean).join(" • ");
+
+    return {
+      id:`inventory-stock-out-${row.id}`,
+      inventory_history_id:row.id,
+      expense_date:date,
+      expense_name:`${row.item_name||item.name||"Inventory item"} Stock Out`,
+      amount,
+      category:"Inventory",
+      payment_method:"Other",
+      notes:details,
+      created_at:row.created_at,
+      auto_inventory:true
+    };
+  });
+}
+
 /* =====================================================
    LOAD DAILY LEDGER
    SALES REMAIN FROM chaat_orders.
@@ -198,7 +266,7 @@ async function loadDate(){
   $("fixedExpensesArea").innerHTML='<div class="loading">Loading expenses…</div>';
 
   try{
-    const [ordersRes,expensesRes,overrideRes]=await Promise.all([
+    const [ordersRes,expensesRes,overrideRes,inventoryOutRes]=await Promise.all([
       db.from("chaat_orders")
         .select("id,order_number,customer_name,total,payment_method,status,created_at")
         .gte("created_at",startDateIso(selectedDate))
@@ -212,12 +280,20 @@ async function loadDate(){
 
       db.from("ledger_overrides")
         .select("*")
-        .eq("ledger_date",selectedDate)
+        .eq("ledger_date",selectedDate),
+
+      db.from("inventory_history")
+        .select("id,inventory_item_id,item_name,movement,quantity,unit,balance,reason,price_per_unit,total_cost,vendor,created_at")
+        .eq("movement","Stock Out")
+        .gte("created_at",startDateIso(selectedDate))
+        .lt("created_at",nextDateIso(selectedDate))
+        .order("created_at",{ascending:true})
     ]);
 
     if(ordersRes.error) throw ordersRes.error;
     if(expensesRes.error) throw expensesRes.error;
     if(overrideRes.error) throw overrideRes.error;
+    if(inventoryOutRes.error) throw inventoryOutRes.error;
 
     salesRows=(ordersRes.data||[]).map(order=>({
       source_type:"sale_order",
@@ -232,6 +308,9 @@ async function loadDate(){
     }));
 
     dailyExpenses=expensesRes.data||[];
+    inventoryLedgerExpenses=await buildInventoryLedgerExpenses(inventoryOutRes.data||[]);
+    dailyExpenses=[...dailyExpenses,...inventoryLedgerExpenses];
+    dailyExpenses.sort((a,b)=>new Date(a.created_at||0)-new Date(b.created_at||0));
     overrides={};
     (overrideRes.data||[]).forEach(o=>{overrides[sourceKey(o.source_type,o.source_id)]=o;});
 
@@ -293,12 +372,13 @@ function renderExpenses(){
 
   let html=`<div class="table-wrap"><table><thead><tr><th>Expense</th><th>Category</th><th>Payment</th><th class="num">Amount</th><th>Action</th></tr></thead><tbody>`;
   dailyExpenses.forEach(expense=>{
+    const auto=expense.auto_inventory===true;
     html+=`<tr>
       <td><b>${esc(expense.expense_name)}</b>${expense.notes?`<div class="source">${esc(expense.notes)}</div>`:""}</td>
-      <td>${esc(expense.category||"Other")}</td>
+      <td>${esc(expense.category||"Other")}${auto?`<div class="source">Automatic from Inventory Stock Out</div>`:""}</td>
       <td>${paymentPill(expense.payment_method)}</td>
       <td class="num amount">${money(expense.amount)}</td>
-      <td><button class="edit-btn" onclick='editExpense(${JSON.stringify(expense)})'>Edit</button><button class="delete-btn" onclick='deleteExpense(${JSON.stringify(String(expense.id))})'>Delete</button></td>
+      <td>${auto?`<span class="source">Auto</span>`:`<button class="edit-btn" onclick='editExpense(${JSON.stringify(expense)})'>Edit</button><button class="delete-btn" onclick='deleteExpense(${JSON.stringify(String(expense.id))})'>Delete</button>`}</td>
     </tr>`;
   });
   html+=`</tbody></table></div>`;
