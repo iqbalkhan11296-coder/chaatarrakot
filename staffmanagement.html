@@ -432,6 +432,9 @@ nav{
    A = RED
    L = YELLOW
    H = PURPLE
+
+   Strong selectors + !important ensure the letters
+   cannot be overridden by generic button/table styles.
    ===================================================== */
 
 .cell-btn{
@@ -441,30 +444,48 @@ nav{
   background:white;
   font-size:12px;
   font-weight:900;
+  appearance:none;
+  -webkit-appearance:none;
 }
 
 /* PRESENT — GREEN */
-.cell-btn.p{
-  background:#eaf6ef;
-  color:#287a52;
+.calendar .cell-btn.p,
+.calendar .cell-btn.p:hover,
+.calendar .cell-btn.p:focus,
+.calendar .cell-btn.p:active{
+  background:#eaf6ef !important;
+  color:#287a52 !important;
+  -webkit-text-fill-color:#287a52 !important;
 }
 
 /* ABSENT — RED */
-.cell-btn.a{
-  background:#fbecee;
-  color:#b43b45;
+.calendar .cell-btn.a,
+.calendar .cell-btn.a:hover,
+.calendar .cell-btn.a:focus,
+.calendar .cell-btn.a:active{
+  background:#fbecee !important;
+  color:#b43b45 !important;
+  -webkit-text-fill-color:#b43b45 !important;
 }
 
 /* LEAVE — YELLOW */
-.cell-btn.l{
-  background:#fff5dc;
-  color:#a06b12;
+.calendar .cell-btn.l,
+.calendar .cell-btn.l:hover,
+.calendar .cell-btn.l:focus,
+.calendar .cell-btn.l:active{
+  background:#fff5dc !important;
+  color:#a06b12 !important;
+  -webkit-text-fill-color:#a06b12 !important;
 }
 
 /* HALF DAY — PURPLE */
-.cell-btn.h{
-  background:#eee8fa;
-  color:#67469a;
+.calendar .cell-btn.h,
+.calendar .cell-btn.h:hover,
+.calendar .cell-btn.h:focus,
+.calendar .cell-btn.h:active{
+  background:#eee8fa !important;
+  color:#67469a !important;
+  -webkit-text-fill-color:#67469a !important;
 }
 
 .cell-btn:hover{
