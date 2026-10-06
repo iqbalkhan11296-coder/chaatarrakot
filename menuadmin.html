@@ -1,0 +1,1629 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>Chaatarra - Menu Admin</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="supabase.js?v=4"></script>
+
+<style>
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    font-family:Arial, sans-serif;
+    background:#f4f4f4;
+    color:#222;
+}
+
+/* =========================
+   HEADER
+========================= */
+
+header{
+    background:#4b001f;
+    color:white;
+    padding:22px;
+    text-align:center;
+}
+
+header h1{
+    margin:0;
+    font-size:30px;
+}
+
+header p{
+    margin:6px 0 0;
+    font-size:14px;
+    opacity:.9;
+}
+
+/* =========================
+   CONTAINER
+========================= */
+
+.container{
+    max-width:1200px;
+    margin:auto;
+    padding:20px;
+}
+
+/* =========================
+   CARD
+========================= */
+
+.card{
+    background:white;
+    border-radius:12px;
+    padding:20px;
+    margin-bottom:20px;
+    box-shadow:0 3px 12px rgba(0,0,0,.08);
+}
+
+.card h2{
+    margin-top:0;
+    color:#4b001f;
+    border-bottom:2px solid #eee;
+    padding-bottom:10px;
+}
+
+/* =========================
+   FORM
+========================= */
+
+.form-grid{
+    display:grid;
+    grid-template-columns:
+        repeat(2, minmax(0,1fr));
+    gap:15px;
+}
+
+.form-group{
+    display:flex;
+    flex-direction:column;
+}
+
+.form-group label{
+    font-weight:bold;
+    margin-bottom:6px;
+    color:#4b001f;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea{
+    width:100%;
+    padding:12px;
+    border:1px solid #ccc;
+    border-radius:7px;
+    font-size:16px;
+    background:white;
+}
+
+.form-group textarea{
+    min-height:90px;
+    resize:vertical;
+}
+
+.full{
+    grid-column:1 / -1;
+}
+
+/* =========================
+   BUTTONS
+========================= */
+
+.button-row{
+    display:flex;
+    gap:10px;
+    margin-top:20px;
+}
+
+button{
+    border:none;
+    border-radius:7px;
+    padding:13px 20px;
+    font-size:16px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.primary{
+    background:#4b001f;
+    color:white;
+}
+
+.secondary{
+    background:#222;
+    color:white;
+}
+
+.cancel{
+    background:#ddd;
+    color:#222;
+}
+
+.delete{
+    background:#b00020;
+    color:white;
+}
+
+button:hover{
+    opacity:.9;
+}
+
+button:disabled{
+    opacity:.5;
+    cursor:not-allowed;
+}
+
+/* =========================
+   MESSAGE
+========================= */
+
+#message{
+    min-height:24px;
+    margin-top:15px;
+    font-weight:bold;
+}
+
+.success{
+    color:green;
+}
+
+.error{
+    color:red;
+}
+
+/* =========================
+   MENU TABLE
+========================= */
+
+.table-wrapper{
+    overflow-x:auto;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    min-width:950px;
+}
+
+th{
+    background:#4b001f;
+    color:white;
+    padding:12px;
+    text-align:left;
+}
+
+td{
+    padding:12px;
+    border-bottom:1px solid #eee;
+    vertical-align:middle;
+}
+
+tr:hover{
+    background:#fafafa;
+}
+
+.price{
+    font-weight:bold;
+    color:#4b001f;
+}
+
+.category{
+    font-weight:bold;
+}
+
+.status{
+    display:inline-block;
+    padding:5px 9px;
+    border-radius:15px;
+    font-size:12px;
+    font-weight:bold;
+}
+
+.active{
+    background:#dff5e3;
+    color:#08752b;
+}
+
+.inactive{
+    background:#eee;
+    color:#666;
+}
+
+.type-badge{
+    background:#4b001f;
+    color:white;
+    padding:4px 8px;
+    border-radius:5px;
+    font-size:12px;
+}
+
+.actions{
+    display:flex;
+    gap:7px;
+}
+
+.edit-btn{
+    background:#4b001f;
+    color:white;
+    padding:8px 12px;
+    font-size:13px;
+}
+
+.delete-btn{
+    background:#b00020;
+    color:white;
+    padding:8px 12px;
+    font-size:13px;
+}
+
+/* =========================
+   FILTER
+========================= */
+
+.filter-row{
+    display:flex;
+    gap:10px;
+    margin-bottom:15px;
+}
+
+.filter-row select,
+.filter-row input{
+    padding:11px;
+    border:1px solid #ccc;
+    border-radius:7px;
+    font-size:15px;
+}
+
+.search-box{
+    flex:1;
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media(max-width:700px){
+
+    .container{
+        padding:10px;
+    }
+
+    .form-grid{
+        grid-template-columns:1fr;
+    }
+
+    .full{
+        grid-column:auto;
+    }
+
+    .button-row{
+        flex-direction:column;
+    }
+
+    .button-row button{
+        width:100%;
+    }
+
+    .filter-row{
+        flex-direction:column;
+    }
+
+    .filter-row select,
+    .filter-row input{
+        width:100%;
+    }
+
+    header h1{
+        font-size:24px;
+    }
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header>
+
+    <h1>CHAATARRA</h1>
+
+    <p>Menu Management</p>
+
+</header>
+
+
+<div class="container">
+
+
+<!-- =========================
+     MENU FORM
+========================= -->
+
+<div class="card">
+
+    <h2 id="formTitle">
+        Add Menu Item
+    </h2>
+
+
+    <input
+        type="hidden"
+        id="itemId"
+    >
+
+
+    <div class="form-grid">
+
+
+        <!-- NAME -->
+
+        <div class="form-group">
+
+            <label>
+                Menu Name
+            </label>
+
+            <input
+                type="text"
+                id="itemName"
+                placeholder="Example: Pani Puri"
+            >
+
+        </div>
+
+
+        <!-- PRICE -->
+
+        <div class="form-group">
+
+            <label>
+                Price (₹)
+            </label>
+
+            <input
+                type="number"
+                id="itemPrice"
+                min="0"
+                step="0.01"
+                placeholder="50"
+            >
+
+        </div>
+
+
+        <!-- CATEGORY -->
+
+        <div class="form-group">
+
+            <label>
+                Category
+            </label>
+
+            <select id="itemCategory">
+
+                <option value="Chaats">
+                    Chaats
+                </option>
+
+                <option value="Drinks">
+                    Drinks
+                </option>
+
+                <option value="Burgers">
+                    Burgers
+                </option>
+
+                <option value="Combos">
+                    Combos
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <!-- COUNTER -->
+
+        <div class="form-group">
+
+            <label>
+                Counter
+            </label>
+
+            <select id="itemCounter">
+
+                <option value="">
+                    No Counter
+                </option>
+
+                <option value="chaats">
+                    Chaats Counter
+                </option>
+
+                <option value="drinks">
+                    Drinks Counter
+                </option>
+
+                <option value="burgers">
+                    Burgers Counter
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <!-- ITEM TYPE -->
+
+        <div class="form-group">
+
+            <label>
+                Item Type
+            </label>
+
+            <select id="itemType">
+
+                <option value="single">
+                    Single Item
+                </option>
+
+                <option value="combo">
+                    Combo
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <!-- SORT -->
+
+        <div class="form-group">
+
+            <label>
+                Display Order
+            </label>
+
+            <input
+                type="number"
+                id="itemSort"
+                value="0"
+                min="0"
+            >
+
+        </div>
+
+
+        <!-- DESCRIPTION -->
+
+        <div class="form-group full">
+
+            <label>
+                Description
+            </label>
+
+            <textarea
+                id="itemDescription"
+                placeholder="Optional description"
+            ></textarea>
+
+        </div>
+
+
+        <!-- ACTIVE -->
+
+        <div class="form-group">
+
+            <label>
+                Status
+            </label>
+
+            <select id="itemActive">
+
+                <option value="true">
+                    Active
+                </option>
+
+                <option value="false">
+                    Inactive
+                </option>
+
+            </select>
+
+        </div>
+
+
+    </div>
+
+
+    <div class="button-row">
+
+        <button
+            class="primary"
+            id="saveButton"
+            onclick="saveItem()"
+        >
+            ADD MENU ITEM
+        </button>
+
+        <button
+            class="cancel"
+            id="cancelButton"
+            onclick="resetForm()"
+            style="display:none;"
+        >
+            CANCEL EDIT
+        </button>
+
+    </div>
+
+
+    <div id="message"></div>
+
+</div>
+
+
+
+<!-- =========================
+     MENU LIST
+========================= -->
+
+<div class="card">
+
+    <h2>
+        Current Menu
+    </h2>
+
+
+    <div class="filter-row">
+
+        <input
+            type="text"
+            id="searchInput"
+            class="search-box"
+            placeholder="Search menu..."
+            oninput="renderMenu()"
+        >
+
+
+        <select
+            id="filterCategory"
+            onchange="renderMenu()"
+        >
+
+            <option value="All">
+                All Categories
+            </option>
+
+            <option value="Chaats">
+                Chaats
+            </option>
+
+            <option value="Drinks">
+                Drinks
+            </option>
+
+            <option value="Burgers">
+                Burgers
+            </option>
+
+            <option value="Combos">
+                Combos
+            </option>
+
+        </select>
+
+
+        <select
+            id="filterStatus"
+            onchange="renderMenu()"
+        >
+
+            <option value="All">
+                All Status
+            </option>
+
+            <option value="Active">
+                Active
+            </option>
+
+            <option value="Inactive">
+                Inactive
+            </option>
+
+        </select>
+
+    </div>
+
+
+    <div class="table-wrapper">
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        #
+                    </th>
+
+                    <th>
+                        Name
+                    </th>
+
+                    <th>
+                        Price
+                    </th>
+
+                    <th>
+                        Category
+                    </th>
+
+                    <th>
+                        Counter
+                    </th>
+
+                    <th>
+                        Type
+                    </th>
+
+                    <th>
+                        Status
+                    </th>
+
+                    <th>
+                        Order
+                    </th>
+
+                    <th>
+                        Actions
+                    </th>
+
+                </tr>
+
+            </thead>
+
+            <tbody id="menuTable">
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+</div>
+
+
+<script>
+
+/*
+==========================================
+GLOBAL
+==========================================
+*/
+
+let menuItems = [];
+
+let editingId = null;
+
+
+/*
+==========================================
+LOAD MENU
+==========================================
+*/
+
+async function loadMenu(){
+
+    const table =
+        document.getElementById(
+            "menuTable"
+        );
+
+    table.innerHTML = `
+        <tr>
+            <td colspan="9">
+                Loading menu...
+            </td>
+        </tr>
+    `;
+
+
+    try{
+
+        const {
+            data,
+            error
+        } = await supabaseClient
+
+            .from("billing_menu")
+
+            .select("*")
+
+            .order(
+                "category",
+                {
+                    ascending:true
+                }
+            )
+
+            .order(
+                "sort_order",
+                {
+                    ascending:true
+                }
+            );
+
+
+        if(error){
+
+            throw error;
+
+        }
+
+
+        menuItems =
+            data || [];
+
+
+        renderMenu();
+
+
+    }catch(error){
+
+        console.error(error);
+
+
+        table.innerHTML = `
+            <tr>
+                <td colspan="9">
+                    Failed to load menu.
+                </td>
+            </tr>
+        `;
+
+    }
+
+}
+
+
+/*
+==========================================
+RENDER MENU
+==========================================
+*/
+
+function renderMenu(){
+
+    const table =
+        document.getElementById(
+            "menuTable"
+        );
+
+
+    const search =
+        document.getElementById(
+            "searchInput"
+        )
+        .value
+        .toLowerCase()
+        .trim();
+
+
+    const category =
+        document.getElementById(
+            "filterCategory"
+        )
+        .value;
+
+
+    const status =
+        document.getElementById(
+            "filterStatus"
+        )
+        .value;
+
+
+    let filtered =
+        menuItems.filter(item => {
+
+
+            const matchesSearch =
+                !search ||
+                String(item.name || "")
+                    .toLowerCase()
+                    .includes(search);
+
+
+            const matchesCategory =
+                category === "All" ||
+                item.category === category;
+
+
+            const matchesStatus =
+                status === "All" ||
+
+                (
+                    status === "Active" &&
+                    item.active === true
+                ) ||
+
+                (
+                    status === "Inactive" &&
+                    item.active === false
+                );
+
+
+            return (
+                matchesSearch &&
+                matchesCategory &&
+                matchesStatus
+            );
+
+        });
+
+
+    if(filtered.length === 0){
+
+        table.innerHTML = `
+            <tr>
+                <td colspan="9">
+                    No menu items found.
+                </td>
+            </tr>
+        `;
+
+        return;
+
+    }
+
+
+    table.innerHTML = "";
+
+
+    filtered.forEach(
+        (item,index) => {
+
+
+            const row =
+                document.createElement(
+                    "tr"
+                );
+
+
+            row.innerHTML = `
+
+                <td>
+                    ${index + 1}
+                </td>
+
+                <td>
+                    <strong>
+                        ${escapeHtml(item.name)}
+                    </strong>
+                </td>
+
+                <td class="price">
+                    ₹${Number(item.price).toFixed(0)}
+                </td>
+
+                <td class="category">
+                    ${escapeHtml(item.category)}
+                </td>
+
+                <td>
+                    ${
+                        item.counter
+                        ? escapeHtml(item.counter)
+                        : "—"
+                    }
+                </td>
+
+                <td>
+
+                    <span class="type-badge">
+
+                        ${
+                            item.item_type === "combo"
+                            ? "COMBO"
+                            : "SINGLE"
+                        }
+
+                    </span>
+
+                </td>
+
+                <td>
+
+                    <span
+                        class="status ${
+                            item.active
+                            ? "active"
+                            : "inactive"
+                        }"
+                    >
+
+                        ${
+                            item.active
+                            ? "ACTIVE"
+                            : "INACTIVE"
+                        }
+
+                    </span>
+
+                </td>
+
+                <td>
+                    ${item.sort_order}
+                </td>
+
+                <td>
+
+                    <div class="actions">
+
+                        <button
+                            class="edit-btn"
+                            onclick="editItem('${item.id}')"
+                        >
+                            EDIT
+                        </button>
+
+                        <button
+                            class="delete-btn"
+                            onclick="deleteItem('${item.id}')"
+                        >
+                            DELETE
+                        </button>
+
+                    </div>
+
+                </td>
+
+            `;
+
+
+            table.appendChild(row);
+
+        }
+    );
+
+}
+
+
+/*
+==========================================
+ESCAPE HTML
+==========================================
+*/
+
+function escapeHtml(value){
+
+    return String(value || "")
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
+
+}
+
+
+/*
+==========================================
+SAVE ITEM
+==========================================
+*/
+
+async function saveItem(){
+
+    const name =
+        document.getElementById(
+            "itemName"
+        )
+        .value
+        .trim();
+
+
+    const price =
+        Number(
+            document.getElementById(
+                "itemPrice"
+            ).value
+        );
+
+
+    const category =
+        document.getElementById(
+            "itemCategory"
+        ).value;
+
+
+    const counter =
+        document.getElementById(
+            "itemCounter"
+        ).value;
+
+
+    const itemType =
+        document.getElementById(
+            "itemType"
+        ).value;
+
+
+    const description =
+        document.getElementById(
+            "itemDescription"
+        ).value
+        .trim();
+
+
+    const active =
+        document.getElementById(
+            "itemActive"
+        ).value === "true";
+
+
+    const sortOrder =
+        Number(
+            document.getElementById(
+                "itemSort"
+            ).value
+        ) || 0;
+
+
+    if(!name){
+
+        showMessage(
+            "Please enter a menu name.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    if(
+        !Number.isFinite(price) ||
+        price < 0
+    ){
+
+        showMessage(
+            "Please enter a valid price.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    const saveButton =
+        document.getElementById(
+            "saveButton"
+        );
+
+
+    saveButton.disabled = true;
+
+
+    saveButton.textContent =
+        editingId
+        ? "SAVING..."
+        : "ADDING...";
+
+
+    const payload = {
+
+        name:name,
+
+        price:price,
+
+        category:category,
+
+        counter:
+            counter || null,
+
+        item_type:itemType,
+
+        description:
+            description || null,
+
+        active:active,
+
+        sort_order:sortOrder
+
+    };
+
+
+    try{
+
+        let error;
+
+
+        if(editingId){
+
+            const result =
+                await supabaseClient
+
+                    .from("billing_menu")
+
+                    .update(payload)
+
+                    .eq(
+                        "id",
+                        editingId
+                    );
+
+
+            error =
+                result.error;
+
+        }else{
+
+            const result =
+                await supabaseClient
+
+                    .from("billing_menu")
+
+                    .insert(payload);
+
+
+            error =
+                result.error;
+
+        }
+
+
+        if(error){
+
+            throw error;
+
+        }
+
+
+        showMessage(
+            editingId
+            ? "Menu item updated successfully."
+            : "Menu item added successfully.",
+            "success"
+        );
+
+
+        resetForm();
+
+
+        await loadMenu();
+
+
+    }catch(error){
+
+        console.error(error);
+
+
+        showMessage(
+            error.message ||
+            "Could not save menu item.",
+            "error"
+        );
+
+    }
+
+
+    saveButton.disabled = false;
+
+}
+
+
+/*
+==========================================
+EDIT ITEM
+==========================================
+*/
+
+function editItem(id){
+
+    const item =
+        menuItems.find(
+            menuItem =>
+                menuItem.id === id
+        );
+
+
+    if(!item){
+
+        return;
+
+    }
+
+
+    editingId = id;
+
+
+    document.getElementById(
+        "formTitle"
+    ).textContent =
+        "Edit Menu Item";
+
+
+    document.getElementById(
+        "itemId"
+    ).value =
+        item.id;
+
+
+    document.getElementById(
+        "itemName"
+    ).value =
+        item.name || "";
+
+
+    document.getElementById(
+        "itemPrice"
+    ).value =
+        item.price ?? "";
+
+
+    document.getElementById(
+        "itemCategory"
+    ).value =
+        item.category || "Chaats";
+
+
+    document.getElementById(
+        "itemCounter"
+    ).value =
+        item.counter || "";
+
+
+    document.getElementById(
+        "itemType"
+    ).value =
+        item.item_type || "single";
+
+
+    document.getElementById(
+        "itemDescription"
+    ).value =
+        item.description || "";
+
+
+    document.getElementById(
+        "itemActive"
+    ).value =
+        item.active
+        ? "true"
+        : "false";
+
+
+    document.getElementById(
+        "itemSort"
+    ).value =
+        item.sort_order ?? 0;
+
+
+    document.getElementById(
+        "saveButton"
+    ).textContent =
+        "SAVE CHANGES";
+
+
+    document.getElementById(
+        "cancelButton"
+    ).style.display =
+        "block";
+
+
+    window.scrollTo({
+
+        top:0,
+
+        behavior:"smooth"
+
+    });
+
+}
+
+
+/*
+==========================================
+DELETE ITEM
+==========================================
+*/
+
+async function deleteItem(id){
+
+    const item =
+        menuItems.find(
+            menuItem =>
+                menuItem.id === id
+        );
+
+
+    if(!item){
+
+        return;
+
+    }
+
+
+    const confirmed =
+        confirm(
+            `Delete "${item.name}"?`
+        );
+
+
+    if(!confirmed){
+
+        return;
+
+    }
+
+
+    try{
+
+        const {
+            error
+        } =
+            await supabaseClient
+
+                .from("billing_menu")
+
+                .delete()
+
+                .eq(
+                    "id",
+                    id
+                );
+
+
+        if(error){
+
+            throw error;
+
+        }
+
+
+        showMessage(
+            "Menu item deleted.",
+            "success"
+        );
+
+
+        if(editingId === id){
+
+            resetForm();
+
+        }
+
+
+        await loadMenu();
+
+
+    }catch(error){
+
+        console.error(error);
+
+
+        showMessage(
+            error.message ||
+            "Could not delete menu item.",
+            "error"
+        );
+
+    }
+
+}
+
+
+/*
+==========================================
+RESET FORM
+==========================================
+*/
+
+function resetForm(){
+
+    editingId = null;
+
+
+    document.getElementById(
+        "formTitle"
+    ).textContent =
+        "Add Menu Item";
+
+
+    document.getElementById(
+        "itemId"
+    ).value = "";
+
+
+    document.getElementById(
+        "itemName"
+    ).value = "";
+
+
+    document.getElementById(
+        "itemPrice"
+    ).value = "";
+
+
+    document.getElementById(
+        "itemCategory"
+    ).value =
+        "Chaats";
+
+
+    document.getElementById(
+        "itemCounter"
+    ).value =
+        "";
+
+
+    document.getElementById(
+        "itemType"
+    ).value =
+        "single";
+
+
+    document.getElementById(
+        "itemDescription"
+    ).value = "";
+
+
+    document.getElementById(
+        "itemActive"
+    ).value =
+        "true";
+
+
+    document.getElementById(
+        "itemSort"
+    ).value =
+        "0";
+
+
+    document.getElementById(
+        "saveButton"
+    ).textContent =
+        "ADD MENU ITEM";
+
+
+    document.getElementById(
+        "cancelButton"
+    ).style.display =
+        "none";
+
+}
+
+
+/*
+==========================================
+MESSAGE
+==========================================
+*/
+
+function showMessage(
+    text,
+    type
+){
+
+    const message =
+        document.getElementById(
+            "message"
+        );
+
+
+    message.className =
+        type;
+
+
+    message.textContent =
+        text;
+
+
+    setTimeout(
+        () => {
+
+            message.textContent =
+                "";
+
+            message.className =
+                "";
+
+        },
+        4000
+    );
+
+}
+
+
+/*
+==========================================
+CATEGORY / COUNTER LOGIC
+==========================================
+*/
+
+document
+    .getElementById(
+        "itemCategory"
+    )
+    .addEventListener(
+        "change",
+        function(){
+
+            const counter =
+                document.getElementById(
+                    "itemCounter"
+                );
+
+            const type =
+                document.getElementById(
+                    "itemType"
+                );
+
+
+            if(
+                this.value === "Combos"
+            ){
+
+                counter.value = "";
+
+                counter.disabled = true;
+
+                type.value = "combo";
+
+            }else{
+
+                counter.disabled = false;
+
+                if(
+                    type.value === "combo"
+                ){
+
+                    type.value =
+                        "single";
+
+                }
+
+            }
+
+        }
+    );
+
+
+/*
+==========================================
+INITIAL LOAD
+==========================================
+*/
+
+loadMenu();
+
+</script>
+
+</body>
+
+</html> 
