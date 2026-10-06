@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 
@@ -85,7 +84,7 @@ header p {
 
 .summary {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(6, 1fr);
     gap: 15px;
     margin-bottom: 20px;
 }
@@ -109,6 +108,14 @@ header p {
     font-size: 26px;
     color: #4b001f;
     margin-top: 8px;
+}
+
+.payment-card h3 {
+    color: #4b001f;
+}
+
+.payment-card strong {
+    color: #4b001f;
 }
 
 .section {
@@ -371,6 +378,26 @@ Refresh
 <h3>Total Sales</h3>
 
 <strong id="totalSales">
+₹0
+</strong>
+
+</div>
+
+<div class="card payment-card cash-card">
+
+<h3>Cash Sales</h3>
+
+<strong id="cashSales">
+₹0
+</strong>
+
+</div>
+
+<div class="card payment-card upi-card">
+
+<h3>UPI Sales</h3>
+
+<strong id="upiSales">
 ₹0
 </strong>
 
@@ -1237,6 +1264,10 @@ function renderSales() {
         filtered
     );
 
+    renderPaymentSummary(
+        filtered
+    );
+
 
     renderItemsTable(
         filtered
@@ -1383,6 +1414,60 @@ function renderSummary(data) {
         "₹" +
         totalSales.toFixed(2);
 
+}
+
+
+/* =====================================================
+   PAYMENT SUMMARY
+   ===================================================== */
+
+function renderPaymentSummary(data) {
+
+    const paymentTotals = {
+        Cash: 0,
+        UPI: 0
+    };
+
+    const orderPaymentTotals = new Map();
+
+    data.forEach(row => {
+
+        const payment =
+            String(getOrderPayment(row.order) || "")
+                .trim()
+                .toUpperCase();
+
+        const method =
+            payment === "UPI"
+                ? "UPI"
+                : payment === "CASH"
+                    ? "Cash"
+                    : null;
+
+        if (!method) return;
+
+        const key = row.orderId;
+
+        if (!orderPaymentTotals.has(key)) {
+            orderPaymentTotals.set(key, {
+                method: method,
+                amount: 0
+            });
+        }
+
+        orderPaymentTotals.get(key).amount +=
+            Number(row.amount || 0);
+    });
+
+    orderPaymentTotals.forEach(entry => {
+        paymentTotals[entry.method] += entry.amount;
+    });
+
+    document.getElementById("cashSales").textContent =
+        "₹" + paymentTotals.Cash.toFixed(2);
+
+    document.getElementById("upiSales").textContent =
+        "₹" + paymentTotals.UPI.toFixed(2);
 }
 
 
@@ -1651,6 +1736,9 @@ function renderOrdersTable(data) {
                     combos:
                         0,
 
+                    payment:
+                        getOrderPayment(row.order),
+
                     status:
                         row.status
 
@@ -1726,6 +1814,8 @@ function renderOrdersTable(data) {
 
         <th>Combos</th>
 
+        <th>Payment</th>
+
         <th>Calculated Total</th>
 
         <th>Status</th>
@@ -1776,6 +1866,11 @@ function renderOrdersTable(data) {
 
             <td>
                 ${order.combos}
+            </td>
+
+
+            <td>
+                <b>${escapeHtml(order.payment || "-")}</b>
             </td>
 
 
@@ -2612,4 +2707,3 @@ loadSales();
 
 </html>
 
-```
