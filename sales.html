@@ -2467,30 +2467,81 @@ function exportToExcel() {
 
 
 /* =====================================================
+   SET TODAY'S DATE
+   ===================================================== */
+
+function getTodayLocalDate() {
+
+    const today = new Date();
+
+    const year =
+        today.getFullYear();
+
+    const month =
+        String(today.getMonth() + 1)
+            .padStart(2, "0");
+
+    const day =
+        String(today.getDate())
+            .padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
+}
+
+
+/* =====================================================
+   SET DEFAULT DATE FILTER
+   ===================================================== */
+
+function setTodayFilter() {
+
+    const today =
+        getTodayLocalDate();
+
+    document.getElementById(
+        "fromDate"
+    ).value = today;
+
+    document.getElementById(
+        "toDate"
+    ).value = today;
+}
+
+
+/* =====================================================
    RESET FILTERS
    ===================================================== */
 
 function resetFilters() {
 
-    document.getElementById(
-        "fromDate"
-    ).value = "";
+    /*
+     * Reset date back to TODAY
+     */
+
+    setTodayFilter();
 
 
-    document.getElementById(
-        "toDate"
-    ).value = "";
-
+    /*
+     * Reset counter
+     */
 
     document.getElementById(
         "counterFilter"
     ).value = "all";
 
 
+    /*
+     * Reset status
+     */
+
     document.getElementById(
         "statusFilter"
     ).value = "all";
 
+
+    /*
+     * Render today's sales
+     */
 
     renderSales();
 
@@ -2706,4 +2757,3 @@ loadSales();
 </body>
 
 </html>
-
