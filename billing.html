@@ -126,6 +126,7 @@
             border: 1px solid #ccc;
             border-radius: 6px;
             font-size: 16px;
+            margin-bottom: 8px;
         }
 
         .cart {
@@ -155,6 +156,38 @@
             font-weight: bold;
             color: #4b001f;
             margin-top: 15px;
+        }
+
+        /* PAYMENT */
+
+        .payment-title {
+            margin-top: 18px;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #4b001f;
+        }
+
+        .payment-options {
+            display: flex;
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        .payment-btn {
+            flex: 1;
+            padding: 14px;
+            border: 2px solid #4b001f;
+            border-radius: 8px;
+            background: white;
+            color: #4b001f;
+            font-size: 17px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .payment-btn.selected {
+            background: #4b001f;
+            color: white;
         }
 
         .buttons {
@@ -290,6 +323,13 @@
                 font-size: 10px;
             }
 
+            .receipt-payment {
+                display: flex;
+                justify-content: space-between;
+                font-size: 11px;
+                font-weight: bold;
+            }
+
             .receipt-total {
                 display: flex;
                 justify-content: space-between;
@@ -301,6 +341,18 @@
                 text-align: center;
                 margin-top: 8px;
                 font-size: 10px;
+            }
+        }
+
+        @media (max-width: 600px) {
+
+            .payment-options {
+                flex-direction: row;
+            }
+
+            .payment-btn {
+                font-size: 15px;
+                padding: 13px 8px;
             }
         }
     </style>
@@ -417,6 +469,36 @@
             Total: ₹<span id="total">0</span>
         </div>
 
+
+        <!-- PAYMENT -->
+
+        <div class="payment-title">
+            Payment Method
+        </div>
+
+        <div class="payment-options">
+
+            <button
+                type="button"
+                class="payment-btn selected"
+                id="cashPayment"
+                onclick="selectPayment('Cash')"
+            >
+                CASH
+            </button>
+
+            <button
+                type="button"
+                class="payment-btn"
+                id="upiPayment"
+                onclick="selectPayment('UPI')"
+            >
+                UPI
+            </button>
+
+        </div>
+
+
         <div class="buttons">
 
             <button
@@ -479,6 +561,11 @@
             Customer:
             <span id="receiptCustomer"></span>
 
+        </div>
+
+        <div>
+            Payment:
+            <span id="receiptPayment"></span>
         </div>
 
     </div>
@@ -597,7 +684,7 @@
 
     /*
     ==========================================
-    DUMMY COMBOS
+    COMBOS
     ==========================================
     */
 
@@ -701,6 +788,9 @@
 
     let lastOrder = null;
 
+    let selectedPayment = "Cash";
+
+
     /*
     ==========================================
     SAVED CUSTOMER NUMBERS
@@ -708,6 +798,42 @@
     */
 
     let savedCustomers = [];
+
+
+    /*
+    ==========================================
+    PAYMENT SELECTION
+    ==========================================
+    */
+
+    function selectPayment(method) {
+
+        selectedPayment = method;
+
+        const cashButton =
+            document.getElementById("cashPayment");
+
+        const upiButton =
+            document.getElementById("upiPayment");
+
+
+        cashButton.classList.remove("selected");
+        upiButton.classList.remove("selected");
+
+
+        if (method === "Cash") {
+
+            cashButton.classList.add("selected");
+
+        }
+
+        if (method === "UPI") {
+
+            upiButton.classList.add("selected");
+
+        }
+
+    }
 
 
     /*
@@ -725,7 +851,10 @@
                     .from("loyalty_customers")
                     .select("phone, name")
                     .not("phone", "is", null)
-                    .order("name", { ascending: true });
+                    .order("name", {
+                        ascending: true
+                    });
+
 
             if (error) {
 
@@ -738,14 +867,18 @@
 
             }
 
+
             savedCustomers = data || [];
+
 
             const datalist =
                 document.getElementById(
                     "savedCustomerPhones"
                 );
 
+
             datalist.innerHTML = "";
+
 
             savedCustomers.forEach(customer => {
 
@@ -753,11 +886,14 @@
                     return;
                 }
 
+
                 const option =
                     document.createElement("option");
 
+
                 option.value =
                     customer.phone;
+
 
                 if (customer.name) {
 
@@ -765,6 +901,7 @@
                         customer.name;
 
                 }
+
 
                 datalist.appendChild(option);
 
@@ -794,6 +931,7 @@
             String(phone || "")
                 .replace(/\D/g, "");
 
+
         if (
             digits.length === 12 &&
             digits.startsWith("91")
@@ -803,6 +941,7 @@
                 digits.substring(2);
 
         }
+
 
         return digits;
 
@@ -821,18 +960,22 @@
                 "customerName"
             );
 
+
         if (!phoneInput || !nameInput) {
             return;
         }
+
 
         const phone =
             normalizePhone(
                 phoneInput.value
             );
 
+
         if (!phone) {
             return;
         }
+
 
         const customer =
             savedCustomers.find(item => {
@@ -845,6 +988,7 @@
                 return savedPhone === phone;
 
             });
+
 
         if (customer && customer.name) {
 
@@ -863,6 +1007,7 @@
             findSavedCustomer
         );
 
+
     document
         .getElementById("customerPhone")
         .addEventListener(
@@ -880,7 +1025,10 @@
     function createMenu(containerId, counter) {
 
         const container =
-            document.getElementById(containerId);
+            document.getElementById(
+                containerId
+            );
+
 
         container.innerHTML = "";
 
@@ -897,6 +1045,7 @@
 
             const div =
                 document.createElement("div");
+
 
             div.className = "item";
 
@@ -953,7 +1102,10 @@
     function createComboMenu() {
 
         const container =
-            document.getElementById("combosMenu");
+            document.getElementById(
+                "combosMenu"
+            );
+
 
         container.innerHTML = "";
 
@@ -965,6 +1117,7 @@
 
             const div =
                 document.createElement("div");
+
 
             div.className = "item";
 
@@ -1021,15 +1174,18 @@
         "chaats"
     );
 
+
     createMenu(
         "drinksMenu",
         "drinks"
     );
 
+
     createMenu(
         "burgersMenu",
         "burgers"
     );
+
 
     createComboMenu();
 
@@ -1048,7 +1204,9 @@
 
 
         if (quantities[item] < 0) {
+
             quantities[item] = 0;
+
         }
 
 
@@ -1078,7 +1236,9 @@
 
 
         if (comboQuantities[combo] < 0) {
+
             comboQuantities[combo] = 0;
+
         }
 
 
@@ -1106,6 +1266,7 @@
 
         const cart =
             document.getElementById("cart");
+
 
         let total = 0;
 
@@ -1223,8 +1384,9 @@
         }
 
 
-        document.getElementById("total").textContent =
-            total;
+        document.getElementById(
+            "total"
+        ).textContent = total;
 
     }
 
@@ -1238,23 +1400,37 @@
     async function placeOrder() {
 
         const button =
-            document.getElementById("placeOrder");
+            document.getElementById(
+                "placeOrder"
+            );
+
 
         const printButton =
-            document.getElementById("printBill");
+            document.getElementById(
+                "printBill"
+            );
+
 
         const message =
-            document.getElementById("message");
+            document.getElementById(
+                "message"
+            );
+
 
         const customerName =
-            document.getElementById("customerName")
-                .value
-                .trim();
+            document.getElementById(
+                "customerName"
+            )
+            .value
+            .trim();
+
 
         const customerPhone =
-            document.getElementById("customerPhone")
-                .value
-                .trim();
+            document.getElementById(
+                "customerPhone"
+            )
+            .value
+            .trim();
 
 
         const selectedItems = [];
@@ -1263,9 +1439,7 @@
 
 
         /*
-        ======================================
         NORMAL ITEMS
-        ======================================
         */
 
         Object.keys(menu).forEach(item => {
@@ -1284,11 +1458,13 @@
 
                     name: item,
 
-                    price: menu[item].price,
+                    price:
+                        menu[item].price,
 
                     quantity: qty,
 
-                    counter: menu[item].counter,
+                    counter:
+                        menu[item].counter,
 
                     type: "single"
 
@@ -1303,9 +1479,7 @@
 
 
         /*
-        ======================================
         COMBOS
-        ======================================
         */
 
         Object.keys(combos).forEach(combo => {
@@ -1324,7 +1498,8 @@
 
                     name: combo,
 
-                    price: combos[combo].price,
+                    price:
+                        combos[combo].price,
 
                     quantity: qty,
 
@@ -1344,9 +1519,7 @@
 
 
         /*
-        ======================================
         CHECK ORDER
-        ======================================
         */
 
         if (selectedItems.length === 0) {
@@ -1367,8 +1540,10 @@
         button.textContent =
             "PLACING ORDER...";
 
+
         printButton.style.display =
             "none";
+
 
         message.textContent =
             "";
@@ -1382,7 +1557,10 @@
             ==================================
             */
 
-            const { data: order, error: orderError } =
+            const {
+                data: order,
+                error: orderError
+            } =
                 await supabaseClient
 
                     .from("orders")
@@ -1401,6 +1579,9 @@
                         total:
                             total,
 
+                        payment_method:
+                            selectedPayment,
+
                         status:
                             "Pending"
 
@@ -1412,7 +1593,9 @@
 
 
             if (orderError) {
+
                 throw orderError;
+
             }
 
 
@@ -1434,18 +1617,24 @@
 
 
             /*
-            ==================================
             SPLIT NORMAL ITEMS
-            ==================================
             */
 
             selectedItems.forEach(item => {
 
-                if (item.type === "single") {
+                if (
+                    item.type === "single"
+                ) {
 
-                    if (counterItems[item.counter]) {
+                    if (
+                        counterItems[
+                            item.counter
+                        ]
+                    ) {
 
-                        counterItems[item.counter].push({
+                        counterItems[
+                            item.counter
+                        ].push({
 
                             name:
                                 item.name,
@@ -1463,9 +1652,7 @@
 
 
             /*
-            ==================================
             SPLIT COMBOS
-            ==================================
             */
 
             selectedItems.forEach(item => {
@@ -1475,29 +1662,31 @@
                     item.components
                 ) {
 
-                    item.components.forEach(component => {
+                    item.components.forEach(
+                        component => {
 
-                        if (
-                            counterItems[
-                                component.counter
-                            ]
-                        ) {
+                            if (
+                                counterItems[
+                                    component.counter
+                                ]
+                            ) {
 
-                            counterItems[
-                                component.counter
-                            ].push({
+                                counterItems[
+                                    component.counter
+                                ].push({
 
-                                name:
-                                    component.name,
+                                    name:
+                                        component.name,
 
-                                quantity:
-                                    item.quantity
+                                    quantity:
+                                        item.quantity
 
-                            });
+                                });
+
+                            }
 
                         }
-
-                    });
+                    );
 
                 }
 
@@ -1513,10 +1702,14 @@
             const kotRows = [];
 
 
-            Object.keys(counterItems).forEach(counter => {
+            Object.keys(
+                counterItems
+            ).forEach(counter => {
 
                 if (
-                    counterItems[counter].length > 0
+                    counterItems[
+                        counter
+                    ].length > 0
                 ) {
 
                     kotRows.push({
@@ -1528,7 +1721,9 @@
                             counter,
 
                         items:
-                            counterItems[counter],
+                            counterItems[
+                                counter
+                            ],
 
                         status:
                             "Pending"
@@ -1546,9 +1741,13 @@
             ==================================
             */
 
-            if (kotRows.length > 0) {
+            if (
+                kotRows.length > 0
+            ) {
 
-                const { error: kotError } =
+                const {
+                    error: kotError
+                } =
                     await supabaseClient
 
                         .from("counter_kot")
@@ -1557,7 +1756,9 @@
 
 
                 if (kotError) {
+
                     throw kotError;
+
                 }
 
             }
@@ -1569,99 +1770,210 @@
             ==================================
             */
 
-            if (customerPhone || customerName) {
+            if (
+                customerPhone ||
+                customerName
+            ) {
 
                 try {
 
                     let customer = null;
 
-                    const { data: existingCustomer, error: customerFindError } =
-                        customerPhone
-                            ? await supabaseClient
-                                .from("loyalty_customers")
-                                .select("*")
-                                .eq("phone", customerPhone)
-                                .maybeSingle()
-                            : { data: null, error: null };
 
-                    if (customerFindError) {
+                    const {
+                        data:
+                            existingCustomer,
+                        error:
+                            customerFindError
+                    } =
+                        customerPhone
+
+                            ? await supabaseClient
+                                .from(
+                                    "loyalty_customers"
+                                )
+                                .select("*")
+                                .eq(
+                                    "phone",
+                                    customerPhone
+                                )
+                                .maybeSingle()
+
+                            : {
+                                data: null,
+                                error: null
+                            };
+
+
+                    if (
+                        customerFindError
+                    ) {
+
                         console.error(
                             "Loyalty customer lookup failed:",
                             customerFindError
                         );
+
                     }
 
-                    if (existingCustomer) {
 
-                        customer = existingCustomer;
+                    if (
+                        existingCustomer
+                    ) {
+
+                        customer =
+                            existingCustomer;
+
 
                         if (
                             customerName &&
-                            existingCustomer.name !== customerName
+                            existingCustomer.name !==
+                                customerName
                         ) {
 
-                            const { data: updatedCustomer, error: updateError } =
+                            const {
+                                data:
+                                    updatedCustomer,
+                                error:
+                                    updateError
+                            } =
                                 await supabaseClient
-                                    .from("loyalty_customers")
+
+                                    .from(
+                                        "loyalty_customers"
+                                    )
+
                                     .update({
-                                        name: customerName,
-                                        updated_at: new Date().toISOString()
+
+                                        name:
+                                            customerName,
+
+                                        updated_at:
+                                            new Date()
+                                                .toISOString()
+
                                     })
-                                    .eq("id", existingCustomer.id)
+
+                                    .eq(
+                                        "id",
+                                        existingCustomer.id
+                                    )
+
                                     .select()
                                     .single();
 
+
                             if (!updateError) {
-                                customer = updatedCustomer;
+
+                                customer =
+                                    updatedCustomer;
+
                             }
+
                         }
 
                     } else {
 
-                        const { data: newCustomer, error: createError } =
+                        const {
+                            data:
+                                newCustomer,
+                            error:
+                                createError
+                        } =
                             await supabaseClient
-                                .from("loyalty_customers")
+
+                                .from(
+                                    "loyalty_customers"
+                                )
+
                                 .insert({
-                                    phone: customerPhone || null,
-                                    name: customerName || null
+
+                                    phone:
+                                        customerPhone ||
+                                        null,
+
+                                    name:
+                                        customerName ||
+                                        null
+
                                 })
+
                                 .select()
                                 .single();
 
+
                         if (!createError) {
-                            customer = newCustomer;
+
+                            customer =
+                                newCustomer;
+
                         } else {
+
                             console.error(
                                 "Loyalty customer creation failed:",
                                 createError
                             );
+
                         }
+
                     }
+
 
                     if (customer) {
 
-                        const { error: loyaltyError } =
+                        const {
+                            error:
+                                loyaltyError
+                        } =
                             await supabaseClient
-                                .from("loyalty_transactions")
+
+                                .from(
+                                    "loyalty_transactions"
+                                )
+
                                 .insert({
-                                    customer_id: customer.id,
-                                    order_id: order.id,
-                                    type: "purchase",
-                                    points: 0,
-                                    amount: total,
-                                    description: JSON.stringify(selectedItems),
-                                    created_at: new Date().toISOString()
+
+                                    customer_id:
+                                        customer.id,
+
+                                    order_id:
+                                        order.id,
+
+                                    type:
+                                        "purchase",
+
+                                    points:
+                                        0,
+
+                                    amount:
+                                        total,
+
+                                    description:
+                                        JSON.stringify(
+                                            selectedItems
+                                        ),
+
+                                    created_at:
+                                        new Date()
+                                            .toISOString()
+
                                 });
 
+
                         if (loyaltyError) {
+
                             console.error(
                                 "Loyalty transaction save failed:",
                                 loyaltyError
                             );
+
                         }
+
                     }
 
-                } catch (loyaltyError) {
+                } catch (
+                    loyaltyError
+                ) {
 
                     console.error(
                         "Loyalty connection failed:",
@@ -1687,6 +1999,12 @@
                 customerName:
                     customerName,
 
+                customerPhone:
+                    customerPhone,
+
+                paymentMethod:
+                    selectedPayment,
+
                 items:
                     selectedItems,
 
@@ -1696,11 +2014,14 @@
             };
 
 
-            prepareReceipt(lastOrder);
+            prepareReceipt(
+                lastOrder
+            );
 
 
             message.className =
                 "success";
+
 
             message.textContent =
                 "Order #" +
@@ -1711,20 +2032,27 @@
             button.style.display =
                 "none";
 
+
             printButton.style.display =
                 "block";
+
 
         } catch (error) {
 
             console.error(error);
 
+
             message.className =
                 "error";
+
 
             message.textContent =
                 "Order failed. Please try again.";
 
-            button.disabled = false;
+
+            button.disabled =
+                false;
+
 
             button.textContent =
                 "PLACE ORDER";
@@ -1771,6 +2099,7 @@
             ).textContent =
                 order.customerName;
 
+
             customerRow.style.display =
                 "block";
 
@@ -1780,6 +2109,13 @@
                 "none";
 
         }
+
+
+        document.getElementById(
+            "receiptPayment"
+        ).textContent =
+            order.paymentMethod ||
+            "Cash";
 
 
         const receiptItems =
@@ -1800,7 +2136,9 @@
 
 
             const row =
-                document.createElement("div");
+                document.createElement(
+                    "div"
+                );
 
 
             row.className =
@@ -1812,30 +2150,26 @@
                 <div class="receipt-item-line">
 
                     <span class="receipt-item-name">
-
                         ${item.name}
-
                     </span>
 
                     <span class="receipt-item-price">
-
                         ₹${amount}
-
                     </span>
 
                 </div>
 
                 <div class="receipt-qty">
-
                     ${item.quantity}
                     × ₹${item.price}
-
                 </div>
 
             `;
 
 
-            receiptItems.appendChild(row);
+            receiptItems.appendChild(
+                row
+            );
 
         });
 
@@ -1861,7 +2195,9 @@
         }
 
 
-        prepareReceipt(lastOrder);
+        prepareReceipt(
+            lastOrder
+        );
 
 
         setTimeout(() => {
@@ -1879,15 +2215,16 @@
     ==========================================
     */
 
-    window.onafterprint = function() {
+    window.onafterprint =
+        function() {
 
-        setTimeout(() => {
+            setTimeout(() => {
 
-            window.location.reload();
+                window.location.reload();
 
-        }, 500);
+            }, 500);
 
-    };
+        };
 
 </script>
 
