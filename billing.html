@@ -2,9 +2,7 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Cafe Billing</title>
@@ -13,7 +11,6 @@
     <script src="supabase.js?v=4"></script>
 
     <style>
-
         * {
             box-sizing: border-box;
         }
@@ -244,28 +241,6 @@
             display: none;
         }
 
-        /* ==========================================
-           LOADING MENU
-           ========================================== */
-
-        .menu-loading {
-            text-align: center;
-            padding: 20px;
-            color: #777;
-            font-weight: bold;
-        }
-
-        .menu-error {
-            text-align: center;
-            padding: 20px;
-            color: red;
-            font-weight: bold;
-        }
-
-        /* ==========================================
-           PRINT
-           ========================================== */
-
         @media print {
 
             @page {
@@ -379,28 +354,18 @@
                 font-size: 15px;
                 padding: 13px 8px;
             }
-
         }
-
     </style>
-
 </head>
-
 
 <body>
 
-
 <header>
-
     <h1>Cafe Billing</h1>
-
     <p>Main Billing Counter</p>
-
 </header>
 
-
 <div class="container">
-
 
     <!-- CUSTOMER -->
 
@@ -440,11 +405,7 @@
         <div
             class="menu-grid"
             id="chaatsMenu"
-        >
-            <div class="menu-loading">
-                Loading menu...
-            </div>
-        </div>
+        ></div>
 
     </div>
 
@@ -458,11 +419,7 @@
         <div
             class="menu-grid"
             id="drinksMenu"
-        >
-            <div class="menu-loading">
-                Loading menu...
-            </div>
-        </div>
+        ></div>
 
     </div>
 
@@ -476,11 +433,7 @@
         <div
             class="menu-grid"
             id="burgersMenu"
-        >
-            <div class="menu-loading">
-                Loading menu...
-            </div>
-        </div>
+        ></div>
 
     </div>
 
@@ -513,9 +466,7 @@
         </div>
 
         <div class="total">
-
             Total: ₹<span id="total">0</span>
-
         </div>
 
 
@@ -591,24 +542,18 @@
 
     </div>
 
-
     <div class="receipt-line"></div>
-
 
     <div class="receipt-info">
 
         <div>
-
             Order No:
             <span id="receiptOrderNumber"></span>
-
         </div>
 
         <div>
-
             Date:
             <span id="receiptDate"></span>
-
         </div>
 
         <div id="receiptCustomerRow">
@@ -619,39 +564,29 @@
         </div>
 
         <div>
-
             Payment:
             <span id="receiptPayment"></span>
-
         </div>
 
     </div>
 
-
     <div class="receipt-line"></div>
-
 
     <div id="receiptItems"></div>
 
-
     <div class="receipt-line"></div>
-
 
     <div class="receipt-total">
 
         <span>TOTAL</span>
 
         <span>
-
             ₹<span id="receiptTotal"></span>
-
         </span>
 
     </div>
 
-
     <div class="receipt-line"></div>
-
 
     <div class="receipt-footer">
 
@@ -666,1296 +601,286 @@
 </div>
 
 
-
 <script>
 
-
-/*
-==================================================
-SUPABASE
-==================================================
-*/
-
-/*
-supabase.js?v=4 creates:
-
-supabaseClient
-
-The existing Billing page continues using
-the same Supabase connection.
-*/
-
-
-/*
-==================================================
-DYNAMIC MENU
-==================================================
-*/
-
-const menu = {};
-
-
-/*
-==================================================
-COMBOS
-==================================================
-*/
-
-const combos = {
-
-    "Pani Puri + Mint Lime": {
-
-        price: 80,
-
-        items: [
-
-            {
-                name: "Pani Puri",
-                counter: "chaats"
-            },
-
-            {
-                name: "Mint Lime",
-                counter: "drinks"
-            }
-
-        ]
-
-    },
-
-
-    "Masala Puri + Mango Shake": {
-
-        price: 140,
-
-        items: [
-
-            {
-                name: "Masala Puri",
-                counter: "chaats"
-            },
-
-            {
-                name: "Mango Shake",
-                counter: "drinks"
-            }
-
-        ]
-
-    },
-
-
-    "Classic Burger + Mango Shake": {
-
-        price: 190,
-
-        items: [
-
-            {
-                name: "Classic Burger",
-                counter: "burgers"
-            },
-
-            {
-                name: "Mango Shake",
-                counter: "drinks"
-            }
-
-        ]
-
-    },
-
-
-    "Chicken Burger + Oreo Shake": {
-
-        price: 210,
-
-        items: [
-
-            {
-                name: "Chicken Burger",
-                counter: "burgers"
-            },
-
-            {
-                name: "Oreo Shake",
-                counter: "drinks"
-            }
-
-        ]
-
-    }
-
-};
-
-
-/*
-==================================================
-QUANTITIES
-==================================================
-*/
-
-const quantities = {};
-
-const comboQuantities = {};
-
-let lastOrder = null;
-
-let selectedPayment = "Cash";
-
-
-/*
-==================================================
-SAVED CUSTOMERS
-==================================================
-*/
-
-let savedCustomers = [];
-
-
-/*
-==================================================
-PAYMENT SELECTION
-==================================================
-*/
-
-function selectPayment(method) {
-
-    selectedPayment = method;
-
-    const cashButton =
-        document.getElementById("cashPayment");
-
-    const upiButton =
-        document.getElementById("upiPayment");
-
-
-    cashButton.classList.remove("selected");
-
-    upiButton.classList.remove("selected");
-
-
-    if (method === "Cash") {
-
-        cashButton.classList.add("selected");
-
-    }
-
-
-    if (method === "UPI") {
-
-        upiButton.classList.add("selected");
-
-    }
-
-}
-
-
-/*
-==================================================
-CATEGORY → BILLING COUNTER
-==================================================
-
-IMPORTANT:
-
-The category stored in Supabase is NOT changed.
-
-This function only decides which existing Billing
-section should display the item.
-
-Examples:
-
-Chaat       → chaats
-Drinks      → drinks
-Burgers     → burgers
-
-It also supports category names containing
-Chaat / Drink / Burger / Smash / Blend.
-==================================================
-*/
-
-function getBillingCounter(category) {
-
-    const value =
-        String(category || "")
-            .trim()
-            .toLowerCase();
-
-
     /*
-    CHAAT
+    ==========================================
+    NORMAL MENU ITEMS
+    ==========================================
     */
 
-    if (
-        value.includes("chaat")
-    ) {
+    const menu = {
 
-        return "chaats";
+        // CHAATS
 
-    }
+        "Pani Puri": {
+            price: 50,
+            counter: "chaats"
+        },
 
+        "Masala Puri": {
+            price: 60,
+            counter: "chaats"
+        },
 
-    /*
-    DRINKS / BLENDER
-    */
+        "Samosa Chaat": {
+            price: 80,
+            counter: "chaats"
+        },
 
-    if (
-        value.includes("drink") ||
-        value.includes("beverage") ||
-        value.includes("blend")
-    ) {
-
-        return "drinks";
-
-    }
-
-
-    /*
-    BURGERS / SMASH
-    */
-
-    if (
-        value.includes("burger") ||
-        value.includes("smash")
-    ) {
-
-        return "burgers";
-
-    }
+        "Dahi Puri": {
+            price: 80,
+            counter: "chaats"
+        },
 
 
-    /*
-    Exact common alternatives
-    */
+        // DRINKS
 
-    if (
-        value === "chaats"
-    ) {
+        "Mango Shake": {
+            price: 90,
+            counter: "drinks"
+        },
 
-        return "chaats";
+        "Oreo Shake": {
+            price: 80,
+            counter: "drinks"
+        },
 
-    }
+        "Strawberry Shake": {
+            price: 90,
+            counter: "drinks"
+        },
 
-
-    if (
-        value === "drinks"
-    ) {
-
-        return "drinks";
-
-    }
-
-
-    if (
-        value === "burgers"
-    ) {
-
-        return "burgers";
-
-    }
+        "Mint Lime": {
+            price: 35,
+            counter: "drinks"
+        },
 
 
-    return null;
+        // BURGERS
 
-}
+        "Classic Burger": {
+            price: 120,
+            counter: "burgers"
+        },
 
+        "Chicken Burger": {
+            price: 150,
+            counter: "burgers"
+        },
 
-/*
-==================================================
-LOAD MENU FROM SUPABASE
-==================================================
-*/
+        "Cheese Burger": {
+            price: 140,
+            counter: "burgers"
+        },
 
-async function loadMenu() {
-
-    const chaatContainer =
-        document.getElementById("chaatsMenu");
-
-    const drinksContainer =
-        document.getElementById("drinksMenu");
-
-    const burgersContainer =
-        document.getElementById("burgersMenu");
-
-
-    chaatContainer.innerHTML =
-        `<div class="menu-loading">Loading menu...</div>`;
-
-    drinksContainer.innerHTML =
-        `<div class="menu-loading">Loading menu...</div>`;
-
-    burgersContainer.innerHTML =
-        `<div class="menu-loading">Loading menu...</div>`;
-
-
-    try {
-
-        const {
-            data,
-            error
-        } =
-            await supabaseClient
-
-                .from("chaat_products")
-
-                .select(
-                    "id, name, category, price, available"
-                )
-
-                .eq(
-                    "available",
-                    true
-                )
-
-                .order(
-                    "id",
-                    {
-                        ascending: true
-                    }
-                );
-
-
-        if (error) {
-
-            throw error;
-
+        "Double Burger": {
+            price: 180,
+            counter: "burgers"
         }
 
-
-        /*
-        Clear the current menu
-        */
-
-        Object.keys(menu).forEach(item => {
-
-            delete menu[item];
-
-        });
-
-
-        /*
-        Reset quantities
-        */
-
-        Object.keys(quantities).forEach(item => {
-
-            delete quantities[item];
-
-        });
-
-
-        /*
-        Build menu from database
-        */
-
-        (data || []).forEach(product => {
-
-            if (!product.name) {
-                return;
-            }
-
-
-            const counter =
-                getBillingCounter(
-                    product.category
-                );
-
-
-            /*
-            Unknown categories are not placed
-            into a wrong counter.
-            */
-
-            if (!counter) {
-
-                console.warn(
-                    "Menu item category could not be mapped:",
-                    product
-                );
-
-                return;
-
-            }
-
-
-            const price =
-                Number(product.price || 0);
-
-
-            menu[product.name] = {
-
-                id:
-                    product.id,
-
-                price:
-                    price,
-
-                counter:
-                    counter,
-
-                category:
-                    product.category
-
-            };
-
-
-            quantities[product.name] = 0;
-
-        });
-
-
-        /*
-        Render menus
-        */
-
-        createMenu(
-            "chaatsMenu",
-            "chaats"
-        );
-
-
-        createMenu(
-            "drinksMenu",
-            "drinks"
-        );
-
-
-        createMenu(
-            "burgersMenu",
-            "burgers"
-        );
-
-
-    } catch (error) {
-
-        console.error(
-            "Menu loading failed:",
-            error
-        );
-
-
-        chaatContainer.innerHTML =
-            `<div class="menu-error">
-                Could not load menu.
-            </div>`;
-
-
-        drinksContainer.innerHTML =
-            `<div class="menu-error">
-                Could not load menu.
-            </div>`;
-
-
-        burgersContainer.innerHTML =
-            `<div class="menu-error">
-                Could not load menu.
-            </div>`;
-
-    }
-
-}
-
-
-/*
-==================================================
-CREATE NORMAL MENU
-==================================================
-*/
-
-function createMenu(containerId, counter) {
-
-    const container =
-        document.getElementById(
-            containerId
-        );
-
-
-    container.innerHTML = "";
-
-
-    let itemCount = 0;
-
-
-    Object.keys(menu).forEach(item => {
-
-        if (
-            menu[item].counter !== counter
-        ) {
-
-            return;
-
-        }
-
-
-        itemCount++;
-
-
-        quantities[item] = 0;
-
-
-        const div =
-            document.createElement("div");
-
-
-        div.className =
-            "item";
-
-
-        /*
-        Create safe DOM instead of putting
-        item names directly into onclick HTML.
-        */
-
-        const itemName =
-            document.createElement("div");
-
-        itemName.className =
-            "item-name";
-
-        itemName.textContent =
-            item;
-
-
-        const itemPrice =
-            document.createElement("div");
-
-        itemPrice.className =
-            "item-price";
-
-        itemPrice.textContent =
-            "₹" + menu[item].price;
-
-
-        const quantityRow =
-            document.createElement("div");
-
-        quantityRow.className =
-            "quantity-row";
-
-
-        const minusButton =
-            document.createElement("button");
-
-        minusButton.type =
-            "button";
-
-        minusButton.textContent =
-            "−";
-
-
-        const quantity =
-            document.createElement("span");
-
-        quantity.className =
-            "quantity";
-
-        quantity.id =
-            "qty-" +
-            item.replace(
-                /[^a-zA-Z0-9]/g,
-                ""
-            );
-
-        quantity.textContent =
-            "0";
-
-
-        const plusButton =
-            document.createElement("button");
-
-        plusButton.type =
-            "button";
-
-        plusButton.textContent =
-            "+";
-
-
-        minusButton.addEventListener(
-            "click",
-            function() {
-
-                changeQuantity(
-                    item,
-                    -1
-                );
-
-            }
-        );
-
-
-        plusButton.addEventListener(
-            "click",
-            function() {
-
-                changeQuantity(
-                    item,
-                    1
-                );
-
-            }
-        );
-
-
-        quantityRow.appendChild(
-            minusButton
-        );
-
-        quantityRow.appendChild(
-            quantity
-        );
-
-        quantityRow.appendChild(
-            plusButton
-        );
-
-
-        div.appendChild(
-            itemName
-        );
-
-        div.appendChild(
-            itemPrice
-        );
-
-        div.appendChild(
-            quantityRow
-        );
-
-
-        container.appendChild(
-            div
-        );
-
-    });
-
-
-    if (itemCount === 0) {
-
-        container.innerHTML =
-            `<div class="menu-loading">
-                No items available.
-            </div>`;
-
-    }
-
-}
-
-
-/*
-==================================================
-CREATE COMBO MENU
-==================================================
-*/
-
-function createComboMenu() {
-
-    const container =
-        document.getElementById(
-            "combosMenu"
-        );
-
-
-    container.innerHTML = "";
-
-
-    Object.keys(combos).forEach(combo => {
-
-        comboQuantities[combo] = 0;
-
-
-        const div =
-            document.createElement("div");
-
-
-        div.className =
-            "item";
-
-
-        const itemName =
-            document.createElement("div");
-
-        itemName.className =
-            "item-name";
-
-        itemName.textContent =
-            combo;
-
-
-        const label =
-            document.createElement("span");
-
-        label.className =
-            "combo-label";
-
-        label.textContent =
-            "COMBO";
-
-
-        const itemPrice =
-            document.createElement("div");
-
-        itemPrice.className =
-            "item-price";
-
-        itemPrice.textContent =
-            "₹" +
-            combos[combo].price;
-
-
-        const quantityRow =
-            document.createElement("div");
-
-        quantityRow.className =
-            "quantity-row";
-
-
-        const minusButton =
-            document.createElement("button");
-
-        minusButton.type =
-            "button";
-
-        minusButton.textContent =
-            "−";
-
-
-        const quantity =
-            document.createElement("span");
-
-        quantity.className =
-            "quantity";
-
-        quantity.id =
-            "comboQty-" +
-            combo.replace(
-                /[^a-zA-Z0-9]/g,
-                ""
-            );
-
-        quantity.textContent =
-            "0";
-
-
-        const plusButton =
-            document.createElement("button");
-
-        plusButton.type =
-            "button";
-
-        plusButton.textContent =
-            "+";
-
-
-        minusButton.addEventListener(
-            "click",
-            function() {
-
-                changeComboQuantity(
-                    combo,
-                    -1
-                );
-
-            }
-        );
-
-
-        plusButton.addEventListener(
-            "click",
-            function() {
-
-                changeComboQuantity(
-                    combo,
-                    1
-                );
-
-            }
-        );
-
-
-        quantityRow.appendChild(
-            minusButton
-        );
-
-        quantityRow.appendChild(
-            quantity
-        );
-
-        quantityRow.appendChild(
-            plusButton
-        );
-
-
-        div.appendChild(
-            itemName
-        );
-
-        div.appendChild(
-            label
-        );
-
-        div.appendChild(
-            itemPrice
-        );
-
-        div.appendChild(
-            quantityRow
-        );
-
-
-        container.appendChild(
-            div
-        );
-
-    });
-
-}
-
-
-/*
-==================================================
-NORMAL ITEM QUANTITY
-==================================================
-*/
-
-function changeQuantity(item, change) {
-
-    if (
-        typeof quantities[item] !== "number"
-    ) {
-
-        quantities[item] = 0;
-
-    }
-
-
-    quantities[item] += change;
-
-
-    if (
-        quantities[item] < 0
-    ) {
-
-        quantities[item] = 0;
-
-    }
-
-
-    const id =
-        "qty-" +
-        item.replace(
-            /[^a-zA-Z0-9]/g,
-            ""
-        );
-
-
-    const element =
-        document.getElementById(id);
-
-
-    if (element) {
-
-        element.textContent =
-            quantities[item];
-
-    }
-
-
-    updateCart();
-
-}
-
-
-/*
-==================================================
-COMBO QUANTITY
-==================================================
-*/
-
-function changeComboQuantity(
-    combo,
-    change
-) {
-
-    comboQuantities[combo] +=
-        change;
-
-
-    if (
-        comboQuantities[combo] < 0
-    ) {
-
-        comboQuantities[combo] = 0;
-
-    }
-
-
-    const id =
-        "comboQty-" +
-        combo.replace(
-            /[^a-zA-Z0-9]/g,
-            ""
-        );
-
-
-    const element =
-        document.getElementById(id);
-
-
-    if (element) {
-
-        element.textContent =
-            comboQuantities[combo];
-
-    }
-
-
-    updateCart();
-
-}
-
-
-/*
-==================================================
-UPDATE CART
-==================================================
-*/
-
-function updateCart() {
-
-    const cart =
-        document.getElementById(
-            "cart"
-        );
-
-
-    let total = 0;
-
-    let html = "";
-
-    let hasItems = false;
+    };
 
 
     /*
-    NORMAL ITEMS
-    */
-
-    Object.keys(menu).forEach(item => {
-
-        const qty =
-            quantities[item];
-
-
-        if (qty > 0) {
-
-            hasItems = true;
-
-
-            const amount =
-                menu[item].price *
-                qty;
-
-
-            total += amount;
-
-
-            const row =
-                document.createElement(
-                    "div"
-                );
-
-
-            row.className =
-                "cart-row";
-
-
-            const left =
-                document.createElement(
-                    "div"
-                );
-
-            left.className =
-                "cart-left";
-
-            left.textContent =
-                item +
-                " × " +
-                qty;
-
-
-            const right =
-                document.createElement(
-                    "div"
-                );
-
-            right.className =
-                "cart-right";
-
-            right.textContent =
-                "₹" +
-                amount;
-
-
-            row.appendChild(left);
-
-            row.appendChild(right);
-
-
-            cart.innerHTML = "";
-
-            /*
-            The actual cart is rebuilt below.
-            */
-
-        }
-
-    });
-
-
-    /*
-    Build cart safely.
-    */
-
-    const cartFragment =
-        document.createDocumentFragment();
-
-
-    /*
-    NORMAL ITEMS
-    */
-
-    Object.keys(menu).forEach(item => {
-
-        const qty =
-            quantities[item];
-
-
-        if (qty > 0) {
-
-            hasItems = true;
-
-
-            const amount =
-                menu[item].price *
-                qty;
-
-
-            total += 0;
-
-
-            const row =
-                document.createElement(
-                    "div"
-                );
-
-
-            row.className =
-                "cart-row";
-
-
-            const left =
-                document.createElement(
-                    "div"
-                );
-
-            left.className =
-                "cart-left";
-
-            left.textContent =
-                item +
-                " × " +
-                qty;
-
-
-            const right =
-                document.createElement(
-                    "div"
-                );
-
-            right.className =
-                "cart-right";
-
-            right.textContent =
-                "₹" +
-                amount;
-
-
-            row.appendChild(left);
-
-            row.appendChild(right);
-
-
-            cartFragment.appendChild(
-                row
-            );
-
-        }
-
-    });
-
-
-    /*
+    ==========================================
     COMBOS
+    ==========================================
     */
 
-    Object.keys(combos).forEach(combo => {
+    const combos = {
 
-        const qty =
-            comboQuantities[combo];
+        "Pani Puri + Mint Lime": {
 
+            price: 80,
 
-        if (qty > 0) {
+            items: [
 
-            hasItems = true;
+                {
+                    name: "Pani Puri",
+                    counter: "chaats"
+                },
 
+                {
+                    name: "Mint Lime",
+                    counter: "drinks"
+                }
 
-            const amount =
-                combos[combo].price *
-                qty;
+            ]
 
-
-            total += amount;
-
-
-            const row =
-                document.createElement(
-                    "div"
-                );
+        },
 
 
-            row.className =
-                "cart-row";
+        "Masala Puri + Mango Shake": {
+
+            price: 140,
+
+            items: [
+
+                {
+                    name: "Masala Puri",
+                    counter: "chaats"
+                },
+
+                {
+                    name: "Mango Shake",
+                    counter: "drinks"
+                }
+
+            ]
+
+        },
 
 
-            const left =
-                document.createElement(
-                    "div"
-                );
+        "Classic Burger + Mango Shake": {
 
-            left.className =
-                "cart-left";
+            price: 190,
 
-            left.textContent =
-                combo +
-                " × " +
-                qty;
+            items: [
 
+                {
+                    name: "Classic Burger",
+                    counter: "burgers"
+                },
 
-            const right =
-                document.createElement(
-                    "div"
-                );
+                {
+                    name: "Mango Shake",
+                    counter: "drinks"
+                }
 
-            right.className =
-                "cart-right";
+            ]
 
-            right.textContent =
-                "₹" +
-                amount;
+        },
 
 
-            row.appendChild(left);
+        "Chicken Burger + Oreo Shake": {
 
-            row.appendChild(right);
+            price: 210,
 
+            items: [
 
-            cartFragment.appendChild(
-                row
-            );
+                {
+                    name: "Chicken Burger",
+                    counter: "burgers"
+                },
+
+                {
+                    name: "Oreo Shake",
+                    counter: "drinks"
+                }
+
+            ]
 
         }
 
-    });
+    };
 
 
-    cart.innerHTML = "";
+    /*
+    ==========================================
+    QUANTITIES
+    ==========================================
+    */
+
+    const quantities = {};
+
+    const comboQuantities = {};
+
+    let lastOrder = null;
+
+    let selectedPayment = "Cash";
 
 
-    if (!hasItems) {
+    /*
+    ==========================================
+    SAVED CUSTOMER NUMBERS
+    ==========================================
+    */
 
-        cart.textContent =
-            "No items selected.";
+    let savedCustomers = [];
 
-    } else {
 
-        cart.appendChild(
-            cartFragment
-        );
+    /*
+    ==========================================
+    PAYMENT SELECTION
+    ==========================================
+    */
+
+    function selectPayment(method) {
+
+        selectedPayment = method;
+
+        const cashButton =
+            document.getElementById("cashPayment");
+
+        const upiButton =
+            document.getElementById("upiPayment");
+
+
+        cashButton.classList.remove("selected");
+        upiButton.classList.remove("selected");
+
+
+        if (method === "Cash") {
+
+            cashButton.classList.add("selected");
+
+        }
+
+        if (method === "UPI") {
+
+            upiButton.classList.add("selected");
+
+        }
 
     }
 
 
-    document.getElementById(
-        "total"
-    ).textContent =
-        total;
+    /*
+    ==========================================
+    LOAD SAVED CUSTOMER NUMBERS
+    ==========================================
+    */
 
-}
+    async function loadSavedCustomers() {
 
+        try {
 
-/*
-==================================================
-LOAD SAVED CUSTOMER NUMBERS
-==================================================
-*/
-
-async function loadSavedCustomers() {
-
-    try {
-
-        const {
-            data,
-            error
-        } =
-            await supabaseClient
-
-                .from("loyalty_customers")
-
-                .select(
-                    "phone, name"
-                )
-
-                .not(
-                    "phone",
-                    "is",
-                    null
-                )
-
-                .order(
-                    "name",
-                    {
+            const { data, error } =
+                await supabaseClient
+                    .from("loyalty_customers")
+                    .select("phone, name")
+                    .not("phone", "is", null)
+                    .order("name", {
                         ascending: true
-                    }
+                    });
+
+
+            if (error) {
+
+                console.error(
+                    "Could not load saved customer numbers:",
+                    error
+                );
+
+                return;
+
+            }
+
+
+            savedCustomers = data || [];
+
+
+            const datalist =
+                document.getElementById(
+                    "savedCustomerPhones"
                 );
 
 
-        if (error) {
-
-            console.error(
-                "Could not load saved customer numbers:",
-                error
-            );
-
-            return;
-
-        }
+            datalist.innerHTML = "";
 
 
-        savedCustomers =
-            data || [];
-
-
-        const datalist =
-            document.getElementById(
-                "savedCustomerPhones"
-            );
-
-
-        datalist.innerHTML =
-            "";
-
-
-        savedCustomers.forEach(
-            customer => {
+            savedCustomers.forEach(customer => {
 
                 if (!customer.phone) {
                     return;
@@ -1963,9 +888,7 @@ async function loadSavedCustomers() {
 
 
                 const option =
-                    document.createElement(
-                        "option"
-                    );
+                    document.createElement("option");
 
 
                 option.value =
@@ -1980,613 +903,982 @@ async function loadSavedCustomers() {
                 }
 
 
-                datalist.appendChild(
-                    option
-                );
+                datalist.appendChild(option);
 
-            }
-        );
+            });
 
-    } catch (error) {
+        } catch (error) {
 
-        console.error(
-            "Saved customer loading failed:",
-            error
-        );
+            console.error(
+                "Saved customer loading failed:",
+                error
+            );
+
+        }
 
     }
 
-}
+
+    /*
+    ==========================================
+    FIND SAVED CUSTOMER BY PHONE
+    ==========================================
+    */
+
+    function normalizePhone(phone) {
+
+        let digits =
+            String(phone || "")
+                .replace(/\D/g, "");
 
 
-/*
-==================================================
-FIND SAVED CUSTOMER BY PHONE
-==================================================
-*/
+        if (
+            digits.length === 12 &&
+            digits.startsWith("91")
+        ) {
 
-function normalizePhone(phone) {
+            digits =
+                digits.substring(2);
 
-    let digits =
-        String(phone || "")
-            .replace(
-                /\D/g,
-                ""
+        }
+
+
+        return digits;
+
+    }
+
+
+    function findSavedCustomer() {
+
+        const phoneInput =
+            document.getElementById(
+                "customerPhone"
+            );
+
+        const nameInput =
+            document.getElementById(
+                "customerName"
             );
 
 
-    if (
-        digits.length === 12 &&
-        digits.startsWith("91")
-    ) {
-
-        digits =
-            digits.substring(2);
-
-    }
+        if (!phoneInput || !nameInput) {
+            return;
+        }
 
 
-    return digits;
-
-}
-
-
-function findSavedCustomer() {
-
-    const phoneInput =
-        document.getElementById(
-            "customerPhone"
-        );
+        const phone =
+            normalizePhone(
+                phoneInput.value
+            );
 
 
-    const nameInput =
-        document.getElementById(
-            "customerName"
-        );
+        if (!phone) {
+            return;
+        }
 
 
-    if (
-        !phoneInput ||
-        !nameInput
-    ) {
-
-        return;
-
-    }
-
-
-    const phone =
-        normalizePhone(
-            phoneInput.value
-        );
-
-
-    if (!phone) {
-        return;
-    }
-
-
-    const customer =
-        savedCustomers.find(
-            item => {
+        const customer =
+            savedCustomers.find(item => {
 
                 const savedPhone =
                     normalizePhone(
                         item.phone
                     );
 
+                return savedPhone === phone;
 
-                return (
-                    savedPhone ===
-                    phone
-                );
-
-            }
-        );
+            });
 
 
-    if (
-        customer &&
-        customer.name
-    ) {
+        if (customer && customer.name) {
 
-        nameInput.value =
-            customer.name;
+            nameInput.value =
+                customer.name;
+
+        }
 
     }
 
-}
 
-
-document
-    .getElementById(
-        "customerPhone"
-    )
-    .addEventListener(
-        "input",
-        findSavedCustomer
-    );
-
-
-document
-    .getElementById(
-        "customerPhone"
-    )
-    .addEventListener(
-        "change",
-        findSavedCustomer
-    );
-
-
-/*
-==================================================
-PLACE ORDER
-==================================================
-*/
-
-async function placeOrder() {
-
-    const button =
-        document.getElementById(
-            "placeOrder"
+    document
+        .getElementById("customerPhone")
+        .addEventListener(
+            "input",
+            findSavedCustomer
         );
 
 
-    const printButton =
-        document.getElementById(
-            "printBill"
+    document
+        .getElementById("customerPhone")
+        .addEventListener(
+            "change",
+            findSavedCustomer
         );
-
-
-    const message =
-        document.getElementById(
-            "message"
-        );
-
-
-    const customerName =
-        document.getElementById(
-            "customerName"
-        )
-        .value
-        .trim();
-
-
-    const customerPhone =
-        document.getElementById(
-            "customerPhone"
-        )
-        .value
-        .trim();
-
-
-    const selectedItems = [];
-
-    let total = 0;
 
 
     /*
-    NORMAL ITEMS
+    ==========================================
+    CREATE NORMAL MENU
+    ==========================================
     */
 
-    Object.keys(menu).forEach(item => {
+    function createMenu(containerId, counter) {
 
-        const qty =
+        const container =
+            document.getElementById(
+                containerId
+            );
+
+
+        container.innerHTML = "";
+
+
+        Object.keys(menu).forEach(item => {
+
+            if (menu[item].counter !== counter) {
+                return;
+            }
+
+
+            quantities[item] = 0;
+
+
+            const div =
+                document.createElement("div");
+
+
+            div.className = "item";
+
+
+            div.innerHTML = `
+
+                <div class="item-name">
+                    ${item}
+                </div>
+
+                <div class="item-price">
+                    ₹${menu[item].price}
+                </div>
+
+                <div class="quantity-row">
+
+                    <button
+                        onclick="changeQuantity('${item}', -1)"
+                    >
+                        −
+                    </button>
+
+                    <span
+                        class="quantity"
+                        id="qty-${item.replace(/[^a-zA-Z0-9]/g, '')}"
+                    >
+                        0
+                    </span>
+
+                    <button
+                        onclick="changeQuantity('${item}', 1)"
+                    >
+                        +
+                    </button>
+
+                </div>
+
+            `;
+
+
+            container.appendChild(div);
+
+        });
+
+    }
+
+
+    /*
+    ==========================================
+    CREATE COMBO MENU
+    ==========================================
+    */
+
+    function createComboMenu() {
+
+        const container =
+            document.getElementById(
+                "combosMenu"
+            );
+
+
+        container.innerHTML = "";
+
+
+        Object.keys(combos).forEach(combo => {
+
+            comboQuantities[combo] = 0;
+
+
+            const div =
+                document.createElement("div");
+
+
+            div.className = "item";
+
+
+            div.innerHTML = `
+
+                <div class="item-name">
+                    ${combo}
+                </div>
+
+                <span class="combo-label">
+                    COMBO
+                </span>
+
+                <div class="item-price">
+                    ₹${combos[combo].price}
+                </div>
+
+                <div class="quantity-row">
+
+                    <button
+                        onclick="changeComboQuantity('${combo}', -1)"
+                    >
+                        −
+                    </button>
+
+                    <span
+                        class="quantity"
+                        id="comboQty-${combo.replace(/[^a-zA-Z0-9]/g, '')}"
+                    >
+                        0
+                    </span>
+
+                    <button
+                        onclick="changeComboQuantity('${combo}', 1)"
+                    >
+                        +
+                    </button>
+
+                </div>
+
+            `;
+
+
+            container.appendChild(div);
+
+        });
+
+    }
+
+
+    createMenu(
+        "chaatsMenu",
+        "chaats"
+    );
+
+
+    createMenu(
+        "drinksMenu",
+        "drinks"
+    );
+
+
+    createMenu(
+        "burgersMenu",
+        "burgers"
+    );
+
+
+    createComboMenu();
+
+    loadSavedCustomers();
+
+
+    /*
+    ==========================================
+    NORMAL ITEM QUANTITY
+    ==========================================
+    */
+
+    function changeQuantity(item, change) {
+
+        quantities[item] += change;
+
+
+        if (quantities[item] < 0) {
+
+            quantities[item] = 0;
+
+        }
+
+
+        const id =
+            "qty-" +
+            item.replace(/[^a-zA-Z0-9]/g, "");
+
+
+        document.getElementById(id).textContent =
             quantities[item];
 
 
-        if (qty > 0) {
-
-            const amount =
-                menu[item].price *
-                qty;
-
-
-            selectedItems.push({
-
-                name:
-                    item,
-
-                price:
-                    menu[item].price,
-
-                quantity:
-                    qty,
-
-                counter:
-                    menu[item].counter,
-
-                type:
-                    "single"
-
-            });
-
-
-            total += amount;
-
-        }
-
-    });
-
-
-    /*
-    COMBOS
-    */
-
-    Object.keys(combos).forEach(combo => {
-
-        const qty =
-            comboQuantities[combo];
-
-
-        if (qty > 0) {
-
-            const amount =
-                combos[combo].price *
-                qty;
-
-
-            selectedItems.push({
-
-                name:
-                    combo,
-
-                price:
-                    combos[combo].price,
-
-                quantity:
-                    qty,
-
-                type:
-                    "combo",
-
-                components:
-                    combos[combo].items
-
-            });
-
-
-            total += amount;
-
-        }
-
-    });
-
-
-    /*
-    CHECK ORDER
-    */
-
-    if (
-        selectedItems.length === 0
-    ) {
-
-        message.className =
-            "error";
-
-        message.textContent =
-            "Please select at least one item.";
-
-        return;
+        updateCart();
 
     }
 
 
-    button.disabled =
-        true;
+    /*
+    ==========================================
+    COMBO QUANTITY
+    ==========================================
+    */
+
+    function changeComboQuantity(combo, change) {
+
+        comboQuantities[combo] += change;
 
 
-    button.textContent =
-        "PLACING ORDER...";
+        if (comboQuantities[combo] < 0) {
 
-
-    printButton.style.display =
-        "none";
-
-
-    message.textContent =
-        "";
-
-
-    try {
-
-
-        /*
-        ==================================
-        CREATE MAIN ORDER
-        ==================================
-        */
-
-        const {
-            data: order,
-            error: orderError
-        } =
-            await supabaseClient
-
-                .from("orders")
-
-                .insert({
-
-                    customer_name:
-                        customerName ||
-                        null,
-
-                    customer_phone:
-                        customerPhone ||
-                        null,
-
-                    items:
-                        selectedItems,
-
-                    total:
-                        total,
-
-                    payment_method:
-                        selectedPayment,
-
-                    status:
-                        "Pending"
-
-                })
-
-                .select()
-
-                .single();
-
-
-        if (orderError) {
-
-            throw orderError;
+            comboQuantities[combo] = 0;
 
         }
 
 
+        const id =
+            "comboQty-" +
+            combo.replace(/[^a-zA-Z0-9]/g, "");
+
+
+        document.getElementById(id).textContent =
+            comboQuantities[combo];
+
+
+        updateCart();
+
+    }
+
+
+    /*
+    ==========================================
+    UPDATE CART
+    ==========================================
+    */
+
+    function updateCart() {
+
+        const cart =
+            document.getElementById("cart");
+
+
+        let total = 0;
+
+        let html = "";
+
+        let hasItems = false;
+
+
         /*
-        ==================================
-        CREATE COUNTER ITEM GROUPS
-        ==================================
+        NORMAL ITEMS
         */
 
-        const counterItems = {
+        Object.keys(menu).forEach(item => {
 
-            chaats: [],
+            const qty =
+                quantities[item];
 
-            drinks: [],
 
-            burgers: []
+            if (qty > 0) {
 
-        };
+                hasItems = true;
+
+
+                const amount =
+                    menu[item].price * qty;
+
+
+                total += amount;
+
+
+                html += `
+
+                    <div class="cart-row">
+
+                        <div class="cart-left">
+
+                            ${item}
+                            × ${qty}
+
+                        </div>
+
+                        <div class="cart-right">
+
+                            ₹${amount}
+
+                        </div>
+
+                    </div>
+
+                `;
+
+            }
+
+        });
 
 
         /*
-        SPLIT NORMAL ITEMS
+        COMBOS
         */
 
-        selectedItems.forEach(item => {
+        Object.keys(combos).forEach(combo => {
 
-            if (
-                item.type ===
-                "single"
-            ) {
+            const qty =
+                comboQuantities[combo];
+
+
+            if (qty > 0) {
+
+                hasItems = true;
+
+
+                const amount =
+                    combos[combo].price * qty;
+
+
+                total += amount;
+
+
+                html += `
+
+                    <div class="cart-row">
+
+                        <div class="cart-left">
+
+                            ${combo}
+                            × ${qty}
+
+                        </div>
+
+                        <div class="cart-right">
+
+                            ₹${amount}
+
+                        </div>
+
+                    </div>
+
+                `;
+
+            }
+
+        });
+
+
+        if (!hasItems) {
+
+            cart.innerHTML =
+                "No items selected.";
+
+        } else {
+
+            cart.innerHTML =
+                html;
+
+        }
+
+
+        document.getElementById(
+            "total"
+        ).textContent = total;
+
+    }
+
+
+    /*
+    ==========================================
+    PLACE ORDER
+    ==========================================
+    */
+
+    async function placeOrder() {
+
+        const button =
+            document.getElementById(
+                "placeOrder"
+            );
+
+
+        const printButton =
+            document.getElementById(
+                "printBill"
+            );
+
+
+        const message =
+            document.getElementById(
+                "message"
+            );
+
+
+        const customerName =
+            document.getElementById(
+                "customerName"
+            )
+            .value
+            .trim();
+
+
+        const customerPhone =
+            document.getElementById(
+                "customerPhone"
+            )
+            .value
+            .trim();
+
+
+        const selectedItems = [];
+
+        let total = 0;
+
+
+        /*
+        NORMAL ITEMS
+        */
+
+        Object.keys(menu).forEach(item => {
+
+            const qty =
+                quantities[item];
+
+
+            if (qty > 0) {
+
+                const amount =
+                    menu[item].price * qty;
+
+
+                selectedItems.push({
+
+                    name: item,
+
+                    price:
+                        menu[item].price,
+
+                    quantity: qty,
+
+                    counter:
+                        menu[item].counter,
+
+                    type: "single"
+
+                });
+
+
+                total += amount;
+
+            }
+
+        });
+
+
+        /*
+        COMBOS
+        */
+
+        Object.keys(combos).forEach(combo => {
+
+            const qty =
+                comboQuantities[combo];
+
+
+            if (qty > 0) {
+
+                const amount =
+                    combos[combo].price * qty;
+
+
+                selectedItems.push({
+
+                    name: combo,
+
+                    price:
+                        combos[combo].price,
+
+                    quantity: qty,
+
+                    type: "combo",
+
+                    components:
+                        combos[combo].items
+
+                });
+
+
+                total += amount;
+
+            }
+
+        });
+
+
+        /*
+        CHECK ORDER
+        */
+
+        if (selectedItems.length === 0) {
+
+            message.className =
+                "error";
+
+            message.textContent =
+                "Please select at least one item.";
+
+            return;
+
+        }
+
+
+        button.disabled = true;
+
+        button.textContent =
+            "PLACING ORDER...";
+
+
+        printButton.style.display =
+            "none";
+
+
+        message.textContent =
+            "";
+
+
+        try {
+
+            /*
+            ==================================
+            CREATE MAIN ORDER
+            ==================================
+            */
+
+            const {
+                data: order,
+                error: orderError
+            } =
+                await supabaseClient
+
+                    .from("orders")
+
+                    .insert({
+
+                        customer_name:
+                            customerName || null,
+
+                        customer_phone:
+                            customerPhone || null,
+
+                        items:
+                            selectedItems,
+
+                        total:
+                            total,
+
+                        payment_method:
+                            selectedPayment,
+
+                        status:
+                            "Pending"
+
+                    })
+
+                    .select()
+
+                    .single();
+
+
+            if (orderError) {
+
+                throw orderError;
+
+            }
+
+
+            /*
+            ==================================
+            CREATE COUNTER ITEM GROUPS
+            ==================================
+            */
+
+            const counterItems = {
+
+                chaats: [],
+
+                drinks: [],
+
+                burgers: []
+
+            };
+
+
+            /*
+            SPLIT NORMAL ITEMS
+            */
+
+            selectedItems.forEach(item => {
+
+                if (
+                    item.type === "single"
+                ) {
+
+                    if (
+                        counterItems[
+                            item.counter
+                        ]
+                    ) {
+
+                        counterItems[
+                            item.counter
+                        ].push({
+
+                            name:
+                                item.name,
+
+                            quantity:
+                                item.quantity
+
+                        });
+
+                    }
+
+                }
+
+            });
+
+
+            /*
+            SPLIT COMBOS
+            */
+
+            selectedItems.forEach(item => {
+
+                if (
+                    item.type === "combo" &&
+                    item.components
+                ) {
+
+                    item.components.forEach(
+                        component => {
+
+                            if (
+                                counterItems[
+                                    component.counter
+                                ]
+                            ) {
+
+                                counterItems[
+                                    component.counter
+                                ].push({
+
+                                    name:
+                                        component.name,
+
+                                    quantity:
+                                        item.quantity
+
+                                });
+
+                            }
+
+                        }
+                    );
+
+                }
+
+            });
+
+
+            /*
+            ==================================
+            CREATE KOT ROWS
+            ==================================
+            */
+
+            const kotRows = [];
+
+
+            Object.keys(
+                counterItems
+            ).forEach(counter => {
 
                 if (
                     counterItems[
-                        item.counter
-                    ]
+                        counter
+                    ].length > 0
                 ) {
 
-                    counterItems[
-                        item.counter
-                    ].push({
+                    kotRows.push({
 
-                        name:
-                            item.name,
+                        order_id:
+                            order.id,
 
-                        quantity:
-                            item.quantity
+                        counter:
+                            counter,
+
+                        items:
+                            counterItems[
+                                counter
+                            ],
+
+                        status:
+                            "Pending"
 
                     });
 
                 }
 
-            }
-
-        });
+            });
 
 
-        /*
-        SPLIT COMBOS
-        */
-
-        selectedItems.forEach(item => {
+            /*
+            ==================================
+            INSERT KOTS
+            ==================================
+            */
 
             if (
-                item.type === "combo" &&
-                item.components
+                kotRows.length > 0
             ) {
-
-                item.components.forEach(
-                    component => {
-
-                        if (
-                            counterItems[
-                                component.counter
-                            ]
-                        ) {
-
-                            counterItems[
-                                component.counter
-                            ].push({
-
-                                name:
-                                    component.name,
-
-                                quantity:
-                                    item.quantity
-
-                            });
-
-                        }
-
-                    }
-                );
-
-            }
-
-        });
-
-
-        /*
-        ==================================
-        CREATE KOT ROWS
-        ==================================
-        */
-
-        const kotRows = [];
-
-
-        Object.keys(
-            counterItems
-        ).forEach(counter => {
-
-            if (
-                counterItems[
-                    counter
-                ].length > 0
-            ) {
-
-                kotRows.push({
-
-                    order_id:
-                        order.id,
-
-                    counter:
-                        counter,
-
-                    items:
-                        counterItems[
-                            counter
-                        ],
-
-                    status:
-                        "Pending"
-
-                });
-
-            }
-
-        });
-
-
-        /*
-        ==================================
-        INSERT KOTS
-        ==================================
-        */
-
-        if (
-            kotRows.length > 0
-        ) {
-
-            const {
-                error: kotError
-            } =
-                await supabaseClient
-
-                    .from(
-                        "counter_kot"
-                    )
-
-                    .insert(
-                        kotRows
-                    );
-
-
-            if (kotError) {
-
-                throw kotError;
-
-            }
-
-        }
-
-
-        /*
-        ==================================
-        SAVE CUSTOMER LOYALTY DATA
-        ==================================
-        */
-
-        if (
-            customerPhone ||
-            customerName
-        ) {
-
-            try {
-
-                let customer = null;
-
 
                 const {
-                    data:
-                        existingCustomer,
-                    error:
-                        customerFindError
+                    error: kotError
                 } =
-                    customerPhone
+                    await supabaseClient
 
-                        ? await supabaseClient
+                        .from("counter_kot")
 
-                            .from(
-                                "loyalty_customers"
-                            )
-
-                            .select("*")
-
-                            .eq(
-                                "phone",
-                                customerPhone
-                            )
-
-                            .maybeSingle()
-
-                        : {
-                            data: null,
-                            error: null
-                        };
+                        .insert(kotRows);
 
 
-                if (
-                    customerFindError
-                ) {
+                if (kotError) {
 
-                    console.error(
-                        "Loyalty customer lookup failed:",
-                        customerFindError
-                    );
+                    throw kotError;
 
                 }
 
+            }
 
-                if (
-                    existingCustomer
-                ) {
 
-                    customer =
-                        existingCustomer;
+            /*
+            ==================================
+            SAVE CUSTOMER LOYALTY DATA
+            ==================================
+            */
+
+            if (
+                customerPhone ||
+                customerName
+            ) {
+
+                try {
+
+                    let customer = null;
+
+
+                    const {
+                        data:
+                            existingCustomer,
+                        error:
+                            customerFindError
+                    } =
+                        customerPhone
+
+                            ? await supabaseClient
+                                .from(
+                                    "loyalty_customers"
+                                )
+                                .select("*")
+                                .eq(
+                                    "phone",
+                                    customerPhone
+                                )
+                                .maybeSingle()
+
+                            : {
+                                data: null,
+                                error: null
+                            };
 
 
                     if (
-                        customerName &&
-                        existingCustomer.name !==
-                            customerName
+                        customerFindError
                     ) {
+
+                        console.error(
+                            "Loyalty customer lookup failed:",
+                            customerFindError
+                        );
+
+                    }
+
+
+                    if (
+                        existingCustomer
+                    ) {
+
+                        customer =
+                            existingCustomer;
+
+
+                        if (
+                            customerName &&
+                            existingCustomer.name !==
+                                customerName
+                        ) {
+
+                            const {
+                                data:
+                                    updatedCustomer,
+                                error:
+                                    updateError
+                            } =
+                                await supabaseClient
+
+                                    .from(
+                                        "loyalty_customers"
+                                    )
+
+                                    .update({
+
+                                        name:
+                                            customerName,
+
+                                        updated_at:
+                                            new Date()
+                                                .toISOString()
+
+                                    })
+
+                                    .eq(
+                                        "id",
+                                        existingCustomer.id
+                                    )
+
+                                    .select()
+                                    .single();
+
+
+                            if (!updateError) {
+
+                                customer =
+                                    updatedCustomer;
+
+                            }
+
+                        }
+
+                    } else {
 
                         const {
                             data:
-                                updatedCustomer,
+                                newCustomer,
                             error:
-                                updateError
+                                createError
                         } =
                             await supabaseClient
 
@@ -2594,181 +1886,313 @@ async function placeOrder() {
                                     "loyalty_customers"
                                 )
 
-                                .update({
+                                .insert({
+
+                                    phone:
+                                        customerPhone ||
+                                        null,
 
                                     name:
-                                        customerName,
-
-                                    updated_at:
-                                        new Date()
-                                            .toISOString()
+                                        customerName ||
+                                        null
 
                                 })
-
-                                .eq(
-                                    "id",
-                                    existingCustomer.id
-                                )
 
                                 .select()
                                 .single();
 
 
-                        if (
-                            !updateError
-                        ) {
+                        if (!createError) {
 
                             customer =
-                                updatedCustomer;
+                                newCustomer;
+
+                        } else {
+
+                            console.error(
+                                "Loyalty customer creation failed:",
+                                createError
+                            );
 
                         }
 
                     }
 
-                } else {
 
-                    const {
-                        data:
-                            newCustomer,
-                        error:
-                            createError
-                    } =
-                        await supabaseClient
+                    if (customer) {
 
-                            .from(
-                                "loyalty_customers"
-                            )
+                        const {
+                            error:
+                                loyaltyError
+                        } =
+                            await supabaseClient
 
-                            .insert({
+                                .from(
+                                    "loyalty_transactions"
+                                )
 
-                                phone:
-                                    customerPhone ||
-                                    null,
+                                .insert({
 
-                                name:
-                                    customerName ||
-                                    null
+                                    customer_id:
+                                        customer.id,
 
-                            })
+                                    order_id:
+                                        order.id,
 
-                            .select()
-                            .single();
+                                    type:
+                                        "purchase",
 
+                                    points:
+                                        0,
 
-                    if (
-                        !createError
-                    ) {
+                                    amount:
+                                        total,
 
-                        customer =
-                            newCustomer;
+                                    description:
+                                        JSON.stringify(
+                                            selectedItems
+                                        ),
 
-                    } else {
+                                    created_at:
+                                        new Date()
+                                            .toISOString()
 
-                        console.error(
-                            "Loyalty customer creation failed:",
-                            createError
-                        );
-
-                    }
-
-                }
+                                });
 
 
-                if (customer) {
+                        if (loyaltyError) {
 
-                    const {
-                        error:
-                            loyaltyError
-                    } =
-                        await supabaseClient
+                            console.error(
+                                "Loyalty transaction save failed:",
+                                loyaltyError
+                            );
 
-                            .from(
-                                "loyalty_transactions"
-                            )
-
-                            .insert({
-
-                                customer_id:
-                                    customer.id,
-
-                                order_id:
-                                    order.id,
-
-                                type:
-                                    "purchase",
-
-                                points:
-                                    0,
-
-                                amount:
-                                    total,
-
-                                description:
-                                    JSON.stringify(
-                                        selectedItems
-                                    ),
-
-                                created_at:
-                                    new Date()
-                                        .toISOString()
-
-                            });
-
-
-                    if (
-                        loyaltyError
-                    ) {
-
-                        console.error(
-                            "Loyalty transaction save failed:",
-                            loyaltyError
-                        );
+                        }
 
                     }
 
-                }
-
-            } catch (
-                loyaltyError
-            ) {
-
-                console.error(
-                    "Loyalty connection failed:",
+                } catch (
                     loyaltyError
-                );
+                ) {
+
+                    console.error(
+                        "Loyalty connection failed:",
+                        loyaltyError
+                    );
+
+                }
 
             }
+
+
+            /*
+            ==================================
+            SAVE FOR PRINTING
+            ==================================
+            */
+
+            lastOrder = {
+
+                orderNumber:
+                    order.order_number,
+
+                customerName:
+                    customerName,
+
+                customerPhone:
+                    customerPhone,
+
+                paymentMethod:
+                    selectedPayment,
+
+                items:
+                    selectedItems,
+
+                total:
+                    total
+
+            };
+
+
+            prepareReceipt(
+                lastOrder
+            );
+
+
+            message.className =
+                "success";
+
+
+            message.textContent =
+                "Order #" +
+                order.order_number +
+                " sent to counters.";
+
+
+            button.style.display =
+                "none";
+
+
+            printButton.style.display =
+                "block";
+
+
+        } catch (error) {
+
+            console.error(error);
+
+
+            message.className =
+                "error";
+
+
+            message.textContent =
+                "Order failed. Please try again.";
+
+
+            button.disabled =
+                false;
+
+
+            button.textContent =
+                "PLACE ORDER";
+
+        }
+
+    }
+
+
+    /*
+    ==========================================
+    PREPARE RECEIPT
+    ==========================================
+    */
+
+    function prepareReceipt(order) {
+
+        document.getElementById(
+            "receiptOrderNumber"
+        ).textContent =
+            order.orderNumber;
+
+
+        const now =
+            new Date();
+
+
+        document.getElementById(
+            "receiptDate"
+        ).textContent =
+            now.toLocaleString();
+
+
+        const customerRow =
+            document.getElementById(
+                "receiptCustomerRow"
+            );
+
+
+        if (order.customerName) {
+
+            document.getElementById(
+                "receiptCustomer"
+            ).textContent =
+                order.customerName;
+
+
+            customerRow.style.display =
+                "block";
+
+        } else {
+
+            customerRow.style.display =
+                "none";
 
         }
 
 
-        /*
-        ==================================
-        SAVE FOR PRINTING
-        ==================================
-        */
+        document.getElementById(
+            "receiptPayment"
+        ).textContent =
+            order.paymentMethod ||
+            "Cash";
 
-        lastOrder = {
 
-            orderNumber:
-                order.order_number,
+        const receiptItems =
+            document.getElementById(
+                "receiptItems"
+            );
 
-            customerName:
-                customerName,
 
-            customerPhone:
-                customerPhone,
+        receiptItems.innerHTML =
+            "";
 
-            paymentMethod:
-                selectedPayment,
 
-            items:
-                selectedItems,
+        order.items.forEach(item => {
 
-            total:
-                total
+            const amount =
+                item.price *
+                item.quantity;
 
-        };
+
+            const row =
+                document.createElement(
+                    "div"
+                );
+
+
+            row.className =
+                "receipt-item";
+
+
+            row.innerHTML = `
+
+                <div class="receipt-item-line">
+
+                    <span class="receipt-item-name">
+                        ${item.name}
+                    </span>
+
+                    <span class="receipt-item-price">
+                        ₹${amount}
+                    </span>
+
+                </div>
+
+                <div class="receipt-qty">
+                    ${item.quantity}
+                    × ₹${item.price}
+                </div>
+
+            `;
+
+
+            receiptItems.appendChild(
+                row
+            );
+
+        });
+
+
+        document.getElementById(
+            "receiptTotal"
+        ).textContent =
+            order.total;
+
+    }
+
+
+    /*
+    ==========================================
+    PRINT
+    ==========================================
+    */
+
+    function printBill() {
+
+        if (!lastOrder) {
+            return;
+        }
 
 
         prepareReceipt(
@@ -2776,305 +2200,33 @@ async function placeOrder() {
         );
 
 
-        message.className =
-            "success";
-
-
-        message.textContent =
-            "Order #" +
-            order.order_number +
-            " sent to counters.";
-
-
-        button.style.display =
-            "none";
-
-
-        printButton.style.display =
-            "block";
-
-
-    } catch (error) {
-
-        console.error(
-            error
-        );
-
-
-        message.className =
-            "error";
-
-
-        message.textContent =
-            "Order failed. Please try again.";
-
-
-        button.disabled =
-            false;
-
-
-        button.textContent =
-            "PLACE ORDER";
-
-    }
-
-}
-
-
-/*
-==================================================
-PREPARE RECEIPT
-==================================================
-*/
-
-function prepareReceipt(order) {
-
-    document.getElementById(
-        "receiptOrderNumber"
-    ).textContent =
-        order.orderNumber;
-
-
-    const now =
-        new Date();
-
-
-    document.getElementById(
-        "receiptDate"
-    ).textContent =
-        now.toLocaleString();
-
-
-    const customerRow =
-        document.getElementById(
-            "receiptCustomerRow"
-        );
-
-
-    if (
-        order.customerName
-    ) {
-
-        document.getElementById(
-            "receiptCustomer"
-        ).textContent =
-            order.customerName;
-
-
-        customerRow.style.display =
-            "block";
-
-    } else {
-
-        customerRow.style.display =
-            "none";
-
-    }
-
-
-    document.getElementById(
-        "receiptPayment"
-    ).textContent =
-        order.paymentMethod ||
-        "Cash";
-
-
-    const receiptItems =
-        document.getElementById(
-            "receiptItems"
-        );
-
-
-    receiptItems.innerHTML =
-        "";
-
-
-    order.items.forEach(item => {
-
-        const amount =
-            item.price *
-            item.quantity;
-
-
-        const row =
-            document.createElement(
-                "div"
-            );
-
-
-        row.className =
-            "receipt-item";
-
-
-        const line =
-            document.createElement(
-                "div"
-            );
-
-        line.className =
-            "receipt-item-line";
-
-
-        const name =
-            document.createElement(
-                "span"
-            );
-
-        name.className =
-            "receipt-item-name";
-
-        name.textContent =
-            item.name;
-
-
-        const price =
-            document.createElement(
-                "span"
-            );
-
-        price.className =
-            "receipt-item-price";
-
-        price.textContent =
-            "₹" + amount;
-
-
-        line.appendChild(
-            name
-        );
-
-        line.appendChild(
-            price
-        );
-
-
-        const qty =
-            document.createElement(
-                "div"
-            );
-
-        qty.className =
-            "receipt-qty";
-
-        qty.textContent =
-            item.quantity +
-            " × ₹" +
-            item.price;
-
-
-        row.appendChild(
-            line
-        );
-
-        row.appendChild(
-            qty
-        );
-
-
-        receiptItems.appendChild(
-            row
-        );
-
-    });
-
-
-    document.getElementById(
-        "receiptTotal"
-    ).textContent =
-        order.total;
-
-}
-
-
-/*
-==================================================
-PRINT
-==================================================
-*/
-
-function printBill() {
-
-    if (!lastOrder) {
-
-        return;
-
-    }
-
-
-    prepareReceipt(
-        lastOrder
-    );
-
-
-    setTimeout(
-        () => {
+        setTimeout(() => {
 
             window.print();
 
-        },
-        200
-    );
+        }, 200);
 
-}
+    }
 
 
-/*
-==================================================
-AFTER PRINT
-==================================================
-*/
+    /*
+    ==========================================
+    AFTER PRINT
+    ==========================================
+    */
 
-window.onafterprint =
-    function() {
+    window.onafterprint =
+        function() {
 
-        setTimeout(
-            () => {
+            setTimeout(() => {
 
                 window.location.reload();
 
-            },
-            500
-        );
+            }, 500);
 
-    };
-
-
-/*
-==================================================
-START PAGE
-==================================================
-*/
-
-async function initializeBilling() {
-
-    /*
-    Load menu and customer data.
-    */
-
-    await Promise.all([
-
-        loadMenu(),
-
-        loadSavedCustomers()
-
-    ]);
-
-
-    /*
-    Combos remain separate from
-    database normal menu items.
-    */
-
-    createComboMenu();
-
-}
-
-
-initializeBilling();
-
+        };
 
 </script>
 
 </body>
-
 </html>
