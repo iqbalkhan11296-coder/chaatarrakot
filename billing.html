@@ -969,16 +969,6 @@ MENU DATA
 ==================================================
 */
 
-/*
-    These arrays are now loaded from:
-
-        billing_menu
-
-    The billing page no longer contains
-    hard-coded menu prices.
-*/
-
-
 let menuItems = [];
 
 let comboItems = [];
@@ -1002,11 +992,693 @@ let selectedPayment = "Cash";
 
 /*
 ==================================================
-SAVED CUSTOMER NUMBERS
+LOCAL LOYALTY DATABASE
+==================================================
+
+Database:
+
+    ChaatarraLoyaltyDB
+
+Stores:
+
+    customers
+    transactions
+
+This is completely separate from:
+
+    orders
+    counter_kot
+
+Those Supabase tables remain unchanged.
+*/
+
+const LOYALTY_DB_NAME =
+    "ChaatarraLoyaltyDB";
+
+const LOYALTY_CUSTOMERS_STORE =
+    "customers";
+
+const LOYALTY_TRANSACTIONS_STORE =
+    "transactions";
+
+let loyaltyDB = null;
+
+
+/*
+==================================================
+OPEN LOCAL LOYALTY DATABASE
 ==================================================
 */
 
-let savedCustomers = [];
+function openLoyaltyDatabase() {
+
+    return new Promise(
+        (resolve, reject) => {
+
+            const request =
+                indexedDB.open(
+                    LOYALTY_DB_NAME
+                );
+
+
+            request.onupgradeneeded =
+                function(event) {
+
+                    const database =
+                        event.target.result;
+
+
+                    /*
+                    ==========================
+                    CUSTOMERS
+                    ==========================
+                    */
+
+                    if (
+                        !database.objectStoreNames
+                            .contains(
+                                LOYALTY_CUSTOMERS_STORE
+                            )
+                    ) {
+
+                        const customerStore =
+                            database.createObjectStore(
+                                LOYALTY_CUSTOMERS_STORE,
+                                {
+                                    keyPath: "id"
+                                }
+                            );
+
+
+                        customerStore.createIndex(
+                            "phone",
+                            "phone",
+                            {
+                                unique: false
+                            }
+                        );
+
+                    }
+
+
+                    /*
+                    ==========================
+                    TRANSACTIONS
+                    ==========================
+                    */
+
+                    if (
+                        !database.objectStoreNames
+                            .contains(
+                                LOYALTY_TRANSACTIONS_STORE
+                            )
+                    ) {
+
+                        const transactionStore =
+                            database.createObjectStore(
+                                LOYALTY_TRANSACTIONS_STORE,
+                                {
+                                    keyPath: "id"
+                                }
+                            );
+
+
+                        transactionStore.createIndex(
+                            "customerId",
+                            "customerId",
+                            {
+                                unique: false
+                            }
+                        );
+
+
+                        transactionStore.createIndex(
+                            "createdAt",
+                            "createdAt",
+                            {
+                                unique: false
+                            }
+                        );
+
+                    }
+
+                };
+
+
+            request.onsuccess =
+                function(event) {
+
+                    loyaltyDB =
+                        event.target.result;
+
+
+                    loyaltyDB.onversionchange =
+                        function() {
+
+                            loyaltyDB.close();
+
+                        };
+
+
+                    resolve(
+                        loyaltyDB
+                    );
+
+                };
+
+
+            request.onerror =
+                function() {
+
+                    reject(
+                        request.error
+                    );
+
+                };
+
+        }
+    );
+
+}
+
+
+/*
+==================================================
+NORMALIZE PHONE
+==================================================
+*/
+
+function normalizePhone(phone) {
+
+    let digits =
+        String(phone || "")
+            .replace(
+                /\D/g,
+                ""
+            );
+
+
+    if (
+        digits.length === 12 &&
+        digits.startsWith("91")
+    ) {
+
+        digits =
+            digits.substring(2);
+
+    }
+
+
+    return digits;
+
+}
+
+
+/*
+==================================================
+GET ALL LOYALTY CUSTOMERS
+==================================================
+*/
+
+function getLoyaltyCustomers() {
+
+    return new Promise(
+        (resolve, reject) => {
+
+            if (!loyaltyDB) {
+
+                reject(
+                    new Error(
+                        "Loyalty database not open"
+                    )
+                );
+
+                return;
+
+            }
+
+
+            const transaction =
+                loyaltyDB.transaction(
+                    LOYALTY_CUSTOMERS_STORE,
+                    "readonly"
+                );
+
+
+            const store =
+                transaction.objectStore(
+                    LOYALTY_CUSTOMERS_STORE
+                );
+
+
+            const request =
+                store.getAll();
+
+
+            request.onsuccess =
+                function() {
+
+                    resolve(
+                        request.result || []
+                    );
+
+                };
+
+
+            request.onerror =
+                function() {
+
+                    reject(
+                        request.error
+                    );
+
+                };
+
+        }
+    );
+
+}
+
+
+/*
+==================================================
+GET CUSTOMER BY PHONE
+==================================================
+*/
+
+function getCustomerByPhone(phone) {
+
+    return new Promise(
+        (resolve, reject) => {
+
+            if (!loyaltyDB) {
+
+                reject(
+                    new Error(
+                        "Loyalty database not open"
+                    )
+                );
+
+                return;
+
+            }
+
+
+            const normalizedPhone =
+                normalizePhone(phone);
+
+
+            if (!normalizedPhone) {
+
+                resolve(null);
+
+                return;
+
+            }
+
+
+            const transaction =
+                loyaltyDB.transaction(
+                    LOYALTY_CUSTOMERS_STORE,
+                    "readonly"
+                );
+
+
+            const store =
+                transaction.objectStore(
+                    LOYALTY_CUSTOMERS_STORE
+                );
+
+
+            const request =
+                store.getAll();
+
+
+            request.onsuccess =
+                function() {
+
+                    const customers =
+                        request.result || [];
+
+
+                    const customer =
+                        customers.find(
+                            item =>
+                                normalizePhone(
+                                    item.phone
+                                ) ===
+                                normalizedPhone
+                        );
+
+
+                    resolve(
+                        customer || null
+                    );
+
+                };
+
+
+            request.onerror =
+                function() {
+
+                    reject(
+                        request.error
+                    );
+
+                };
+
+        }
+    );
+
+}
+
+
+/*
+==================================================
+SAVE LOYALTY CUSTOMER
+==================================================
+*/
+
+function saveLoyaltyCustomer(
+    customer
+) {
+
+    return new Promise(
+        (resolve, reject) => {
+
+            if (!loyaltyDB) {
+
+                reject(
+                    new Error(
+                        "Loyalty database not open"
+                    )
+                );
+
+                return;
+
+            }
+
+
+            const transaction =
+                loyaltyDB.transaction(
+                    LOYALTY_CUSTOMERS_STORE,
+                    "readwrite"
+                );
+
+
+            const store =
+                transaction.objectStore(
+                    LOYALTY_CUSTOMERS_STORE
+                );
+
+
+            const request =
+                store.put(
+                    customer
+                );
+
+
+            request.onsuccess =
+                function() {
+
+                    resolve(
+                        customer
+                    );
+
+                };
+
+
+            request.onerror =
+                function() {
+
+                    reject(
+                        request.error
+                    );
+
+                };
+
+        }
+    );
+
+}
+
+
+/*
+==================================================
+SAVE LOYALTY TRANSACTION
+==================================================
+*/
+
+function saveLoyaltyTransaction(
+    transactionData
+) {
+
+    return new Promise(
+        (resolve, reject) => {
+
+            if (!loyaltyDB) {
+
+                reject(
+                    new Error(
+                        "Loyalty database not open"
+                    )
+                );
+
+                return;
+
+            }
+
+
+            const transaction =
+                loyaltyDB.transaction(
+                    LOYALTY_TRANSACTIONS_STORE,
+                    "readwrite"
+                );
+
+
+            const store =
+                transaction.objectStore(
+                    LOYALTY_TRANSACTIONS_STORE
+                );
+
+
+            const request =
+                store.put(
+                    transactionData
+                );
+
+
+            request.onsuccess =
+                function() {
+
+                    resolve(
+                        transactionData
+                    );
+
+                };
+
+
+            request.onerror =
+                function() {
+
+                    reject(
+                        request.error
+                    );
+
+                };
+
+        }
+    );
+
+}
+
+
+/*
+==================================================
+LOAD SAVED CUSTOMER NUMBERS
+==================================================
+*/
+
+async function loadSavedCustomers() {
+
+    try {
+
+        if (!loyaltyDB) {
+
+            await openLoyaltyDatabase();
+
+        }
+
+
+        const data =
+            await getLoyaltyCustomers();
+
+
+        const savedCustomers =
+            data || [];
+
+
+        savedCustomers.sort(
+            (a, b) =>
+                String(
+                    a.name || ""
+                )
+                .localeCompare(
+                    String(
+                        b.name || ""
+                    )
+                )
+        );
+
+
+        const datalist =
+            document.getElementById(
+                "savedCustomerPhones"
+            );
+
+
+        datalist.innerHTML = "";
+
+
+        savedCustomers.forEach(
+            customer => {
+
+                if (!customer.phone) {
+
+                    return;
+
+                }
+
+
+                const option =
+                    document.createElement(
+                        "option"
+                    );
+
+
+                option.value =
+                    customer.phone;
+
+
+                if (customer.name) {
+
+                    option.label =
+                        customer.name;
+
+                }
+
+
+                datalist.appendChild(
+                    option
+                );
+
+            }
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Saved customer loading failed:",
+            error
+        );
+
+    }
+
+}
+
+
+/*
+==================================================
+FIND SAVED CUSTOMER
+==================================================
+*/
+
+async function findSavedCustomer() {
+
+    const phoneInput =
+        document.getElementById(
+            "customerPhone"
+        );
+
+
+    const nameInput =
+        document.getElementById(
+            "customerName"
+        );
+
+
+    if (
+        !phoneInput ||
+        !nameInput
+    ) {
+
+        return;
+
+    }
+
+
+    const phone =
+        normalizePhone(
+            phoneInput.value
+        );
+
+
+    if (!phone) {
+
+        return;
+
+    }
+
+
+    try {
+
+        const customer =
+            await getCustomerByPhone(
+                phone
+            );
+
+
+        if (
+            customer &&
+            customer.name
+        ) {
+
+            nameInput.value =
+                customer.name;
+
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Customer lookup failed:",
+            error
+        );
+
+    }
+
+}
+
+
+document
+    .getElementById(
+        "customerPhone"
+    )
+    .addEventListener(
+        "input",
+        findSavedCustomer
+    );
+
+
+document
+    .getElementById(
+        "customerPhone"
+    )
+    .addEventListener(
+        "change",
+        findSavedCustomer
+    );
 
 
 /*
@@ -1135,10 +1807,6 @@ async function loadBillingMenu() {
             );
 
 
-        /*
-        RESET QUANTITIES
-        */
-
         Object.keys(
             quantities
         ).forEach(key => {
@@ -1156,10 +1824,6 @@ async function loadBillingMenu() {
 
         });
 
-
-        /*
-        CREATE MENUS
-        */
 
         createMenu(
             "chaatsMenu",
@@ -1247,243 +1911,6 @@ function showMenuError(message) {
     });
 
 }
-
-
-/*
-==================================================
-LOAD SAVED CUSTOMER NUMBERS
-==================================================
-*/
-
-async function loadSavedCustomers() {
-
-    try {
-
-        const {
-            data,
-            error
-        } =
-            await supabaseClient
-
-                .from("loyalty_customers")
-
-                .select(
-                    "phone, name"
-                )
-
-                .not(
-                    "phone",
-                    "is",
-                    null
-                )
-
-                .order(
-                    "name",
-                    {
-                        ascending: true
-                    }
-                );
-
-
-        if (error) {
-
-            console.error(
-                "Could not load saved customer numbers:",
-                error
-            );
-
-
-            return;
-
-        }
-
-
-        savedCustomers =
-            data || [];
-
-
-        const datalist =
-            document.getElementById(
-                "savedCustomerPhones"
-            );
-
-
-        datalist.innerHTML = "";
-
-
-        savedCustomers.forEach(
-            customer => {
-
-                if (!customer.phone) {
-
-                    return;
-
-                }
-
-
-                const option =
-                    document.createElement(
-                        "option"
-                    );
-
-
-                option.value =
-                    customer.phone;
-
-
-                if (customer.name) {
-
-                    option.label =
-                        customer.name;
-
-                }
-
-
-                datalist.appendChild(
-                    option
-                );
-
-            }
-        );
-
-
-    } catch (error) {
-
-        console.error(
-            "Saved customer loading failed:",
-            error
-        );
-
-    }
-
-}
-
-
-/*
-==================================================
-NORMALIZE PHONE
-==================================================
-*/
-
-function normalizePhone(phone) {
-
-    let digits =
-        String(phone || "")
-            .replace(
-                /\D/g,
-                ""
-            );
-
-
-    if (
-        digits.length === 12 &&
-        digits.startsWith("91")
-    ) {
-
-        digits =
-            digits.substring(2);
-
-    }
-
-
-    return digits;
-
-}
-
-
-/*
-==================================================
-FIND SAVED CUSTOMER
-==================================================
-*/
-
-function findSavedCustomer() {
-
-    const phoneInput =
-        document.getElementById(
-            "customerPhone"
-        );
-
-
-    const nameInput =
-        document.getElementById(
-            "customerName"
-        );
-
-
-    if (
-        !phoneInput ||
-        !nameInput
-    ) {
-
-        return;
-
-    }
-
-
-    const phone =
-        normalizePhone(
-            phoneInput.value
-        );
-
-
-    if (!phone) {
-
-        return;
-
-    }
-
-
-    const customer =
-        savedCustomers.find(
-            item => {
-
-                const savedPhone =
-                    normalizePhone(
-                        item.phone
-                    );
-
-
-                return (
-                    savedPhone ===
-                    phone
-                );
-
-            }
-        );
-
-
-    if (
-        customer &&
-        customer.name
-    ) {
-
-        nameInput.value =
-            customer.name;
-
-    }
-
-}
-
-
-document
-    .getElementById(
-        "customerPhone"
-    )
-    .addEventListener(
-        "input",
-        findSavedCustomer
-    );
-
-
-document
-    .getElementById(
-        "customerPhone"
-    )
-    .addEventListener(
-        "change",
-        findSavedCustomer
-    );
 
 
 /*
@@ -2002,10 +2429,6 @@ function updateCart() {
     let hasItems = false;
 
 
-    /*
-    NORMAL ITEMS
-    */
-
     menuItems.forEach(
         item => {
 
@@ -2058,10 +2481,6 @@ function updateCart() {
         }
     );
 
-
-    /*
-    COMBOS
-    */
 
     comboItems.forEach(
         combo => {
@@ -2142,21 +2561,6 @@ function updateCart() {
 ==================================================
 FIND COMBO COMPONENTS
 ==================================================
-
-For a combo named:
-
-    Pani Puri + Mint Lime
-
-the system searches the loaded billing_menu
-for:
-
-    Pani Puri
-    Mint Lime
-
-and uses their counters.
-
-This keeps the existing KOT logic working
-without adding another database table.
 */
 
 function getComboComponents(
@@ -2215,6 +2619,207 @@ function getComboComponents(
 
 
     return components;
+
+}
+
+
+/*
+==================================================
+SAVE LOYALTY DATA TO INDEXEDDB
+==================================================
+
+This is the ONLY loyalty write.
+
+No Supabase loyalty tables are used.
+
+The order itself is still saved to:
+
+    Supabase orders
+
+and KOT is still saved to:
+
+    Supabase counter_kot
+==================================================
+*/
+
+async function saveOrderToLocalLoyalty(
+    order,
+    customerName,
+    customerPhone,
+    selectedItems,
+    total
+) {
+
+    /*
+    No customer information entered.
+    Nothing to save.
+    */
+
+    if (
+        !customerName &&
+        !customerPhone
+    ) {
+
+        return;
+
+    }
+
+
+    try {
+
+        if (!loyaltyDB) {
+
+            await openLoyaltyDatabase();
+
+        }
+
+
+        let customer =
+            null;
+
+
+        /*
+        ======================================
+        FIND CUSTOMER BY PHONE
+        ======================================
+        */
+
+        if (customerPhone) {
+
+            customer =
+                await getCustomerByPhone(
+                    customerPhone
+                );
+
+        }
+
+
+        /*
+        ======================================
+        IF CUSTOMER DOES NOT EXIST
+        ======================================
+        */
+
+        if (!customer) {
+
+            customer = {
+
+                id:
+                    crypto.randomUUID(),
+
+                name:
+                    customerName ||
+                    "Customer",
+
+                phone:
+                    customerPhone ||
+                    null
+
+            };
+
+        } else {
+
+            /*
+            Update name if the customer
+            entered a new name.
+            */
+
+            if (
+                customerName &&
+                customer.name !==
+                    customerName
+            ) {
+
+                customer.name =
+                    customerName;
+
+            }
+
+
+            /*
+            Keep latest phone formatting.
+            */
+
+            if (
+                customerPhone
+            ) {
+
+                customer.phone =
+                    customerPhone;
+
+            }
+
+        }
+
+
+        /*
+        ======================================
+        SAVE CUSTOMER
+        ======================================
+        */
+
+        await saveLoyaltyCustomer(
+            customer
+        );
+
+
+        /*
+        ======================================
+        SAVE TRANSACTION
+        ======================================
+        */
+
+        const transactionData = {
+
+            id:
+                crypto.randomUUID(),
+
+            customerId:
+                customer.id,
+
+            amount:
+                Number(total),
+
+            items:
+                selectedItems,
+
+            createdAt:
+                new Date().toISOString()
+
+        };
+
+
+        await saveLoyaltyTransaction(
+            transactionData
+        );
+
+
+        console.log(
+            "Loyalty saved locally:",
+            {
+                customer,
+                transaction:
+                    transactionData
+            }
+        );
+
+
+    } catch (error) {
+
+        /*
+        Loyalty failure must NOT
+        cancel a successful restaurant order.
+
+        The main order and KOT have already
+        been saved to Supabase.
+        */
+
+        console.error(
+            "Local loyalty save failed:",
+            error
+        );
+
+    }
 
 }
 
@@ -2579,11 +3184,6 @@ async function placeOrder() {
 
                     /*
                     FALLBACK
-
-                    If the combo name does not
-                    contain recognizable menu
-                    item names, send the combo
-                    to its own configured counter.
                     */
 
                     if (
@@ -2692,234 +3292,38 @@ async function placeOrder() {
 
         /*
         ======================================
-        SAVE CUSTOMER LOYALTY DATA
+        LOCAL LOYALTY
+        ======================================
+
+        IMPORTANT:
+
+        The old Supabase loyalty code has
+        been removed.
+
+        Loyalty is now stored locally in:
+
+            ChaatarraLoyaltyDB
+
+        Stores:
+
+            customers
+            transactions
         ======================================
         */
 
-        if (
-            customerPhone ||
-            customerName
-        ) {
+        await saveOrderToLocalLoyalty(
 
-            try {
+            order,
 
-                let customer =
-                    null;
+            customerName,
 
+            customerPhone,
 
-                const {
-                    data:
-                        existingCustomer,
-                    error:
-                        customerFindError
-                } =
-                    customerPhone
+            selectedItems,
 
-                        ? await supabaseClient
+            total
 
-                            .from(
-                                "loyalty_customers"
-                            )
-
-                            .select("*")
-
-                            .eq(
-                                "phone",
-                                customerPhone
-                            )
-
-                            .maybeSingle()
-
-                        : {
-                            data: null,
-                            error: null
-                        };
-
-
-                if (
-                    customerFindError
-                ) {
-
-                    console.error(
-                        "Loyalty customer lookup failed:",
-                        customerFindError
-                    );
-
-                }
-
-
-                if (
-                    existingCustomer
-                ) {
-
-                    customer =
-                        existingCustomer;
-
-
-                    if (
-                        customerName &&
-                        existingCustomer.name !==
-                            customerName
-                    ) {
-
-                        const {
-                            data:
-                                updatedCustomer,
-                            error:
-                                updateError
-                        } =
-                            await supabaseClient
-
-                                .from(
-                                    "loyalty_customers"
-                                )
-
-                                .update({
-
-                                    name:
-                                        customerName,
-
-                                    updated_at:
-                                        new Date()
-                                            .toISOString()
-
-                                })
-
-                                .eq(
-                                    "id",
-                                    existingCustomer.id
-                                )
-
-                                .select()
-                                .single();
-
-
-                        if (
-                            !updateError
-                        ) {
-
-                            customer =
-                                updatedCustomer;
-
-                        }
-
-                    }
-
-                } else {
-
-                    const {
-                        data:
-                            newCustomer,
-                        error:
-                            createError
-                    } =
-                        await supabaseClient
-
-                            .from(
-                                "loyalty_customers"
-                            )
-
-                            .insert({
-
-                                phone:
-                                    customerPhone ||
-                                    null,
-
-                                name:
-                                    customerName ||
-                                    null
-
-                            })
-
-                            .select()
-                            .single();
-
-
-                    if (
-                        !createError
-                    ) {
-
-                        customer =
-                            newCustomer;
-
-                    } else {
-
-                        console.error(
-                            "Loyalty customer creation failed:",
-                            createError
-                        );
-
-                    }
-
-                }
-
-
-                if (customer) {
-
-                    const {
-                        error:
-                            loyaltyError
-                    } =
-                        await supabaseClient
-
-                            .from(
-                                "loyalty_transactions"
-                            )
-
-                            .insert({
-
-                                customer_id:
-                                    customer.id,
-
-                                order_id:
-                                    order.id,
-
-                                type:
-                                    "purchase",
-
-                                points:
-                                    0,
-
-                                amount:
-                                    total,
-
-                                description:
-                                    JSON.stringify(
-                                        selectedItems
-                                    ),
-
-                                created_at:
-                                    new Date()
-                                        .toISOString()
-
-                            });
-
-
-                    if (
-                        loyaltyError
-                    ) {
-
-                        console.error(
-                            "Loyalty transaction save failed:",
-                            loyaltyError
-                        );
-
-                    }
-
-                }
-
-            } catch (
-                loyaltyError
-            ) {
-
-                console.error(
-                    "Loyalty connection failed:",
-                    loyaltyError
-                );
-
-            }
-
-        }
+        );
 
 
         /*
@@ -3207,15 +3611,38 @@ STARTUP
 async function initializeBilling() {
 
     /*
-        Menu comes from billing_menu.
+    ==========================================
+    OPEN LOCAL LOYALTY DATABASE
+    ==========================================
+    */
+
+    try {
+
+        await openLoyaltyDatabase();
+
+    } catch (error) {
+
+        console.error(
+            "Local loyalty database could not open:",
+            error
+        );
+
+    }
+
+
+    /*
+    ==========================================
+    LOAD BILLING MENU
+    ==========================================
     */
 
     await loadBillingMenu();
 
 
     /*
-        Customer information still comes
-        from loyalty_customers.
+    ==========================================
+    LOAD LOCAL LOYALTY CUSTOMERS
+    ==========================================
     */
 
     await loadSavedCustomers();
