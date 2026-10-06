@@ -1,459 +1,480 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
 <meta charset="UTF-8">
-
-<meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
->
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 
 <title>CHAATARRA - Sales</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
 <style>
+*{box-sizing:border-box}
 
-* {
-    box-sizing: border-box;
+body{
+    margin:0;
+    font-family:Arial,sans-serif;
+    background:#f5f5f5;
+    color:#222;
 }
 
-body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #f5f5f5;
-    color: #222;
+header{
+    background:#4b001f;
+    color:#FFD700;
+    padding:20px;
+    text-align:center;
 }
 
-header {
-    background: #4b001f;
-    color: #FFD700;
-    padding: 20px;
-    text-align: center;
+header h1{margin:0;font-size:28px}
+header p{margin:5px 0 0;color:white}
+
+.container{
+    max-width:1200px;
+    margin:auto;
+    padding:20px;
 }
 
-header h1 {
-    margin: 0;
-    font-size: 28px;
+.controls{
+    background:white;
+    padding:15px;
+    border-radius:10px;
+    margin-bottom:20px;
+    box-shadow:0 2px 8px rgba(0,0,0,.08);
 }
 
-header p {
-    margin: 5px 0 0;
-    color: white;
-}
-
-.container {
-    max-width: 1200px;
-    margin: auto;
-    padding: 20px;
-}
-
-.controls {
-    background: white;
-    padding: 15px;
-    border-radius: 10px;
-    margin-bottom: 20px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-}
-
-.controls label {
-    font-weight: bold;
-    margin-right: 5px;
+.controls label{
+    font-weight:bold;
+    margin-right:5px;
 }
 
 .controls input,
 .controls select,
-.controls button {
-    padding: 10px;
-    margin: 5px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
+.controls button{
+    padding:10px;
+    margin:5px;
+    border-radius:6px;
+    border:1px solid #ccc;
 }
 
-.controls button {
-    background: #4b001f;
-    color: #FFD700;
-    border: none;
-    cursor: pointer;
-    font-weight: bold;
+.controls button{
+    background:#4b001f;
+    color:#FFD700;
+    border:none;
+    cursor:pointer;
+    font-weight:bold;
 }
 
-.summary {
-    display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    gap: 15px;
-    margin-bottom: 20px;
+.controls .menu-btn{
+    background:#111;
+    color:#FFD700;
 }
 
-.card {
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    text-align: center;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+.summary{
+    display:grid;
+    grid-template-columns:repeat(6,1fr);
+    gap:15px;
+    margin-bottom:20px;
 }
 
-.card h3 {
-    margin: 0;
-    color: #666;
-    font-size: 15px;
+.card{
+    background:white;
+    padding:20px;
+    border-radius:10px;
+    text-align:center;
+    box-shadow:0 2px 8px rgba(0,0,0,.08);
 }
 
-.card strong {
-    display: block;
-    font-size: 26px;
-    color: #4b001f;
-    margin-top: 8px;
+.card h3{
+    margin:0;
+    color:#666;
+    font-size:15px;
 }
 
-.payment-card h3 {
-    color: #4b001f;
+.card strong{
+    display:block;
+    font-size:26px;
+    color:#4b001f;
+    margin-top:8px;
 }
 
-.payment-card strong {
-    color: #4b001f;
+.section{
+    background:white;
+    padding:20px;
+    border-radius:10px;
+    margin-bottom:20px;
+    box-shadow:0 2px 8px rgba(0,0,0,.08);
 }
 
-.section {
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    margin-bottom: 20px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+.section h2{
+    margin-top:0;
+    color:#4b001f;
 }
 
-.section h2 {
-    margin-top: 0;
-    color: #4b001f;
+table{
+    width:100%;
+    border-collapse:collapse;
 }
 
-table {
-    width: 100%;
-    border-collapse: collapse;
+th{
+    background:#4b001f;
+    color:#FFD700;
+    padding:12px;
+    text-align:left;
 }
 
-th {
-    background: #4b001f;
-    color: #FFD700;
-    padding: 12px;
-    text-align: left;
+td{
+    padding:11px;
+    border-bottom:1px solid #ddd;
 }
 
-td {
-    padding: 11px;
-    border-bottom: 1px solid #ddd;
+tr:hover{background:#fafafa}
+
+.empty{
+    text-align:center;
+    padding:30px;
+    color:#777;
 }
 
-tr:hover {
-    background: #fafafa;
+.error{
+    background:#f8d7da;
+    color:#721c24;
+    padding:15px;
+    border-radius:8px;
+    margin-bottom:20px;
+    display:none;
 }
 
-.type {
-    padding: 5px 9px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: bold;
+.debug{
+    background:#222;
+    color:#0f0;
+    padding:15px;
+    border-radius:8px;
+    font-family:monospace;
+    font-size:12px;
+    white-space:pre-wrap;
+    overflow-x:auto;
 }
 
-.type.single {
-    background: #e8f0ff;
-    color: #174ea6;
+.type{
+    padding:5px 9px;
+    border-radius:20px;
+    font-size:12px;
+    font-weight:bold;
 }
 
-.type.combo {
-    background: #fff0c2;
-    color: #7a4d00;
+.type.single{
+    background:#e8f0ff;
+    color:#174ea6;
 }
 
-.status {
-    padding: 5px 9px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: bold;
+.type.combo{
+    background:#fff0c2;
+    color:#7a4d00;
 }
 
-.status.pending {
-    background: #fff3cd;
-    color: #856404;
+.order-link{
+    color:#4b001f;
+    font-weight:bold;
+    cursor:pointer;
+    text-decoration:underline;
 }
 
-.status.served,
-.status.completed {
-    background: #d4edda;
-    color: #155724;
+/* ================= MENU MODAL ================= */
+
+.menu-modal{
+    position:fixed;
+    inset:0;
+    z-index:100000;
+    background:rgba(0,0,0,.65);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:15px;
 }
 
-.status.cancelled {
-    background: #f8d7da;
-    color: #721c24;
+.menu-box{
+    width:min(1000px,96vw);
+    max-height:92vh;
+    overflow:auto;
+    background:#f5f5f5;
+    border-radius:16px;
+    box-shadow:0 20px 60px rgba(0,0,0,.4);
 }
 
-.loading {
-    text-align: center;
-    padding: 30px;
-    font-size: 18px;
+.menu-header{
+    background:#4b001f;
+    color:white;
+    padding:18px 20px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    position:sticky;
+    top:0;
+    z-index:2;
 }
 
-.error {
-    background: #f8d7da;
-    color: #721c24;
-    padding: 15px;
-    border-radius: 8px;
-    margin-bottom: 20px;
-    display: none;
+.menu-header h2{
+    margin:0;
+    color:#FFD700;
 }
 
-.empty {
-    text-align: center;
-    padding: 30px;
-    color: #777;
+.close-btn{
+    width:40px;
+    height:40px;
+    border:0;
+    border-radius:50%;
+    background:rgba(255,255,255,.15);
+    color:white;
+    font-size:25px;
+    cursor:pointer;
 }
 
-.debug {
-    background: #222;
-    color: #0f0;
-    padding: 15px;
-    border-radius: 8px;
-    font-family: monospace;
-    font-size: 12px;
-    white-space: pre-wrap;
-    overflow-x: auto;
+.menu-content{
+    padding:20px;
 }
 
-.combo-components {
-    margin-top: 5px;
-    font-size: 12px;
-    color: #777;
+.menu-form{
+    background:white;
+    padding:18px;
+    border-radius:10px;
+    margin-bottom:20px;
 }
 
-
-.order-link {
-    color: #4b001f;
-    font-weight: bold;
-    cursor: pointer;
-    text-decoration: underline;
+.menu-form h3{
+    margin-top:0;
+    color:#4b001f;
 }
 
-.order-link:hover {
-    color: #7a0033;
+.form-grid{
+    display:grid;
+    grid-template-columns:2fr 1fr 1fr auto;
+    gap:10px;
+    align-items:end;
 }
 
-@media(max-width:700px) {
+.form-group label{
+    display:block;
+    font-weight:bold;
+    margin-bottom:5px;
+}
 
-    .summary {
-        grid-template-columns: 1fr;
+.form-group input,
+.form-group select{
+    width:100%;
+    padding:11px;
+    border:1px solid #ccc;
+    border-radius:7px;
+}
+
+.available-row{
+    margin-top:12px;
+}
+
+.menu-save{
+    padding:11px 18px;
+    background:#4b001f;
+    color:#FFD700;
+    border:0;
+    border-radius:7px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.menu-cancel{
+    padding:11px 18px;
+    background:#777;
+    color:white;
+    border:0;
+    border-radius:7px;
+    font-weight:bold;
+    cursor:pointer;
+    display:none;
+}
+
+.menu-table-wrap{
+    background:white;
+    padding:15px;
+    border-radius:10px;
+    overflow-x:auto;
+}
+
+.menu-table{
+    min-width:650px;
+}
+
+.menu-actions button{
+    border:0;
+    border-radius:5px;
+    padding:7px 10px;
+    margin:2px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.edit-btn{
+    background:#fff0c2;
+    color:#7a4d00;
+}
+
+.delete-btn{
+    background:#f8d7da;
+    color:#721c24;
+}
+
+.available-btn{
+    background:#d4edda;
+    color:#155724;
+}
+
+.unavailable-btn{
+    background:#eee;
+    color:#555;
+}
+
+.available{
+    color:#155724;
+    font-weight:bold;
+}
+
+.unavailable{
+    color:#721c24;
+    font-weight:bold;
+}
+
+@media(max-width:800px){
+    .summary{
+        grid-template-columns:repeat(2,1fr);
     }
 
-    .section {
-        overflow-x: auto;
+    .form-grid{
+        grid-template-columns:1fr;
     }
+}
 
-    table {
-        min-width: 850px;
+@media(max-width:600px){
+    .summary{
+        grid-template-columns:1fr;
     }
 
     .controls input,
     .controls select,
-    .controls button {
-        width: 100%;
-        margin: 5px 0;
+    .controls button{
+        width:100%;
+        margin:5px 0;
     }
 
-}
-
-
-
-/* =====================================================
-   ORDER DETAILS - IN-PAGE MODAL
-   ===================================================== */
-.order-modal-open {
-    overflow: hidden;
-}
-
-.order-details-modal {
-    position: fixed;
-    inset: 0;
-    z-index: 99999;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 24px;
-}
-
-.order-details-backdrop {
-    position: absolute;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.55);
-    backdrop-filter: blur(3px);
-}
-
-.order-details-box {
-    position: relative;
-    z-index: 1;
-    width: min(720px, 94vw);
-    max-height: 88vh;
-    overflow-y: auto;
-    background: #f7f7f7;
-    color: #222;
-    border-radius: 16px;
-    box-shadow: 0 20px 60px rgba(0,0,0,.30);
-}
-
-.order-details-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 15px;
-    padding: 18px 20px;
-    background: #4b001f;
-    color: white;
-    border-radius: 16px 16px 0 0;
-}
-
-.order-details-header h2 {
-    margin: 0;
-    color: #FFD700;
-    font-size: 22px;
-}
-
-.order-details-header span {
-    display: block;
-    margin-top: 4px;
-    font-size: 12px;
-    opacity: .85;
-}
-
-.order-details-close {
-    width: 40px;
-    height: 40px;
-    border: 0;
-    border-radius: 50%;
-    background: rgba(255,255,255,.15);
-    color: white;
-    font-size: 28px;
-    line-height: 1;
-    cursor: pointer;
-}
-
-.order-details-close:hover {
-    background: rgba(255,255,255,.25);
-}
-
-.order-details-info {
-    margin: 16px 20px;
-    padding: 14px;
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0,0,0,.08);
-}
-
-.order-details-info > div {
-    display: flex;
-    justify-content: space-between;
-    gap: 20px;
-    padding: 7px 0;
-    border-bottom: 1px solid #eee;
-}
-
-.order-details-info > div:last-child {
-    border-bottom: 0;
-}
-
-.order-details-items {
-    margin: 0 20px;
-    overflow-x: auto;
-}
-
-.order-modal-table {
-    width: 100%;
-    border-collapse: collapse;
-    background: white;
-    border-radius: 10px;
-    overflow: hidden;
-}
-
-.order-modal-table th {
-    background: #4b001f;
-    color: #FFD700;
-    padding: 10px;
-    text-align: left;
-}
-
-.order-modal-table td {
-    padding: 10px;
-    border-bottom: 1px solid #ddd;
-}
-
-.order-modal-components {
-    margin-top: 4px;
-    font-size: 12px;
-    color: #777;
-}
-
-.order-modal-empty {
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    text-align: center;
-}
-
-.order-details-total {
-    margin: 16px 20px 20px;
-    padding: 15px;
-    background: white;
-    border-radius: 10px;
-    text-align: right;
-    color: #4b001f;
-    font-size: 21px;
-    font-weight: bold;
-    box-shadow: 0 2px 8px rgba(0,0,0,.08);
-}
-
-@media (max-width: 600px) {
-    .order-details-modal {
-        padding: 10px;
+    .section{
+        overflow-x:auto;
     }
 
-    .order-details-box {
-        width: 96vw;
-        max-height: 92vh;
+    table{
+        min-width:700px;
     }
+}
 
-    .order-details-info,
-    .order-details-items,
-    .order-details-total {
-        margin-left: 12px;
-        margin-right: 12px;
-    }
+/* ================= ORDER MODAL ================= */
 
-    .order-details-info > div {
-        flex-direction: column;
-        gap: 2px;
-    }
+.order-details-modal{
+    position:fixed;
+    inset:0;
+    z-index:99999;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:15px;
+}
+
+.order-details-backdrop{
+    position:absolute;
+    inset:0;
+    background:rgba(0,0,0,.55);
+}
+
+.order-details-box{
+    position:relative;
+    z-index:1;
+    width:min(720px,96vw);
+    max-height:90vh;
+    overflow-y:auto;
+    background:#f7f7f7;
+    border-radius:16px;
+}
+
+.order-details-header{
+    display:flex;
+    justify-content:space-between;
+    padding:18px 20px;
+    background:#4b001f;
+    color:white;
+}
+
+.order-details-header h2{
+    margin:0;
+    color:#FFD700;
+}
+
+.order-details-info{
+    margin:16px;
+    padding:14px;
+    background:white;
+    border-radius:10px;
+}
+
+.order-details-info>div{
+    display:flex;
+    justify-content:space-between;
+    padding:7px 0;
+    border-bottom:1px solid #eee;
+}
+
+.order-details-items{
+    margin:16px;
+    overflow-x:auto;
+}
+
+.order-details-total{
+    margin:16px;
+    padding:15px;
+    background:white;
+    border-radius:10px;
+    text-align:right;
+    color:#4b001f;
+    font-size:21px;
+    font-weight:bold;
+}
+
+.order-modal-table{
+    width:100%;
+    background:white;
+    border-collapse:collapse;
+}
+
+.order-modal-table th{
+    background:#4b001f;
+    color:#FFD700;
+}
+
+.order-modal-table td,
+.order-modal-table th{
+    padding:10px;
+}
+
+.order-modal-components{
+    font-size:12px;
+    color:#777;
 }
 </style>
-
 </head>
 
 <body>
 
 <header>
-
-<h1>CHAATARRA</h1>
-<p>Sales Report</p>
-
+    <h1>CHAATARRA</h1>
+    <p>Sales Report</p>
 </header>
 
-
 <div class="container">
-
-
-<!-- FILTERS -->
 
 <div class="controls">
 
@@ -464,186 +485,177 @@ tr:hover {
 <input type="date" id="toDate">
 
 <label>Counter:</label>
-
 <select id="counterFilter">
-
-<option value="all">
-All Counters
-</option>
-
-<option value="chaats">
-Chaatarra
-</option>
-
-<option value="drinks">
-Blenderaa
-</option>
-
-<option value="burgers">
-Smasharra
-</option>
-
+    <option value="all">All Counters</option>
+    <option value="chaats">Chaatarra</option>
+    <option value="drinks">Blenderaa</option>
+    <option value="burgers">Smasharra</option>
 </select>
-
 
 <label>Status:</label>
-
 <select id="statusFilter">
-
-<option value="all">
-All Status
-</option>
-
+    <option value="all">All Status</option>
 </select>
 
+<button onclick="applyFilters()">Apply</button>
+<button onclick="resetFilters()">Reset</button>
+<button onclick="loadSales()">Refresh</button>
+<button onclick="exportToExcel()">📊 Export Excel</button>
 
-<button onclick="applyFilters()">
-Apply
-</button>
-
-<button onclick="resetFilters()">
-Reset
-</button>
-
-<button onclick="loadSales()">
-Refresh
-</button>
-
-<button onclick="exportToExcel()">
-📊 Export Excel
+<button class="menu-btn" onclick="openMenuManager()">
+    🍽 Menu Management
 </button>
 
 </div>
 
-
 <div id="errorBox" class="error"></div>
-
-
-<!-- SUMMARY -->
 
 <div class="summary">
 
 <div class="card">
-
 <h3>Total Orders</h3>
-
-<strong id="totalOrders">
-0
-</strong>
-
+<strong id="totalOrders">0</strong>
 </div>
 
-
 <div class="card">
-
 <h3>Total Items Sold</h3>
-
-<strong id="totalItems">
-0
-</strong>
-
+<strong id="totalItems">0</strong>
 </div>
 
-
 <div class="card">
-
 <h3>Total Combos Sold</h3>
-
-<strong id="totalCombos">
-0
-</strong>
-
+<strong id="totalCombos">0</strong>
 </div>
-
 
 <div class="card">
-
 <h3>Total Sales</h3>
-
-<strong id="totalSales">
-₹0
-</strong>
-
+<strong id="totalSales">₹0</strong>
 </div>
 
-<div class="card payment-card cash-card">
-
+<div class="card">
 <h3>Cash Sales</h3>
-
-<strong id="cashSales">
-₹0
-</strong>
-
+<strong id="cashSales">₹0</strong>
 </div>
 
-<div class="card payment-card upi-card">
-
+<div class="card">
 <h3>UPI Sales</h3>
-
-<strong id="upiSales">
-₹0
-</strong>
-
+<strong id="upiSales">₹0</strong>
 </div>
 
 </div>
-
-
-<!-- ORDER DETAILS -->
 
 <div class="section">
-
-<h2>
-Order Details
-</h2>
-
+<h2>Order Details</h2>
 <div id="ordersTableContainer"></div>
-
 </div>
 
-
-<!-- ITEM SUMMARY -->
-
 <div class="section">
-
-<h2>
-Item Summary
-</h2>
-
+<h2>Item Summary</h2>
 <div id="summaryTableContainer"></div>
-
 </div>
-
-
-<!-- DEBUG -->
 
 <div class="section">
-
 <details>
-
-<summary>
-<b>Technical Information</b>
-</summary>
-
+<summary><b>Technical Information</b></summary>
 <br>
-
-<div id="debugBox" class="debug">
-Waiting for data...
-</div>
-
+<div id="debugBox" class="debug">Waiting for data...</div>
 </details>
+</div>
 
 </div>
 
 
+<!-- ================= MENU MANAGEMENT ================= -->
+
+<div id="menuModal" class="menu-modal">
+
+<div class="menu-box">
+
+<div class="menu-header">
+    <h2>🍽 Menu Management</h2>
+    <button class="close-btn" onclick="closeMenuManager()">×</button>
+</div>
+
+<div class="menu-content">
+
+<div class="menu-form">
+
+<h3 id="menuFormTitle">Add New Menu Item</h3>
+
+<div class="form-grid">
+
+<div class="form-group">
+<label>Item Name</label>
+<input id="menuItemName" type="text" placeholder="Example: Mango Shake">
+</div>
+
+<div class="form-group">
+<label>Price</label>
+<input id="menuItemPrice" type="number" min="0" step="0.01" placeholder="90">
+</div>
+
+<div class="form-group">
+<label>Category</label>
+<select id="menuItemCategory">
+<option value="">Loading categories...</option>
+</select>
+</div>
+
+<div>
+<button class="menu-save" onclick="saveMenuItem()">
+Save Item
+</button>
+
+<button id="menuCancelBtn" class="menu-cancel" onclick="cancelMenuEdit()">
+Cancel
+</button>
+</div>
+
+</div>
+
+<div class="available-row">
+<label>
+<input type="checkbox" id="menuItemAvailable" checked>
+ Available for Billing
+</label>
+</div>
+
+</div>
+
+<div class="menu-table-wrap">
+
+<table class="menu-table">
+
+<thead>
+<tr>
+<th>ID</th>
+<th>Item</th>
+<th>Category</th>
+<th>Price</th>
+<th>Available</th>
+<th>Actions</th>
+</tr>
+</thead>
+
+<tbody id="menuTableBody">
+<tr>
+<td colspan="6" class="empty">Loading menu...</td>
+</tr>
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+</div>
 </div>
 
 
 <script>
 
-
 /* =====================================================
-   SUPABASE CONNECTION
+   SUPABASE
    ===================================================== */
 
 const SUPABASE_URL =
@@ -660,32 +672,26 @@ supabase.createClient(
 
 
 /* =====================================================
-   GLOBAL DATA
+   SALES DATA
    ===================================================== */
 
-let ordersData = [];
-let kotData = [];
-let salesData = [];
+let ordersData=[];
+let kotData=[];
+let salesData=[];
 
-/*
- * Normal menu prices.
- * Used only to calculate each component's share of a combo price.
- */
-const basePrices = {
-    "Pani Puri": 50,
-    "Masala Puri": 60,
-    "Samosa Chaat": 80,
-    "Dahi Puri": 80,
-
-    "Mango Shake": 90,
-    "Oreo Shake": 80,
-    "Strawberry Shake": 90,
-    "Mint Lime": 35,
-
-    "Classic Burger": 120,
-    "Chicken Burger": 150,
-    "Cheese Burger": 140,
-    "Double Burger": 180
+const basePrices={
+    "Pani Puri":50,
+    "Masala Puri":60,
+    "Samosa Chaat":80,
+    "Dahi Puri":80,
+    "Mango Shake":90,
+    "Oreo Shake":80,
+    "Strawberry Shake":90,
+    "Mint Lime":35,
+    "Classic Burger":120,
+    "Chicken Burger":150,
+    "Cheese Burger":140,
+    "Double Burger":180
 };
 
 
@@ -693,476 +699,194 @@ const basePrices = {
    LOAD SALES
    ===================================================== */
 
-async function loadSales() {
+async function loadSales(){
 
-    showError("");
+showError("");
 
-    const itemsLoading = document.getElementById("itemsLoading");
+try{
 
-    if (itemsLoading) {
-        itemsLoading.style.display = "block";
-    }
+const {data:orders,error:ordersError}=
+await supabaseClient
+.from("orders")
+.select("*")
+.order("created_at",{ascending:false});
 
+if(ordersError)
+throw new Error("ORDERS TABLE ERROR:\n"+ordersError.message);
 
-    try {
+const {data:kots,error:kotError}=
+await supabaseClient
+.from("counter_kot")
+.select("*")
+.order("created_at",{ascending:false});
 
-        /*
-         * IMPORTANT:
-         * Sales are calculated from ORDERS.
-         *
-         * This is necessary because combo orders are stored
-         * as one item in orders.items.
-         *
-         * counter_kot splits the combo into preparation
-         * components and therefore must NOT be used to
-         * calculate sales revenue.
-         */
+if(kotError)
+throw new Error("COUNTER_KOT TABLE ERROR:\n"+kotError.message);
 
+ordersData=orders||[];
+kotData=kots||[];
+salesData=[];
 
-        const {
-            data: orders,
-            error: ordersError
-        } = await supabaseClient
+ordersData.forEach(order=>{
 
-            .from("orders")
+const items=parseItems(order.items);
 
-            .select("*")
+if(!Array.isArray(items)) return;
 
-            .order("created_at", {
-                ascending: false
-            });
+items.forEach(item=>{
 
+const quantity=Number(
+item.quantity??item.qty??1
+);
 
-        if (ordersError) {
+const price=Number(
+item.price??item.unit_price??0
+);
 
-            throw new Error(
-                "ORDERS TABLE ERROR:\n" +
-                ordersError.message
-            );
+const isCombo=item.type==="combo";
+
+const itemName=
+item.name??item.item_name??"Unknown Item";
 
-        }
+if(
+isCombo &&
+Array.isArray(item.components) &&
+item.components.length
+){
 
+const components=item.components.map(component=>({
 
-        /*
-         * Load KOT only for counter/status information.
-         */
+name:
+component.name??
+component.item_name??
+"Unknown Item",
 
-        const {
-            data: kots,
-            error: kotError
-        } = await supabaseClient
+counter:
+component.counter||"-",
 
-            .from("counter_kot")
+price:Number(
+component.price??
+component.unit_price??
+basePrices[
+component.name??
+component.item_name
+]??0
+)
+
+}));
 
-            .select("*")
+const fixedComponents=
+components.filter(c=>
+c.counter==="chaats"||
+c.counter==="burgers"
+);
 
-            .order("created_at", {
-                ascending: false
-            });
+const drinkComponents=
+components.filter(c=>
+c.counter==="drinks"
+);
 
+const fixedTotal=
+fixedComponents.reduce(
+(sum,c)=>sum+c.price,0
+);
 
-        if (kotError) {
+const comboTotal=
+quantity*price;
 
-            throw new Error(
-                "COUNTER_KOT TABLE ERROR:\n" +
-                kotError.message
-            );
+const remainingForDrinks=
+comboTotal-
+quantity*fixedTotal;
 
-        }
+components.forEach((component,index)=>{
 
+let allocatedAmount=0;
 
-        ordersData = orders || [];
+if(
+component.counter==="chaats"||
+component.counter==="burgers"
+){
 
-        kotData = kots || [];
+allocatedAmount=
+quantity*component.price;
 
+}else if(component.counter==="drinks"){
 
-        /*
-         * Build SALES DATA directly from orders.
-         */
+const drinkNormalTotal=
+drinkComponents.reduce(
+(sum,d)=>sum+d.price,0
+);
 
-        salesData = [];
+allocatedAmount=
+drinkNormalTotal>0
+?remainingForDrinks*
+(component.price/drinkNormalTotal)
+:0;
 
+}
 
-        ordersData.forEach(order => {
+salesData.push({
 
-            const items =
-                parseItems(order.items);
+orderId:order.id,
+orderNumber:order.order_number,
+order:order,
+created_at:order.created_at,
+table:order.table_number??"-",
+customer:order.customer_name??"-",
+item:component.name,
+quantity:quantity,
+price:component.price,
+amount:allocatedAmount,
+counter:component.counter,
+status:order.status??"Pending",
+type:"combo",
+components:item.components,
+comboName:itemName,
+comboGroup:order.id+"_"+itemName,
+comboComponentIndex:index,
+isComboComponent:true
 
+});
 
-            if (!Array.isArray(items)) {
-                return;
-            }
+});
 
+}else{
 
-            items.forEach(item => {
-
-                const quantity =
-                    Number(
-                        item.quantity ??
-                        item.qty ??
-                        1
-                    );
-
-                const price =
-                    Number(
-                        item.price ??
-                        item.unit_price ??
-                        0
-                    );
-
-                const isCombo =
-                    item.type === "combo";
-
-                const itemName =
-                    item.name ??
-                    item.item_name ??
-                    "Unknown Item";
-
-                /*
-                 * COMBO:
-                 * Split the actual combo selling price between
-                 * the component counters according to the
-                 * normal component prices.
-                 */
-                if (
-                    isCombo &&
-                    Array.isArray(item.components) &&
-                    item.components.length
-                ) {
-
-                    const components =
-                        item.components.map(component => {
-
-                            const name =
-                                component.name ??
-                                component.item_name ??
-                                "Unknown Item";
-
-                            const componentPrice =
-                                Number(
-                                    component.price ??
-                                    component.unit_price ??
-                                    basePrices[name] ??
-                                    0
-                                );
-
-                            return {
-                                name: name,
-                                counter:
-                                    component.counter ||
-                                    "-",
-                                price:
-                                    componentPrice
-                            };
-
-                        });
-
-                    /*
-                     * COMBO PRICING:
-                     * Chaats and Burgers keep their full normal price.
-                     * The discount is taken from Drinks.
-                     *
-                     * Example:
-                     * Pani Puri ₹50 + Mint Lime ₹35
-                     * Combo ₹80
-                     * Chaats = ₹50
-                     * Drinks = ₹30
-                     */
-                    const fixedComponents =
-                        components.filter(
-                            component =>
-                                component.counter === "chaats" ||
-                                component.counter === "burgers"
-                        );
-
-                    const drinkComponents =
-                        components.filter(
-                            component =>
-                                component.counter === "drinks"
-                        );
-
-                    const fixedTotal =
-                        fixedComponents.reduce(
-                            (sum, component) =>
-                                sum + component.price,
-                            0
-                        );
-
-                    const comboTotal =
-                        quantity * price;
-
-                    const remainingForDrinks =
-                        comboTotal -
-                        quantity * fixedTotal;
-
-                    if (components.length > 0) {
-
-                        components.forEach(
-                            (component, index) => {
-
-                                let allocatedAmount = 0;
-
-                                if (
-                                    component.counter === "chaats" ||
-                                    component.counter === "burgers"
-                                ) {
-
-                                    allocatedAmount =
-                                        quantity *
-                                        component.price;
-
-                                } else if (
-                                    component.counter === "drinks"
-                                ) {
-
-                                    const drinkNormalTotal =
-                                        drinkComponents.reduce(
-                                            (sum, drink) =>
-                                                sum + drink.price,
-                                            0
-                                        );
-
-                                    allocatedAmount =
-                                        drinkNormalTotal > 0
-                                            ? remainingForDrinks *
-                                              (
-                                                  component.price /
-                                                  drinkNormalTotal
-                                              )
-                                            : 0;
-
-                                }
-
-                                salesData.push({
-
-                                    orderId:
-                                        order.id,
-
-                                    orderNumber:
-                                        order.order_number,
-
-                                    order:
-                                        order,
-
-                                    created_at:
-                                        order.created_at,
-
-                                    table:
-                                        order.table_number ??
-                                        "-",
-
-                                    customer:
-                                        order.customer_name ??
-                                        "-",
-
-                                    item:
-                                        component.name,
-
-                                    quantity:
-                                        quantity,
-
-                                    /*
-                                     * Original menu price of
-                                     * this component.
-                                     */
-
-                                    price:
-                                        component.price,
-
-                                    /*
-                                     * THIS is the important value:
-                                     * the component's share of the
-                                     * actual combo selling price.
-                                     */
-
-                                    amount:
-                                        allocatedAmount,
-
-                                    counter:
-                                        component.counter,
-
-                                    status:
-                                        order.status ??
-                                        "Pending",
-
-                                    type:
-                                        "combo",
-
-                                    components:
-                                        item.components,
-
-                                    comboName:
-                                        itemName,
+salesData.push({
 
-                                    comboGroup:
-                                        order.id +
-                                        "_" +
-                                        itemName,
+orderId:order.id,
+orderNumber:order.order_number,
+order:order,
+created_at:order.created_at,
+table:order.table_number??"-",
+customer:order.customer_name??"-",
+item:itemName,
+quantity:quantity,
+price:price,
+amount:quantity*price,
+counter:item.counter||"-",
+status:order.status??"Pending",
+type:"single",
+components:[]
 
-                                    comboComponentIndex:
-                                        index,
+});
 
-                                    isComboComponent:
-                                        true
+}
 
-                                });
+});
 
-                            }
-                        );
+});
 
-                    } else {
+populateFilters();
+renderSales();
+updateDebug();
 
-                        /*
-                         * Safety fallback if component prices
-                         * cannot be determined.
-                         */
+}catch(error){
 
-                        salesData.push({
+console.error(error);
+showError(error.message);
 
-                            orderId:
-                                order.id,
-
-                            orderNumber:
-                                order.order_number,
-
-                            order:
-                                order,
-
-                            created_at:
-                                order.created_at,
-
-                            table:
-                                order.table_number ??
-                                "-",
-
-                            customer:
-                                order.customer_name ??
-                                "-",
-
-                            item:
-                                itemName,
-
-                            quantity:
-                                quantity,
-
-                            price:
-                                price,
-
-                            amount:
-                                quantity * price,
-
-                            counter:
-                                "-",
-
-                            status:
-                                order.status ??
-                                "Pending",
-
-                            type:
-                                "combo",
-
-                            components:
-                                item.components,
-
-                            comboName:
-                                itemName,
-
-                            comboGroup:
-                                order.id +
-                                "_" +
-                                itemName,
-
-                            isComboComponent:
-                                false
-
-                        });
-
-                    }
-
-                } else {
-
-                    /*
-                     * NORMAL SINGLE ITEM:
-                     * unchanged.
-                     */
-
-                    salesData.push({
-
-                        orderId:
-                            order.id,
-
-                        orderNumber:
-                            order.order_number,
-
-                        order:
-                            order,
-
-                        created_at:
-                            order.created_at,
-
-                        table:
-                            order.table_number ??
-                            "-",
-
-                        customer:
-                            order.customer_name ??
-                            "-",
-
-                        item:
-                            itemName,
-
-                        quantity:
-                            quantity,
-
-                        price:
-                            price,
-
-                        amount:
-                            quantity * price,
-
-                        counter:
-                            item.counter || "-",
-
-                        status:
-                            order.status ??
-                            "Pending",
-
-                        type:
-                            "single",
-
-                        components:
-                            []
-
-                    });
-
-                }
-
-            });
-
-        });
-
-        populateFilters();
-
-        renderSales();
-
-        updateDebug();
-
-
-    } catch (error) {
-
-        console.error(error);
-
-        showError(
-            error.message
-        );
-
-        const itemsLoading = document.getElementById("itemsLoading");
-
-        if (itemsLoading) {
-            itemsLoading.style.display = "none";
-        }
-
-    }
+}
 
 }
 
@@ -1171,683 +895,411 @@ async function loadSales() {
    PARSE ITEMS
    ===================================================== */
 
-function parseItems(items) {
+function parseItems(items){
 
-    if (!items) {
-        return [];
-    }
+if(!items)return[];
 
+if(Array.isArray(items))
+return items;
 
-    if (Array.isArray(items)) {
-        return items;
-    }
+if(typeof items==="string"){
 
+try{
 
-    if (typeof items === "string") {
+const parsed=JSON.parse(items);
 
-        try {
+if(Array.isArray(parsed))
+return parsed;
 
-            const parsed =
-                JSON.parse(items);
+if(parsed&&Array.isArray(parsed.items))
+return parsed.items;
 
+}catch(e){
+console.error(e);
+}
 
-            if (Array.isArray(parsed)) {
-                return parsed;
-            }
+}
 
+if(
+typeof items==="object"&&
+Array.isArray(items.items)
+)
+return items.items;
 
-            if (
-                parsed &&
-                Array.isArray(parsed.items)
-            ) {
-
-                return parsed.items;
-
-            }
-
-        } catch (e) {
-
-            console.error(
-                "Could not parse items:",
-                items
-            );
-
-        }
-
-    }
+return[];
+}
 
 
-    if (
-        typeof items === "object" &&
-        Array.isArray(items.items)
-    ) {
+/* =====================================================
+   FILTERS
+   ===================================================== */
 
-        return items.items;
+function populateFilters(){
 
-    }
+const select=
+document.getElementById("statusFilter");
 
+const statuses=[
+...new Set(
+salesData
+.map(x=>x.status)
+.filter(Boolean)
+)
+];
 
-    return [];
+select.innerHTML=
+'<option value="all">All Status</option>';
+
+statuses.forEach(status=>{
+
+select.innerHTML+=
+`<option value="${escapeHtml(status)}">
+${escapeHtml(status)}
+</option>`;
+
+});
+
+}
+
+function applyFilters(){
+renderSales();
+}
+
+function getFilteredData(){
+
+const fromDate=
+document.getElementById("fromDate").value;
+
+const toDate=
+document.getElementById("toDate").value;
+
+const counter=
+document.getElementById("counterFilter").value;
+
+const status=
+document.getElementById("statusFilter").value;
+
+return salesData.filter(row=>{
+
+if(
+counter!=="all"&&
+row.counter!==counter
+)return false;
+
+if(
+status!=="all"&&
+row.status!==status
+)return false;
+
+if(fromDate||toDate){
+
+if(!row.created_at)return false;
+
+const date=new Date(row.created_at);
+
+const dateString=
+date.getFullYear()+"-"+
+String(date.getMonth()+1).padStart(2,"0")+"-"+
+String(date.getDate()).padStart(2,"0");
+
+if(fromDate&&dateString<fromDate)
+return false;
+
+if(toDate&&dateString>toDate)
+return false;
+
+}
+
+return true;
+
+});
 
 }
 
 
 /* =====================================================
-   FILTER OPTIONS
+   RENDER
    ===================================================== */
 
-function populateFilters() {
+function renderSales(){
 
-    const statusSelect =
-        document.getElementById(
-            "statusFilter"
-        );
+const data=getFilteredData();
 
+renderSummary(data);
+renderPaymentSummary(data);
+renderOrdersTable(data);
+renderItemSummary(data);
 
-    const statuses =
-        [
-            ...new Set(
-                salesData
-                    .map(x => x.status)
-                    .filter(Boolean)
-            )
-        ];
+}
 
+function renderSummary(data){
 
-    statusSelect.innerHTML =
-        '<option value="all">All Status</option>';
+const orders=
+new Set(data.map(x=>x.orderId));
 
+const totalItems=
+data.reduce(
+(sum,x)=>sum+Number(x.quantity||0),0
+);
 
-    statuses.forEach(status => {
+const comboGroups=new Map();
 
-        statusSelect.innerHTML +=
+data
+.filter(x=>x.type==="combo")
+.forEach(x=>{
 
-            `<option value="${escapeHtml(status)}">
-                ${escapeHtml(status)}
-            </option>`;
+const key=
+x.comboGroup||
+x.orderId+"|"+x.item;
 
-    });
+if(!comboGroups.has(key))
+comboGroups.set(
+key,
+Number(x.quantity||0)
+);
+
+});
+
+const totalCombos=
+[...comboGroups.values()]
+.reduce((sum,x)=>sum+x,0);
+
+const totalSales=
+data.reduce(
+(sum,x)=>sum+Number(x.amount||0),0
+);
+
+document.getElementById("totalOrders").textContent=
+orders.size;
+
+document.getElementById("totalItems").textContent=
+totalItems;
+
+document.getElementById("totalCombos").textContent=
+totalCombos;
+
+document.getElementById("totalSales").textContent=
+"₹"+totalSales.toFixed(2);
+
+}
+
+function getOrderPayment(order){
+
+if(!order)return"-";
+
+return(
+order.payment_method??
+order.payment??
+order.payment_type??
+order.paymentMode??
+order.payment_mode??
+"-"
+);
+
+}
+
+function renderPaymentSummary(data){
+
+const totals={Cash:0,UPI:0};
+const map=new Map();
+
+data.forEach(row=>{
+
+const p=String(
+getOrderPayment(row.order)
+).trim().toUpperCase();
+
+const method=
+p==="UPI"?"UPI":
+p==="CASH"?"Cash":null;
+
+if(!method)return;
+
+if(!map.has(row.orderId))
+map.set(row.orderId,{
+method,
+amount:0
+});
+
+map.get(row.orderId).amount+=
+Number(row.amount||0);
+
+});
+
+map.forEach(x=>{
+totals[x.method]+=x.amount;
+});
+
+document.getElementById("cashSales").textContent=
+"₹"+totals.Cash.toFixed(2);
+
+document.getElementById("upiSales").textContent=
+"₹"+totals.UPI.toFixed(2);
 
 }
 
 
 /* =====================================================
-   APPLY FILTERS
+   ORDERS TABLE
    ===================================================== */
 
-function applyFilters() {
+function renderOrdersTable(data){
 
-    renderSales();
+const container=
+document.getElementById("ordersTableContainer");
+
+const map=new Map();
+
+data.forEach(row=>{
+
+if(!map.has(row.orderId))
+map.set(row.orderId,{
+orderId:row.orderId,
+orderNumber:row.orderNumber,
+amount:0
+});
+
+map.get(row.orderId).amount+=
+Number(row.amount||0);
+
+});
+
+const orders=[...map.values()];
+
+if(!orders.length){
+
+container.innerHTML=
+'<div class="empty">No orders found.</div>';
+
+return;
+
+}
+
+let html=`
+<table>
+<thead>
+<tr>
+<th>Order Number</th>
+<th>Total Price</th>
+</tr>
+</thead>
+<tbody>
+`;
+
+orders.forEach(order=>{
+
+const number=
+order.orderNumber??order.orderId;
+
+html+=`
+<tr>
+<td>
+<span
+class="order-link"
+onclick="openOrderDetails('${escapeJs(order.orderId)}')">
+#${escapeHtml(number)}
+</span>
+</td>
+<td>
+<b>₹${order.amount.toFixed(2)}</b>
+</td>
+</tr>
+`;
+
+});
+
+html+=`</tbody></table>`;
+
+container.innerHTML=html;
 
 }
 
 
 /* =====================================================
-   GET FILTERED DATA
+   ITEM SUMMARY
    ===================================================== */
 
-function getFilteredData() {
+function renderItemSummary(data){
 
-    const fromDate =
-        document.getElementById(
-            "fromDate"
-        ).value;
+const container=
+document.getElementById("summaryTableContainer");
 
+const map=new Map();
 
-    const toDate =
-        document.getElementById(
-            "toDate"
-        ).value;
+data.forEach(row=>{
 
+const key=
+row.type+"|"+row.item+"|"+(row.comboName||"");
 
-    const counter =
-        document.getElementById(
-            "counterFilter"
-        ).value;
+if(!map.has(key))
+map.set(key,{
+item:row.item,
+type:row.type,
+comboName:row.comboName||"",
+quantity:0,
+amount:0
+});
 
+const entry=map.get(key);
 
-    const status =
-        document.getElementById(
-            "statusFilter"
-        ).value;
+entry.quantity+=Number(row.quantity||0);
+entry.amount+=Number(row.amount||0);
 
+});
 
-    return salesData.filter(row => {
+const summary=[...map.values()]
+.sort((a,b)=>b.quantity-a.quantity);
 
+if(!summary.length){
 
-        /*
-         * Counter filter
-         */
+container.innerHTML=
+'<div class="empty">No item data.</div>';
 
-        if (counter !== "all") {
-
-            /*
-             * Normal item
-             */
-
-            if (
-                row.type === "single" &&
-                row.counter !== counter
-            ) {
-
-                return false;
-
-            }
-
-
-            /*
-             * Combo:
-             * check component counters.
-             */
-
-            if (
-                row.type === "combo" &&
-                row.counter !== counter
-            ) {
-
-                return false;
-
-            }
-
-        }
-
-
-        /*
-         * Status filter
-         */
-
-        if (
-            status !== "all" &&
-            row.status !== status
-        ) {
-
-            return false;
-
-        }
-
-
-        /*
-         * Date filter
-         */
-
-        if (
-            fromDate ||
-            toDate
-        ) {
-
-            if (!row.created_at) {
-                return false;
-            }
-
-
-            const date =
-                new Date(
-                    row.created_at
-                );
-
-
-            const dateString =
-                date.getFullYear() + "-" +
-                String(date.getMonth() + 1).padStart(2, "0") + "-" +
-                String(date.getDate()).padStart(2, "0");
-
-
-            if (
-                fromDate &&
-                dateString < fromDate
-            ) {
-
-                return false;
-
-            }
-
-
-            if (
-                toDate &&
-                dateString > toDate
-            ) {
-
-                return false;
-
-            }
-
-        }
-
-
-        return true;
-
-    });
+return;
 
 }
 
+let html=`
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Type</th>
+<th>Total Quantity</th>
+<th>Total Amount</th>
+</tr>
+</thead>
+<tbody>
+`;
 
-/* =====================================================
-   RENDER SALES
-   ===================================================== */
+summary.forEach(row=>{
 
-function renderSales() {
-
-    const filtered =
-        getFilteredData();
-
-
-    renderSummary(
-        filtered
-    );
-
-    renderPaymentSummary(
-        filtered
-    );
-
-
-    renderOrdersTable(
-        filtered
-    );
-
-
-    renderItemSummary(
-        filtered
-    );
-
+html+=`
+<tr>
+<td>
+<b>${escapeHtml(row.item)}</b>
+${
+row.type==="combo"&&row.comboName
+?`<div class="combo-components">
+From combo: ${escapeHtml(row.comboName)}
+</div>`:""
 }
-
-
-/* =====================================================
-   SUMMARY
-   ===================================================== */
-
-function renderSummary(data) {
-
-
-    /*
-     * Unique orders
-     */
-
-    const orderIds =
-        new Set(
-            data.map(
-                x => x.orderId
-            )
-        );
-
-
-    const totalOrders =
-        orderIds.size;
-
-
-    /*
-     * Total quantities.
-     *
-     * Both normal items and combos count
-     * as one sold item per quantity.
-     */
-
-    const totalItems =
-        data.reduce(
-            (sum, x) =>
-                sum +
-                Number(
-                    x.quantity || 0
-                ),
-            0
-        );
-
-
-    /*
-     * Number of combos sold
-     */
-
-    const comboGroups =
-        new Map();
-
-    data
-        .filter(
-            x =>
-                x.type === "combo"
-        )
-        .forEach(x => {
-
-            const key =
-                x.comboGroup ||
-                (
-                    x.orderId +
-                    "|" +
-                    x.item
-                );
-
-            if (!comboGroups.has(key)) {
-
-                comboGroups.set(
-                    key,
-                    Number(
-                        x.quantity || 0
-                    )
-                );
-
-            }
-
-        });
-
-    const totalCombos =
-        Array.from(
-            comboGroups.values()
-        ).reduce(
-            (sum, quantity) =>
-                sum + quantity,
-            0
-        );
-
-
-    /*
-     * Sales amount.
-     *
-     * Because each row comes from orders.items,
-     * combo price is counted ONCE.
-     */
-
-    const totalSales =
-        data.reduce(
-            (sum, x) =>
-                sum +
-                Number(
-                    x.amount || 0
-                ),
-            0
-        );
-
-
-    document.getElementById(
-        "totalOrders"
-    ).textContent =
-        totalOrders;
-
-
-    document.getElementById(
-        "totalItems"
-    ).textContent =
-        totalItems;
-
-
-    document.getElementById(
-        "totalCombos"
-    ).textContent =
-        totalCombos;
-
-
-    document.getElementById(
-        "totalSales"
-    ).textContent =
-        "₹" +
-        totalSales.toFixed(2);
-
-}
-
-
-/* =====================================================
-   PAYMENT SUMMARY
-   ===================================================== */
-
-function renderPaymentSummary(data) {
-
-    const paymentTotals = {
-        Cash: 0,
-        UPI: 0
-    };
-
-    const orderPaymentTotals = new Map();
-
-    data.forEach(row => {
-
-        const payment =
-            String(getOrderPayment(row.order) || "")
-                .trim()
-                .toUpperCase();
-
-        const method =
-            payment === "UPI"
-                ? "UPI"
-                : payment === "CASH"
-                    ? "Cash"
-                    : null;
-
-        if (!method) return;
-
-        const key = row.orderId;
-
-        if (!orderPaymentTotals.has(key)) {
-            orderPaymentTotals.set(key, {
-                method: method,
-                amount: 0
-            });
-        }
-
-        orderPaymentTotals.get(key).amount +=
-            Number(row.amount || 0);
-    });
-
-    orderPaymentTotals.forEach(entry => {
-        paymentTotals[entry.method] += entry.amount;
-    });
-
-    document.getElementById("cashSales").textContent =
-        "₹" + paymentTotals.Cash.toFixed(2);
-
-    document.getElementById("upiSales").textContent =
-        "₹" + paymentTotals.UPI.toFixed(2);
-}
-
-
-/* =====================================================
-   SALES ITEMS TABLE
-   ===================================================== */
-
-function renderItemsTable(data) {
-
-    const itemsLoading = document.getElementById("itemsLoading");
-
-    if (itemsLoading) {
-        itemsLoading.style.display = "none";
-    }
-
-
-    const container =
-        document.getElementById(
-            "itemsTableContainer"
-        );
-
-
-    if (!data.length) {
-
-        container.innerHTML =
-            '<div class="empty">No sales found.</div>';
-
-        return;
-
-    }
-
-
-    let html = `
-
-    <table>
-
-    <thead>
-
-    <tr>
-
-        <th>Date / Time</th>
-
-        <th>Order</th>
-
-        <th>Customer</th>
-
-        <th>Item</th>
-
-        <th>Type</th>
-
-        <th>Qty</th>
-
-        <th>Price</th>
-
-        <th>Amount</th>
-
-        <th>Counter</th>
-
-        <th>Status</th>
-
-    </tr>
-
-    </thead>
-
-    <tbody>
-
-    `;
-
-
-    data.forEach(row => {
-
-
-        let componentText = "";
-
-        /*
-         * Combo components are now separate rows.
-         * Show the original combo name underneath the item.
-         */
-
-        if (
-            row.type === "combo" &&
-            row.comboName
-        ) {
-
-            componentText =
-                "From combo: " +
-                escapeHtml(row.comboName);
-
-        }
-
-
-        html += `
-
-        <tr>
-
-            <td>
-                ${formatDate(
-                    row.created_at
-                )}
-            </td>
-
-
-            <td>
-                <b>
-                    #${escapeHtml(
-                        row.orderNumber ??
-                        row.orderId
-                    )}
-                </b>
-            </td>
-
-
-            <td>
-                ${escapeHtml(
-                    row.customer
-                )}
-            </td>
-
-
-            <td>
-
-                <b>
-                    ${escapeHtml(
-                        row.item
-                    )}
-                </b>
-
-                ${
-                    componentText
-                    ? `
-                    <div class="combo-components">
-                        Includes:
-                        ${componentText}
-                    </div>
-                    `
-                    : ""
-                }
-
-            </td>
-
-
-            <td>
-
-                <span class="type ${row.type}">
-
-                    ${
-                        row.type === "combo"
-                        ? "COMBO"
-                        : "SINGLE"
-                    }
-
-                </span>
-
-            </td>
-
-
-            <td>
-                ${row.quantity}
-            </td>
-
-
-            <td>
-                ₹${row.price.toFixed(2)}
-            </td>
-
-
-            <td>
-                <b>
-                    ₹${row.amount.toFixed(2)}
-                </b>
-            </td>
-
-
-            <td>
-                ${escapeHtml(
-                    row.counter
-                )}
-            </td>
-
-
-            <td>
-
-                <span
-                    class="status ${statusClass(
-                        row.status
-                    )}"
-                >
-
-                    ${escapeHtml(
-                        row.status
-                    )}
-
-                </span>
-
-            </td>
-
-        </tr>
-
-        `;
-
-    });
-
-
-    html += `
-
-    </tbody>
-
-    </table>
-
-    `;
-
-
-    container.innerHTML =
-        html;
+</td>
+<td>
+<span class="type ${row.type}">
+${row.type==="combo"?"COMBO":"SINGLE"}
+</span>
+</td>
+<td>${row.quantity}</td>
+<td><b>₹${row.amount.toFixed(2)}</b></td>
+</tr>
+`;
+
+});
+
+html+=`</tbody></table>`;
+
+container.innerHTML=html;
 
 }
 
@@ -1856,1077 +1308,818 @@ function renderItemsTable(data) {
    ORDER DETAILS
    ===================================================== */
 
-function renderOrdersTable(data) {
+function openOrderDetails(orderId){
 
-    const container =
-        document.getElementById(
-            "ordersTableContainer"
-        );
+const order=ordersData.find(
+x=>String(x.id)===String(orderId)
+);
 
+if(!order){
+alert("Order details could not be found.");
+return;
+}
 
-    const orderMap =
-        new Map();
+const items=parseItems(order.items);
 
+let itemsHtml="";
 
-    data.forEach(row => {
+if(!items.length){
 
-        if (!orderMap.has(row.orderId)) {
+itemsHtml=
+`<div class="empty">No items found.</div>`;
 
-            orderMap.set(
-                row.orderId,
-                {
-                    orderId: row.orderId,
-                    orderNumber: row.orderNumber,
-                    amount: 0
-                }
-            );
+}else{
 
-        }
+itemsHtml=`
+<table class="order-modal-table">
+<thead>
+<tr>
+<th>Item</th>
+<th>Qty</th>
+<th>Price</th>
+<th>Amount</th>
+</tr>
+</thead>
+<tbody>
+`;
 
+items.forEach(item=>{
 
-        const order =
-            orderMap.get(row.orderId);
+const name=
+item.name??item.item_name??"Unknown Item";
 
+const quantity=
+Number(item.quantity??item.qty??1);
 
-        order.amount +=
-            Number(row.amount || 0);
+const price=
+Number(item.price??item.unit_price??0);
 
-    });
+let components="";
 
+if(
+item.type==="combo"&&
+Array.isArray(item.components)
+){
 
-    const orders =
-        [...orderMap.values()];
+components=
+`<div class="order-modal-components">
+Includes:
+${item.components.map(c=>
+escapeHtml(c.name??c.item_name??"Unknown")
+).join(", ")}
+</div>`;
 
+}
 
-    if (!orders.length) {
+itemsHtml+=`
+<tr>
+<td>
+<b>${escapeHtml(name)}</b>
+${components}
+</td>
+<td>${quantity}</td>
+<td>₹${price.toFixed(2)}</td>
+<td><b>₹${(quantity*price).toFixed(2)}</b></td>
+</tr>
+`;
 
-        container.innerHTML =
-            '<div class="empty">No orders found.</div>';
+});
 
-        return;
+itemsHtml+=`</tbody></table>`;
 
-    }
+}
 
+const total=
+Number(
+order.total??
+order.grand_total??
+order.amount??
+0
+);
 
-    let html = `
+const existing=
+document.getElementById("orderDetailsModal");
 
-    <table>
+if(existing)existing.remove();
 
-    <thead>
+const modal=document.createElement("div");
 
-    <tr>
+modal.id="orderDetailsModal";
+modal.className="order-details-modal";
 
-        <th>Order Number</th>
+modal.innerHTML=`
 
-        <th>Total Price</th>
+<div
+class="order-details-backdrop"
+onclick="closeOrderDetails()">
+</div>
 
-    </tr>
+<div class="order-details-box">
 
-    </thead>
+<div class="order-details-header">
 
-    <tbody>
+<div>
+<h2>Order #${escapeHtml(order.order_number??order.id)}</h2>
+</div>
 
-    `;
+<button
+class="close-btn"
+onclick="closeOrderDetails()">
+×
+</button>
 
+</div>
 
-    orders.forEach(order => {
+<div class="order-details-info">
 
-        const displayNumber =
-            order.orderNumber ??
-            order.orderId;
+<div>
+<b>Date / Time</b>
+<span>${escapeHtml(formatDate(order.created_at))}</span>
+</div>
 
+<div>
+<b>Customer</b>
+<span>${escapeHtml(order.customer_name??"-")}</span>
+</div>
 
-        html += `
+<div>
+<b>Table</b>
+<span>${escapeHtml(order.table_number??"-")}</span>
+</div>
 
-        <tr>
+<div>
+<b>Payment</b>
+<span>${escapeHtml(getOrderPayment(order))}</span>
+</div>
 
-            <td>
-                <span
-                    class="order-link"
-                    onclick="openOrderDetails('${escapeJs(order.orderId)}')"
-                    title="Click to view order details"
-                >
-                    #${escapeHtml(displayNumber)}
-                </span>
-            </td>
+<div>
+<b>Status</b>
+<span>${escapeHtml(order.status??"Pending")}</span>
+</div>
 
+</div>
 
-            <td>
-                <b>
-                    ₹${order.amount.toFixed(2)}
-                </b>
-            </td>
+<div class="order-details-items">
+${itemsHtml}
+</div>
 
-        </tr>
+<div class="order-details-total">
+Total: ₹${total.toFixed(2)}
+</div>
 
-        `;
+</div>
+`;
 
-    });
+document.body.appendChild(modal);
 
+}
 
-    html += `
+function closeOrderDetails(){
 
-    </tbody>
+const modal=
+document.getElementById("orderDetailsModal");
 
-    </table>
-
-    `;
-
-
-    container.innerHTML =
-        html;
+if(modal)modal.remove();
 
 }
 
 
 /* =====================================================
-   ORDER DETAIL POPUP
+   MENU MANAGEMENT
    ===================================================== */
 
-function openOrderDetails(orderId) {
+let menuItems=[];
+let editingMenuId=null;
 
-    const order =
-        ordersData.find(
-            x => String(x.id) === String(orderId)
-        );
 
-    if (!order) {
-        alert("Order details could not be found.");
-        return;
-    }
+/*
+ * Open manager.
+ */
+async function openMenuManager(){
 
-    const items = parseItems(order.items);
+document.getElementById("menuModal").style.display="flex";
 
-    const orderNumber =
-        order.order_number ??
-        order.id;
-
-    const payment = getOrderPayment(order);
-
-    let calculatedTotal = 0;
-
-    items.forEach(item => {
-        calculatedTotal +=
-            Number(item.quantity ?? item.qty ?? 1) *
-            Number(item.price ?? item.unit_price ?? 0);
-    });
-
-    const total =
-        Number(order.total ?? order.grand_total ?? order.amount);
-
-    const finalTotal =
-        Number.isFinite(total) && total > 0
-            ? total
-            : calculatedTotal;
-
-    let itemsHtml = "";
-
-    if (!items.length) {
-        itemsHtml = `
-            <div class="order-modal-empty">
-                No items found for this order.
-            </div>
-        `;
-    } else {
-        itemsHtml = `
-        <table class="order-modal-table">
-            <thead>
-                <tr>
-                    <th>Item</th>
-                    <th>Qty</th>
-                    <th>Price</th>
-                    <th>Amount</th>
-                </tr>
-            </thead>
-            <tbody>
-        `;
-
-        items.forEach(item => {
-            const name =
-                item.name ??
-                item.item_name ??
-                "Unknown Item";
-
-            const quantity =
-                Number(item.quantity ?? item.qty ?? 1);
-
-            const price =
-                Number(item.price ?? item.unit_price ?? 0);
-
-            const amount = quantity * price;
-
-            const isCombo = item.type === "combo";
-            let componentText = "";
-
-            if (
-                isCombo &&
-                Array.isArray(item.components) &&
-                item.components.length
-            ) {
-                componentText =
-                    `<div class="order-modal-components">Includes: ` +
-                    item.components.map(component =>
-                        escapeHtml(
-                            component.name ??
-                            component.item_name ??
-                            "Unknown Item"
-                        )
-                    ).join(", ") +
-                    `</div>`;
-            }
-
-            itemsHtml += `
-                <tr>
-                    <td>
-                        <b>${escapeHtml(name)}</b>
-                        ${componentText}
-                    </td>
-                    <td>${quantity}</td>
-                    <td>₹${price.toFixed(2)}</td>
-                    <td><b>₹${amount.toFixed(2)}</b></td>
-                </tr>
-            `;
-        });
-
-        itemsHtml += `
-            </tbody>
-        </table>
-        `;
-    }
-
-    // Remove an already-open order window inside the page.
-    const existing = document.getElementById("orderDetailsModal");
-    if (existing) existing.remove();
-
-    const modal = document.createElement("div");
-    modal.id = "orderDetailsModal";
-    modal.className = "order-details-modal";
-
-    modal.innerHTML = `
-        <div class="order-details-backdrop" onclick="closeOrderDetails(event)"></div>
-
-        <div class="order-details-box" role="dialog" aria-modal="true" aria-label="Order details">
-            <div class="order-details-header">
-                <div>
-                    <h2>Order #${escapeHtml(orderNumber)}</h2>
-                    <span>CHAATARRA • Order Details</span>
-                </div>
-                <button class="order-details-close" onclick="closeOrderDetails()" aria-label="Close">×</button>
-            </div>
-
-            <div class="order-details-info">
-                <div><b>Date / Time</b><span>${escapeHtml(formatDate(order.created_at))}</span></div>
-                <div><b>Customer</b><span>${escapeHtml(order.customer_name ?? "-")}</span></div>
-                <div><b>Table</b><span>${escapeHtml(order.table_number ?? "-")}</span></div>
-                <div><b>Payment</b><span>${escapeHtml(payment)}</span></div>
-                <div><b>Status</b><span>${escapeHtml(order.status ?? "Pending")}</span></div>
-            </div>
-
-            <div class="order-details-items">
-                ${itemsHtml}
-            </div>
-
-            <div class="order-details-total">
-                Total: ₹${finalTotal.toFixed(2)}
-            </div>
-        </div>
-    `;
-
-    document.body.appendChild(modal);
-
-    // Prevent the page behind the modal from scrolling.
-    document.body.classList.add("order-modal-open");
-}
-
-function closeOrderDetails(event) {
-    if (event && event.target && event.target.id !== "orderDetailsModal") {
-        return;
-    }
-
-    const modal = document.getElementById("orderDetailsModal");
-    if (modal) modal.remove();
-
-    document.body.classList.remove("order-modal-open");
-}
-
-
-function escapeJs(value) {
-
-    return String(value ?? "")
-        .replace(/\\/g, "\\\\")
-        .replace(/'/g, "\\'")
-        .replace(/"/g, "\\\"")
-        .replace(/\n/g, "\\n")
-        .replace(/\r/g, "\\r");
-}
-
-
-/* =====================================================
-   ITEM SUMMARY
-   ===================================================== */
-
-function renderItemSummary(data) {
-
-    const container =
-        document.getElementById(
-            "summaryTableContainer"
-        );
-
-
-    const map =
-        new Map();
-
-
-    data.forEach(row => {
-
-        /*
-         * Keep SINGLE and COMBO separate.
-         */
-
-        const key =
-            row.type +
-            "|" +
-            row.item +
-            "|" +
-            (row.comboName || "");
-
-
-        if (
-            !map.has(key)
-        ) {
-
-            map.set(
-                key,
-                {
-
-                    item:
-                        row.item,
-
-                    type:
-                        row.type,
-
-                    comboName:
-                        row.comboName || "",
-
-                    quantity:
-                        0,
-
-                    amount:
-                        0
-
-                }
-            );
-
-        }
-
-
-        const entry =
-            map.get(key);
-
-
-        entry.quantity +=
-            Number(
-                row.quantity || 0
-            );
-
-
-        entry.amount +=
-            Number(
-                row.amount || 0
-            );
-
-    });
-
-
-    const summary =
-        [
-            ...map.values()
-        ]
-        .sort(
-            (a,b) =>
-                b.quantity -
-                a.quantity
-        );
-
-
-    if (!summary.length) {
-
-        container.innerHTML =
-            '<div class="empty">No item data.</div>';
-
-        return;
-
-    }
-
-
-    let html = `
-
-    <table>
-
-    <thead>
-
-    <tr>
-
-        <th>Item</th>
-
-        <th>Type</th>
-
-        <th>Total Quantity</th>
-
-        <th>Total Amount</th>
-
-    </tr>
-
-    </thead>
-
-    <tbody>
-
-    `;
-
-
-    summary.forEach(row => {
-
-        html += `
-
-        <tr>
-
-            <td>
-                <b>
-                    ${escapeHtml(
-                        row.item
-                    )}
-                </b>
-
-                ${
-                    row.type === "combo" && row.comboName
-                    ? `
-                        <div class="combo-components">
-                            From combo: ${escapeHtml(row.comboName)}
-                        </div>
-                    `
-                    : ""
-                }
-            </td>
-
-
-            <td>
-
-                <span
-                    class="type ${row.type}"
-                >
-
-                    ${
-                        row.type === "combo"
-                        ? "COMBO"
-                        : "SINGLE"
-                    }
-
-                </span>
-
-            </td>
-
-
-            <td>
-                ${row.quantity}
-            </td>
-
-
-            <td>
-                <b>
-                    ₹${row.amount.toFixed(2)}
-                </b>
-            </td>
-
-        </tr>
-
-        `;
-
-    });
-
-
-    html += `
-
-    </tbody>
-
-    </table>
-
-    `;
-
-
-    container.innerHTML =
-        html;
+await loadMenuManager();
 
 }
 
 
-/* =====================================================
-   EXPORT TO EXCEL
-   ===================================================== */
+/*
+ * Close manager.
+ */
+function closeMenuManager(){
 
-function getOrderPayment(order) {
+document.getElementById("menuModal").style.display="none";
 
-    if (!order) return "-";
-
-    return (
-        order.payment_method ??
-        order.payment ??
-        order.payment_type ??
-        order.paymentMode ??
-        order.payment_mode ??
-        "-"
-    );
-}
-
-function exportToExcel() {
-
-    if (typeof XLSX === "undefined") {
-        alert("Excel library is still loading. Please try again.");
-        return;
-    }
-
-    const data = getFilteredData();
-
-    if (!data.length) {
-        alert("There is no sales data to export for the selected filters.");
-        return;
-    }
-
-    const workbook = XLSX.utils.book_new();
-
-    /*
-     * -----------------------------------------------------
-     * SHEET 1: SALES ITEMS
-     * -----------------------------------------------------
-     */
-
-    const itemRows = data.map(row => ({
-        "Date / Time": formatDate(row.created_at),
-        "Order": "#" + (row.orderNumber ?? row.orderId),
-        "Customer": row.customer ?? "-",
-        "Payment": getOrderPayment(row.order),
-        "Item": row.item ?? "-",
-        "Type": row.type === "combo" ? "COMBO" : "SINGLE",
-        "Quantity": Number(row.quantity || 0),
-        "Unit Price": Number(row.price || 0),
-        "Revenue": Number(row.amount || 0),
-        "Counter": row.counter ?? "-",
-        "Status": row.status ?? "Pending",
-        "From Combo": row.comboName ?? ""
-    }));
-
-    const salesSheet = XLSX.utils.json_to_sheet(itemRows);
-    XLSX.utils.book_append_sheet(workbook, salesSheet, "Sales Items");
-
-    /*
-     * -----------------------------------------------------
-     * SHEET 2: ORDER DETAILS
-     * -----------------------------------------------------
-     */
-
-    const orderMap = new Map();
-
-    data.forEach(row => {
-
-        if (!orderMap.has(row.orderId)) {
-            orderMap.set(row.orderId, {
-                "Date / Time": formatDate(row.created_at),
-                "Order": "#" + (row.orderNumber ?? row.orderId),
-                "Customer": row.customer ?? "-",
-                "Payment": getOrderPayment(row.order),
-                "Items": 0,
-                "Combos": 0,
-                "Total": 0,
-                "Status": row.status ?? "Pending"
-            });
-        }
-
-        const order = orderMap.get(row.orderId);
-
-        order["Items"] += Number(row.quantity || 0);
-        order["Total"] += Number(row.amount || 0);
-
-        if (row.type === "combo") {
-            order["Combos"] += Number(row.quantity || 0);
-        }
-    });
-
-    const orderRows = [...orderMap.values()];
-    const orderSheet = XLSX.utils.json_to_sheet(orderRows);
-    XLSX.utils.book_append_sheet(workbook, orderSheet, "Orders");
-
-    /*
-     * -----------------------------------------------------
-     * SHEET 3: ITEM SUMMARY
-     * -----------------------------------------------------
-     */
-
-    const itemMap = new Map();
-
-    data.forEach(row => {
-
-        const key =
-            row.type +
-            "|" +
-            row.item +
-            "|" +
-            (row.comboName || "");
-
-        if (!itemMap.has(key)) {
-            itemMap.set(key, {
-                "Item": row.item ?? "-",
-                "Type": row.type === "combo" ? "COMBO" : "SINGLE",
-                "From Combo": row.comboName ?? "",
-                "Quantity": 0,
-                "Revenue": 0
-            });
-        }
-
-        const entry = itemMap.get(key);
-
-        entry["Quantity"] += Number(row.quantity || 0);
-        entry["Revenue"] += Number(row.amount || 0);
-    });
-
-    const itemSummaryRows = [...itemMap.values()]
-        .sort((a, b) => b["Quantity"] - a["Quantity"]);
-
-    const summarySheet =
-        XLSX.utils.json_to_sheet(itemSummaryRows);
-
-    XLSX.utils.book_append_sheet(
-        workbook,
-        summarySheet,
-        "Item Summary"
-    );
-
-    /*
-     * -----------------------------------------------------
-     * SHEET 4: PAYMENT BREAKDOWN
-     * -----------------------------------------------------
-     */
-
-    const paymentMap = new Map();
-
-    orderRows.forEach(order => {
-
-        const payment = order["Payment"] || "-";
-
-        if (!paymentMap.has(payment)) {
-            paymentMap.set(payment, {
-                "Payment Method": payment,
-                "Orders": 0,
-                "Revenue": 0
-            });
-        }
-
-        const entry = paymentMap.get(payment);
-
-        entry["Orders"] += 1;
-        entry["Revenue"] += Number(order["Total"] || 0);
-    });
-
-    const paymentRows = [...paymentMap.values()];
-
-    const paymentSheet =
-        XLSX.utils.json_to_sheet(paymentRows);
-
-    XLSX.utils.book_append_sheet(
-        workbook,
-        paymentSheet,
-        "Payments"
-    );
-
-    /*
-     * -----------------------------------------------------
-     * SHEET 5: REPORT SUMMARY
-     * -----------------------------------------------------
-     */
-
-    const totalOrders =
-        new Set(data.map(x => x.orderId)).size;
-
-    const totalItems =
-        data.reduce(
-            (sum, x) => sum + Number(x.quantity || 0),
-            0
-        );
-
-    const totalSales =
-        data.reduce(
-            (sum, x) => sum + Number(x.amount || 0),
-            0
-        );
-
-    const comboGroups = new Map();
-
-    data
-        .filter(x => x.type === "combo")
-        .forEach(x => {
-
-            const key =
-                x.comboGroup ||
-                x.orderId + "|" + x.item;
-
-            if (!comboGroups.has(key)) {
-                comboGroups.set(
-                    key,
-                    Number(x.quantity || 0)
-                );
-            }
-        });
-
-    const totalCombos =
-        [...comboGroups.values()]
-            .reduce(
-                (sum, quantity) => sum + quantity,
-                0
-            );
-
-    const averageBill =
-        totalOrders > 0
-            ? totalSales / totalOrders
-            : 0;
-
-    const fromDate =
-        document.getElementById("fromDate").value || "All";
-
-    const toDate =
-        document.getElementById("toDate").value || "All";
-
-    const counter =
-        document.getElementById("counterFilter").value;
-
-    const status =
-        document.getElementById("statusFilter").value;
-
-    const reportRows = [
-        {
-            "Report": "CHAATARRA SALES REPORT",
-            "Value": ""
-        },
-        {
-            "Report": "From Date",
-            "Value": fromDate
-        },
-        {
-            "Report": "To Date",
-            "Value": toDate
-        },
-        {
-            "Report": "Counter",
-            "Value": counter
-        },
-        {
-            "Report": "Status",
-            "Value": status
-        },
-        {
-            "Report": "",
-            "Value": ""
-        },
-        {
-            "Report": "Total Orders",
-            "Value": totalOrders
-        },
-        {
-            "Report": "Total Items Sold",
-            "Value": totalItems
-        },
-        {
-            "Report": "Total Combos Sold",
-            "Value": totalCombos
-        },
-        {
-            "Report": "Total Sales",
-            "Value": totalSales
-        },
-        {
-            "Report": "Average Bill",
-            "Value": averageBill
-        }
-    ];
-
-    const reportSheet =
-        XLSX.utils.json_to_sheet(reportRows);
-
-    XLSX.utils.book_append_sheet(
-        workbook,
-        reportSheet,
-        "Report Summary"
-    );
-
-    /*
-     * -----------------------------------------------------
-     * FORMAT COLUMN WIDTHS
-     * -----------------------------------------------------
-     */
-
-    function setWidths(sheet, widths) {
-        sheet["!cols"] = widths.map(width => ({
-            wch: width
-        }));
-    }
-
-    setWidths(salesSheet, [
-        20, 10, 22, 14, 28, 10,
-        10, 12, 12, 14, 14, 28
-    ]);
-
-    setWidths(orderSheet, [
-        20, 10, 22, 14, 10, 10, 14, 14
-    ]);
-
-    setWidths(summarySheet, [
-        30, 12, 30, 12, 14
-    ]);
-
-    setWidths(paymentSheet, [
-        20, 12, 15
-    ]);
-
-    setWidths(reportSheet, [
-        25, 20
-    ]);
-
-    /*
-     * -----------------------------------------------------
-     * FILE NAME
-     * -----------------------------------------------------
-     */
-
-    const today = new Date();
-
-    const datePart =
-        today.toISOString().split("T")[0];
-
-    const fileName =
-        "Chaatarra_Sales_" +
-        datePart +
-        ".xlsx";
-
-    XLSX.writeFile(workbook, fileName);
-}
-
-
-/* =====================================================
-   RESET FILTERS
-   ===================================================== */
-
-function getTodayLocalDate() {
-
-    const today = new Date();
-
-    const year = today.getFullYear();
-
-    const month = String(today.getMonth() + 1).padStart(2, "0");
-
-    const day = String(today.getDate()).padStart(2, "0");
-
-    return `${year}-${month}-${day}`;
+cancelMenuEdit();
 
 }
 
 
-function setTodayFilter() {
+/*
+ * Load existing categories + items.
+ *
+ * IMPORTANT:
+ * Categories are NOT renamed.
+ * Whatever exists in chaat_products.category
+ * is used exactly as stored.
+ */
+async function loadMenuManager(){
 
-    const today = getTodayLocalDate();
+const body=
+document.getElementById("menuTableBody");
 
-    document.getElementById("fromDate").value = today;
-    document.getElementById("toDate").value = today;
+body.innerHTML=
+`<tr>
+<td colspan="6" class="empty">Loading menu...</td>
+</tr>`;
+
+const {data,error}=
+await supabaseClient
+.from("chaat_products")
+.select("id,created_at,name,category,price,available")
+.order("id",{ascending:true});
+
+if(error){
+
+body.innerHTML=
+`<tr>
+<td colspan="6" class="empty">
+Error: ${escapeHtml(error.message)}
+</td>
+</tr>`;
+
+return;
+
+}
+
+menuItems=data||[];
+
+renderMenuTable();
+loadCategories();
 
 }
 
 
-function resetFilters() {
+/*
+ * Build category dropdown from the existing database values.
+ */
+function loadCategories(){
 
-    setTodayFilter();
+const select=
+document.getElementById("menuItemCategory");
+
+const categories=[
+...new Set(
+menuItems
+.map(item=>item.category)
+.filter(
+category=>
+category!==null&&
+category!==undefined&&
+String(category).trim()!==""
+)
+)
+];
+
+select.innerHTML="";
+
+if(!categories.length){
+
+select.innerHTML=
+`<option value="">No category yet</option>`;
+
+return;
+
+}
+
+categories.forEach(category=>{
+
+const option=document.createElement("option");
+
+option.value=category;
+option.textContent=category;
+
+select.appendChild(option);
+
+});
+
+}
 
 
-    document.getElementById(
-        "counterFilter"
-    ).value = "all";
+/*
+ * Render menu table.
+ */
+function renderMenuTable(){
+
+const body=
+document.getElementById("menuTableBody");
+
+if(!menuItems.length){
+
+body.innerHTML=
+`<tr>
+<td colspan="6" class="empty">
+No menu items found.
+</td>
+</tr>`;
+
+return;
+
+}
+
+body.innerHTML="";
+
+menuItems.forEach(item=>{
+
+const row=document.createElement("tr");
+
+row.innerHTML=`
+
+<td>${item.id}</td>
+
+<td>
+<b>${escapeHtml(item.name??"-")}</b>
+</td>
+
+<td>
+${escapeHtml(item.category??"-")}
+</td>
+
+<td>
+₹${Number(item.price??0).toFixed(2)}
+</td>
+
+<td>
+<span class="${
+item.available
+?"available"
+:"unavailable"
+}">
+${item.available?"Available":"Unavailable"}
+</span>
+</td>
+
+<td class="menu-actions">
+
+<button
+class="edit-btn"
+onclick="editMenuItem(${item.id})">
+Edit
+</button>
+
+<button
+class="${
+item.available
+?"unavailable-btn"
+:"available-btn"
+}"
+onclick="toggleMenuAvailability(${item.id},${!item.available})">
+${item.available?"Disable":"Enable"}
+</button>
+
+<button
+class="delete-btn"
+onclick="deleteMenuItem(${item.id})">
+Delete
+</button>
+
+</td>
+`;
+
+body.appendChild(row);
+
+});
+
+}
 
 
-    document.getElementById(
-        "statusFilter"
-    ).value = "all";
+/*
+ * Add or update item.
+ */
+async function saveMenuItem(){
+
+const name=
+document.getElementById("menuItemName")
+.value.trim();
+
+const price=
+Number(
+document.getElementById("menuItemPrice").value
+);
+
+const category=
+document.getElementById("menuItemCategory").value;
+
+const available=
+document.getElementById("menuItemAvailable").checked;
+
+if(!name){
+
+alert("Please enter the item name.");
+return;
+
+}
+
+if(!Number.isFinite(price)||price<0){
+
+alert("Please enter a valid price.");
+return;
+
+}
+
+if(!category){
+
+alert("Please select a category.");
+return;
+
+}
+
+let result;
+
+if(editingMenuId===null){
+
+result=await supabaseClient
+.from("chaat_products")
+.insert({
+name:name,
+category:category,
+price:price,
+available:available
+});
+
+}else{
+
+result=await supabaseClient
+.from("chaat_products")
+.update({
+name:name,
+category:category,
+price:price,
+available:available
+})
+.eq("id",editingMenuId);
+
+}
+
+if(result.error){
+
+alert(
+"Could not save menu item:\n"+
+result.error.message
+);
+
+return;
+
+}
+
+alert(
+editingMenuId===null
+?"Menu item added successfully."
+:"Menu item updated successfully."
+);
+
+cancelMenuEdit();
+
+await loadMenuManager();
+
+}
 
 
-    renderSales();
+/*
+ * Edit.
+ */
+function editMenuItem(id){
+
+const item=
+menuItems.find(x=>Number(x.id)===Number(id));
+
+if(!item)return;
+
+editingMenuId=item.id;
+
+document.getElementById("menuFormTitle")
+.textContent="Edit Menu Item";
+
+document.getElementById("menuItemName")
+.value=item.name??"";
+
+document.getElementById("menuItemPrice")
+.value=item.price??0;
+
+document.getElementById("menuItemAvailable")
+.checked=item.available!==false;
+
+
+/*
+ * Make sure exact existing category is selected.
+ */
+const select=
+document.getElementById("menuItemCategory");
+
+let found=false;
+
+[...select.options].forEach(option=>{
+
+if(option.value===item.category){
+
+option.selected=true;
+found=true;
+
+}
+
+});
+
+if(!found&&item.category){
+
+const option=document.createElement("option");
+
+option.value=item.category;
+option.textContent=item.category;
+option.selected=true;
+
+select.appendChild(option);
+
+}
+
+document.getElementById("menuCancelBtn")
+.style.display="inline-block";
+
+window.scrollTo({
+top:0,
+behavior:"smooth"
+});
+
+}
+
+
+/*
+ * Cancel edit.
+ */
+function cancelMenuEdit(){
+
+editingMenuId=null;
+
+document.getElementById("menuFormTitle")
+.textContent="Add New Menu Item";
+
+document.getElementById("menuItemName").value="";
+document.getElementById("menuItemPrice").value="";
+document.getElementById("menuItemAvailable").checked=true;
+
+document.getElementById("menuCancelBtn")
+.style.display="none";
+
+}
+
+
+/*
+ * Enable / Disable.
+ */
+async function toggleMenuAvailability(id,newValue){
+
+const {error}=
+await supabaseClient
+.from("chaat_products")
+.update({
+available:newValue
+})
+.eq("id",id);
+
+if(error){
+
+alert(
+"Could not update availability:\n"+
+error.message
+);
+
+return;
+
+}
+
+await loadMenuManager();
+
+}
+
+
+/*
+ * Delete.
+ */
+async function deleteMenuItem(id){
+
+const item=
+menuItems.find(x=>Number(x.id)===Number(id));
+
+if(!item)return;
+
+const confirmed=
+confirm(
+`Delete "${item.name}" from the menu?\n\n`+
+`This removes it from chaat_products.`
+);
+
+if(!confirmed)return;
+
+const {error}=
+await supabaseClient
+.from("chaat_products")
+.delete()
+.eq("id",id);
+
+if(error){
+
+alert(
+"Could not delete item:\n"+
+error.message
+);
+
+return;
+
+}
+
+alert("Menu item deleted.");
+
+await loadMenuManager();
 
 }
 
 
 /* =====================================================
-   DATE FORMAT
+   EXCEL EXPORT
    ===================================================== */
 
-function formatDate(value) {
+function exportToExcel(){
 
-    if (!value) {
-        return "-";
-    }
+if(typeof XLSX==="undefined"){
+
+alert("Excel library is still loading.");
+return;
+
+}
+
+const data=getFilteredData();
+
+if(!data.length){
+
+alert("There is no sales data to export.");
+return;
+
+}
+
+const workbook=XLSX.utils.book_new();
+
+const rows=data.map(row=>({
+
+"Date / Time":formatDate(row.created_at),
+"Order":"#"+(row.orderNumber??row.orderId),
+"Customer":row.customer??"-",
+"Payment":getOrderPayment(row.order),
+"Item":row.item??"-",
+"Type":row.type==="combo"?"COMBO":"SINGLE",
+"Quantity":Number(row.quantity||0),
+"Unit Price":Number(row.price||0),
+"Revenue":Number(row.amount||0),
+"Counter":row.counter??"-",
+"Status":row.status??"Pending",
+"From Combo":row.comboName??""
+
+}));
+
+const sheet=
+XLSX.utils.json_to_sheet(rows);
+
+XLSX.utils.book_append_sheet(
+workbook,
+sheet,
+"Sales Items"
+);
+
+const datePart=
+new Date().toISOString().split("T")[0];
+
+XLSX.writeFile(
+workbook,
+"Chaatarra_Sales_"+datePart+".xlsx"
+);
 
 
-    const date =
-        new Date(value);
+/* =====================================================
+   DATE
+   ===================================================== */
 
+}
 
-    if (
-        isNaN(
-            date.getTime()
-        )
-    ) {
+function getTodayLocalDate(){
 
-        return "-";
+const d=new Date();
 
-    }
+return d.getFullYear()+"-"+
+String(d.getMonth()+1).padStart(2,"0")+"-"+
+String(d.getDate()).padStart(2,"0");
 
+}
 
-    return date.toLocaleString(
-        "en-IN",
-        {
+function setTodayFilter(){
 
-            day: "2-digit",
+const today=getTodayLocalDate();
 
-            month: "2-digit",
+document.getElementById("fromDate").value=today;
+document.getElementById("toDate").value=today;
 
-            year: "numeric",
+}
 
-            hour: "2-digit",
+function resetFilters(){
 
-            minute: "2-digit"
+setTodayFilter();
 
-        }
-    );
+document.getElementById("counterFilter")
+.value="all";
+
+document.getElementById("statusFilter")
+.value="all";
+
+renderSales();
 
 }
 
 
 /* =====================================================
-   STATUS CLASS
+   HELPERS
    ===================================================== */
 
-function statusClass(status) {
+function formatDate(value){
 
-    if (!status) {
-        return "";
-    }
+if(!value)return"-";
 
+const date=new Date(value);
 
-    return String(status)
-        .toLowerCase()
-        .replace(
-            /\s+/g,
-            "-"
-        );
+if(isNaN(date.getTime()))return"-";
+
+return date.toLocaleString(
+"en-IN",
+{
+day:"2-digit",
+month:"2-digit",
+year:"numeric",
+hour:"2-digit",
+minute:"2-digit"
+}
+);
 
 }
 
+function escapeHtml(value){
 
-/* =====================================================
-   ESCAPE HTML
-   ===================================================== */
+if(value===null||value===undefined)
+return"";
 
-function escapeHtml(value) {
-
-    if (
-        value === null ||
-        value === undefined
-    ) {
-
-        return "";
-
-    }
-
-
-    return String(value)
-
-        .replace(
-            /&/g,
-            "&amp;"
-        )
-
-        .replace(
-            /</g,
-            "&lt;"
-        )
-
-        .replace(
-            />/g,
-            "&gt;"
-        )
-
-        .replace(
-            /"/g,
-            "&quot;"
-        )
-
-        .replace(
-            /'/g,
-            "&#039;"
-        );
+return String(value)
+.replace(/&/g,"&amp;")
+.replace(/</g,"&lt;")
+.replace(/>/g,"&gt;")
+.replace(/"/g,"&quot;")
+.replace(/'/g,"&#039;");
 
 }
 
+function escapeJs(value){
 
-/* =====================================================
-   ERROR
-   ===================================================== */
-
-function showError(message) {
-
-    const box =
-        document.getElementById(
-            "errorBox"
-        );
-
-
-    if (!message) {
-
-        box.style.display =
-            "none";
-
-        box.textContent = "";
-
-        return;
-
-    }
-
-
-    box.style.display =
-        "block";
-
-
-    box.textContent =
-        message;
+return String(value??"")
+.replace(/\\/g,"\\\\")
+.replace(/'/g,"\\'")
+.replace(/"/g,'\\"')
+.replace(/\n/g,"\\n")
+.replace(/\r/g,"\\r");
 
 }
 
+function showError(message){
 
-/* =====================================================
-   DEBUG
-   ===================================================== */
+const box=
+document.getElementById("errorBox");
 
-function updateDebug() {
+if(!message){
 
-    const comboCount =
-        salesData.filter(
-            x =>
-                x.type === "combo"
-        ).length;
+box.style.display="none";
+box.textContent="";
+return;
 
+}
 
-    const singleCount =
-        salesData.filter(
-            x =>
-                x.type === "single"
-        ).length;
+box.style.display="block";
+box.textContent=message;
 
+}
 
-    document.getElementById(
-        "debugBox"
-    ).textContent =
+function updateDebug(){
+
+const combos=
+salesData.filter(x=>x.type==="combo").length;
+
+const singles=
+salesData.filter(x=>x.type==="single").length;
+
+document.getElementById("debugBox").textContent=
 
 `ORDERS ROWS: ${ordersData.length}
 
@@ -2934,23 +2127,15 @@ COUNTER_KOT ROWS: ${kotData.length}
 
 SALES ROWS: ${salesData.length}
 
-SINGLE SALES ROWS: ${singleCount}
+SINGLE SALES ROWS: ${singles}
 
-COMBO SALES ROWS: ${comboCount}
+COMBO SALES ROWS: ${combos}
 
 First order:
-${JSON.stringify(
-    ordersData[0] || null,
-    null,
-    2
-)}
+${JSON.stringify(ordersData[0]||null,null,2)}
 
 First sales row:
-${JSON.stringify(
-    salesData[0] || null,
-    null,
-    2
-)}`;
+${JSON.stringify(salesData[0]||null,null,2)}`;
 
 }
 
@@ -2960,12 +2145,10 @@ ${JSON.stringify(
    ===================================================== */
 
 setTodayFilter();
+
 loadSales();
 
 </script>
 
 </body>
-
 </html>
-
-```
