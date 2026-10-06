@@ -2,370 +2,693 @@
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>Cafe Billing</title>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <script src="supabase.js?v=4"></script>
 
+
     <style>
+
         * {
             box-sizing: border-box;
         }
 
+
         body {
+
             margin: 0;
+
             font-family: Arial, sans-serif;
+
             background: #f4f4f4;
+
             color: #222;
+
         }
+
 
         header {
+
             background: #4b001f;
+
             color: white;
+
             padding: 18px;
+
             text-align: center;
+
         }
+
 
         header h1 {
+
             margin: 0;
+
             font-size: 28px;
+
         }
+
 
         header p {
+
             margin: 5px 0 0;
+
             font-size: 14px;
+
         }
+
 
         .container {
+
             max-width: 1000px;
+
             margin: auto;
+
             padding: 15px;
+
         }
+
 
         .section {
+
             background: white;
+
             margin-bottom: 15px;
+
             padding: 15px;
+
             border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+            box-shadow:
+                0 2px 8px rgba(0, 0, 0, 0.08);
+
         }
+
 
         .section h2 {
+
             margin-top: 0;
+
             color: #4b001f;
+
             border-bottom: 2px solid #eee;
+
             padding-bottom: 8px;
+
         }
+
 
         .menu-grid {
+
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+
+            grid-template-columns:
+                repeat(
+                    auto-fit,
+                    minmax(180px, 1fr)
+                );
+
             gap: 10px;
+
         }
+
 
         .item {
+
             border: 1px solid #ddd;
+
             border-radius: 8px;
+
             padding: 12px;
+
             background: #fff;
+
         }
+
 
         .item-name {
+
             font-weight: bold;
+
             font-size: 17px;
+
         }
+
+
+        .item-description {
+
+            font-size: 13px;
+
+            color: #777;
+
+            margin-top: 4px;
+
+        }
+
 
         .item-price {
+
             color: #4b001f;
+
             font-weight: bold;
+
             margin-top: 5px;
+
         }
+
 
         .combo-label {
+
             display: inline-block;
+
             margin-top: 5px;
+
             padding: 3px 7px;
+
             border-radius: 4px;
+
             background: #4b001f;
+
             color: white;
+
             font-size: 11px;
+
             font-weight: bold;
+
         }
+
 
         .quantity-row {
+
             display: flex;
+
             align-items: center;
+
             justify-content: space-between;
+
             margin-top: 10px;
+
         }
+
 
         .quantity-row button {
+
             width: 35px;
+
             height: 35px;
+
             border: none;
+
             border-radius: 6px;
+
             background: #4b001f;
+
             color: white;
+
             font-size: 20px;
+
             cursor: pointer;
+
         }
+
 
         .quantity {
+
             font-size: 18px;
+
             font-weight: bold;
+
             min-width: 30px;
+
             text-align: center;
+
         }
+
 
         .customer-box input {
+
             width: 100%;
+
             padding: 12px;
+
             border: 1px solid #ccc;
+
             border-radius: 6px;
+
             font-size: 16px;
+
             margin-bottom: 8px;
+
         }
+
 
         .cart {
+
             margin-top: 10px;
+
         }
+
 
         .cart-row {
+
             display: flex;
+
             justify-content: space-between;
+
             padding: 8px 0;
+
             border-bottom: 1px solid #eee;
+
             gap: 10px;
+
         }
+
 
         .cart-left {
+
             flex: 1;
+
         }
+
 
         .cart-right {
+
             white-space: nowrap;
+
             font-weight: bold;
+
         }
 
+
         .total {
+
             text-align: right;
+
             font-size: 24px;
+
             font-weight: bold;
+
             color: #4b001f;
+
             margin-top: 15px;
+
         }
+
 
         /* PAYMENT */
 
+
         .payment-title {
+
             margin-top: 18px;
+
             margin-bottom: 8px;
+
             font-weight: bold;
+
             color: #4b001f;
+
         }
+
 
         .payment-options {
+
             display: flex;
+
             gap: 10px;
+
             margin-top: 8px;
+
         }
+
 
         .payment-btn {
+
             flex: 1;
+
             padding: 14px;
+
             border: 2px solid #4b001f;
+
             border-radius: 8px;
+
             background: white;
+
             color: #4b001f;
+
             font-size: 17px;
+
             font-weight: bold;
+
             cursor: pointer;
+
         }
+
 
         .payment-btn.selected {
+
             background: #4b001f;
+
             color: white;
+
         }
+
 
         .buttons {
+
             display: flex;
+
             gap: 10px;
+
             margin-top: 15px;
+
         }
+
 
         .buttons button {
+
             flex: 1;
+
             padding: 16px;
+
             border: none;
+
             border-radius: 8px;
+
             font-size: 18px;
+
             font-weight: bold;
+
             cursor: pointer;
+
         }
+
 
         #placeOrder {
+
             background: #4b001f;
+
             color: white;
+
         }
+
 
         #printBill {
+
             background: #222;
+
             color: white;
+
             display: none;
+
         }
+
 
         button:disabled {
+
             opacity: 0.6;
+
             cursor: not-allowed;
+
         }
+
 
         #message {
+
             text-align: center;
+
             font-weight: bold;
+
             margin-top: 15px;
+
             min-height: 24px;
+
         }
+
 
         .success {
+
             color: green;
+
         }
+
 
         .error {
+
             color: red;
+
         }
 
+
         #receipt {
+
             display: none;
+
         }
+
+
+        /* PRINT */
+
 
         @media print {
 
             @page {
+
                 size: 58mm auto;
+
                 margin: 0;
+
             }
+
 
             body {
+
                 margin: 0;
+
                 padding: 0;
+
                 background: white;
+
             }
 
+
             body * {
+
                 visibility: hidden;
+
             }
+
 
             #receipt,
             #receipt * {
+
                 visibility: visible;
+
             }
+
 
             #receipt {
+
                 display: block;
+
                 position: absolute;
+
                 left: 0;
+
                 top: 0;
+
                 width: 58mm;
+
                 padding: 3mm;
-                font-family: "Courier New", monospace;
+
+                font-family:
+                    "Courier New",
+                    monospace;
+
                 font-size: 11px;
+
                 line-height: 1.3;
+
                 color: black;
+
             }
+
 
             .receipt-header {
+
                 text-align: center;
+
             }
+
 
             .receipt-title {
+
                 font-size: 18px;
+
                 font-weight: bold;
+
             }
+
 
             .receipt-subtitle {
+
                 font-size: 10px;
+
             }
+
 
             .receipt-line {
-                border-top: 1px dashed black;
+
+                border-top:
+                    1px dashed black;
+
                 margin: 5px 0;
+
             }
+
 
             .receipt-info {
+
                 font-size: 10px;
+
             }
+
 
             .receipt-item {
+
                 margin: 5px 0;
+
             }
+
 
             .receipt-item-line {
+
                 display: flex;
-                justify-content: space-between;
+
+                justify-content:
+                    space-between;
+
                 gap: 5px;
+
             }
+
 
             .receipt-item-name {
+
                 width: 36mm;
+
                 word-wrap: break-word;
+
             }
+
 
             .receipt-item-price {
+
                 width: 13mm;
+
                 text-align: right;
+
                 white-space: nowrap;
+
             }
+
 
             .receipt-qty {
+
                 font-size: 10px;
+
             }
+
 
             .receipt-payment {
+
                 display: flex;
-                justify-content: space-between;
+
+                justify-content:
+                    space-between;
+
                 font-size: 11px;
+
                 font-weight: bold;
+
             }
+
 
             .receipt-total {
+
                 display: flex;
-                justify-content: space-between;
+
+                justify-content:
+                    space-between;
+
                 font-size: 14px;
+
                 font-weight: bold;
+
             }
 
+
             .receipt-footer {
+
                 text-align: center;
+
                 margin-top: 8px;
+
                 font-size: 10px;
+
             }
+
         }
+
 
         @media (max-width: 600px) {
 
             .payment-options {
+
                 flex-direction: row;
+
             }
 
+
             .payment-btn {
+
                 font-size: 15px;
+
                 padding: 13px 8px;
+
             }
+
         }
+
     </style>
+
 </head>
+
 
 <body>
 
+
 <header>
+
     <h1>Cafe Billing</h1>
+
     <p>Main Billing Counter</p>
+
 </header>
 
+
 <div class="container">
+
 
     <!-- CUSTOMER -->
 
@@ -389,7 +712,9 @@
                 autocomplete="off"
             >
 
-            <datalist id="savedCustomerPhones"></datalist>
+            <datalist
+                id="savedCustomerPhones"
+            ></datalist>
 
         </div>
 
@@ -465,16 +790,23 @@
             No items selected.
         </div>
 
+
         <div class="total">
-            Total: ₹<span id="total">0</span>
+
+            Total:
+            ₹<span id="total">0</span>
+
         </div>
 
 
         <!-- PAYMENT -->
 
         <div class="payment-title">
+
             Payment Method
+
         </div>
+
 
         <div class="payment-options">
 
@@ -486,6 +818,7 @@
             >
                 CASH
             </button>
+
 
             <button
                 type="button"
@@ -508,6 +841,7 @@
                 PLACE ORDER
             </button>
 
+
             <button
                 id="printBill"
                 onclick="printBill()"
@@ -516,6 +850,7 @@
             </button>
 
         </div>
+
 
         <div id="message"></div>
 
@@ -533,28 +868,41 @@
     <div class="receipt-header">
 
         <div class="receipt-title">
+
             CHAATARRA
+
         </div>
 
+
         <div class="receipt-subtitle">
+
             The House of Chaats
+
         </div>
 
     </div>
 
+
     <div class="receipt-line"></div>
+
 
     <div class="receipt-info">
 
         <div>
+
             Order No:
             <span id="receiptOrderNumber"></span>
+
         </div>
 
+
         <div>
+
             Date:
             <span id="receiptDate"></span>
+
         </div>
+
 
         <div id="receiptCustomerRow">
 
@@ -563,30 +911,41 @@
 
         </div>
 
+
         <div>
+
             Payment:
             <span id="receiptPayment"></span>
+
         </div>
 
     </div>
 
+
     <div class="receipt-line"></div>
+
 
     <div id="receiptItems"></div>
 
+
     <div class="receipt-line"></div>
+
 
     <div class="receipt-total">
 
         <span>TOTAL</span>
 
         <span>
+
             ₹<span id="receiptTotal"></span>
+
         </span>
 
     </div>
 
+
     <div class="receipt-line"></div>
+
 
     <div class="receipt-footer">
 
@@ -603,292 +962,369 @@
 
 <script>
 
-    /*
-    ==========================================
-    NORMAL MENU ITEMS
-    ==========================================
-    */
 
-    const menu = {
+/*
+==================================================
+MENU DATA
+==================================================
+*/
 
-        // CHAATS
+/*
+    These arrays are now loaded from:
 
-        "Pani Puri": {
-            price: 50,
-            counter: "chaats"
-        },
+        billing_menu
 
-        "Masala Puri": {
-            price: 60,
-            counter: "chaats"
-        },
+    The billing page no longer contains
+    hard-coded menu prices.
+*/
 
-        "Samosa Chaat": {
-            price: 80,
-            counter: "chaats"
-        },
 
-        "Dahi Puri": {
-            price: 80,
-            counter: "chaats"
-        },
+let menuItems = [];
 
+let comboItems = [];
 
-        // DRINKS
 
-        "Mango Shake": {
-            price: 90,
-            counter: "drinks"
-        },
+/*
+==================================================
+QUANTITIES
+==================================================
+*/
 
-        "Oreo Shake": {
-            price: 80,
-            counter: "drinks"
-        },
+const quantities = {};
 
-        "Strawberry Shake": {
-            price: 90,
-            counter: "drinks"
-        },
+const comboQuantities = {};
 
-        "Mint Lime": {
-            price: 35,
-            counter: "drinks"
-        },
 
+let lastOrder = null;
 
-        // BURGERS
+let selectedPayment = "Cash";
 
-        "Classic Burger": {
-            price: 120,
-            counter: "burgers"
-        },
 
-        "Chicken Burger": {
-            price: 150,
-            counter: "burgers"
-        },
+/*
+==================================================
+SAVED CUSTOMER NUMBERS
+==================================================
+*/
 
-        "Cheese Burger": {
-            price: 140,
-            counter: "burgers"
-        },
+let savedCustomers = [];
 
-        "Double Burger": {
-            price: 180,
-            counter: "burgers"
-        }
 
-    };
+/*
+==================================================
+PAYMENT SELECTION
+==================================================
+*/
 
+function selectPayment(method) {
 
-    /*
-    ==========================================
-    COMBOS
-    ==========================================
-    */
+    selectedPayment = method;
 
-    const combos = {
 
-        "Pani Puri + Mint Lime": {
+    const cashButton =
+        document.getElementById(
+            "cashPayment"
+        );
 
-            price: 80,
 
-            items: [
+    const upiButton =
+        document.getElementById(
+            "upiPayment"
+        );
 
-                {
-                    name: "Pani Puri",
-                    counter: "chaats"
-                },
 
-                {
-                    name: "Mint Lime",
-                    counter: "drinks"
-                }
+    cashButton.classList.remove(
+        "selected"
+    );
 
-            ]
 
-        },
+    upiButton.classList.remove(
+        "selected"
+    );
 
 
-        "Masala Puri + Mango Shake": {
+    if (method === "Cash") {
 
-            price: 140,
-
-            items: [
-
-                {
-                    name: "Masala Puri",
-                    counter: "chaats"
-                },
-
-                {
-                    name: "Mango Shake",
-                    counter: "drinks"
-                }
-
-            ]
-
-        },
-
-
-        "Classic Burger + Mango Shake": {
-
-            price: 190,
-
-            items: [
-
-                {
-                    name: "Classic Burger",
-                    counter: "burgers"
-                },
-
-                {
-                    name: "Mango Shake",
-                    counter: "drinks"
-                }
-
-            ]
-
-        },
-
-
-        "Chicken Burger + Oreo Shake": {
-
-            price: 210,
-
-            items: [
-
-                {
-                    name: "Chicken Burger",
-                    counter: "burgers"
-                },
-
-                {
-                    name: "Oreo Shake",
-                    counter: "drinks"
-                }
-
-            ]
-
-        }
-
-    };
-
-
-    /*
-    ==========================================
-    QUANTITIES
-    ==========================================
-    */
-
-    const quantities = {};
-
-    const comboQuantities = {};
-
-    let lastOrder = null;
-
-    let selectedPayment = "Cash";
-
-
-    /*
-    ==========================================
-    SAVED CUSTOMER NUMBERS
-    ==========================================
-    */
-
-    let savedCustomers = [];
-
-
-    /*
-    ==========================================
-    PAYMENT SELECTION
-    ==========================================
-    */
-
-    function selectPayment(method) {
-
-        selectedPayment = method;
-
-        const cashButton =
-            document.getElementById("cashPayment");
-
-        const upiButton =
-            document.getElementById("upiPayment");
-
-
-        cashButton.classList.remove("selected");
-        upiButton.classList.remove("selected");
-
-
-        if (method === "Cash") {
-
-            cashButton.classList.add("selected");
-
-        }
-
-        if (method === "UPI") {
-
-            upiButton.classList.add("selected");
-
-        }
+        cashButton.classList.add(
+            "selected"
+        );
 
     }
 
 
-    /*
-    ==========================================
-    LOAD SAVED CUSTOMER NUMBERS
-    ==========================================
-    */
+    if (method === "UPI") {
 
-    async function loadSavedCustomers() {
+        upiButton.classList.add(
+            "selected"
+        );
 
-        try {
+    }
 
-            const { data, error } =
-                await supabaseClient
-                    .from("loyalty_customers")
-                    .select("phone, name")
-                    .not("phone", "is", null)
-                    .order("name", {
+}
+
+
+/*
+==================================================
+LOAD MENU FROM SUPABASE
+==================================================
+*/
+
+async function loadBillingMenu() {
+
+    try {
+
+        const {
+            data,
+            error
+        } =
+            await supabaseClient
+
+                .from("billing_menu")
+
+                .select(`
+                    id,
+                    name,
+                    price,
+                    category,
+                    counter,
+                    item_type,
+                    description,
+                    active,
+                    sort_order
+                `)
+
+                .eq(
+                    "active",
+                    true
+                )
+
+                .order(
+                    "sort_order",
+                    {
                         ascending: true
-                    });
-
-
-            if (error) {
-
-                console.error(
-                    "Could not load saved customer numbers:",
-                    error
-                );
-
-                return;
-
-            }
-
-
-            savedCustomers = data || [];
-
-
-            const datalist =
-                document.getElementById(
-                    "savedCustomerPhones"
+                    }
                 );
 
 
-            datalist.innerHTML = "";
+        if (error) {
+
+            console.error(
+                "Billing menu loading failed:",
+                error
+            );
 
 
-            savedCustomers.forEach(customer => {
+            showMenuError(
+                "Could not load menu. Please refresh."
+            );
+
+
+            return;
+
+        }
+
+
+        menuItems = (data || [])
+            .filter(item =>
+                item.item_type === "single"
+            );
+
+
+        comboItems = (data || [])
+            .filter(item =>
+                item.item_type === "combo"
+            );
+
+
+        /*
+        RESET QUANTITIES
+        */
+
+        Object.keys(
+            quantities
+        ).forEach(key => {
+
+            delete quantities[key];
+
+        });
+
+
+        Object.keys(
+            comboQuantities
+        ).forEach(key => {
+
+            delete comboQuantities[key];
+
+        });
+
+
+        /*
+        CREATE MENUS
+        */
+
+        createMenu(
+            "chaatsMenu",
+            "chaats"
+        );
+
+
+        createMenu(
+            "drinksMenu",
+            "drinks"
+        );
+
+
+        createMenu(
+            "burgersMenu",
+            "burgers"
+        );
+
+
+        createComboMenu();
+
+
+        updateCart();
+
+
+    } catch (error) {
+
+        console.error(
+            "Menu loading error:",
+            error
+        );
+
+
+        showMenuError(
+            "Could not load menu. Please refresh."
+        );
+
+    }
+
+}
+
+
+/*
+==================================================
+MENU ERROR
+==================================================
+*/
+
+function showMenuError(message) {
+
+    const containers = [
+
+        "chaatsMenu",
+        "drinksMenu",
+        "burgersMenu",
+        "combosMenu"
+
+    ];
+
+
+    containers.forEach(id => {
+
+        const element =
+            document.getElementById(id);
+
+
+        if (element) {
+
+            element.innerHTML = `
+
+                <div
+                    style="
+                        color:red;
+                        font-weight:bold;
+                        padding:15px;
+                    "
+                >
+                    ${message}
+                </div>
+
+            `;
+
+        }
+
+    });
+
+}
+
+
+/*
+==================================================
+LOAD SAVED CUSTOMER NUMBERS
+==================================================
+*/
+
+async function loadSavedCustomers() {
+
+    try {
+
+        const {
+            data,
+            error
+        } =
+            await supabaseClient
+
+                .from("loyalty_customers")
+
+                .select(
+                    "phone, name"
+                )
+
+                .not(
+                    "phone",
+                    "is",
+                    null
+                )
+
+                .order(
+                    "name",
+                    {
+                        ascending: true
+                    }
+                );
+
+
+        if (error) {
+
+            console.error(
+                "Could not load saved customer numbers:",
+                error
+            );
+
+
+            return;
+
+        }
+
+
+        savedCustomers =
+            data || [];
+
+
+        const datalist =
+            document.getElementById(
+                "savedCustomerPhones"
+            );
+
+
+        datalist.innerHTML = "";
+
+
+        savedCustomers.forEach(
+            customer => {
 
                 if (!customer.phone) {
+
                     return;
+
                 }
 
 
                 const option =
-                    document.createElement("option");
+                    document.createElement(
+                        "option"
+                    );
 
 
                 option.value =
@@ -903,180 +1339,284 @@
                 }
 
 
-                datalist.appendChild(option);
+                datalist.appendChild(
+                    option
+                );
 
-            });
+            }
+        );
 
-        } catch (error) {
 
-            console.error(
-                "Saved customer loading failed:",
-                error
+    } catch (error) {
+
+        console.error(
+            "Saved customer loading failed:",
+            error
+        );
+
+    }
+
+}
+
+
+/*
+==================================================
+NORMALIZE PHONE
+==================================================
+*/
+
+function normalizePhone(phone) {
+
+    let digits =
+        String(phone || "")
+            .replace(
+                /\D/g,
+                ""
             );
 
-        }
+
+    if (
+        digits.length === 12 &&
+        digits.startsWith("91")
+    ) {
+
+        digits =
+            digits.substring(2);
 
     }
 
 
-    /*
-    ==========================================
-    FIND SAVED CUSTOMER BY PHONE
-    ==========================================
-    */
+    return digits;
 
-    function normalizePhone(phone) {
-
-        let digits =
-            String(phone || "")
-                .replace(/\D/g, "");
+}
 
 
-        if (
-            digits.length === 12 &&
-            digits.startsWith("91")
-        ) {
+/*
+==================================================
+FIND SAVED CUSTOMER
+==================================================
+*/
 
-            digits =
-                digits.substring(2);
+function findSavedCustomer() {
 
-        }
+    const phoneInput =
+        document.getElementById(
+            "customerPhone"
+        );
 
 
-        return digits;
+    const nameInput =
+        document.getElementById(
+            "customerName"
+        );
+
+
+    if (
+        !phoneInput ||
+        !nameInput
+    ) {
+
+        return;
 
     }
 
 
-    function findSavedCustomer() {
-
-        const phoneInput =
-            document.getElementById(
-                "customerPhone"
-            );
-
-        const nameInput =
-            document.getElementById(
-                "customerName"
-            );
+    const phone =
+        normalizePhone(
+            phoneInput.value
+        );
 
 
-        if (!phoneInput || !nameInput) {
-            return;
-        }
+    if (!phone) {
+
+        return;
+
+    }
 
 
-        const phone =
-            normalizePhone(
-                phoneInput.value
-            );
-
-
-        if (!phone) {
-            return;
-        }
-
-
-        const customer =
-            savedCustomers.find(item => {
+    const customer =
+        savedCustomers.find(
+            item => {
 
                 const savedPhone =
                     normalizePhone(
                         item.phone
                     );
 
-                return savedPhone === phone;
 
-            });
+                return (
+                    savedPhone ===
+                    phone
+                );
+
+            }
+        );
 
 
-        if (customer && customer.name) {
+    if (
+        customer &&
+        customer.name
+    ) {
 
-            nameInput.value =
-                customer.name;
+        nameInput.value =
+            customer.name;
 
-        }
+    }
+
+}
+
+
+document
+    .getElementById(
+        "customerPhone"
+    )
+    .addEventListener(
+        "input",
+        findSavedCustomer
+    );
+
+
+document
+    .getElementById(
+        "customerPhone"
+    )
+    .addEventListener(
+        "change",
+        findSavedCustomer
+    );
+
+
+/*
+==================================================
+CREATE NORMAL MENU
+==================================================
+*/
+
+function createMenu(
+    containerId,
+    counter
+) {
+
+    const container =
+        document.getElementById(
+            containerId
+        );
+
+
+    container.innerHTML = "";
+
+
+    const items =
+        menuItems.filter(
+            item =>
+                item.counter === counter
+        );
+
+
+    if (items.length === 0) {
+
+        container.innerHTML = `
+
+            <div
+                style="
+                    color:#777;
+                    padding:10px;
+                "
+            >
+                No items available.
+            </div>
+
+        `;
+
+
+        return;
 
     }
 
 
-    document
-        .getElementById("customerPhone")
-        .addEventListener(
-            "input",
-            findSavedCustomer
-        );
+    items.forEach(
+        item => {
 
-
-    document
-        .getElementById("customerPhone")
-        .addEventListener(
-            "change",
-            findSavedCustomer
-        );
-
-
-    /*
-    ==========================================
-    CREATE NORMAL MENU
-    ==========================================
-    */
-
-    function createMenu(containerId, counter) {
-
-        const container =
-            document.getElementById(
-                containerId
-            );
-
-
-        container.innerHTML = "";
-
-
-        Object.keys(menu).forEach(item => {
-
-            if (menu[item].counter !== counter) {
-                return;
-            }
-
-
-            quantities[item] = 0;
+            quantities[item.id] =
+                0;
 
 
             const div =
-                document.createElement("div");
+                document.createElement(
+                    "div"
+                );
 
 
-            div.className = "item";
+            div.className =
+                "item";
+
+
+            const safeId =
+                String(item.id)
+                    .replace(
+                        /[^a-zA-Z0-9]/g,
+                        ""
+                    );
 
 
             div.innerHTML = `
 
                 <div class="item-name">
-                    ${item}
+
+                    ${escapeHtml(
+                        item.name
+                    )}
+
                 </div>
 
+                ${
+                    item.description
+                        ? `
+                            <div
+                                class="item-description"
+                            >
+                                ${escapeHtml(
+                                    item.description
+                                )}
+                            </div>
+                          `
+                        : ""
+                }
+
                 <div class="item-price">
-                    ₹${menu[item].price}
+
+                    ₹${Number(
+                        item.price
+                    )}
+
                 </div>
+
 
                 <div class="quantity-row">
 
                     <button
-                        onclick="changeQuantity('${item}', -1)"
+                        onclick="changeQuantity(
+                            '${escapeJs(item.id)}',
+                            -1
+                        )"
                     >
                         −
                     </button>
 
+
                     <span
                         class="quantity"
-                        id="qty-${item.replace(/[^a-zA-Z0-9]/g, '')}"
+                        id="qty-${safeId}"
                     >
                         0
                     </span>
 
+
                     <button
-                        onclick="changeQuantity('${item}', 1)"
+                        onclick="changeQuantity(
+                            '${escapeJs(item.id)}',
+                            1
+                        )"
                     >
                         +
                     </button>
@@ -1086,73 +1626,149 @@
             `;
 
 
-            container.appendChild(div);
+            container.appendChild(
+                div
+            );
 
-        });
+        }
+    );
+
+}
+
+
+/*
+==================================================
+CREATE COMBO MENU
+==================================================
+*/
+
+function createComboMenu() {
+
+    const container =
+        document.getElementById(
+            "combosMenu"
+        );
+
+
+    container.innerHTML = "";
+
+
+    if (
+        comboItems.length === 0
+    ) {
+
+        container.innerHTML = `
+
+            <div
+                style="
+                    color:#777;
+                    padding:10px;
+                "
+            >
+                No combos available.
+            </div>
+
+        `;
+
+
+        return;
 
     }
 
 
-    /*
-    ==========================================
-    CREATE COMBO MENU
-    ==========================================
-    */
+    comboItems.forEach(
+        combo => {
 
-    function createComboMenu() {
-
-        const container =
-            document.getElementById(
-                "combosMenu"
-            );
-
-
-        container.innerHTML = "";
-
-
-        Object.keys(combos).forEach(combo => {
-
-            comboQuantities[combo] = 0;
+            comboQuantities[
+                combo.id
+            ] = 0;
 
 
             const div =
-                document.createElement("div");
+                document.createElement(
+                    "div"
+                );
 
 
-            div.className = "item";
+            div.className =
+                "item";
+
+
+            const safeId =
+                String(combo.id)
+                    .replace(
+                        /[^a-zA-Z0-9]/g,
+                        ""
+                    );
 
 
             div.innerHTML = `
 
                 <div class="item-name">
-                    ${combo}
+
+                    ${escapeHtml(
+                        combo.name
+                    )}
+
                 </div>
+
 
                 <span class="combo-label">
+
                     COMBO
+
                 </span>
 
+
+                ${
+                    combo.description
+                        ? `
+                            <div
+                                class="item-description"
+                            >
+                                ${escapeHtml(
+                                    combo.description
+                                )}
+                            </div>
+                          `
+                        : ""
+                }
+
+
                 <div class="item-price">
-                    ₹${combos[combo].price}
+
+                    ₹${Number(
+                        combo.price
+                    )}
+
                 </div>
+
 
                 <div class="quantity-row">
 
                     <button
-                        onclick="changeComboQuantity('${combo}', -1)"
+                        onclick="changeComboQuantity(
+                            '${escapeJs(combo.id)}',
+                            -1
+                        )"
                     >
                         −
                     </button>
 
+
                     <span
                         class="quantity"
-                        id="comboQty-${combo.replace(/[^a-zA-Z0-9]/g, '')}"
+                        id="comboQty-${safeId}"
                     >
                         0
                     </span>
 
+
                     <button
-                        onclick="changeComboQuantity('${combo}', 1)"
+                        onclick="changeComboQuantity(
+                            '${escapeJs(combo.id)}',
+                            1
+                        )"
                     >
                         +
                     </button>
@@ -1162,351 +1778,534 @@
             `;
 
 
-            container.appendChild(div);
+            container.appendChild(
+                div
+            );
 
-        });
+        }
+    );
+
+}
+
+
+/*
+==================================================
+ESCAPE HTML
+==================================================
+*/
+
+function escapeHtml(value) {
+
+    return String(
+        value ?? ""
+    )
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+        .replace(
+            /</g,
+            "&lt;"
+        )
+        .replace(
+            />/g,
+            "&gt;"
+        )
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+}
+
+
+/*
+==================================================
+ESCAPE JAVASCRIPT
+==================================================
+*/
+
+function escapeJs(value) {
+
+    return String(
+        value ?? ""
+    )
+        .replace(
+            /\\/g,
+            "\\\\"
+        )
+        .replace(
+            /'/g,
+            "\\'"
+        );
+
+}
+
+
+/*
+==================================================
+NORMAL ITEM QUANTITY
+==================================================
+*/
+
+function changeQuantity(
+    itemId,
+    change
+) {
+
+    if (
+        quantities[itemId] === undefined
+    ) {
+
+        quantities[itemId] =
+            0;
 
     }
 
 
-    createMenu(
-        "chaatsMenu",
-        "chaats"
-    );
+    quantities[itemId] +=
+        change;
 
 
-    createMenu(
-        "drinksMenu",
-        "drinks"
-    );
+    if (
+        quantities[itemId] < 0
+    ) {
 
-
-    createMenu(
-        "burgersMenu",
-        "burgers"
-    );
-
-
-    createComboMenu();
-
-    loadSavedCustomers();
-
-
-    /*
-    ==========================================
-    NORMAL ITEM QUANTITY
-    ==========================================
-    */
-
-    function changeQuantity(item, change) {
-
-        quantities[item] += change;
-
-
-        if (quantities[item] < 0) {
-
-            quantities[item] = 0;
-
-        }
-
-
-        const id =
-            "qty-" +
-            item.replace(/[^a-zA-Z0-9]/g, "");
-
-
-        document.getElementById(id).textContent =
-            quantities[item];
-
-
-        updateCart();
+        quantities[itemId] =
+            0;
 
     }
 
 
-    /*
-    ==========================================
-    COMBO QUANTITY
-    ==========================================
-    */
-
-    function changeComboQuantity(combo, change) {
-
-        comboQuantities[combo] += change;
-
-
-        if (comboQuantities[combo] < 0) {
-
-            comboQuantities[combo] = 0;
-
-        }
-
-
-        const id =
-            "comboQty-" +
-            combo.replace(/[^a-zA-Z0-9]/g, "");
-
-
-        document.getElementById(id).textContent =
-            comboQuantities[combo];
-
-
-        updateCart();
-
-    }
-
-
-    /*
-    ==========================================
-    UPDATE CART
-    ==========================================
-    */
-
-    function updateCart() {
-
-        const cart =
-            document.getElementById("cart");
-
-
-        let total = 0;
-
-        let html = "";
-
-        let hasItems = false;
-
-
-        /*
-        NORMAL ITEMS
-        */
-
-        Object.keys(menu).forEach(item => {
-
-            const qty =
-                quantities[item];
-
-
-            if (qty > 0) {
-
-                hasItems = true;
-
-
-                const amount =
-                    menu[item].price * qty;
-
-
-                total += amount;
-
-
-                html += `
-
-                    <div class="cart-row">
-
-                        <div class="cart-left">
-
-                            ${item}
-                            × ${qty}
-
-                        </div>
-
-                        <div class="cart-right">
-
-                            ₹${amount}
-
-                        </div>
-
-                    </div>
-
-                `;
-
-            }
-
-        });
-
-
-        /*
-        COMBOS
-        */
-
-        Object.keys(combos).forEach(combo => {
-
-            const qty =
-                comboQuantities[combo];
-
-
-            if (qty > 0) {
-
-                hasItems = true;
-
-
-                const amount =
-                    combos[combo].price * qty;
-
-
-                total += amount;
-
-
-                html += `
-
-                    <div class="cart-row">
-
-                        <div class="cart-left">
-
-                            ${combo}
-                            × ${qty}
-
-                        </div>
-
-                        <div class="cart-right">
-
-                            ₹${amount}
-
-                        </div>
-
-                    </div>
-
-                `;
-
-            }
-
-        });
-
-
-        if (!hasItems) {
-
-            cart.innerHTML =
-                "No items selected.";
-
-        } else {
-
-            cart.innerHTML =
-                html;
-
-        }
-
-
+    const id =
+        "qty-" +
+        String(itemId)
+            .replace(
+                /[^a-zA-Z0-9]/g,
+                ""
+            );
+
+
+    const element =
         document.getElementById(
-            "total"
-        ).textContent = total;
+            id
+        );
+
+
+    if (element) {
+
+        element.textContent =
+            quantities[itemId];
 
     }
 
 
+    updateCart();
+
+}
+
+
+/*
+==================================================
+COMBO QUANTITY
+==================================================
+*/
+
+function changeComboQuantity(
+    comboId,
+    change
+) {
+
+    if (
+        comboQuantities[
+            comboId
+        ] === undefined
+    ) {
+
+        comboQuantities[
+            comboId
+        ] = 0;
+
+    }
+
+
+    comboQuantities[
+        comboId
+    ] += change;
+
+
+    if (
+        comboQuantities[
+            comboId
+        ] < 0
+    ) {
+
+        comboQuantities[
+            comboId
+        ] = 0;
+
+    }
+
+
+    const id =
+        "comboQty-" +
+        String(comboId)
+            .replace(
+                /[^a-zA-Z0-9]/g,
+                ""
+            );
+
+
+    const element =
+        document.getElementById(
+            id
+        );
+
+
+    if (element) {
+
+        element.textContent =
+            comboQuantities[
+                comboId
+            ];
+
+    }
+
+
+    updateCart();
+
+}
+
+
+/*
+==================================================
+UPDATE CART
+==================================================
+*/
+
+function updateCart() {
+
+    const cart =
+        document.getElementById(
+            "cart"
+        );
+
+
+    let total = 0;
+
+    let html = "";
+
+    let hasItems = false;
+
+
     /*
-    ==========================================
-    PLACE ORDER
-    ==========================================
+    NORMAL ITEMS
     */
 
-    async function placeOrder() {
-
-        const button =
-            document.getElementById(
-                "placeOrder"
-            );
-
-
-        const printButton =
-            document.getElementById(
-                "printBill"
-            );
-
-
-        const message =
-            document.getElementById(
-                "message"
-            );
-
-
-        const customerName =
-            document.getElementById(
-                "customerName"
-            )
-            .value
-            .trim();
-
-
-        const customerPhone =
-            document.getElementById(
-                "customerPhone"
-            )
-            .value
-            .trim();
-
-
-        const selectedItems = [];
-
-        let total = 0;
-
-
-        /*
-        NORMAL ITEMS
-        */
-
-        Object.keys(menu).forEach(item => {
+    menuItems.forEach(
+        item => {
 
             const qty =
-                quantities[item];
+                quantities[item.id] ||
+                0;
 
 
             if (qty > 0) {
 
+                hasItems = true;
+
+
                 const amount =
-                    menu[item].price * qty;
+                    Number(
+                        item.price
+                    ) * qty;
 
 
-                selectedItems.push({
+                total += amount;
 
-                    name: item,
 
-                    price:
-                        menu[item].price,
+                html += `
 
-                    quantity: qty,
+                    <div class="cart-row">
+
+                        <div class="cart-left">
+
+                            ${escapeHtml(
+                                item.name
+                            )}
+
+                            × ${qty}
+
+                        </div>
+
+
+                        <div class="cart-right">
+
+                            ₹${amount}
+
+                        </div>
+
+                    </div>
+
+                `;
+
+            }
+
+        }
+    );
+
+
+    /*
+    COMBOS
+    */
+
+    comboItems.forEach(
+        combo => {
+
+            const qty =
+                comboQuantities[
+                    combo.id
+                ] || 0;
+
+
+            if (qty > 0) {
+
+                hasItems = true;
+
+
+                const amount =
+                    Number(
+                        combo.price
+                    ) * qty;
+
+
+                total += amount;
+
+
+                html += `
+
+                    <div class="cart-row">
+
+                        <div class="cart-left">
+
+                            ${escapeHtml(
+                                combo.name
+                            )}
+
+                            × ${qty}
+
+                        </div>
+
+
+                        <div class="cart-right">
+
+                            ₹${amount}
+
+                        </div>
+
+                    </div>
+
+                `;
+
+            }
+
+        }
+    );
+
+
+    if (!hasItems) {
+
+        cart.innerHTML =
+            "No items selected.";
+
+    } else {
+
+        cart.innerHTML =
+            html;
+
+    }
+
+
+    document.getElementById(
+        "total"
+    ).textContent =
+        total;
+
+}
+
+
+/*
+==================================================
+FIND COMBO COMPONENTS
+==================================================
+
+For a combo named:
+
+    Pani Puri + Mint Lime
+
+the system searches the loaded billing_menu
+for:
+
+    Pani Puri
+    Mint Lime
+
+and uses their counters.
+
+This keeps the existing KOT logic working
+without adding another database table.
+*/
+
+function getComboComponents(
+    combo
+) {
+
+    const components = [];
+
+
+    const parts =
+        String(
+            combo.name || ""
+        )
+        .split("+")
+        .map(
+            part =>
+                part.trim()
+        )
+        .filter(
+            part =>
+                part.length > 0
+        );
+
+
+    parts.forEach(
+        part => {
+
+            const matchingItem =
+                menuItems.find(
+                    item =>
+                        String(
+                            item.name
+                        )
+                        .trim()
+                        .toLowerCase() ===
+                        part.toLowerCase()
+                );
+
+
+            if (matchingItem) {
+
+                components.push({
+
+                    name:
+                        matchingItem.name,
 
                     counter:
-                        menu[item].counter,
-
-                    type: "single"
+                        matchingItem.counter
 
                 });
 
-
-                total += amount;
-
             }
 
-        });
+        }
+    );
 
 
-        /*
-        COMBOS
-        */
+    return components;
 
-        Object.keys(combos).forEach(combo => {
+}
+
+
+/*
+==================================================
+PLACE ORDER
+==================================================
+*/
+
+async function placeOrder() {
+
+    const button =
+        document.getElementById(
+            "placeOrder"
+        );
+
+
+    const printButton =
+        document.getElementById(
+            "printBill"
+        );
+
+
+    const message =
+        document.getElementById(
+            "message"
+        );
+
+
+    const customerName =
+        document.getElementById(
+            "customerName"
+        )
+        .value
+        .trim();
+
+
+    const customerPhone =
+        document.getElementById(
+            "customerPhone"
+        )
+        .value
+        .trim();
+
+
+    const selectedItems = [];
+
+    let total = 0;
+
+
+    /*
+    ==========================================
+    NORMAL ITEMS
+    ==========================================
+    */
+
+    menuItems.forEach(
+        item => {
 
             const qty =
-                comboQuantities[combo];
+                quantities[item.id] ||
+                0;
 
 
             if (qty > 0) {
 
                 const amount =
-                    combos[combo].price * qty;
+                    Number(
+                        item.price
+                    ) * qty;
 
 
                 selectedItems.push({
 
-                    name: combo,
+                    name:
+                        item.name,
 
                     price:
-                        combos[combo].price,
+                        Number(
+                            item.price
+                        ),
 
-                    quantity: qty,
+                    quantity:
+                        qty,
 
-                    type: "combo",
+                    counter:
+                        item.counter,
 
-                    components:
-                        combos[combo].items
+                    type:
+                        "single"
 
                 });
 
@@ -1515,115 +2314,192 @@
 
             }
 
-        });
+        }
+    );
 
 
-        /*
-        CHECK ORDER
-        */
+    /*
+    ==========================================
+    COMBOS
+    ==========================================
+    */
 
-        if (selectedItems.length === 0) {
+    comboItems.forEach(
+        combo => {
 
-            message.className =
-                "error";
+            const qty =
+                comboQuantities[
+                    combo.id
+                ] || 0;
 
-            message.textContent =
-                "Please select at least one item.";
 
-            return;
+            if (qty > 0) {
+
+                const amount =
+                    Number(
+                        combo.price
+                    ) * qty;
+
+
+                const components =
+                    getComboComponents(
+                        combo
+                    );
+
+
+                selectedItems.push({
+
+                    name:
+                        combo.name,
+
+                    price:
+                        Number(
+                            combo.price
+                        ),
+
+                    quantity:
+                        qty,
+
+                    type:
+                        "combo",
+
+                    counter:
+                        combo.counter,
+
+                    components:
+                        components
+
+                });
+
+
+                total += amount;
+
+            }
 
         }
+    );
 
 
-        button.disabled = true;
+    /*
+    ==========================================
+    CHECK ORDER
+    ==========================================
+    */
 
-        button.textContent =
-            "PLACING ORDER...";
+    if (
+        selectedItems.length === 0
+    ) {
 
-
-        printButton.style.display =
-            "none";
+        message.className =
+            "error";
 
 
         message.textContent =
-            "";
+            "Please select at least one item.";
 
 
-        try {
+        return;
 
-            /*
-            ==================================
-            CREATE MAIN ORDER
-            ==================================
-            */
-
-            const {
-                data: order,
-                error: orderError
-            } =
-                await supabaseClient
-
-                    .from("orders")
-
-                    .insert({
-
-                        customer_name:
-                            customerName || null,
-
-                        customer_phone:
-                            customerPhone || null,
-
-                        items:
-                            selectedItems,
-
-                        total:
-                            total,
-
-                        payment_method:
-                            selectedPayment,
-
-                        status:
-                            "Pending"
-
-                    })
-
-                    .select()
-
-                    .single();
+    }
 
 
-            if (orderError) {
-
-                throw orderError;
-
-            }
+    button.disabled =
+        true;
 
 
-            /*
-            ==================================
-            CREATE COUNTER ITEM GROUPS
-            ==================================
-            */
-
-            const counterItems = {
-
-                chaats: [],
-
-                drinks: [],
-
-                burgers: []
-
-            };
+    button.textContent =
+        "PLACING ORDER...";
 
 
-            /*
-            SPLIT NORMAL ITEMS
-            */
+    printButton.style.display =
+        "none";
 
-            selectedItems.forEach(item => {
+
+    message.textContent =
+        "";
+
+
+    try {
+
+        /*
+        ======================================
+        CREATE MAIN ORDER
+        ======================================
+        */
+
+        const {
+            data: order,
+            error: orderError
+        } =
+            await supabaseClient
+
+                .from("orders")
+
+                .insert({
+
+                    customer_name:
+                        customerName ||
+                        null,
+
+                    customer_phone:
+                        customerPhone ||
+                        null,
+
+                    items:
+                        selectedItems,
+
+                    total:
+                        total,
+
+                    payment_method:
+                        selectedPayment,
+
+                    status:
+                        "Pending"
+
+                })
+
+                .select()
+
+                .single();
+
+
+        if (orderError) {
+
+            throw orderError;
+
+        }
+
+
+        /*
+        ======================================
+        CREATE COUNTER ITEM GROUPS
+        ======================================
+        */
+
+        const counterItems = {
+
+            chaats: [],
+
+            drinks: [],
+
+            burgers: []
+
+        };
+
+
+        /*
+        ======================================
+        NORMAL ITEMS
+        ======================================
+        */
+
+        selectedItems.forEach(
+            item => {
 
                 if (
-                    item.type === "single"
+                    item.type ===
+                    "single"
                 ) {
 
                     if (
@@ -1648,18 +2524,25 @@
 
                 }
 
-            });
+            }
+        );
 
 
-            /*
-            SPLIT COMBOS
-            */
+        /*
+        ======================================
+        COMBOS
+        ======================================
+        */
 
-            selectedItems.forEach(item => {
+        selectedItems.forEach(
+            item => {
 
                 if (
-                    item.type === "combo" &&
-                    item.components
+                    item.type ===
+                        "combo" &&
+                    item.components &&
+                    item.components.length >
+                        0
                 ) {
 
                     item.components.forEach(
@@ -1688,23 +2571,61 @@
                         }
                     );
 
+
+                } else if (
+                    item.type ===
+                        "combo"
+                ) {
+
+                    /*
+                    FALLBACK
+
+                    If the combo name does not
+                    contain recognizable menu
+                    item names, send the combo
+                    to its own configured counter.
+                    */
+
+                    if (
+                        item.counter &&
+                        counterItems[
+                            item.counter
+                        ]
+                    ) {
+
+                        counterItems[
+                            item.counter
+                        ].push({
+
+                            name:
+                                item.name,
+
+                            quantity:
+                                item.quantity
+
+                        });
+
+                    }
+
                 }
 
-            });
+            }
+        );
 
 
-            /*
-            ==================================
-            CREATE KOT ROWS
-            ==================================
-            */
+        /*
+        ======================================
+        CREATE KOT ROWS
+        ======================================
+        */
 
-            const kotRows = [];
+        const kotRows = [];
 
 
-            Object.keys(
-                counterItems
-            ).forEach(counter => {
+        Object.keys(
+            counterItems
+        ).forEach(
+            counter => {
 
                 if (
                     counterItems[
@@ -1732,153 +2653,120 @@
 
                 }
 
-            });
+            }
+        );
 
 
-            /*
-            ==================================
-            INSERT KOTS
-            ==================================
-            */
+        /*
+        ======================================
+        INSERT KOTS
+        ======================================
+        */
 
-            if (
-                kotRows.length > 0
-            ) {
+        if (
+            kotRows.length > 0
+        ) {
 
-                const {
-                    error: kotError
-                } =
-                    await supabaseClient
+            const {
+                error: kotError
+            } =
+                await supabaseClient
 
-                        .from("counter_kot")
+                    .from(
+                        "counter_kot"
+                    )
 
-                        .insert(kotRows);
+                    .insert(
+                        kotRows
+                    );
 
 
-                if (kotError) {
+            if (kotError) {
 
-                    throw kotError;
-
-                }
+                throw kotError;
 
             }
 
-
-            /*
-            ==================================
-            SAVE CUSTOMER LOYALTY DATA
-            ==================================
-            */
-
-            if (
-                customerPhone ||
-                customerName
-            ) {
-
-                try {
-
-                    let customer = null;
+        }
 
 
-                    const {
-                        data:
-                            existingCustomer,
-                        error:
-                            customerFindError
-                    } =
-                        customerPhone
+        /*
+        ======================================
+        SAVE CUSTOMER LOYALTY DATA
+        ======================================
+        */
 
-                            ? await supabaseClient
-                                .from(
-                                    "loyalty_customers"
-                                )
-                                .select("*")
-                                .eq(
-                                    "phone",
-                                    customerPhone
-                                )
-                                .maybeSingle()
+        if (
+            customerPhone ||
+            customerName
+        ) {
 
-                            : {
-                                data: null,
-                                error: null
-                            };
+            try {
+
+                let customer =
+                    null;
 
 
-                    if (
+                const {
+                    data:
+                        existingCustomer,
+                    error:
                         customerFindError
-                    ) {
+                } =
+                    customerPhone
 
-                        console.error(
-                            "Loyalty customer lookup failed:",
-                            customerFindError
-                        );
+                        ? await supabaseClient
 
-                    }
+                            .from(
+                                "loyalty_customers"
+                            )
+
+                            .select("*")
+
+                            .eq(
+                                "phone",
+                                customerPhone
+                            )
+
+                            .maybeSingle()
+
+                        : {
+                            data: null,
+                            error: null
+                        };
+
+
+                if (
+                    customerFindError
+                ) {
+
+                    console.error(
+                        "Loyalty customer lookup failed:",
+                        customerFindError
+                    );
+
+                }
+
+
+                if (
+                    existingCustomer
+                ) {
+
+                    customer =
+                        existingCustomer;
 
 
                     if (
-                        existingCustomer
+                        customerName &&
+                        existingCustomer.name !==
+                            customerName
                     ) {
-
-                        customer =
-                            existingCustomer;
-
-
-                        if (
-                            customerName &&
-                            existingCustomer.name !==
-                                customerName
-                        ) {
-
-                            const {
-                                data:
-                                    updatedCustomer,
-                                error:
-                                    updateError
-                            } =
-                                await supabaseClient
-
-                                    .from(
-                                        "loyalty_customers"
-                                    )
-
-                                    .update({
-
-                                        name:
-                                            customerName,
-
-                                        updated_at:
-                                            new Date()
-                                                .toISOString()
-
-                                    })
-
-                                    .eq(
-                                        "id",
-                                        existingCustomer.id
-                                    )
-
-                                    .select()
-                                    .single();
-
-
-                            if (!updateError) {
-
-                                customer =
-                                    updatedCustomer;
-
-                            }
-
-                        }
-
-                    } else {
 
                         const {
                             data:
-                                newCustomer,
+                                updatedCustomer,
                             error:
-                                createError
+                                updateError
                         } =
                             await supabaseClient
 
@@ -1886,249 +2774,305 @@
                                     "loyalty_customers"
                                 )
 
-                                .insert({
-
-                                    phone:
-                                        customerPhone ||
-                                        null,
+                                .update({
 
                                     name:
-                                        customerName ||
-                                        null
+                                        customerName,
+
+                                    updated_at:
+                                        new Date()
+                                            .toISOString()
 
                                 })
+
+                                .eq(
+                                    "id",
+                                    existingCustomer.id
+                                )
 
                                 .select()
                                 .single();
 
 
-                        if (!createError) {
+                        if (
+                            !updateError
+                        ) {
 
                             customer =
-                                newCustomer;
-
-                        } else {
-
-                            console.error(
-                                "Loyalty customer creation failed:",
-                                createError
-                            );
+                                updatedCustomer;
 
                         }
 
                     }
 
+                } else {
 
-                    if (customer) {
+                    const {
+                        data:
+                            newCustomer,
+                        error:
+                            createError
+                    } =
+                        await supabaseClient
 
-                        const {
-                            error:
-                                loyaltyError
-                        } =
-                            await supabaseClient
+                            .from(
+                                "loyalty_customers"
+                            )
 
-                                .from(
-                                    "loyalty_transactions"
-                                )
+                            .insert({
 
-                                .insert({
+                                phone:
+                                    customerPhone ||
+                                    null,
 
-                                    customer_id:
-                                        customer.id,
+                                name:
+                                    customerName ||
+                                    null
 
-                                    order_id:
-                                        order.id,
+                            })
 
-                                    type:
-                                        "purchase",
-
-                                    points:
-                                        0,
-
-                                    amount:
-                                        total,
-
-                                    description:
-                                        JSON.stringify(
-                                            selectedItems
-                                        ),
-
-                                    created_at:
-                                        new Date()
-                                            .toISOString()
-
-                                });
+                            .select()
+                            .single();
 
 
-                        if (loyaltyError) {
+                    if (
+                        !createError
+                    ) {
 
-                            console.error(
-                                "Loyalty transaction save failed:",
-                                loyaltyError
-                            );
+                        customer =
+                            newCustomer;
 
-                        }
+                    } else {
+
+                        console.error(
+                            "Loyalty customer creation failed:",
+                            createError
+                        );
 
                     }
-
-                } catch (
-                    loyaltyError
-                ) {
-
-                    console.error(
-                        "Loyalty connection failed:",
-                        loyaltyError
-                    );
 
                 }
 
+
+                if (customer) {
+
+                    const {
+                        error:
+                            loyaltyError
+                    } =
+                        await supabaseClient
+
+                            .from(
+                                "loyalty_transactions"
+                            )
+
+                            .insert({
+
+                                customer_id:
+                                    customer.id,
+
+                                order_id:
+                                    order.id,
+
+                                type:
+                                    "purchase",
+
+                                points:
+                                    0,
+
+                                amount:
+                                    total,
+
+                                description:
+                                    JSON.stringify(
+                                        selectedItems
+                                    ),
+
+                                created_at:
+                                    new Date()
+                                        .toISOString()
+
+                            });
+
+
+                    if (
+                        loyaltyError
+                    ) {
+
+                        console.error(
+                            "Loyalty transaction save failed:",
+                            loyaltyError
+                        );
+
+                    }
+
+                }
+
+            } catch (
+                loyaltyError
+            ) {
+
+                console.error(
+                    "Loyalty connection failed:",
+                    loyaltyError
+                );
+
             }
 
-
-            /*
-            ==================================
-            SAVE FOR PRINTING
-            ==================================
-            */
-
-            lastOrder = {
-
-                orderNumber:
-                    order.order_number,
-
-                customerName:
-                    customerName,
-
-                customerPhone:
-                    customerPhone,
-
-                paymentMethod:
-                    selectedPayment,
-
-                items:
-                    selectedItems,
-
-                total:
-                    total
-
-            };
-
-
-            prepareReceipt(
-                lastOrder
-            );
-
-
-            message.className =
-                "success";
-
-
-            message.textContent =
-                "Order #" +
-                order.order_number +
-                " sent to counters.";
-
-
-            button.style.display =
-                "none";
-
-
-            printButton.style.display =
-                "block";
-
-
-        } catch (error) {
-
-            console.error(error);
-
-
-            message.className =
-                "error";
-
-
-            message.textContent =
-                "Order failed. Please try again.";
-
-
-            button.disabled =
-                false;
-
-
-            button.textContent =
-                "PLACE ORDER";
-
         }
+
+
+        /*
+        ======================================
+        SAVE FOR PRINTING
+        ======================================
+        */
+
+        lastOrder = {
+
+            orderNumber:
+                order.order_number,
+
+            customerName:
+                customerName,
+
+            customerPhone:
+                customerPhone,
+
+            paymentMethod:
+                selectedPayment,
+
+            items:
+                selectedItems,
+
+            total:
+                total
+
+        };
+
+
+        prepareReceipt(
+            lastOrder
+        );
+
+
+        message.className =
+            "success";
+
+
+        message.textContent =
+            "Order #" +
+            order.order_number +
+            " sent to counters.";
+
+
+        button.style.display =
+            "none";
+
+
+        printButton.style.display =
+            "block";
+
+
+    } catch (error) {
+
+        console.error(
+            error
+        );
+
+
+        message.className =
+            "error";
+
+
+        message.textContent =
+            "Order failed. Please try again.";
+
+
+        button.disabled =
+            false;
+
+
+        button.textContent =
+            "PLACE ORDER";
+
+    }
+
+}
+
+
+/*
+==================================================
+PREPARE RECEIPT
+==================================================
+*/
+
+function prepareReceipt(
+    order
+) {
+
+    document.getElementById(
+        "receiptOrderNumber"
+    ).textContent =
+        order.orderNumber;
+
+
+    const now =
+        new Date();
+
+
+    document.getElementById(
+        "receiptDate"
+    ).textContent =
+        now.toLocaleString();
+
+
+    const customerRow =
+        document.getElementById(
+            "receiptCustomerRow"
+        );
+
+
+    if (
+        order.customerName
+    ) {
+
+        document.getElementById(
+            "receiptCustomer"
+        ).textContent =
+            order.customerName;
+
+
+        customerRow.style.display =
+            "block";
+
+    } else {
+
+        customerRow.style.display =
+            "none";
 
     }
 
 
-    /*
-    ==========================================
-    PREPARE RECEIPT
-    ==========================================
-    */
+    document.getElementById(
+        "receiptPayment"
+    ).textContent =
+        order.paymentMethod ||
+        "Cash";
 
-    function prepareReceipt(order) {
 
+    const receiptItems =
         document.getElementById(
-            "receiptOrderNumber"
-        ).textContent =
-            order.orderNumber;
+            "receiptItems"
+        );
 
 
-        const now =
-            new Date();
+    receiptItems.innerHTML =
+        "";
 
 
-        document.getElementById(
-            "receiptDate"
-        ).textContent =
-            now.toLocaleString();
-
-
-        const customerRow =
-            document.getElementById(
-                "receiptCustomerRow"
-            );
-
-
-        if (order.customerName) {
-
-            document.getElementById(
-                "receiptCustomer"
-            ).textContent =
-                order.customerName;
-
-
-            customerRow.style.display =
-                "block";
-
-        } else {
-
-            customerRow.style.display =
-                "none";
-
-        }
-
-
-        document.getElementById(
-            "receiptPayment"
-        ).textContent =
-            order.paymentMethod ||
-            "Cash";
-
-
-        const receiptItems =
-            document.getElementById(
-                "receiptItems"
-            );
-
-
-        receiptItems.innerHTML =
-            "";
-
-
-        order.items.forEach(item => {
+    order.items.forEach(
+        item => {
 
             const amount =
                 item.price *
@@ -2147,21 +3091,39 @@
 
             row.innerHTML = `
 
-                <div class="receipt-item-line">
+                <div
+                    class="receipt-item-line"
+                >
 
-                    <span class="receipt-item-name">
-                        ${item.name}
+                    <span
+                        class="receipt-item-name"
+                    >
+
+                        ${escapeHtml(
+                            item.name
+                        )}
+
                     </span>
 
-                    <span class="receipt-item-price">
+
+                    <span
+                        class="receipt-item-price"
+                    >
+
                         ₹${amount}
+
                     </span>
 
                 </div>
 
-                <div class="receipt-qty">
+
+                <div
+                    class="receipt-qty"
+                >
+
                     ${item.quantity}
                     × ₹${item.price}
+
                 </div>
 
             `;
@@ -2171,62 +3133,106 @@
                 row
             );
 
-        });
+        }
+    );
 
 
-        document.getElementById(
-            "receiptTotal"
-        ).textContent =
-            order.total;
+    document.getElementById(
+        "receiptTotal"
+    ).textContent =
+        order.total;
+
+}
+
+
+/*
+==================================================
+PRINT
+==================================================
+*/
+
+function printBill() {
+
+    if (!lastOrder) {
+
+        return;
 
     }
 
 
-    /*
-    ==========================================
-    PRINT
-    ==========================================
-    */
-
-    function printBill() {
-
-        if (!lastOrder) {
-            return;
-        }
+    prepareReceipt(
+        lastOrder
+    );
 
 
-        prepareReceipt(
-            lastOrder
-        );
-
-
-        setTimeout(() => {
+    setTimeout(
+        () => {
 
             window.print();
 
-        }, 200);
+        },
+        200
+    );
 
-    }
+}
 
 
-    /*
-    ==========================================
-    AFTER PRINT
-    ==========================================
-    */
+/*
+==================================================
+AFTER PRINT
+==================================================
+*/
 
-    window.onafterprint =
-        function() {
+window.onafterprint =
+    function() {
 
-            setTimeout(() => {
+        setTimeout(
+            () => {
 
                 window.location.reload();
 
-            }, 500);
+            },
+            500
+        );
 
-        };
+    };
+
+
+/*
+==================================================
+STARTUP
+==================================================
+*/
+
+async function initializeBilling() {
+
+    /*
+        Menu comes from billing_menu.
+    */
+
+    await loadBillingMenu();
+
+
+    /*
+        Customer information still comes
+        from loyalty_customers.
+    */
+
+    await loadSavedCustomers();
+
+}
+
+
+/*
+==================================================
+START BILLING PAGE
+==================================================
+*/
+
+initializeBilling();
 
 </script>
 
 </body>
+
 </html>
